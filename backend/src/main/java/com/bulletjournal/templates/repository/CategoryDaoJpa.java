@@ -128,9 +128,19 @@ public class CategoryDaoJpa {
     public CategorySteps getCategorySteps(Long categoryId) {
         CategorySteps categorySteps = new CategorySteps();
         List<Triple<com.bulletjournal.templates.controller.model.Step, Rule, com.bulletjournal.templates.controller.model.Step>> connections = new ArrayList<>();
+        List<Long> allStepIds = new ArrayList<>();
+        allStepIds.add(categoryId);
 
-        List<CategoryRule> categoryRules = categoryRepository.getById(categoryId).getCategoryRules();
-        Queue<Step> bfsQueue = categoryRules.stream().map(com.bulletjournal.templates.repository.model.Rule::getConnectedStep)
+        Category category = categoryRepository.getById(categoryId);
+        List<CategoryRule> categoryRules = category.getCategoryRules();
+        Queue<Step> bfsQueue = categoryRules.stream().map(categoryRule -> {
+            Step nextStep = categoryRule.getConnectedStep();
+            connections.add(Triple.of(category.toPresentationModel().convertToStep(),
+                    categoryRule.toPresentationModel(), nextStep.toPresentationModel()));
+            allStepIds.add(nextStep.getId());
+
+            return nextStep;
+        })
                 .collect(Collectors.toCollection(LinkedList::new));
         int size = bfsQueue.size();
         while (size > 0) {
@@ -144,13 +154,22 @@ public class CategoryDaoJpa {
                 if (stepRules != null && !stepRules.isEmpty()) {
                     stepRules.forEach(stepRule -> {
                         Step nextStep = ruleDaoJpa.getStepRuleById(stepRule.getId()).getConnectedStep();
-                        connections.add(Triple.of(currentStep.toPresentationModel(), stepRule.toPresentationModel(), nextStep.toPresentationModel()));
 
-                        bfsQueue.add(nextStep);
+                        if (nextStep != null) {
+                            connections.add(Triple.of(currentStep.toPresentationModel(), stepRule.toPresentationModel(), nextStep.toPresentationModel()));
+
+                            bfsQueue.add(nextStep);
+                            allStepIds.add(nextStep.getId());
+                        }
                     });
                 } else {
                     Step nextStep = currentStep.getNextStep();
-                    connections.add(Triple.of(currentStep.toPresentationModel(), null, nextStep == null ? null : nextStep.toPresentationModel()));
+                    if (nextStep != null) {
+                        connections.add(Triple.of(currentStep.toPresentationModel(), null, nextStep.toPresentationModel()));
+
+                        bfsQueue.add(nextStep);
+                        allStepIds.add(nextStep.getId());
+                    }
                 }
 
                 size = bfsQueue.size();
@@ -158,6 +177,7 @@ public class CategoryDaoJpa {
         }
 
         categorySteps.setConnections(connections);
+        categorySteps.setStepIds(allStepIds);
 
         return categorySteps;
     }
