@@ -20,10 +20,11 @@ type AdminStepProps = {
     deleteStep: (stepId: number) => void;
     setStepChoices: (id: number, choices: number[]) => void;
     updateStep: (stepId: number, name: string, nextStepId: number | undefined) => void;
+    deleteRule: (ruleId: number, ruleType: string) => void;
 }
 
 const AdminStepPage: React.FC<AdminStepProps> = (
-    {step, getStep, deleteStep, setStepChoices, updateStep}) => {
+    {step, getStep, deleteStep, setStepChoices, updateStep, deleteRule}) => {
     const history = useHistory();
     const {stepId} = useParams();
 
@@ -121,5 +122,5 @@ const mapStateToProps = (state: IState) => ({
 });
 
 export default connect(mapStateToProps, {
-    getStep, deleteStep, setStepChoices, updateStep
+    getStep, deleteStep, setStepChoices, updateStep, deleteRule
 })(AdminStepPage);
