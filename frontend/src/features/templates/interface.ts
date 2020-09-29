@@ -66,6 +66,7 @@ export interface SampleTask {
     metadata: string;
     uid: string;
     steps: Step[];
+    choice?: Choice;
 }
 
 export interface SampleTasks {

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
-import { Role, LockedUser, LockedIP, UserInfo } from './interface';
+import {Role, LockedUser, LockedIP, UserInfo, CategorySteps} from './interface';
 import { User } from '../group/interface';
 
 export type setRoleAction = {
@@ -59,11 +59,20 @@ export type UserInfoPointsAction = {
 
 export type GetLockedUsersAndIPsAction = {};
 
+export type GetCategoryStepsAction = {
+  categoryId: number;
+};
+
+export type CategoryStepsAction = {
+  categorySteps: CategorySteps;
+};
+
 let initialState = {
   usersByRole: [] as User[],
   lockedUsers: [] as LockedUser[],
   lockedIPs: [] as LockedIP[],
   userInfo: {} as UserInfo,
+  categorySteps: undefined as CategorySteps | undefined,
 };
 
 const slice = createSlice({
@@ -106,6 +115,11 @@ const slice = createSlice({
     unlockUserandIP: (state, action: PayloadAction<UnlockUserAndIPAction>) =>
       state,
     lockUserandIP: (state, action: PayloadAction<LockUserAndIPAction>) => state,
+    getCategorySteps: (state, action: PayloadAction<GetCategoryStepsAction>) => state,
+    categoryStepsReceived: (state, action: PayloadAction<CategoryStepsAction>) => {
+      const { categorySteps } = action.payload;
+      state.categorySteps = categorySteps;
+    },
   },
 });
 

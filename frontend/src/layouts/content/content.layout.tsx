@@ -26,6 +26,7 @@ import AdminCategoryPage from "../../pages/admin/category.pages";
 import AdminStepsPage from "../../pages/admin/steps.pages";
 import AdminStepPage from "../../pages/admin/step.pages";
 import SampleTaskPage from "../../pages/admin/sample-task.pages";
+import AdminMetadataPage from "../../pages/admin/admin-metadata.pages";
 
 const { Content } = Layout;
 class ContentLayout extends React.Component {
@@ -60,6 +61,7 @@ class ContentLayout extends React.Component {
           />
           <Route exact path='/admin' component={AdminPage} />
           <Route exact path='/admin/categories' component={AdminCategoriesPage} />
+          <Route exact path='/admin/metadata' component={AdminMetadataPage} />
           <Route exact path='/admin/categories/:categoryId' component={AdminCategoryPage} />
           <Route exact path='/admin/categories/:categoryId/steps' component={AdminStepsPage} />
           <Route exact path='/admin/steps/:stepId' component={AdminStepPage} />

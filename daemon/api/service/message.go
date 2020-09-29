@@ -33,7 +33,7 @@ func (m *MessageService) SendJoinGroupEmail(username, email string, groupId, uid
 	messagesInfo := []mailjet.InfoMessagesV31{
 		{
 			From: &mailjet.RecipientV31{
-				Email: "bulletjournal1024@hotmail.com",
+				Email: "bulletjournal1024@outlook.com",
 				Name:  "Bullet Journal",
 			},
 			To: &mailjet.RecipientsV31{

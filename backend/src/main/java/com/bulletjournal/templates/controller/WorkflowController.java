@@ -3,16 +3,17 @@ package com.bulletjournal.templates.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.UserDaoJpa;
+import com.bulletjournal.templates.controller.model.SampleTask;
+import com.bulletjournal.templates.controller.model.SampleTaskRule;
 import com.bulletjournal.templates.controller.model.*;
 import com.bulletjournal.templates.redis.RedisSampleTasksRepository;
 import com.bulletjournal.templates.repository.*;
 import com.bulletjournal.templates.repository.model.Category;
-import com.bulletjournal.templates.repository.model.CategoryRule;
+import com.bulletjournal.templates.repository.model.Choice;
 import com.bulletjournal.templates.repository.model.Step;
-import com.bulletjournal.templates.repository.model.StepRule;
+import com.bulletjournal.templates.repository.model.*;
 import com.bulletjournal.templates.workflow.engine.RuleEngine;
 import com.bulletjournal.templates.workflow.models.RuleExpression;
-import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
@@ -21,10 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -70,13 +68,18 @@ public class WorkflowController {
     @GetMapping(SUBSCRIBED_CATEGORIES_ROUTE)
     public List<SubscribedCategory> getUserSubscribedCategories() {
         String requester = MDC.get(UserClient.USER_NAME_KEY);
-        List<SubscribedCategory> result = userCategoryDaoJpa.getUserCategoriesByUserName(requester).stream()
-                .map(uc -> new SubscribedCategory(
-                    uc.getCategory().toSimplePresentationModel(),
-                    ImmutableList.of(uc.getMetadataKeyword().getSelection().toPresentationModel()),
-                    uc.getProject().toPresentationModel())
-                ).collect(Collectors.toList());
-        return result;
+        List<UserCategory> userCategoryList = userCategoryDaoJpa.getUserCategoriesByUserName(requester);
+        Map<Category, SubscribedCategory> map = new HashMap<>();
+        userCategoryList.forEach(uc -> {
+            if (!map.containsKey(uc.getCategory())) {
+                map.put(uc.getCategory(), new SubscribedCategory());
+            }
+            SubscribedCategory sc = map.get(uc.getCategory());
+            sc.addProject(uc.getProject().toPresentationModel());
+            sc.addSelection(uc.getMetadataKeyword().getSelection().toPresentationModel());
+            sc.setCategory(uc.getCategory().toSimplePresentationModel());
+        });
+        return new ArrayList<>(map.values());
     }
 
     @GetMapping(NEXT_STEP_ROUTE)
@@ -254,7 +257,14 @@ public class WorkflowController {
     @GetMapping(SAMPLE_TASK_ROUTE)
     public SampleTask getSampleTask(@NotNull @PathVariable Long sampleTaskId) {
         validateRequester();
-        return sampleTaskDaoJpa.findSampleTaskById(sampleTaskId).toPresentationModel();
+        com.bulletjournal.templates.repository.model.SampleTask sampleTask =
+                this.sampleTaskDaoJpa.findSampleTaskById(sampleTaskId);
+        SampleTask result = sampleTask.toPresentationModel();
+        Choice choice = this.sampleTaskDaoJpa.getSampleTaskChoice(sampleTask);
+        if (choice != null) {
+            result.setChoice(choice.toPresentationModel());
+        }
+        return result;
     }
 
     @GetMapping(SAMPLE_TASK_BY_METADATA)
@@ -296,7 +306,7 @@ public class WorkflowController {
     @GetMapping(CATEGORY_STEPS_ROUTE)
     public CategorySteps getCategorySteps(@NotNull @PathVariable Long categoryId) {
         validateRequester();
-        return null;
+        return categoryDaoJpa.getCategorySteps(categoryId);
     }
 
     private void validateRequester() {

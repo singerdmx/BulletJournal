@@ -1,14 +1,20 @@
-package main
+package investment
 
 import (
-	"fmt"
-	"time"
 	"encoding/json"
+	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/pkg/errors"
-	"github.com/go-resty/resty/v2"
+
+	persistence "github.com/singerdmx/BulletJournal/daemon/persistence"
 )
+
+type DividendsClient struct {
+	BaseTemplateClient
+	data *DividendsData
+}
 
 type DividendsData struct {
 	Dividends []Dividends `json:"dividends"`
@@ -33,9 +39,15 @@ type Dividends struct {
 	Updated        int    `json:"updated"`
 }
 
-func fetchDivideneds() (*DividendsData, error) {
-	client := resty.New()
-	year, month, _:= time.Now().Date()
+func NewDividendsClient() (*TemplateClient, error) {
+	c := DividendsClient{
+		BaseTemplateClient: NewBaseTemplateClient(),
+	}
+	return &TemplateClient{&c}, nil
+}
+
+func (c *DividendsClient) FetchData() error {
+	year, month, _ := time.Now().Date()
 
 	var datefrom string
 	var dateto string
@@ -54,42 +66,47 @@ func fetchDivideneds() (*DividendsData, error) {
 	switch judge {
 	case 2:
 		dateto = datebase + "-28"
-	case 4, 6, 9 , 11:
-		dateto = datebase + "-30" 
+	case 4, 6, 9, 11:
+		dateto = datebase + "-30"
 	default:
 		dateto = datebase + "-31"
 	}
 
 	url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/dividends?tpagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", datefrom, dateto)
-	resp, err := client.R().
-	Get(url)
+	resp, err := c.restClient.R().
+		Get(url)
 
 	if err != nil {
-		return nil, errors.Wrap(err, "sending request failed!")
+		return errors.Wrap(err, "Dividends client sending request failed!")
 	}
 
 	var data DividendsData
 
 	if err := json.Unmarshal(resp.Body(), &data); err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("Unmarshal earnings response failed: %s", string(resp.Body())))
+		return errors.Wrap(err, fmt.Sprintf("Unmarshal earnings response failed: %s", string(resp.Body())))
 	}
-
-	for i:= range(data) {
-		target := data[i]
+	c.data = &data
+	return nil
+}
+func(c *DividendsClient) SendData() error{
+	if c.data == nil {
+		return errors.New("Empty Dividends data, please fetch data first.")
+	}
+	for i := range c.data.Dividends {
+		target := c.data.Dividends[i]
 		item := persistence.SampleTask{
-			CreatedAt: time.Now,
-			UpdatedAt: time.Now,
-			MetaData: "INVESTMENT_DIVIDENDS_RECORD",
-			Content: "",
-			Name: target.Name,
-			Uid: target.ID,
-			AvailableBefore: target.Date,
+			CreatedAt:          time.Now(),
+			UpdatedAt:          time.Now(),
+			MetaData:           "INVESTMENT_DIVIDENDS_RECORD",
+			Content:            "",
+			Name:               target.Name,
+			Uid:                target.ID,
+			AvailableBefore:    target.Date, //TODO
 			ReminderBeforeTask: 0,
-			DueDate: "",			
-			DueTime: ""
+			DueDate:            "",
+			DueTime:            "",
 		}
-		sampleTaskDao.Upsert(&item)
+		c.sampleDao.Upsert(&item)
 	}
-
-	return &data, nil
+	return nil
 }

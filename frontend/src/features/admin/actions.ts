@@ -26,3 +26,5 @@ export const lockUserandIP = (name: string, ip: string, reason: string) =>
 
 export const getUserInfo = (username: string) =>
   actions.getUserInfo({ username: username });
+
+export const getCategorySteps = (categoryId: number) => actions.getCategorySteps({categoryId: categoryId});

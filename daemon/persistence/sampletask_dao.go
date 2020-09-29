@@ -3,7 +3,7 @@ package persistence
 import (
 	"fmt"
 	"context"
-
+	"github.com/pkg/errors"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
 )
 
@@ -13,32 +13,15 @@ type SampleTaskDao struct {
 	log *logging.Logger
 }
 
-var sampleTaskDao *SampleTaskDao
-
-func (s *SampleTaskDao) SetLogger() {
-	s.log = logging.GetLogger()
-}
-
-func (s *SampleTaskDao) SetClient() {
-	s.pgc =	GetPostgresClient()
-}
-
-func (s *SampleTaskDao) NewSampleTaskDao() {
-	if s.log == nil {
-		s.SetLogger()
+func NewSampleTaskDao() (*SampleTaskDao, error) {
+	pgc := GetPostgresClient()
+	if pgc == nil {
+		return nil, errors.New("Sample Task DAO get PSQL client failed")
 	}
-
-	if s.pgc == nil {
-		s.SetClient()
-	}
-}
-
-func GetSampleTaskDao() *SampleTaskDao {
-	if sampleTaskDao == nil || sampleTaskDao.log == nil {
-		sampleTaskDao.NewSampleTaskDao()
-	}
-
-	return sampleTaskDao
+	return &SampleTaskDao{
+		log: logging.GetLogger(),
+		pgc: pgc,
+	}, nil
 }
 
 func (s *SampleTaskDao) Upsert(sampleTask *SampleTask) {
@@ -59,19 +42,19 @@ func (s *SampleTaskDao) Upsert(sampleTask *SampleTask) {
 	) ON CONFLICT (uid) DO UPDATE
 		SET updated_at = %v,
 		available_before = %v
-	`, 
-	t.CreatedAt, 
-	t.UpdatedAt, 
-	t.MetaData, 
-	t.Content, 
-	t.Name, 
-	t.Uid, 
-	t.AvailableBefore,
-	t.ReminderBeforeTask,
-	t.DueDate,
-	t.DueTime,
-	t.UpdatedAt,
-	t.AvailableBefore,
+	`,
+		t.CreatedAt,
+		t.UpdatedAt,
+		t.MetaData,
+		t.Content,
+		t.Name,
+		t.Uid,
+		t.AvailableBefore,
+		t.ReminderBeforeTask,
+		t.DueDate,
+		t.DueTime,
+		t.UpdatedAt,
+		t.AvailableBefore,
 	)
 
 	s.pgc.GetClient().Exec(query)

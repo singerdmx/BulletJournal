@@ -3,6 +3,8 @@ package com.bulletjournal.templates.repository;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.templates.controller.model.CreateSampleTaskParams;
 import com.bulletjournal.templates.controller.model.UpdateSampleTaskParams;
+import com.bulletjournal.templates.repository.model.Choice;
+import com.bulletjournal.templates.repository.model.ChoiceMetadataKeyword;
 import com.bulletjournal.templates.repository.model.SampleTask;
 import org.apache.http.util.TextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,9 @@ public class SampleTaskDaoJpa {
 
     @Autowired
     private SampleTaskRepository sampleTaskRepository;
+
+    @Autowired
+    private ChoiceMetadataKeywordRepository choiceMetadataKeywordRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SampleTask createSampleTask(CreateSampleTaskParams createSampleTaskParams) {
@@ -36,6 +41,26 @@ public class SampleTaskDaoJpa {
             throw new ResourceNotFoundException("sample task id: " + sampleTaskId + " does not exist");
         }
         return sampleTask;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public Choice getSampleTaskChoice(SampleTask sampleTask) {
+        if (!sampleTask.isPending()) {
+            return null;
+        }
+        List<ChoiceMetadataKeyword> keywords = this.choiceMetadataKeywordRepository.findAll();
+        int maxLen = 0;
+        ChoiceMetadataKeyword keyword = null;
+        for (ChoiceMetadataKeyword candidate : keywords) {
+            if (candidate.getKeyword().length() > maxLen && sampleTask.getMetadata().contains(candidate.getKeyword())) {
+                maxLen = candidate.getKeyword().length();
+                keyword = candidate;
+            }
+        }
+        if (keyword == null) {
+            return null;
+        }
+        return keyword.getChoice();
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

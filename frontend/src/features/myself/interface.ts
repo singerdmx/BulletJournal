@@ -4,5 +4,5 @@ import {Project} from "../project/interface";
 export interface SubscribedCategory {
     category: Category;
     selections: Selection[];
-    project: Project
+    projects: Project[];
 }
