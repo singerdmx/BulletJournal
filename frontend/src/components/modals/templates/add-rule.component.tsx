@@ -27,7 +27,10 @@ const AddRule: React.FC<AddRuleProps> = (props) => {
             return;
         }
         const logicalOp = values.logicOperator ? values.logicOperator : 'AND';
-        createRule(values.name, values.priority, values.connectedStepId, JSON.stringify(ruleExpression),
+        createRule(values.name, values.priority, values.connectedStepId, JSON.stringify(
+            {rule: ruleExpression, logicOperator: logicalOp})
+                .replace('"AND"', 'AND')
+                .replace('"OR"', 'OR'),
             category ? category.id : undefined, step ? step.id : undefined);
         setVisible(false);
     };
@@ -42,7 +45,7 @@ const AddRule: React.FC<AddRuleProps> = (props) => {
 
     const addCondition = () => {
         if (selectionIds && /^[0-9,]*$/.test(selectionIds)) {
-            ruleExpression.push({'condition': condition, 'selectionIds': selectionIds});
+            ruleExpression.push({'condition': condition, 'selectionIds': selectionIds.split(',').map(s => parseInt(s)) });
             setRuleExpression(ruleExpression);
             console.log(ruleExpression);
             setSelectionIds('');
