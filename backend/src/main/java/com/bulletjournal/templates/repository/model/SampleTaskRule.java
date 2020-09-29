@@ -26,9 +26,6 @@ public class SampleTaskRule implements Serializable {
     @Column(name = "task_ids", nullable = false)
     private String taskIds;
 
-    @Transient
-    private Long stepId;
-
     public SampleTaskRule() {
     }
 
@@ -38,17 +35,14 @@ public class SampleTaskRule implements Serializable {
         this.taskIds = taskIds;
     }
 
-    public SampleTaskRule(String taskIds, Long stepId, String selectionCombo) {
-        this.stepId = stepId;
-        this.selectionCombo = selectionCombo;
-        this.taskIds = taskIds;
-    }
-
     public String getTaskIds() {
         return taskIds;
     }
 
     public void setTaskIds(String taskIds) {
+        if (StringUtils.isNotBlank(taskIds)) {
+            taskIds = StringUtils.join(StringUtil.convertNumArray(taskIds), ",");
+        }
         this.taskIds = taskIds;
     }
 
