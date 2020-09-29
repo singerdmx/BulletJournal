@@ -105,6 +105,7 @@ func(c *DividendsClient) SendData() error{
 			ReminderBeforeTask: 0,
 			DueDate:            "",
 			DueTime:            "",
+			Pending:            true,
 		}
 		c.sampleDao.Upsert(&item)
 	}

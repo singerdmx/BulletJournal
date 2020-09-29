@@ -30,11 +30,11 @@ public class Step {
         this.rules = rules;
     }
 
-    public List<Rule> getStepRules() {
+    public List<Rule> getRules() {
         return rules;
     }
 
-    public void setStepRules(List<Rule> rules) {
+    public void setRules(List<Rule> rules) {
         this.rules = rules;
     }
 

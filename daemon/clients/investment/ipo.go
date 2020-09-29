@@ -109,6 +109,7 @@ func (c *IPOClient) SendData() error {
 			ReminderBeforeTask: 0,
 			DueDate: target.PricingDate,			
 			DueTime: "",
+			Pending: true,
 		}
 		c.sampleDao.Upsert(&item)
 	}

@@ -12,7 +12,11 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Repository
 public class SampleTaskDaoJpa {
@@ -64,8 +68,11 @@ public class SampleTaskDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<SampleTask> findAllById(Iterable<Long> ids) {
-        return sampleTaskRepository.findAllById(ids);
+    public List<SampleTask> findAllById(Collection<Long> ids) {
+        if (ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return this.sampleTaskRepository.findAllById(ids).stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -93,5 +100,10 @@ public class SampleTaskDaoJpa {
             throw new ResourceNotFoundException("sampleTask id " + sampleTaskId + " not exit");
         }
         sampleTaskRepository.deleteById(sampleTaskId);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public SampleTask save(SampleTask sampleTask) {
+        return this.sampleTaskRepository.save(sampleTask);
     }
 }
