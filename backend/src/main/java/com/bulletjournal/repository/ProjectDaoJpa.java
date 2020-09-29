@@ -13,6 +13,7 @@ import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.SampleProjectsCreation;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.Project;
+import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.models.*;
@@ -51,6 +52,8 @@ public class ProjectDaoJpa {
     private ProjectNotesRepository projectNotesRepository;
     @Autowired
     private ProjectTasksRepository projectTasksRepository;
+    @Autowired
+    private TaskRepository taskRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Projects getProjects(String owner) {
@@ -192,6 +195,16 @@ public class ProjectDaoJpa {
         Project todoProject = this.create(sampleTodoProjectParams, sampleProjectsCreation.getUsername(), new ArrayList<>());
         LOGGER.info("Sample todo list project {} created for user {}", todoProject.getId(),
                 sampleProjectsCreation.getUsername());
+
+        CreateTaskParams sampleTaskParams = new CreateTaskParams(sampleProjectsCreation.getUsername(), null, null, null, null, null, "America/Los_Angeles", null);
+        for(int i = 0; i < 3; i++){
+            Task sampleTask = TaskDaoJpa.generateTask(sampleProjectsCreation.getUsername(), todoProject, sampleTaskParams);
+            this.taskRepository.save(sampleTask);
+            LOGGER.info("Sample task {} added into todo list project {} created for user {}",
+                    sampleTask.getId(),
+                    todoProject.getId(),
+                    sampleProjectsCreation.getUsername());
+        }
 
         CreateProjectParams sampleNoteProjectParams =
                 new CreateProjectParams("Notes", ProjectType.NOTE,
