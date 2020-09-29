@@ -511,7 +511,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return result;
     }
 
-    private Task generateTask(String owner, Project project, CreateTaskParams createTaskParams) {
+    public static Task generateTask(String owner, Project project, CreateTaskParams createTaskParams) {
         createTaskParams.selfClean();
 
         Task task = new Task();
@@ -572,7 +572,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return this.taskRepository.findTaskByGoogleCalendarEventId(eventId);
     }
 
-    private ReminderSetting getReminderSetting(String dueDate, Task task, String time, String timezone,
+    private static ReminderSetting getReminderSetting(String dueDate, Task task, String time, String timezone,
                                                String recurrenceRule, ReminderSetting reminderSetting) {
         if (dueDate != null) {
             task.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(dueDate, time, timezone).toInstant()));
