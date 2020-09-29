@@ -60,7 +60,7 @@ const AdminStepsPage: React.FC<AdminStepsProps> = (
         </div>
         <Divider/>
         <div>
-            {steps.map((s) => {
+            {steps.filter(step => !categorySteps!.stepIds.includes(step.id)).map((s) => {
                 return (
                     <div>
                         <span style={{cursor: 'pointer', padding: '5px'}}

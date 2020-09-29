@@ -39,4 +39,5 @@ interface Connection {
 
 export interface CategorySteps {
   connections: Connection[];
+  stepIds: number[];
 }
