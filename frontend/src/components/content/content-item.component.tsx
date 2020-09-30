@@ -13,6 +13,9 @@ import {patchTransactionRevisionContents} from "../../features/transactions/acti
 import {patchTaskRevisionContents} from "../../features/tasks/actions";
 import {patchNoteRevisionContents} from "../../features/notes/actions";
 import {ContentType} from "../../features/myBuJo/constants";
+import 'react-quill/dist/quill.core.css';
+import 'react-quill/dist/quill.bubble.css';
+import 'react-quill/dist/quill.snow.css';
 
 const Delta = Quill.import('delta');
 
@@ -151,12 +154,16 @@ const ContentItem: React.FC<ContentProps> = ({
 
   return (
     <div className="content-item-page-contianer">
-      <div
-        className="content-item-page"
-        dangerouslySetInnerHTML={{
-          __html: contentHtml ? contentHtml : '<p></p>',
-        }}
-      />
+      <div className="ql-container ql-snow" style={{position: 'relative', borderWidth: '0', width: '100%'}}>
+        <div className="ql-editor" data-gramm="false" contentEditable="true">
+          <div
+            className="content-item-page"
+            dangerouslySetInnerHTML={{
+              __html: contentHtml ? contentHtml : '<p></p>',
+            }}
+          />
+        </div>
+      </div>
 
       <ContentEditorDrawer
         delta={delta}
