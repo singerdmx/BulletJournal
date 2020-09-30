@@ -7,6 +7,7 @@ import com.bulletjournal.templates.controller.model.RemoveUserCategoryParams;
 import com.bulletjournal.templates.repository.SelectionMetadataKeywordDaoJpa;
 import com.bulletjournal.templates.repository.UserCategoryDaoJpa;
 import com.bulletjournal.templates.repository.model.Category;
+import com.bulletjournal.templates.repository.model.UserCategoryKey;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,7 +33,7 @@ public class UserCategoryController {
   private SelectionMetadataKeywordDaoJpa selectionMetadataKeywordDaoJpa;
 
   @PostMapping(REMOVE_USER_CATEGORY_ROUTE)
-  public Category removeUserCategory(
+  public UserCategoryKey removeUserCategory(
       @Valid @RequestBody RemoveUserCategoryParams removeUserCategoryParams) {
     String username = MDC.get(UserClient.USER_NAME_KEY);
     return this.userCategoryDaoJpa.removeUserCategories(username, removeUserCategoryParams);

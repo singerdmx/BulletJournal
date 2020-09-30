@@ -113,7 +113,7 @@ public class UserCategoryDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Category removeUserCategories(
+    public UserCategoryKey removeUserCategories(
             String requester,
             RemoveUserCategoryParams removeUserCategoryParams) {
         Long categoryId = removeUserCategoryParams.getCategoryId();
@@ -135,6 +135,6 @@ public class UserCategoryDaoJpa {
                 .orElseThrow(() -> new ResourceNotFoundException("UserCategory not found"));
 
         this.userCategoryRepository.delete(userCategory);
-        return category;
+        return userCategoryKey;
     }
 }
