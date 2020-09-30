@@ -1,23 +1,49 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import './punch-card.styles.less';
-import {Empty} from "antd";
+import {Avatar, Empty, Select, Tooltip} from "antd";
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {getSubscribedCategories} from "../../features/myself/actions";
+import {getSubscribedCategories, unsubscribedCategory} from "../../features/myself/actions";
 import {SubscribedCategory} from "../../features/myself/interface";
 import {renderCategory} from "../templates/categories.page";
 import '../templates/category.styles.less';
+import {Project, ProjectsWithOwner} from "../../features/project/interface";
+import {flattenOwnedProject, flattenSharedProject} from "../projects/projects.pages";
+import {ProjectType} from "../../features/project/constants";
+import {CloseCircleTwoTone} from "@ant-design/icons";
+import {iconMapper} from "../../components/side-menu/side-menu.component";
+
+const {Option} = Select;
 
 type TemplateSubscriptionsProps = {
+    ownedProjects: Project[];
+    sharedProjects: ProjectsWithOwner[];
     subscribedCategories: SubscribedCategory[];
     getSubscribedCategories: () => void;
+    unsubscribedCategory: (categoryId: number, selectionId: number) => void;
 };
 
 const TemplateSubscriptions: React.FC<TemplateSubscriptionsProps> = (
     {
         subscribedCategories,
-        getSubscribedCategories
+        ownedProjects,
+        sharedProjects,
+        getSubscribedCategories,
+        unsubscribedCategory
     }) => {
+
+    const [projects, setProjects] = useState<Project[]>([]);
+
+    useEffect(() => {
+        setProjects([]);
+        setProjects(flattenOwnedProject(ownedProjects, projects));
+        setProjects(flattenSharedProject(sharedProjects, projects));
+        setProjects(
+            projects.filter((p) => {
+                return p.projectType === ProjectType.TODO && !p.shared;
+            })
+        );
+    }, [ownedProjects, sharedProjects]);
 
     useEffect(() => {
         getSubscribedCategories();
@@ -29,14 +55,52 @@ const TemplateSubscriptions: React.FC<TemplateSubscriptionsProps> = (
         </div>
     }
 
+    const unsubscribedUserCategory = (categoryId: number, selectionId: number) => {
+        unsubscribedCategory(categoryId, selectionId);
+    }
+
     return (
         <div className='categories-info'>
             {subscribedCategories.map(subscribedCategory => {
                 return <div>
                     {renderCategory(subscribedCategory.category, undefined)}
                     <div className='selections-card'>
-                        {subscribedCategory.selections.map(s => {
-                            return <div>{s.text}</div>
+                        {subscribedCategory.selections.map((s, index) => {
+                            const projectId = subscribedCategory.projects[index].id;
+                            return <div className='selection-card'>
+                                <div>
+                                    <span className='selection-text'>{s.text}</span>{' '}
+                                    <Tooltip title='Unsubscribe'>
+                                        <CloseCircleTwoTone onClick={() => unsubscribedUserCategory(
+                                            subscribedCategory.category.id, s.id)}/>
+                                    </Tooltip>
+                                </div>
+                                <div>
+                                    <Select
+                                        style={{padding: '3px', minWidth: '40%'}}
+                                        placeholder="Choose BuJo"
+                                        value={projectId}
+                                    >
+                                        {projects.map((project) => {
+                                            return (
+                                                <Option value={project.id} key={project.id}>
+                                                    <Tooltip
+                                                        title={`${project.name} (Group ${project.group.name})`}
+                                                        placement="right"
+                                                    >
+                                                        <span>
+                                                          <Avatar size="small" src={project.owner.avatar}/>
+                                                            &nbsp; {iconMapper[project.projectType]}
+                                                            &nbsp; <strong>{project.name}</strong>
+                                                            &nbsp; (Group <strong>{project.group.name}</strong>)
+                                                        </span>
+                                                    </Tooltip>
+                                                </Option>
+                                            );
+                                        })}
+                                    </Select>
+                                </div>
+                            </div>
                         })}
                     </div>
                 </div>
@@ -46,7 +110,12 @@ const TemplateSubscriptions: React.FC<TemplateSubscriptionsProps> = (
 };
 
 const mapStateToProps = (state: IState) => ({
-    subscribedCategories: state.myself.subscribedCategories
+    subscribedCategories: state.myself.subscribedCategories,
+    ownedProjects: state.project.owned,
+    sharedProjects: state.project.shared,
 });
 
-export default connect(mapStateToProps, {getSubscribedCategories})(TemplateSubscriptions);
+export default connect(mapStateToProps, {
+    getSubscribedCategories,
+    unsubscribedCategory
+})(TemplateSubscriptions);

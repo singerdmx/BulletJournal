@@ -7,15 +7,11 @@ import com.bulletjournal.hierarchy.CategoryRelationsProcessor;
 import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.repository.UserDaoJpa;
-import com.bulletjournal.templates.controller.model.Category;
-import com.bulletjournal.templates.controller.model.CreateCategoryParams;
-import com.bulletjournal.templates.controller.model.CategoryUnsubscribeParams;
-import com.bulletjournal.templates.controller.model.UpdateCategoryParams;
+import com.bulletjournal.templates.controller.model.*;
 import com.bulletjournal.templates.repository.CategoriesHierarchyDaoJpa;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
 import com.bulletjournal.templates.repository.UserCategoryDaoJpa;
 import com.bulletjournal.templates.repository.model.CategoriesHierarchy;
-import com.bulletjournal.templates.repository.model.UserCategoryKey;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +45,9 @@ public class CategoryController {
 
     @Autowired
     private UserCategoryDaoJpa userCategoryDaoJpa;
+
+    @Autowired
+    private WorkflowController workflowController;
 
     @Autowired
     public CategoryController(
@@ -140,11 +139,12 @@ public class CategoryController {
     }
 
     @PostMapping(CATEGORY_UNSUBSCRIBE_ROUTE)
-    public UserCategoryKey categoryUnsubscribe(
+    public List<SubscribedCategory> unsubscribeCategory(
             @NotNull @PathVariable Long categoryId,
             @Valid @RequestBody CategoryUnsubscribeParams categoryUnsubscribeParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.userCategoryDaoJpa.removeUserCategory(username, categoryId, categoryUnsubscribeParams);
+        this.userCategoryDaoJpa.removeUserCategory(username, categoryId, categoryUnsubscribeParams);
+        return this.workflowController.getUserSubscribedCategories();
     }
 
     @PutMapping(CATEGORY_SET_CHOICES_ROUTE)

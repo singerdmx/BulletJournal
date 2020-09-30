@@ -8,7 +8,7 @@ import {
     ThemeUpdate,
     UpdateExpandedMyself,
     ClearMyself,
-    FetchUserPointActivities, SubscribedCategories, GetSubscribedCategories
+    FetchUserPointActivities, SubscribedCategories, GetSubscribedCategories, UnsubscribedCategory
 } from './reducer';
 import { IState } from '../../store';
 import { actions as settingsActions } from '../../components/settings/reducer';
@@ -25,6 +25,7 @@ import {expandedMyselfLoading, reloadReceived} from './actions';
 import {UserPointActivity} from "../../pages/points/interface";
 import {getUserSubscribedCategories} from "../../apis/templates/workflowApis";
 import {SubscribedCategory} from "./interface";
+import {removeUserCategory} from "../../apis/templates/categoryApis";
 
 function* myselfApiErrorAction(action: PayloadAction<MyselfApiErrorAction>) {
   yield call(message.error, `Myself Error Received: ${action.payload.error}`);
@@ -200,6 +201,24 @@ function* getSubscribedCategories(action: PayloadAction<GetSubscribedCategories>
     }
 }
 
+function* unsubscribedCategory(action: PayloadAction<UnsubscribedCategory>) {
+    try {
+        const { categoryId, selectionId } = action.payload;
+        const data : SubscribedCategory[] = yield call(removeUserCategory, categoryId, selectionId);
+        yield put(
+            myselfActions.subscribedCategoriesReceived( {
+                subscribedCategories: data
+            })
+        );
+    } catch (error) {
+        if (error.message === 'reload') {
+            yield put(reloadReceived(true));
+        } else {
+            yield call(message.error, `unsubscribedCategory Error Received: ${error}`);
+        }
+    }
+}
+
 export default function* myselfSagas() {
   yield all([
     yield takeLatest(
@@ -216,6 +235,7 @@ export default function* myselfSagas() {
     yield takeLatest(myselfActions.themeUpdate.type, updateTheme),
     yield takeLatest(myselfActions.getUserPointActivities.type, fetchUserPointActivities),
     yield takeLatest(myselfActions.getSubscribedCategories.type, getSubscribedCategories),
+    yield takeLatest(myselfActions.unsubscribedCategory.type, unsubscribedCategory),
   ]);
 }
 

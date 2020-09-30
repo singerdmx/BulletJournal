@@ -46,6 +46,11 @@ export type FetchUserPointActivities = {};
 
 export type GetSubscribedCategories = {};
 
+export type UnsubscribedCategory = {
+  categoryId: number;
+  selectionId: number;
+};
+
 export type UserPointActivities = {
    userPointActivities: UserPointActivity[];
 };
@@ -129,6 +134,7 @@ const slice = createSlice({
       state.subscribedCategories = subscribedCategories;
     },
     getSubscribedCategories: (state, action: PayloadAction<GetSubscribedCategories>) => state,
+    unsubscribedCategory: (state, action: PayloadAction<UnsubscribedCategory>) => state,
   },
 });
 
