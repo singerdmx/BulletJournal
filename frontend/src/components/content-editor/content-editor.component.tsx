@@ -4,6 +4,8 @@ import { Button, message } from 'antd';
 import { connect } from 'react-redux';
 import ReactQuill from 'react-quill';
 import Quill, {DeltaStatic} from 'quill';
+import 'react-quill/dist/quill.core.css';
+import 'react-quill/dist/quill.bubble.css';
 import 'react-quill/dist/quill.snow.css';
 import { modules, formats } from './content-editor-toolbar';
 import {
