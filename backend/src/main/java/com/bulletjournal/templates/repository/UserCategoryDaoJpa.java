@@ -7,7 +7,7 @@ import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.templates.repository.model.SelectionMetadataKeyword;
 import com.bulletjournal.templates.repository.model.Category;
-import com.bulletjournal.templates.controller.model.RemoveUserCategoryParams;
+import com.bulletjournal.templates.controller.model.CategoryUnsubscribeParams;
 import com.bulletjournal.templates.repository.model.UserCategory;
 import com.bulletjournal.templates.repository.model.UserCategoryKey;
 import com.google.common.collect.ImmutableList;
@@ -107,11 +107,11 @@ public class UserCategoryDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public UserCategoryKey removeUserCategories(
+    public UserCategoryKey removeUserCategory(
             String requester,
-            RemoveUserCategoryParams removeUserCategoryParams) {
-        Long categoryId = removeUserCategoryParams.getCategoryId();
-        Long selectionId = removeUserCategoryParams.getSelectionId();
+            Long categoryId,
+            CategoryUnsubscribeParams categoryUnsubscribeParams) {
+        Long selectionId = categoryUnsubscribeParams.getSelectionId();
         Category category = this.categoryRepository.getById(categoryId);
         if (category == null) {
             throw new ResourceNotFoundException("Category with id " + categoryId + " doesn't exist");
