@@ -1,9 +1,6 @@
 package com.bulletjournal.templates.repository;
 
-import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
-import com.bulletjournal.exceptions.UnAuthorizedException;
-import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.ProjectRepository;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.Project;
@@ -16,15 +13,12 @@ import com.bulletjournal.templates.repository.model.UserCategoryKey;
 import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 

@@ -6,7 +6,6 @@ import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.templates.controller.model.RemoveUserCategoryParams;
 import com.bulletjournal.templates.repository.SelectionMetadataKeywordDaoJpa;
 import com.bulletjournal.templates.repository.UserCategoryDaoJpa;
-import com.bulletjournal.templates.repository.model.Category;
 import com.bulletjournal.templates.repository.model.UserCategoryKey;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;

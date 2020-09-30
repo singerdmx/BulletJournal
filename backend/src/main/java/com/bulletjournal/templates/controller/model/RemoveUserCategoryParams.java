@@ -2,7 +2,6 @@ package com.bulletjournal.templates.controller.model;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 public class RemoveUserCategoryParams {
   @NotNull
@@ -11,7 +10,8 @@ public class RemoveUserCategoryParams {
   @NotBlank
   private Long selectionId;
 
-  public RemoveUserCategoryParams() {}
+  public RemoveUserCategoryParams() {
+  }
 
   public RemoveUserCategoryParams(Long categoryId, Long selectionId) {
     this.categoryId = categoryId;
