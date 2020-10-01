@@ -39,9 +39,6 @@ public class UserCategoryDaoJpa {
     private SelectionMetadataKeywordDaoJpa selectionMetadataKeywordDaoJpa;
 
     @Autowired
-    private SelectionMetadataKeywordRepository selectionMetadataKeywordRepository;
-
-    @Autowired
     private UserDaoJpa userDaoJpa;
 
     @Autowired
@@ -137,7 +134,8 @@ public class UserCategoryDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<User> getSubscribedUsersByMetadataKeyword(List<String> keywords) {
-        return this.userCategoryRepository.findByKeywordIn(keywords)
-                .stream().map(UserCategory::getUser).collect(Collectors.toList());
+//        return this.userCategoryRepository.findByKeywordIn(keywords)
+//                .stream().map(UserCategory::getUser).collect(Collectors.toList());
+        return null;
     }
 }

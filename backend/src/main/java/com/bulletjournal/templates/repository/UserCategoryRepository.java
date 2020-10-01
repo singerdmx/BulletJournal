@@ -14,5 +14,5 @@ public interface UserCategoryRepository extends JpaRepository<UserCategory, User
     List<UserCategory> getAllByUser(User user);
 
     //TODO: use native query
-    List<UserCategory> findByKeywordIn(List<String> keywords);
+//    List<UserCategory> findByKeywordIn(List<String> keywords);
 }
