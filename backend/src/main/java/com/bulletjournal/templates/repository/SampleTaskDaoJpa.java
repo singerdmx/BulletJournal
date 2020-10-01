@@ -1,6 +1,7 @@
 package com.bulletjournal.templates.repository;
 
 import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.repository.models.User;
 import com.bulletjournal.templates.controller.model.AuditSampleTaskParams;
 import com.bulletjournal.templates.controller.model.CreateSampleTaskParams;
 import com.bulletjournal.templates.controller.model.UpdateSampleTaskParams;
@@ -125,7 +126,7 @@ public class SampleTaskDaoJpa {
         List<SelectionMetadataKeyword> keywords =
                 this.selectionMetadataKeywordDaoJpa.getKeywordsBySelections(auditSampleTaskParams.getSelections());
         for (SelectionMetadataKeyword keyword : keywords) {
-            sampleTask.setMetadata(sampleTask.getMetadata() + "," + keyword);
+            sampleTask.setMetadata(sampleTask.getMetadata() + "," + keyword.getKeyword());
         }
         this.save(sampleTask);
 
@@ -134,7 +135,8 @@ public class SampleTaskDaoJpa {
         this.sampleTaskRuleDaoJpa.updateSampleTaskRule(sampleTask, auditSampleTaskParams.getSelections());
 
         // convert to task and send to subscribed users
-//        this.userCategoryDaoJpa.getSubscribedUsersByMetadataKeyword();
+        List<User> users = this.userCategoryDaoJpa.getSubscribedUsersByMetadataKeyword(
+                keywords.stream().map(SelectionMetadataKeyword::getKeyword).collect(Collectors.toList()));
         return sampleTask;
     }
 }

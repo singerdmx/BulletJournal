@@ -12,4 +12,7 @@ import java.util.List;
 public interface UserCategoryRepository extends JpaRepository<UserCategory, UserCategoryKey> {
 
     List<UserCategory> getAllByUser(User user);
+
+    //TODO: use native query
+    List<UserCategory> findByKeywordIn(List<String> keywords);
 }
