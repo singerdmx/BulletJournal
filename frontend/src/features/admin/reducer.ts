@@ -67,6 +67,12 @@ export type CategoryStepsAction = {
   categorySteps: CategorySteps;
 };
 
+export type ApproveSampleTaskAction = {
+  sampleTaskId: number;
+  choiceId: number;
+  selections: number[];
+};
+
 let initialState = {
   usersByRole: [] as User[],
   lockedUsers: [] as LockedUser[],
@@ -120,6 +126,7 @@ const slice = createSlice({
       const { categorySteps } = action.payload;
       state.categorySteps = categorySteps;
     },
+    approveSampleTask: (state, action: PayloadAction<ApproveSampleTaskAction>) => state,
   },
 });
 

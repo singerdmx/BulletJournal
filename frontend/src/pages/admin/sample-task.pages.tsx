@@ -8,19 +8,21 @@ import {SampleTask} from "../../features/templates/interface";
 import {useHistory, useParams} from "react-router-dom";
 import {CloseSquareTwoTone, DeleteFilled, DownloadOutlined} from "@ant-design/icons";
 import {Divider} from "antd/es";
+import {approveSampleTask} from "../../features/admin/actions";
 const {Title, Text} = Typography;
 const {Option} = Select;
 
 type SampleTaskProps = {
     sampleTask: undefined | SampleTask;
     getSampleTask: (sampleTaskId: number) => void;
+    approveSampleTask: (sampleTaskId: number, choiceId: number, selections: number[]) => void;
     removeSampleTask: (sampleTaskId: number) => void;
     updateSampleTask: (sampleTaskId: number, name: string, uid: string, content: string, metadata: string) => void;
 };
 
 const SampleTaskPage: React.FC<SampleTaskProps> = (
     {
-        sampleTask, getSampleTask, removeSampleTask, updateSampleTask
+        sampleTask, getSampleTask, removeSampleTask, updateSampleTask, approveSampleTask
     }
 ) => {
     const {sampleTaskId} = useParams();
@@ -73,12 +75,14 @@ const SampleTaskPage: React.FC<SampleTaskProps> = (
         setSelections(input);
     }
 
-    const onConfirm = () => {
+    const onConfirm = (choiceId: number) => {
         console.log(selections);
         if (selections.length === 0) {
             message.error('No selection');
             return;
         }
+
+        approveSampleTask(sampleTask.id,choiceId, selections);
     }
 
     const choice = sampleTask.choice;
@@ -108,7 +112,7 @@ const SampleTaskPage: React.FC<SampleTaskProps> = (
                         })}
                     </Select>
                     {' '}
-                    <Button type="primary" shape="round" icon={<DownloadOutlined />} onClick={onConfirm}>
+                    <Button type="primary" shape="round" icon={<DownloadOutlined />} onClick={() => onConfirm(choice.id)}>
                         Confirm
                     </Button>
                 </div>}
@@ -125,5 +129,6 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
     getSampleTask,
     removeSampleTask,
-    updateSampleTask
+    updateSampleTask,
+    approveSampleTask
 })(SampleTaskPage);

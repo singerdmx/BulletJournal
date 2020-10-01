@@ -119,7 +119,7 @@ public class SampleTaskDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void auditSampleTask(Long sampleTaskId, AuditSampleTaskParams auditSampleTaskParams) {
+    public SampleTask auditSampleTask(Long sampleTaskId, AuditSampleTaskParams auditSampleTaskParams) {
         SampleTask sampleTask = this.findSampleTaskById(sampleTaskId);
         sampleTask.setPending(false);
         List<SelectionMetadataKeyword> keywords =
@@ -135,5 +135,6 @@ public class SampleTaskDaoJpa {
 
         // convert to task and send to subscribed users
 //        this.userCategoryDaoJpa.getSubscribedUsersByMetadataKeyword();
+        return sampleTask;
     }
 }

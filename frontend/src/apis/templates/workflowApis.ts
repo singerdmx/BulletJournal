@@ -136,3 +136,15 @@ export const fetchCategorySteps = (categoryId: number) => {
             throw Error(err.message);
         });
 }
+
+export const auditSampleTask = (sampleTaskId: number, choiceId: number, selections: number[]) => {
+    const postBody = JSON.stringify({
+        choiceId: choiceId,
+        selections: selections,
+    });
+    return doFetch(`/api/sampleTasks/${sampleTaskId}/audit`, postBody)
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}

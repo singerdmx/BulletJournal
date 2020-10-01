@@ -10,7 +10,7 @@ import {
   LockUserAndIPAction,
   ChangePointsAction,
   SetPointsAction,
-  GetUserInfoAction, GetCategoryStepsAction,
+  GetUserInfoAction, GetCategoryStepsAction, ApproveSampleTaskAction,
 } from './reducer';
 import {
   setRole,
@@ -23,7 +23,9 @@ import {
   setPoints,
 } from '../../apis/adminApis';
 import {CategorySteps, UserInfo} from './interface';
-import {fetchCategorySteps} from "../../apis/templates/workflowApis";
+import {auditSampleTask, fetchCategorySteps} from "../../apis/templates/workflowApis";
+import {SampleTask} from "../templates/interface";
+import {sampleTaskReceived} from "../templates/actions";
 
 function* setUserRole(action: PayloadAction<setRoleAction>) {
   try {
@@ -152,6 +154,16 @@ function* getCategorySteps(action: PayloadAction<GetCategoryStepsAction>) {
   }
 }
 
+function* approveSampleTask(action: PayloadAction<ApproveSampleTaskAction>) {
+  const { sampleTaskId, choiceId, selections } = action.payload;
+  try {
+    const data : SampleTask = yield call(auditSampleTask, sampleTaskId, choiceId, selections);
+    yield put(sampleTaskReceived(data));
+  } catch (error) {
+    yield call(message.error, `approveSampleTask Error Received: ${error}`);
+  }
+}
+
 export default function* AdminSagas() {
   yield all([
     yield takeLatest(adminActions.setRole.type, setUserRole),
@@ -165,5 +177,6 @@ export default function* AdminSagas() {
     yield takeLatest(adminActions.lockUserandIP.type, lockUsersAndIPs),
     yield takeLatest(adminActions.getUserInfo.type, getUserInfo),
     yield takeLatest(adminActions.getCategorySteps.type, getCategorySteps),
+    yield takeLatest(adminActions.approveSampleTask.type, approveSampleTask),
   ])
 }

@@ -88,6 +88,9 @@ export const nextStepReceived = (nextStep: NextStep | undefined) => actions.next
 export const sampleTasksReceived = (sampleTasks: SampleTask[], scrollId: string) =>
     actions.sampleTasksReceived({tasks: sampleTasks, scrollId: scrollId});
 
+export const sampleTaskReceived = (sampleTask: SampleTask) =>
+    actions.sampleTaskReceived({task: sampleTask});
+
 export const createRule = (name: string, priority: number, connectedStepId: number,
                            ruleExpression: string, categoryId?: number, stepId?: number) => actions.createRule({
     name: name,

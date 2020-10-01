@@ -311,10 +311,10 @@ public class WorkflowController {
     }
 
     @PostMapping(AUDIT_SAMPLE_TASK_ROUTE)
-    public void auditSampleTask(@NotNull @PathVariable Long sampleTaskId,
+    public SampleTask auditSampleTask(@NotNull @PathVariable Long sampleTaskId,
                                 @Valid @RequestBody AuditSampleTaskParams auditSampleTaskParams) {
         validateRequester();
-        this.sampleTaskDaoJpa.auditSampleTask(sampleTaskId, auditSampleTaskParams);
+        return this.sampleTaskDaoJpa.auditSampleTask(sampleTaskId, auditSampleTaskParams).toPresentationModel();
     }
 
     private void validateRequester() {
