@@ -38,6 +38,7 @@ public class WorkflowController {
     public static final String SAMPLE_TASKS_RULE_ROUTE = "/api/sampleTaskRules";
     public static final String CATEGORY_STEPS_ROUTE = "/api/categories/{categoryId}/steps";
     public static final String SUBSCRIBED_CATEGORIES_ROUTE = "/api/subscribedCategories";
+    public static final String AUDIT_SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}/audit";
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
@@ -307,6 +308,13 @@ public class WorkflowController {
     public CategorySteps getCategorySteps(@NotNull @PathVariable Long categoryId) {
         validateRequester();
         return categoryDaoJpa.getCategorySteps(categoryId);
+    }
+
+    @PostMapping(AUDIT_SAMPLE_TASK_ROUTE)
+    public void auditSampleTask(@NotNull @PathVariable Long sampleTaskId,
+                                @Valid @RequestBody AuditSampleTaskParams auditSampleTaskParams) {
+        validateRequester();
+        this.sampleTaskDaoJpa.auditSampleTask(sampleTaskId, auditSampleTaskParams);
     }
 
     private void validateRequester() {

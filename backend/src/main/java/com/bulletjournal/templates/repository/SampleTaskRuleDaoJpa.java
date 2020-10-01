@@ -1,6 +1,7 @@
 package com.bulletjournal.templates.repository;
 
 import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.templates.repository.model.SampleTask;
 import com.bulletjournal.templates.repository.model.SampleTaskRule;
 import com.bulletjournal.templates.repository.model.SampleTaskRuleId;
 import com.bulletjournal.templates.repository.model.Step;
@@ -9,7 +10,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 public class SampleTaskRuleDaoJpa {
@@ -43,5 +46,19 @@ public class SampleTaskRuleDaoJpa {
             throw new ResourceNotFoundException("Step with stepId " + stepById + " does not exist");
         }
         return stepById.get();
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void updateSampleTaskRule(SampleTask sampleTask, List<Long> selections) {
+        String selectionCombo = selections.stream().sorted().map(s -> Long.toString(s))
+                .collect(Collectors.joining(","));
+
+        List<SampleTaskRule> sampleTaskRules = this.sampleTaskRuleRepository.findAllBySelectionCombo(selectionCombo);
+        for (SampleTaskRule sampleTaskRule : sampleTaskRules) {
+            List<Long> l = sampleTaskRule.getSelectionIds();
+            l.add(sampleTask.getId());
+            this.upsert(sampleTaskRule.getStep().getId(), selectionCombo,
+                    l.stream().sorted().map(s -> Long.toString(s)).collect(Collectors.joining(",")));
+        }
     }
 }

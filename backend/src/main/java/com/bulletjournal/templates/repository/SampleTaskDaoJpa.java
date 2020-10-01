@@ -1,11 +1,13 @@
 package com.bulletjournal.templates.repository;
 
 import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.templates.controller.model.AuditSampleTaskParams;
 import com.bulletjournal.templates.controller.model.CreateSampleTaskParams;
 import com.bulletjournal.templates.controller.model.UpdateSampleTaskParams;
 import com.bulletjournal.templates.repository.model.Choice;
 import com.bulletjournal.templates.repository.model.ChoiceMetadataKeyword;
 import com.bulletjournal.templates.repository.model.SampleTask;
+import com.bulletjournal.templates.repository.model.SelectionMetadataKeyword;
 import org.apache.http.util.TextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -25,7 +27,16 @@ public class SampleTaskDaoJpa {
     private SampleTaskRepository sampleTaskRepository;
 
     @Autowired
+    private SampleTaskRuleDaoJpa sampleTaskRuleDaoJpa;
+
+    @Autowired
     private ChoiceMetadataKeywordRepository choiceMetadataKeywordRepository;
+
+    @Autowired
+    private SelectionMetadataKeywordDaoJpa selectionMetadataKeywordDaoJpa;
+
+    @Autowired
+    private UserCategoryDaoJpa userCategoryDaoJpa;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SampleTask createSampleTask(CreateSampleTaskParams createSampleTaskParams) {
@@ -105,5 +116,24 @@ public class SampleTaskDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SampleTask save(SampleTask sampleTask) {
         return this.sampleTaskRepository.save(sampleTask);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void auditSampleTask(Long sampleTaskId, AuditSampleTaskParams auditSampleTaskParams) {
+        SampleTask sampleTask = this.findSampleTaskById(sampleTaskId);
+        sampleTask.setPending(false);
+        List<SelectionMetadataKeyword> keywords =
+                this.selectionMetadataKeywordDaoJpa.getKeywordsBySelections(auditSampleTaskParams.getSelections());
+        for (SelectionMetadataKeyword keyword : keywords) {
+            sampleTask.setMetadata(sampleTask.getMetadata() + "," + keyword);
+        }
+        this.save(sampleTask);
+
+        // read redis and clean other admin notifications as well as self's
+
+        this.sampleTaskRuleDaoJpa.updateSampleTaskRule(sampleTask, auditSampleTaskParams.getSelections());
+
+        // convert to task and send to subscribed users
+//        this.userCategoryDaoJpa.getSubscribedUsersByMetadataKeyword();
     }
 }
