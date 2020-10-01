@@ -1,14 +1,10 @@
 package com.bulletjournal.templates.repository;
 
 import com.bulletjournal.exceptions.ResourceNotFoundException;
-import com.bulletjournal.repository.models.User;
 import com.bulletjournal.templates.controller.model.AuditSampleTaskParams;
 import com.bulletjournal.templates.controller.model.CreateSampleTaskParams;
 import com.bulletjournal.templates.controller.model.UpdateSampleTaskParams;
-import com.bulletjournal.templates.repository.model.Choice;
-import com.bulletjournal.templates.repository.model.ChoiceMetadataKeyword;
-import com.bulletjournal.templates.repository.model.SampleTask;
-import com.bulletjournal.templates.repository.model.SelectionMetadataKeyword;
+import com.bulletjournal.templates.repository.model.*;
 import org.apache.http.util.TextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -136,8 +132,8 @@ public class SampleTaskDaoJpa {
         this.sampleTaskRuleDaoJpa.updateSampleTaskRule(
                 sampleTask, originalKeyword, auditSampleTaskParams.getSelections());
 
-        // convert to task and send to subscribed users
-        List<User> users = this.userCategoryDaoJpa.getSubscribedUsersByMetadataKeyword(
+        // send notification to subscribed users
+        List<UserCategory> users = this.userCategoryDaoJpa.getSubscribedUsersByMetadataKeyword(
                 keywords.stream().map(SelectionMetadataKeyword::getKeyword).collect(Collectors.toList()));
         return sampleTask;
     }
