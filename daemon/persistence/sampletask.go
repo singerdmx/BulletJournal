@@ -14,4 +14,5 @@ type SampleTask struct {
 	ReminderBeforeTask 	int 		`db:"reminder_before_task"`
 	DueDate				string		`db:"due_date"`
 	DueTime 			string		`db:"due_time"`
+	Pending				bool		`db:"pending"`
 }
