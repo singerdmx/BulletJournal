@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,11 +19,15 @@ import java.util.stream.Collectors;
 public class SampleTaskRuleDaoJpa {
     private SampleTaskRuleRepository sampleTaskRuleRepository;
     private StepRepository stepRepository;
+    private StepMetadataKeywordRepository stepMetadataKeywordRepository;
 
     @Autowired
-    SampleTaskRuleDaoJpa(SampleTaskRuleRepository sampleTaskRuleRepository, StepRepository stepRepository) {
+    SampleTaskRuleDaoJpa(SampleTaskRuleRepository sampleTaskRuleRepository,
+                         StepRepository stepRepository,
+                         StepMetadataKeywordRepository stepMetadataKeywordRepository) {
         this.sampleTaskRuleRepository = sampleTaskRuleRepository;
         this.stepRepository = stepRepository;
+        this.stepMetadataKeywordRepository = stepMetadataKeywordRepository;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -49,15 +54,19 @@ public class SampleTaskRuleDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void updateSampleTaskRule(SampleTask sampleTask, List<Long> selections) {
-        String selectionCombo = selections.stream().sorted().map(s -> Long.toString(s))
-                .collect(Collectors.joining(","));
-
-        List<SampleTaskRule> sampleTaskRules = this.sampleTaskRuleRepository.findAllBySelectionCombo(selectionCombo);
-        for (SampleTaskRule sampleTaskRule : sampleTaskRules) {
-            List<Long> l = sampleTaskRule.getSelectionIds();
+    public void updateSampleTaskRule(SampleTask sampleTask, String keyword, List<Long> selections) {
+        Step step = this.stepMetadataKeywordRepository.findById(keyword).orElseThrow(
+                () -> new ResourceNotFoundException(keyword + " not found")).getStep();
+        for (Long selection : selections) {
+            String selectionCombo = Long.toString(selection);
+            SampleTaskRuleId ruleId = new SampleTaskRuleId(step, selectionCombo);
+            Optional<SampleTaskRule> rule = this.sampleTaskRuleRepository.findById(ruleId);
+            List<Long> l = new ArrayList<>();
+            if (rule.isPresent()) {
+                l = rule.get().getSampleTaskIds();
+            }
             l.add(sampleTask.getId());
-            this.upsert(sampleTaskRule.getStep().getId(), selectionCombo,
+            this.upsert(step.getId(), selectionCombo,
                     l.stream().sorted().map(s -> Long.toString(s)).collect(Collectors.joining(",")));
         }
     }

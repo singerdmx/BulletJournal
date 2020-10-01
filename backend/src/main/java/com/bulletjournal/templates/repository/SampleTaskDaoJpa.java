@@ -123,6 +123,7 @@ public class SampleTaskDaoJpa {
     public SampleTask auditSampleTask(Long sampleTaskId, AuditSampleTaskParams auditSampleTaskParams) {
         SampleTask sampleTask = this.findSampleTaskById(sampleTaskId);
         sampleTask.setPending(false);
+        String originalKeyword = sampleTask.getMetadata();
         List<SelectionMetadataKeyword> keywords =
                 this.selectionMetadataKeywordDaoJpa.getKeywordsBySelections(auditSampleTaskParams.getSelections());
         for (SelectionMetadataKeyword keyword : keywords) {
@@ -132,7 +133,8 @@ public class SampleTaskDaoJpa {
 
         // read redis and clean other admin notifications as well as self's
 
-        this.sampleTaskRuleDaoJpa.updateSampleTaskRule(sampleTask, auditSampleTaskParams.getSelections());
+        this.sampleTaskRuleDaoJpa.updateSampleTaskRule(
+                sampleTask, originalKeyword, auditSampleTaskParams.getSelections());
 
         // convert to task and send to subscribed users
         List<User> users = this.userCategoryDaoJpa.getSubscribedUsersByMetadataKeyword(

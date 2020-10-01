@@ -82,7 +82,7 @@ const SampleTaskPage: React.FC<SampleTaskProps> = (
             return;
         }
 
-        approveSampleTask(sampleTask.id,choiceId, selections);
+        approveSampleTask(sampleTask.id, choiceId, selections);
     }
 
     const choice = sampleTask.choice;
