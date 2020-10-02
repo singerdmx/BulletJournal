@@ -1,15 +1,23 @@
 package service
 
 import (
-	"github.com/mailjet/mailjet-apiv3-go"
-	"github.com/singerdmx/BulletJournal/daemon/persistence"
+	"context"
+	"fmt"
 	"strconv"
+	"time"
+
+	"github.com/mailjet/mailjet-apiv3-go"
+	"github.com/singerdmx/BulletJournal/daemon/config"
+	"github.com/singerdmx/BulletJournal/daemon/persistence"
 )
 
 const (
 	Accept  = "accept"
 	Decline = "decline"
+	UIDTTL  = 86400000 * time.Millisecond
 )
+
+var ctx = context.Background()
 
 type MessageService struct {
 	groupDao   *persistence.GroupDao
@@ -22,6 +30,13 @@ func GetUrl(uuid uint64, action string) string {
 
 // Send join group invitation email to users
 func (m *MessageService) SendJoinGroupEmail(username, email string, groupId, uid uint64) {
+	//Set in redis with key of uid and value of username
+	rdb := persistence.GetRedisClient(config.GetConfig())
+	err := rdb.Set(ctx, fmt.Sprint(uid), username+"@"+fmt.Sprint(groupId), UIDTTL).Err()
+	if err != nil {
+		log.Fatalf("failed to persist username to redis %v", username)
+	}
+
 	group := persistence.GetGroupDao().FindGroup(groupId)
 	if group == nil {
 		log.Fatalf("cannot find group with group id %v", groupId)
@@ -29,7 +44,7 @@ func (m *MessageService) SendJoinGroupEmail(username, email string, groupId, uid
 	}
 	acceptUrl := GetUrl(uid, Accept)
 	declineUrl := GetUrl(uid, Decline)
-	
+
 	messagesInfo := []mailjet.InfoMessagesV31{
 		{
 			From: &mailjet.RecipientV31{

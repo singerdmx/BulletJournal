@@ -28,6 +28,7 @@ import {createGroupByName, updateGroups} from '../../features/group/actions';
 import {updateProjects} from '../../features/project/actions';
 import {IState} from '../../store';
 import {getProjectItemsAfterUpdateSelect} from '../../features/myBuJo/actions';
+import {getCookie} from "../../index";
 
 const {SubMenu} = Menu;
 //props of groups
@@ -80,8 +81,11 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
 
   // load data of menu
   componentDidMount() {
-    this.props.updateGroups();
-    this.props.updateProjects();
+    const loginCookie = getCookie('__discourse_proxy');
+    if (loginCookie) {
+      this.props.updateGroups();
+      this.props.updateProjects();
+    }
   }
 
   handleClickToday = () => {

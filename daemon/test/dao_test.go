@@ -2,16 +2,18 @@ package main
 
 // Basic imports
 import (
-	"github.com/singerdmx/BulletJournal/daemon/api/service"
-	persistence "github.com/singerdmx/BulletJournal/daemon/persistence"
 	"log"
 	"testing"
 	"time"
+
+	"github.com/singerdmx/BulletJournal/daemon/api/service"
+	"github.com/singerdmx/BulletJournal/daemon/persistence"
 
 	"github.com/singerdmx/BulletJournal/daemon/config"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+	"upper.io/db.v3/lib/sqlbuilder"
 	"upper.io/db.v3/postgresql"
 )
 
@@ -31,17 +33,28 @@ type DaoTestSuite struct {
 	VariableThatShouldStartAtFive int
 }
 
-// Insert data for specific models for testing
-func seedDataForTesting(settings postgresql.ConnectionURL) {
-	log.Printf("In seedDataForTesting")
+func getDbConnection(settings postgresql.ConnectionURL) sqlbuilder.Database {
 	sess, err := postgresql.Open(settings)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer sess.Close()
+	// defer sess.Close()
+	return sess
+}
 
+// Insert data for specific models for testing
+func seedDataForTesting(sess sqlbuilder.Database) {
+	log.Printf("In seedDataForTesting")
+	// sess, err := postgresql.Open(settings)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// defer sess.Close()
+
+	// googleCalendarProjectCollection := sess.Collection("google_calendar_projects")
+	//Clean up table before testing
 	publicProjectItemCollection := sess.Collection("public_project_items")
-	err = publicProjectItemCollection.Truncate()
+	err := publicProjectItemCollection.Truncate()
 	if err != nil {
 		log.Fatalf("Truncate(): %q\n", err)
 	}
@@ -201,40 +214,57 @@ func seedDataForTesting(settings postgresql.ConnectionURL) {
 		log.Fatalf("Inserting public_project_items with err %v", err)
 	}
 
-	_, err = sampleTasksCollection.Insert(persistence.SampleTask{
-			ID:					1,
-			CreatedAt:			t2,
-			UpdatedAt:			t2,
-			MetaData:			"IPO",
-			Content:			"Test Content",
-			Name:				"Test Name",
-			Uid:				"1000",
-			AvailableBefore:	t2.String(),
-			ReminderBeforeTask: 1,
-			DueDate:			"2020-02-20",
-			DueTime: 			"",
-	}) 
+	// _, err = sampleTasksCollection.Insert(persistence.SampleTask{
+	// 	ID:              1,
+	// 	CreatedAt:       t2,
+	// 	UpdatedAt:       t2,
+	// 	MetaData:        "IPO",
+	// 	Content:         "Test Content",
+	// 	Name:            "Test Name",
+	// 	Uid:             "1000",
+	// 	AvailableBefore: t2.String(),
+	// 	// ReminderBeforeTask: 1,
+	// 	DueDate: "2020-02-20",
+	// 	DueTime: "",
+	// })
+	// if err != nil {
+	// 	log.Fatalf("Inserting sampleTask item failed with err %v", err)
+	// }
+}
+
+// func upsertTest() {
+// 	item := persistence.SampleTask{
+// 		CreatedAt:          time.Now(),
+// 		UpdatedAt:          time.Now(),
+// 		MetaData:           "INVESTMENT_IPO_RECORD",
+// 		Content:            "",
+// 		Name:               "",
+// 		Uid:                "",
+// 		AvailableBefore:    time.Now().String(), //TODO
+// 		ReminderBeforeTask: 0,
+// 		DueDate:            "",
+// 		DueTime:            "",
+// 	}
+// 	persistence.NewSampleTaskDao().Upsert(&item)
+// }
+
+func cleanUpTables(sess sqlbuilder.Database) {
+	publicProjectItemCollection := sess.Collection("public_project_items")
+	err := publicProjectItemCollection.Truncate()
 	if err != nil {
-		log.Fatalf("Inserting sampleTask item failed with err %v", err)
+		log.Fatalf("Truncate(): %q\n", err)
+	}
+	auditableCollection := sess.Collection("auditables")
+	err = auditableCollection.Truncate()
+	if err != nil {
+		log.Fatalf("Truncate(): %q\n", err)
+	}
+	notificationCollection := sess.Collection("notifications")
+	err = notificationCollection.Truncate()
+	if err != nil {
+		log.Fatalf("Truncate(): %q\n", err)
 	}
 }
-
-func upsertTest() {
-	item := persistence.SampleTask {
-			CreatedAt: time.Now(), 
-			UpdatedAt: time.Now(),
-			MetaData: "INVESTMENT_IPO_RECORD",
-			Content: "",
-			Name: "",
-			Uid: "",
-			AvailableBefore: time.Now().String(), //TODO
-			ReminderBeforeTask: 0,
-			DueDate: "",			
-			DueTime: "",		
-	}
-	persistence.GetSampleTaskDao().Upsert(&item)
-}
-
 
 // Make sure that VariableThatShouldStartAtFive is set to five
 // before each test
@@ -250,20 +280,26 @@ func (suite *DaoTestSuite) SetupTest() {
 			Password: serviceConfig.Password,
 		},
 	}
-	seedDataForTesting(cleaner.Settings)
+	sess := getDbConnection(cleaner.Settings)
+	defer sess.Close()
+	seedDataForTesting(sess)
 	cleaner.Clean(maxRetentionTimeInDays)
 	suite.RestAuditables = cleaner.CountForTable("auditables")
 	suite.RestPublicProjectItems = cleaner.CountForTable("public_project_items")
 	suite.RestNotifications = cleaner.CountForTable("notifications")
-	//TODO clean up DB after test
+	assert.Equal(suite.T(), uint64(2), *suite.RestAuditables)
+	assert.Equal(suite.T(), uint64(1), *suite.RestPublicProjectItems)
+	assert.Equal(suite.T(), uint64(2), *suite.RestNotifications)
+	//Clean up tables after testing
+	cleanUpTables(sess)
 }
 
 // All methods that begin with "Test" are run as tests within a
 // suite.
 func (suite *DaoTestSuite) TestDao() {
-	assert.Equal(suite.T(), uint64(2), *suite.RestAuditables)
-	assert.Equal(suite.T(), uint64(1), *suite.RestPublicProjectItems)
-	assert.Equal(suite.T(), uint64(2), *suite.RestNotifications)
+	// assert.Equal(suite.T(), uint64(2), *suite.RestAuditables)
+	// assert.Equal(suite.T(), uint64(1), *suite.RestPublicProjectItems)
+	// assert.Equal(suite.T(), uint64(2), *suite.RestNotifications)
 }
 
 // In order for 'go test' to run this suite, we need to create

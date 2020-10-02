@@ -3,15 +3,14 @@ package main
 // Basic imports
 import (
 	"context"
-	"github.com/singerdmx/BulletJournal/daemon/config"
-	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"log"
 	"strconv"
 	"testing"
 
+	"github.com/singerdmx/BulletJournal/daemon/config"
+	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"github.com/singerdmx/BulletJournal/daemon/persistence"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
@@ -111,18 +110,10 @@ func testDeleteByUserName(etagDao *persistence.EtagDao, suite *RedisTestSuite) {
 // before each test
 func (suite *RedisTestSuite) SetupTest() {
 	config.InitConfig()
-	logging.InitLogging(config.GetEnv())
 	serviceConfig := config.GetConfig()
+	logging.InitLogging(config.GetEnv())
 
-	rc := persistence.RedisClient{
-		Settings: redis.Options{
-			Addr:     serviceConfig.Host + ":" + serviceConfig.RedisPort,
-			Password: "", // no password set
-			DB:       0,  // use default DB
-		},
-	}
-	client := rc.RedisClient()
-	etagDao := &persistence.EtagDao{Ctx: ctx, Rdb: client}
+	etagDao := persistence.InitializeEtagDao(ctx, serviceConfig)
 	//Check health of redis connection
 	testRedisClient(etagDao, suite)
 	//Test persisting single entity
@@ -134,7 +125,7 @@ func (suite *RedisTestSuite) SetupTest() {
 	//Test delete by username
 	testDeleteByUserName(etagDao, suite)
 	//TODO clean up redis after test
-	client.FlushAll(ctx)
+	etagDao.Rdb.FlushAll(ctx)
 }
 
 // All methods that begin with "Test" are run as tests within a

@@ -7,6 +7,7 @@ import GroupCard from '../../components/group-card/group-card.component';
 import { BackTop } from 'antd';
 
 import './groups.styles.less';
+import {getCookie} from "../../index";
 
 type GroupsProps = {
   groups: GroupsWithOwner[];
@@ -16,7 +17,10 @@ type GroupsProps = {
 class GroupsPage extends React.Component<GroupsProps> {
   componentDidMount() {
     document.title = 'Bullet Journal - Groups';
-    this.props.updateGroups();
+    const loginCookie = getCookie('__discourse_proxy');
+    if (loginCookie) {
+      this.props.updateGroups();
+    }
   }
 
   render() {

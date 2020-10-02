@@ -37,6 +37,7 @@ import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
 import CopyToClipboard from "react-copy-to-clipboard";
 import {CheckSquareTwoTone, CloseCircleTwoTone, CopyOutlined, MenuOutlined, StopTwoTone} from "@ant-design/icons/lib";
 import {RadioChangeEvent} from "antd/lib/radio";
+import {getCookie} from "../../index";
 
 type ProjectPathParams = {
   projectId: string;
@@ -133,6 +134,10 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
   };
 
   componentDidMount() {
+    const loginCookie = getCookie('__discourse_proxy');
+    if (!loginCookie) {
+      return;
+    }
     this.props.updateExpandedMyself(true);
     const projectId = parseInt(this.props.match.params.projectId);
     this.props.getProject(projectId);

@@ -31,3 +31,5 @@ export const getCategorySteps = (categoryId: number) => actions.getCategorySteps
 
 export const approveSampleTask = (sampleTaskId: number, choiceId: number, selections: number[]) =>
     actions.approveSampleTask({sampleTaskId: sampleTaskId, choiceId: choiceId, selections: selections});
+
+export const getChoiceMetadata = () => actions.getChoiceMetadata({});
