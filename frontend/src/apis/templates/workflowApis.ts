@@ -142,7 +142,7 @@ export const auditSampleTask = (sampleTaskId: number, choiceId: number, selectio
         choiceId: choiceId,
         selections: selections,
     });
-    return doFetch(`/api/sampleTasks/${sampleTaskId}/audit`, postBody)
+    return doPost(`/api/sampleTasks/${sampleTaskId}/audit`, postBody)
         .then((res) => res.json())
         .catch((err) => {
             throw Error(err.message);

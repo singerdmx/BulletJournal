@@ -157,6 +157,7 @@ function* getCategorySteps(action: PayloadAction<GetCategoryStepsAction>) {
 function* approveSampleTask(action: PayloadAction<ApproveSampleTaskAction>) {
   const { sampleTaskId, choiceId, selections } = action.payload;
   try {
+    console.log(action.payload)
     const data : SampleTask = yield call(auditSampleTask, sampleTaskId, choiceId, selections);
     yield put(sampleTaskReceived(data));
   } catch (error) {

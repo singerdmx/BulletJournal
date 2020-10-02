@@ -1,24 +1,20 @@
 package com.bulletjournal.templates.repository;
 
 import com.bulletjournal.exceptions.ResourceNotFoundException;
-import com.bulletjournal.repository.models.User;
+import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.NewSampleTaskEvent;
+import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.templates.controller.model.AuditSampleTaskParams;
 import com.bulletjournal.templates.controller.model.CreateSampleTaskParams;
 import com.bulletjournal.templates.controller.model.UpdateSampleTaskParams;
-import com.bulletjournal.templates.repository.model.Choice;
-import com.bulletjournal.templates.repository.model.ChoiceMetadataKeyword;
-import com.bulletjournal.templates.repository.model.SampleTask;
-import com.bulletjournal.templates.repository.model.SelectionMetadataKeyword;
+import com.bulletjournal.templates.repository.model.*;
 import org.apache.http.util.TextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -38,6 +34,9 @@ public class SampleTaskDaoJpa {
 
     @Autowired
     private UserCategoryDaoJpa userCategoryDaoJpa;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SampleTask createSampleTask(CreateSampleTaskParams createSampleTaskParams) {
@@ -123,6 +122,7 @@ public class SampleTaskDaoJpa {
     public SampleTask auditSampleTask(Long sampleTaskId, AuditSampleTaskParams auditSampleTaskParams) {
         SampleTask sampleTask = this.findSampleTaskById(sampleTaskId);
         sampleTask.setPending(false);
+        String originalKeyword = sampleTask.getMetadata();
         List<SelectionMetadataKeyword> keywords =
                 this.selectionMetadataKeywordDaoJpa.getKeywordsBySelections(auditSampleTaskParams.getSelections());
         for (SelectionMetadataKeyword keyword : keywords) {
@@ -132,11 +132,17 @@ public class SampleTaskDaoJpa {
 
         // read redis and clean other admin notifications as well as self's
 
-        this.sampleTaskRuleDaoJpa.updateSampleTaskRule(sampleTask, auditSampleTaskParams.getSelections());
+        this.sampleTaskRuleDaoJpa.updateSampleTaskRule(
+                sampleTask, originalKeyword, auditSampleTaskParams.getSelections());
 
-        // convert to task and send to subscribed users
-        List<User> users = this.userCategoryDaoJpa.getSubscribedUsersByMetadataKeyword(
+        // send notification to subscribed users
+        List<UserCategory> users = this.userCategoryDaoJpa.getSubscribedUsersByMetadataKeyword(
                 keywords.stream().map(SelectionMetadataKeyword::getKeyword).collect(Collectors.toList()));
+        List<Event> events = new ArrayList<>();
+        for (UserCategory user : users) {
+            events.add(new Event(user.getUser().getName(), sampleTaskId, sampleTask.getName()));
+        }
+        this.notificationService.inform(new NewSampleTaskEvent(events, "BulletJournal"));
         return sampleTask;
     }
 }

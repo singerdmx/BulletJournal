@@ -5,9 +5,9 @@ import com.bulletjournal.repository.ProjectRepository;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.User;
-import com.bulletjournal.templates.repository.model.SelectionMetadataKeyword;
-import com.bulletjournal.templates.repository.model.Category;
 import com.bulletjournal.templates.controller.model.CategoryUnsubscribeParams;
+import com.bulletjournal.templates.repository.model.Category;
+import com.bulletjournal.templates.repository.model.SelectionMetadataKeyword;
 import com.bulletjournal.templates.repository.model.UserCategory;
 import com.bulletjournal.templates.repository.model.UserCategoryKey;
 import com.google.common.collect.ImmutableList;
@@ -133,9 +133,7 @@ public class UserCategoryDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<User> getSubscribedUsersByMetadataKeyword(List<String> keywords) {
-//        return this.userCategoryRepository.findByKeywordIn(keywords)
-//                .stream().map(UserCategory::getUser).collect(Collectors.toList());
-        return null;
+    public List<UserCategory> getSubscribedUsersByMetadataKeyword(List<String> keywords) {
+        return this.userCategoryRepository.findByKeywordIn(keywords);
     }
 }
