@@ -32,7 +32,7 @@ func GetUrl(uuid uint64, action string) string {
 func (m *MessageService) SendJoinGroupEmail(username, email string, groupId, uid uint64) {
 	//Set in redis with key of uid and value of username
 	rdb := persistence.GetRedisClient(config.GetConfig())
-	err := rdb.Set(ctx, fmt.Sprint(uid), username, UIDTTL).Err()
+	err := rdb.Set(ctx, fmt.Sprint(uid), username+"@"+fmt.Sprint(groupId), UIDTTL).Err()
 	if err != nil {
 		log.Fatalf("failed to persist username to redis %v", username)
 	}
