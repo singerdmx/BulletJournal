@@ -14,7 +14,7 @@ services:
       - frontend
 
   frontend:
-    image: mwangxx/bulletjournal-frontend:1.1.202010020036
+    image: mwangxx/bulletjournal-frontend:1.1.202010020636
     container_name: react_app
     ports:
       - "3000:3000"
@@ -22,13 +22,13 @@ services:
       - controller
 
   controller:
-    image: mwangxx/bulletjournal-backend:1.1.202010020036
+    image: mwangxx/bulletjournal-backend:1.1.202010020636
     container_name: springboot_app
     ports:
       - "8080:8080"
     environment:
       spring_profiles_active: prod
-      API_VERSION: 1.1.202010020036
+      API_VERSION: 1.1.202010020636
       SSO_API_KEY: "${SSO_API_KEY}"
       AWS_ACCESS_KEY: "${AWS_ACCESS_KEY}"
       AWS_SECRET_KEY: "${AWS_SECRET_KEY}"
