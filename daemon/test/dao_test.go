@@ -214,39 +214,39 @@ func seedDataForTesting(sess sqlbuilder.Database) {
 		log.Fatalf("Inserting public_project_items with err %v", err)
 	}
 
-	_, err = sampleTasksCollection.Insert(persistence.SampleTask{
-		ID:                 1,
-		CreatedAt:          t2,
-		UpdatedAt:          t2,
-		MetaData:           "IPO",
-		Content:            "Test Content",
-		Name:               "Test Name",
-		Uid:                "1000",
-		AvailableBefore:    t2.String(),
-		ReminderBeforeTask: 1,
-		DueDate:            "2020-02-20",
-		DueTime:            "",
-	})
-	if err != nil {
-		log.Fatalf("Inserting sampleTask item failed with err %v", err)
-	}
+	// _, err = sampleTasksCollection.Insert(persistence.SampleTask{
+	// 	ID:              1,
+	// 	CreatedAt:       t2,
+	// 	UpdatedAt:       t2,
+	// 	MetaData:        "IPO",
+	// 	Content:         "Test Content",
+	// 	Name:            "Test Name",
+	// 	Uid:             "1000",
+	// 	AvailableBefore: t2.String(),
+	// 	// ReminderBeforeTask: 1,
+	// 	DueDate: "2020-02-20",
+	// 	DueTime: "",
+	// })
+	// if err != nil {
+	// 	log.Fatalf("Inserting sampleTask item failed with err %v", err)
+	// }
 }
 
-func upsertTest() {
-	item := persistence.SampleTask{
-		CreatedAt:          time.Now(),
-		UpdatedAt:          time.Now(),
-		MetaData:           "INVESTMENT_IPO_RECORD",
-		Content:            "",
-		Name:               "",
-		Uid:                "",
-		AvailableBefore:    time.Now().String(), //TODO
-		ReminderBeforeTask: 0,
-		DueDate:            "",
-		DueTime:            "",
-	}
-	persistence.GetSampleTaskDao().Upsert(&item)
-}
+// func upsertTest() {
+// 	item := persistence.SampleTask{
+// 		CreatedAt:          time.Now(),
+// 		UpdatedAt:          time.Now(),
+// 		MetaData:           "INVESTMENT_IPO_RECORD",
+// 		Content:            "",
+// 		Name:               "",
+// 		Uid:                "",
+// 		AvailableBefore:    time.Now().String(), //TODO
+// 		ReminderBeforeTask: 0,
+// 		DueDate:            "",
+// 		DueTime:            "",
+// 	}
+// 	persistence.NewSampleTaskDao().Upsert(&item)
+// }
 
 func cleanUpTables(sess sqlbuilder.Database) {
 	publicProjectItemCollection := sess.Collection("public_project_items")
