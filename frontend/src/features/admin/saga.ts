@@ -10,7 +10,7 @@ import {
   LockUserAndIPAction,
   ChangePointsAction,
   SetPointsAction,
-  GetUserInfoAction, GetCategoryStepsAction, ApproveSampleTaskAction,
+  GetUserInfoAction, GetCategoryStepsAction, ApproveSampleTaskAction, GetChoiceMetadataAction,
 } from './reducer';
 import {
   setRole,
@@ -22,10 +22,11 @@ import {
   fetchUserInfo,
   setPoints,
 } from '../../apis/adminApis';
-import {CategorySteps, UserInfo} from './interface';
+import {CategorySteps, ChoiceMetadata, UserInfo} from './interface';
 import {auditSampleTask, fetchCategorySteps} from "../../apis/templates/workflowApis";
 import {SampleTask} from "../templates/interface";
 import {sampleTaskReceived} from "../templates/actions";
+import {fetchChoiceMetadata} from "../../apis/templates/metadataApis";
 
 function* setUserRole(action: PayloadAction<setRoleAction>) {
   try {
@@ -165,6 +166,15 @@ function* approveSampleTask(action: PayloadAction<ApproveSampleTaskAction>) {
   }
 }
 
+function* getChoiceMetadata(action: PayloadAction<GetChoiceMetadataAction>) {
+  try {
+    const data : ChoiceMetadata[] = yield call(fetchChoiceMetadata);
+    yield put(adminActions.choiceMetadataReceived({choiceMetadata: data}));
+  } catch (error) {
+    yield call(message.error, `getChoiceMetadata Error Received: ${error}`);
+  }
+}
+
 export default function* AdminSagas() {
   yield all([
     yield takeLatest(adminActions.setRole.type, setUserRole),
@@ -179,5 +189,6 @@ export default function* AdminSagas() {
     yield takeLatest(adminActions.getUserInfo.type, getUserInfo),
     yield takeLatest(adminActions.getCategorySteps.type, getCategorySteps),
     yield takeLatest(adminActions.approveSampleTask.type, approveSampleTask),
+    yield takeLatest(adminActions.getChoiceMetadata.type, getChoiceMetadata),
   ])
 }

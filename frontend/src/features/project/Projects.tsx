@@ -5,6 +5,7 @@ import { Projects } from './reducer';
 import { updateProjects, createProjectByName } from './actions';
 import { ProjectType } from './constants';
 import { History } from 'history';
+import {getCookie} from "../../index";
 
 type ProjectsProps = {
   projects: Projects;
@@ -20,7 +21,10 @@ type ProjectsProps = {
 
 class ProjectList extends React.Component<ProjectsProps> {
   componentDidMount() {
-    this.props.updateProjects();
+    const loginCookie = getCookie('__discourse_proxy');
+    if (loginCookie) {
+      this.props.updateProjects();
+    }
   }
 
   render() {

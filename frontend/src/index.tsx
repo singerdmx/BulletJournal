@@ -27,6 +27,10 @@ export const getCookie = (cname: string) => {
             return c.substring(name.length, c.length);
         }
     }
+
+    if (window.location.host === 'localhost') {
+        return "discource_cookie";
+    }
     return "";
 }
 

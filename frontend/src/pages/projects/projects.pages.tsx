@@ -16,6 +16,7 @@ import {animation, IconFont, Item, Menu, MenuProvider} from "react-contexify";
 import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
 import CopyToClipboard from "react-copy-to-clipboard";
 import {CopyOutlined} from "@ant-design/icons/lib";
+import {getCookie} from "../../index";
 
 const {Panel} = Collapse;
 
@@ -81,8 +82,11 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
     const {groups, theme, ownedProjects, sharedProjects, updateGroups, updateProjects} = props;
 
     useEffect(() => {
-        updateGroups();
-        updateProjects();
+        const loginCookie = getCookie('__discourse_proxy');
+        if (loginCookie) {
+            updateGroups();
+            updateProjects();
+        }
         document.title = 'Bullet Journal - Journals';
     }, []);
 

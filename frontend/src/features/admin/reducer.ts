@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
-import {Role, LockedUser, LockedIP, UserInfo, CategorySteps} from './interface';
+import {Role, LockedUser, LockedIP, UserInfo, CategorySteps, ChoiceMetadata} from './interface';
 import { User } from '../group/interface';
 
 export type setRoleAction = {
@@ -73,12 +73,19 @@ export type ApproveSampleTaskAction = {
   selections: number[];
 };
 
+export type ChoiceMetadataAction = {
+  choiceMetadata: ChoiceMetadata[];
+}
+
+export type GetChoiceMetadataAction = {};
+
 let initialState = {
   usersByRole: [] as User[],
   lockedUsers: [] as LockedUser[],
   lockedIPs: [] as LockedIP[],
   userInfo: {} as UserInfo,
   categorySteps: undefined as CategorySteps | undefined,
+  choiceMetadata: [] as ChoiceMetadata[]
 };
 
 const slice = createSlice({
@@ -127,6 +134,11 @@ const slice = createSlice({
       state.categorySteps = categorySteps;
     },
     approveSampleTask: (state, action: PayloadAction<ApproveSampleTaskAction>) => state,
+    choiceMetadataReceived: (state, action: PayloadAction<ChoiceMetadataAction>) => {
+      const { choiceMetadata } = action.payload;
+      state.choiceMetadata = choiceMetadata;
+    },
+    getChoiceMetadata: (state, action: PayloadAction<GetChoiceMetadataAction>) => state,
   },
 });
 

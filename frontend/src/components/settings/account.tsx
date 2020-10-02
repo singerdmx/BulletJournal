@@ -14,6 +14,7 @@ import { updateTheme } from './actions';
 import './account.styles.less';
 import getThemeColorVars from '../../utils/theme';
 import { Select, Tooltip } from 'antd';
+import {getCookie} from "../../index";
 
 const { Option } = Select;
 
@@ -38,7 +39,10 @@ declare global {
 
 class Account extends React.Component<AccountProps> {
   componentDidMount() {
-    this.props.updateExpandedMyself(true);
+      const loginCookie = getCookie('__discourse_proxy');
+      if (loginCookie) {
+          this.props.updateExpandedMyself(true);
+      }
   }
 
   componentDidUpdate(prevProps: AccountProps): void {
