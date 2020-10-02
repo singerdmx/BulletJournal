@@ -1,6 +1,9 @@
 package com.bulletjournal.templates.repository;
 
 import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.NewSampleTaskEvent;
+import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.templates.controller.model.AuditSampleTaskParams;
 import com.bulletjournal.templates.controller.model.CreateSampleTaskParams;
 import com.bulletjournal.templates.controller.model.UpdateSampleTaskParams;
@@ -11,10 +14,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -34,6 +34,9 @@ public class SampleTaskDaoJpa {
 
     @Autowired
     private UserCategoryDaoJpa userCategoryDaoJpa;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SampleTask createSampleTask(CreateSampleTaskParams createSampleTaskParams) {
@@ -135,6 +138,11 @@ public class SampleTaskDaoJpa {
         // send notification to subscribed users
         List<UserCategory> users = this.userCategoryDaoJpa.getSubscribedUsersByMetadataKeyword(
                 keywords.stream().map(SelectionMetadataKeyword::getKeyword).collect(Collectors.toList()));
+        List<Event> events = new ArrayList<>();
+        for (UserCategory user : users) {
+            events.add(new Event(user.getUser().getName(), sampleTaskId, sampleTask.getName()));
+        }
+        this.notificationService.inform(new NewSampleTaskEvent(events, "BulletJournal"));
         return sampleTask;
     }
 }
