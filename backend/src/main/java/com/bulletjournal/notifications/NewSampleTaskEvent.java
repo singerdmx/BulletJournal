@@ -16,7 +16,7 @@ public class NewSampleTaskEvent extends Informed {
 
     @Override
     protected String getEventTitle(Event event) {
-        return "##" + event.getContentName() + "##";
+        return event.getContentName();
     }
 
     @Override
