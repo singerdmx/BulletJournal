@@ -9,3 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface ChoiceMetadataKeywordRepository extends JpaRepository<ChoiceMetadataKeyword, String> {
     ChoiceMetadataKeyword findByChoice(Choice choice);
 }
+
+

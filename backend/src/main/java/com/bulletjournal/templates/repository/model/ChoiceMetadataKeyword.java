@@ -33,4 +33,8 @@ public class ChoiceMetadataKeyword extends AuditModel {
     public void setChoice(Choice choice) {
         this.choice = choice;
     }
+
+    public com.bulletjournal.templates.controller.model.ChoiceMetadata toPresentationModel() {
+        return new com.bulletjournal.templates.controller.model.ChoiceMetadata(keyword, choice.toPresentationModel());
+    }
 }

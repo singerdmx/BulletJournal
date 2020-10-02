@@ -1,5 +1,6 @@
 package com.bulletjournal.templates.repository;
 
+import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.templates.repository.model.Selection;
 import com.bulletjournal.templates.repository.model.SelectionMetadataKeyword;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,5 +26,22 @@ public class SelectionMetadataKeywordDaoJpa {
         List<SelectionMetadataKeyword> keywords = this.selectionMetadataKeywordRepository
                 .findBySelectionIn(selections);
         return keywords;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public SelectionMetadataKeyword save(Long selctionId, String keyword) {
+        Selection selection = this.selectionDaoJpa.getById(selctionId);
+        SelectionMetadataKeyword selectionMetadataKeyword = new SelectionMetadataKeyword();
+        selectionMetadataKeyword.setSelection(selection);
+        selectionMetadataKeyword.setKeyword(keyword);
+        return this.selectionMetadataKeywordRepository.save(selectionMetadataKeyword);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void deleteByKeyword(String keyword) {
+        if (!selectionMetadataKeywordRepository.existsById(keyword)) {
+            throw new ResourceNotFoundException("Keyword not found");
+        }
+        selectionMetadataKeywordRepository.deleteById(keyword);
     }
 }
