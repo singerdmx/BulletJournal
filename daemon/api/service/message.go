@@ -1,9 +1,10 @@
 package service
 
 import (
+	"strconv"
+
 	"github.com/mailjet/mailjet-apiv3-go"
 	"github.com/singerdmx/BulletJournal/daemon/persistence"
-	"strconv"
 )
 
 const (
@@ -22,6 +23,13 @@ func GetUrl(uuid uint64, action string) string {
 
 // Send join group invitation email to users
 func (m *MessageService) SendJoinGroupEmail(username, email string, groupId, uid uint64) {
+	//Set in redis with key of uid and value of username
+	rdb := persistence.GetRedisClient(config.GetConfig())
+	err := rdb.Set(ctx, fmt.Sprint(uid), username, UIDTTL).Err()
+	if err != nil {
+		log.Fatalf("failed to persist username to redis %v", username)
+	}
+
 	group := persistence.GetGroupDao().FindGroup(groupId)
 	if group == nil {
 		log.Fatalf("cannot find group with group id %v", groupId)
@@ -29,7 +37,7 @@ func (m *MessageService) SendJoinGroupEmail(username, email string, groupId, uid
 	}
 	acceptUrl := GetUrl(uid, Accept)
 	declineUrl := GetUrl(uid, Decline)
-	
+
 	messagesInfo := []mailjet.InfoMessagesV31{
 		{
 			From: &mailjet.RecipientV31{
