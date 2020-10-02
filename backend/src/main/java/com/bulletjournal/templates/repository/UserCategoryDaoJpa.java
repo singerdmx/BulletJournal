@@ -134,7 +134,6 @@ public class UserCategoryDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<UserCategory> getSubscribedUsersByMetadataKeyword(List<String> keywords) {
-        return this.userCategoryRepository.findByKeywordIn(
-                keywords.stream().map(k -> "'" + k + "'").collect(Collectors.joining(",")));
+        return this.userCategoryRepository.findByKeywordIn(keywords);
     }
 }

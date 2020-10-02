@@ -14,7 +14,7 @@ public interface UserCategoryRepository extends JpaRepository<UserCategory, User
 
     List<UserCategory> getAllByUser(User user);
 
-    @Query(value = "select * from template.users_categories where metadata_keyword in (:keywords)",
+    @Query(value = "select * from template.users_categories where metadata_keyword in :keywords",
             nativeQuery = true)
-    List<UserCategory> findByKeywordIn(String keywords);
+    List<UserCategory> findByKeywordIn(List<String> keywords);
 }
