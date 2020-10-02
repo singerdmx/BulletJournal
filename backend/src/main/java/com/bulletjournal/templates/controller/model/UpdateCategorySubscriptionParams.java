@@ -2,16 +2,17 @@ package com.bulletjournal.templates.controller.model;
 
 import javax.validation.constraints.NotBlank;
 
-public class UpdateSubscribedCategoryProjectParams {
+public class UpdateCategorySubscriptionParams {
   @NotBlank
   private Long selectionId;
 
   @NotBlank
   private Long projectId;
 
-  public UpdateSubscribedCategoryProjectParams() {}
+  public UpdateCategorySubscriptionParams() {
+  }
 
-  public UpdateSubscribedCategoryProjectParams(@NotBlank Long selectionId, @NotBlank Long projectId) {
+  public UpdateCategorySubscriptionParams(@NotBlank Long selectionId, @NotBlank Long projectId) {
     this.selectionId = selectionId;
     this.projectId = projectId;
   }

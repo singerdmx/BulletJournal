@@ -36,8 +36,7 @@ public class CategoryController {
 
     public static final String CATEGORY_UNSUBSCRIBE_ROUTE = "/api/categories/{categoryId}/unsubscribe";
 
-    public static final String UPDATE_SUBSCRIBED_CATEGORY_PROJECT
-            = "/api/categories/{categoryId}/updatedSubscribedCategoryProject";
+    public static final String UPDATE_CATEGORY_SUBSCRIPTION = "/api/categories/{categoryId}/updateCategorySubscription";
 
     protected static final String CATEGORY_SET_CHOICES_ROUTE = "/api/categories/{categoryId}/setChoices";
 
@@ -160,13 +159,13 @@ public class CategoryController {
         return getCategory(categoryId);
     }
 
-    @PutMapping(UPDATE_SUBSCRIBED_CATEGORY_PROJECT)
-    public UserCategory updateSubscribedCategoryProject (
+    @PutMapping(UPDATE_CATEGORY_SUBSCRIPTION)
+    public UserCategory updateCategorySubscription(
             @NotNull @PathVariable Long categoryId,
-            @Valid @RequestBody UpdateSubscribedCategoryProjectParams updateSubscribedCategoryProjectParams) {
+            @Valid @RequestBody UpdateCategorySubscriptionParams updateCategorySubscriptionParams) {
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return userCategoryDaoJpa.updateUserCategoryProject(username, categoryId, updateSubscribedCategoryProjectParams);
+        return userCategoryDaoJpa.updateUserCategoryProject(username, categoryId, updateCategorySubscriptionParams);
     }
 
 
