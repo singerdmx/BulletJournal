@@ -1,14 +1,19 @@
-package main
+package investment
 
 import (
-	"fmt"
-	"time"
 	"encoding/json"
+	"fmt"
 	"strconv"
-
+	"time"
 	"github.com/pkg/errors"
-	"github.com/go-resty/resty"
+
+	"github.com/singerdmx/BulletJournal/daemon/persistence"
 )
+
+type IPOClient struct {
+	BaseTemplateClient
+	data *IPOData
+}
 
 type IPOData struct {
 	IPO []IPO `json:"ipos"`
@@ -37,9 +42,15 @@ type IPO struct {
 	Updated                        int           `json:"updated"`
 }
 
-func fetchIPO() (*IPOData, error) {
-	client := resty.New()
-	year, month, _:= time.Now().Date()
+func NewIPOClient() (*TemplateClient, error) {
+	c := IPOClient{
+		BaseTemplateClient: NewBaseTemplateClient(),
+	}
+	return &TemplateClient{&c}, nil
+}
+
+func (c *IPOClient) FetchData() error {
+	year, month, _ := time.Now().Date()
 
 	var datefrom string
 	var dateto string
@@ -58,25 +69,50 @@ func fetchIPO() (*IPOData, error) {
 	switch judge {
 	case 2:
 		dateto = datebase + "-28"
-	case 4, 6, 9 , 11:
-		dateto = datebase + "-30" 
+	case 4, 6, 9, 11:
+		dateto = datebase + "-30"
 	default:
 		dateto = datebase + "-31"
 	}
 
 	url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/ipos?tpagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", datefrom, dateto)
-	resp, err := client.R().
-	Get(url)
+	resp, err := c.restClient.R().
+		Get(url)
 
 	if err != nil {
-		return nil, errors.Wrap(err, "sending request failed!")
+		return errors.Wrap(err, "IPO client sending request failed!")
 	}
 
 	var data IPOData
 
 	if err := json.Unmarshal(resp.Body(), &data); err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("Unmarshal earnings response failed: %s", string(resp.Body())))
+		return errors.Wrap(err, fmt.Sprintf("Unmarshal earnings response failed: %s", string(resp.Body())))
+	}
+	c.data = &data
+	return nil
+}
+
+func (c *IPOClient) SendData() error {
+	if c.data == nil {
+		return errors.New("Empty IPO data, please fetch data first.")
+	}
+	for i := range c.data.IPO {
+		target := c.data.IPO[i]
+		item := persistence.SampleTask{
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			MetaData: "INVESTMENT_IPO_RECORD",
+			Content: "",
+			Name: target.Name,
+			Uid: target.ID,
+			AvailableBefore: target.Date, // TODO
+			ReminderBeforeTask: 0,
+			DueDate: target.PricingDate,			
+			DueTime: "",
+			Pending: true,
+		}
+		c.sampleDao.Upsert(&item)
 	}
 
-	return &data, nil
+	return nil
 }

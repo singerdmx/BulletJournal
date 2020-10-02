@@ -86,3 +86,14 @@ export const updateChoicesForCategory = (categoryId: number, choicesIds: number[
             }
         );
 };
+
+export const removeUserCategory = (categoryId: number, selectionId: number) => {
+    const postBody = JSON.stringify({
+        selectionId: selectionId,
+    });
+    return doPost(`/api/categories/${categoryId}/unsubscribe`, postBody)
+        .then(res => res.json())
+        .catch(err => {
+            throw Error(err.message);
+        });
+}

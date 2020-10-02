@@ -21,5 +21,6 @@ export enum EventType {
     RemoveFromProjectEvent = 'RemoveFromProjectEvent',
     JoinProjectEvent = 'JoinProjectEvent',
     RevokeSharableEvent = 'RevokeSharableEvent',
-    SetTaskStatusEvent = 'SetTaskStatusEvent'
+    SetTaskStatusEvent = 'SetTaskStatusEvent',
+    NewSampleTaskEvent = 'NewSampleTaskEvent',
 }

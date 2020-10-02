@@ -30,3 +30,9 @@ export const patchMyself = (
 export const getUserPointActivities = () => actions.getUserPointActivities({});
 
 export const reloadReceived = (reload: boolean) => actions.reloadReceived({reload: reload});
+
+export const getSubscribedCategories = () => actions.getSubscribedCategories({});
+
+export const unsubscribedCategory = (categoryId: number, selectionId: number) => actions.unsubscribedCategory({
+    categoryId: categoryId, selectionId: selectionId
+});

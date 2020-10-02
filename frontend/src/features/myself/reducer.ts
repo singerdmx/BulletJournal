@@ -1,5 +1,6 @@
 import {createSlice, PayloadAction} from 'redux-starter-kit';
 import {UserPointActivity} from "../../pages/points/interface";
+import {SubscribedCategory} from "./interface";
 
 export type MyselfWithAvatar = {
   username?: string;
@@ -43,8 +44,19 @@ export type ClearMyself = {};
 
 export type FetchUserPointActivities = {};
 
+export type GetSubscribedCategories = {};
+
+export type UnsubscribedCategory = {
+  categoryId: number;
+  selectionId: number;
+};
+
 export type UserPointActivities = {
    userPointActivities: UserPointActivity[];
+};
+
+export type SubscribedCategories = {
+  subscribedCategories: SubscribedCategory[];
 };
 
 let initialState = {
@@ -59,6 +71,7 @@ let initialState = {
   firstTime: false,
   reload: false,
   userPointActivities: [] as Array<UserPointActivity>,
+  subscribedCategories: [] as SubscribedCategory[],
 };
 
 const slice = createSlice({
@@ -109,14 +122,19 @@ const slice = createSlice({
       state,
       action: PayloadAction<UpdateExpandedMyself>
     ) => state,
-
     userPointActivitiesReceived: (
         state,
         action: PayloadAction<UserPointActivities>
     ) => {
       const { userPointActivities } = action.payload;
       state.userPointActivities = userPointActivities;
-    }
+    },
+    subscribedCategoriesReceived: (state, action: PayloadAction<SubscribedCategories>) => {
+      const { subscribedCategories } = action.payload;
+      state.subscribedCategories = subscribedCategories;
+    },
+    getSubscribedCategories: (state, action: PayloadAction<GetSubscribedCategories>) => state,
+    unsubscribedCategory: (state, action: PayloadAction<UnsubscribedCategory>) => state,
   },
 });
 

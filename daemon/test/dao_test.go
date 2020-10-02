@@ -69,6 +69,15 @@ func seedDataForTesting(sess sqlbuilder.Database) {
 		log.Fatalf("Truncate(): %q\n", err)
 	}
 
+	sampleTasksCollection := sess.Collection("template.sample_tasks")
+	err = sampleTasksCollection.Truncate()
+	if err != nil {
+		log.Fatalf("Truncate(): %q\n", err)
+	}
+
+	// googleCalendarProjectCollection := sess.Collection("google_calendar_projects")
+	//Clean up table before testing
+
 	t := time.Now()
 	t2 := t.AddDate(0, 0, -maxRetentionTimeInDays-2)
 	t3 := t.AddDate(0, 0, 1)
@@ -204,6 +213,39 @@ func seedDataForTesting(sess sqlbuilder.Database) {
 	if err != nil {
 		log.Fatalf("Inserting public_project_items with err %v", err)
 	}
+
+	_, err = sampleTasksCollection.Insert(persistence.SampleTask{
+		ID:                 1,
+		CreatedAt:          t2,
+		UpdatedAt:          t2,
+		MetaData:           "IPO",
+		Content:            "Test Content",
+		Name:               "Test Name",
+		Uid:                "1000",
+		AvailableBefore:    t2.String(),
+		ReminderBeforeTask: 1,
+		DueDate:            "2020-02-20",
+		DueTime:            "",
+	})
+	if err != nil {
+		log.Fatalf("Inserting sampleTask item failed with err %v", err)
+	}
+}
+
+func upsertTest() {
+	item := persistence.SampleTask{
+		CreatedAt:          time.Now(),
+		UpdatedAt:          time.Now(),
+		MetaData:           "INVESTMENT_IPO_RECORD",
+		Content:            "",
+		Name:               "",
+		Uid:                "",
+		AvailableBefore:    time.Now().String(), //TODO
+		ReminderBeforeTask: 0,
+		DueDate:            "",
+		DueTime:            "",
+	}
+	persistence.GetSampleTaskDao().Upsert(&item)
 }
 
 func cleanUpTables(sess sqlbuilder.Database) {

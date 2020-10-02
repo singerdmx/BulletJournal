@@ -26,3 +26,8 @@ export const lockUserandIP = (name: string, ip: string, reason: string) =>
 
 export const getUserInfo = (username: string) =>
   actions.getUserInfo({ username: username });
+
+export const getCategorySteps = (categoryId: number) => actions.getCategorySteps({categoryId: categoryId});
+
+export const approveSampleTask = (sampleTaskId: number, choiceId: number, selections: number[]) =>
+    actions.approveSampleTask({sampleTaskId: sampleTaskId, choiceId: choiceId, selections: selections});

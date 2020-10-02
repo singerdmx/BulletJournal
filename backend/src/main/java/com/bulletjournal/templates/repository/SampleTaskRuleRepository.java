@@ -27,4 +27,6 @@ public interface SampleTaskRuleRepository extends JpaRepository<SampleTaskRule, 
             + "sample_task_rules.selection_combo = :selectionCombo "
             + "returning *", nativeQuery = true)
     String deleteById(Long stepId, String selectionCombo);
+
+    List<SampleTaskRule> findAllBySelectionCombo(String selectionCombo);
 }

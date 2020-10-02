@@ -5,7 +5,7 @@ import (
 )
 
 type Group struct {
-	ID           uint64    `db:"id"`
+	ID           int64     `db:"id"`
 	CreatedAt    time.Time `db:"created_at"`
 	UpdatedAt    time.Time `db:"updated_at"`
 	Name         string    `db:"name"`

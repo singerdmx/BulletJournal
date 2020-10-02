@@ -227,4 +227,8 @@ public class Category {
         this.setImage(category.getImage());
         this.setChoices(category.getChoices());
     }
+
+    public Step convertToStep() {
+        return new Step(id, name);
+    }
 }

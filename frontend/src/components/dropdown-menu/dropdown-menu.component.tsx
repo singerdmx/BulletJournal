@@ -40,7 +40,7 @@ type menuProps = {
 };
 
 const onClickTemplates = (history: History<History.PoorMansUnknown>) => {
-    window.location.href = '/public/templates';
+    history.push('/punchCard');
 };
 
 const onClickPoint = (history: History<History.PoorMansUnknown>) => {

@@ -1,3 +1,5 @@
+import {Rule, Step} from "../templates/interface";
+
 export enum Role {
   BASIC = 'BASIC',
   MEMBER = 'MEMBER',
@@ -27,4 +29,15 @@ export interface UserInfo {
   currency: string;
   theme: string;
   points: number;
+}
+
+interface Connection {
+  left: Step;
+  right: Step;
+  middle?: Rule;
+}
+
+export interface CategorySteps {
+  connections: Connection[];
+  stepIds: number[];
 }

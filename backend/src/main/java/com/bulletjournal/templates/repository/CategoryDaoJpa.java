@@ -2,9 +2,10 @@ package com.bulletjournal.templates.repository;
 
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
-import com.bulletjournal.templates.repository.model.Category;
-import com.bulletjournal.templates.repository.model.Choice;
-import com.bulletjournal.templates.repository.model.Step;
+import com.bulletjournal.templates.controller.model.CategorySteps;
+import com.bulletjournal.templates.controller.model.Rule;
+import com.bulletjournal.templates.repository.model.*;
+import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class CategoryDaoJpa {
@@ -20,13 +22,16 @@ public class CategoryDaoJpa {
     private static Logger LOGGER = LoggerFactory.getLogger(CategoryDaoJpa.class);
 
     private CategoryRepository categoryRepository;
+    private CategoryRuleRepository categoryRuleRepository;
     private ChoiceDaoJpa choiceDaoJpa;
     private StepDaoJpa stepDaoJpa;
+    private RuleDaoJpa ruleDaoJpa;
 
     @Autowired
-    public CategoryDaoJpa(CategoryRepository categoryRepository, ChoiceDaoJpa choiceDaoJpa, StepDaoJpa stepDaoJpa) {
+    public CategoryDaoJpa(CategoryRepository categoryRepository, CategoryRuleRepository categoryRuleRepository, ChoiceDaoJpa choiceDaoJpa, StepDaoJpa stepDaoJpa) {
         this.choiceDaoJpa = choiceDaoJpa;
         this.categoryRepository = categoryRepository;
+        this.categoryRuleRepository = categoryRuleRepository;
         this.stepDaoJpa = stepDaoJpa;
     }
 
@@ -117,5 +122,63 @@ public class CategoryDaoJpa {
             category.setNextStep(step);
         }
         save(category);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public CategorySteps getCategorySteps(Long categoryId) {
+        CategorySteps categorySteps = new CategorySteps();
+        List<Triple<com.bulletjournal.templates.controller.model.Step, Rule, com.bulletjournal.templates.controller.model.Step>> connections = new ArrayList<>();
+        List<Long> allStepIds = new ArrayList<>();
+        allStepIds.add(categoryId);
+
+        Category category = categoryRepository.getById(categoryId);
+        List<CategoryRule> categoryRules = category.getCategoryRules();
+        Queue<Step> bfsQueue = categoryRules.stream().map(categoryRule -> {
+            Step nextStep = categoryRule.getConnectedStep();
+            connections.add(Triple.of(category.toPresentationModel().convertToStep(),
+                    categoryRule.toPresentationModel(), nextStep.toPresentationModel()));
+            allStepIds.add(nextStep.getId());
+
+            return nextStep;
+        })
+                .collect(Collectors.toCollection(LinkedList::new));
+        int size = bfsQueue.size();
+        while (size > 0) {
+            for (int i = 0; i < size; i++) {
+                Step currentStep = bfsQueue.poll();
+                if (currentStep == null) {
+                    continue;
+                }
+
+                List<StepRule> stepRules = currentStep.getStepRules();
+                if (stepRules != null && !stepRules.isEmpty()) {
+                    stepRules.forEach(stepRule -> {
+                        Step nextStep = ruleDaoJpa.getStepRuleById(stepRule.getId()).getConnectedStep();
+
+                        if (nextStep != null) {
+                            connections.add(Triple.of(currentStep.toPresentationModel(), stepRule.toPresentationModel(), nextStep.toPresentationModel()));
+
+                            bfsQueue.add(nextStep);
+                            allStepIds.add(nextStep.getId());
+                        }
+                    });
+                } else {
+                    Step nextStep = currentStep.getNextStep();
+                    if (nextStep != null) {
+                        connections.add(Triple.of(currentStep.toPresentationModel(), null, nextStep.toPresentationModel()));
+
+                        bfsQueue.add(nextStep);
+                        allStepIds.add(nextStep.getId());
+                    }
+                }
+
+                size = bfsQueue.size();
+            }
+        }
+
+        categorySteps.setConnections(connections);
+        categorySteps.setStepIds(allStepIds);
+
+        return categorySteps;
     }
 }

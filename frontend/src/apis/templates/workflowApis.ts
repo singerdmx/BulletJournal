@@ -120,3 +120,31 @@ export const importSampleTasks = (sampleTasks: number[], selections: number[], c
             throw Error(err.message);
         });
 }
+
+export const getUserSubscribedCategories = () => {
+    return doFetch('/api/subscribedCategories')
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}
+
+export const fetchCategorySteps = (categoryId: number) => {
+    return doFetch(`/api/categories/${categoryId}/steps`)
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}
+
+export const auditSampleTask = (sampleTaskId: number, choiceId: number, selections: number[]) => {
+    const postBody = JSON.stringify({
+        choiceId: choiceId,
+        selections: selections,
+    });
+    return doPost(`/api/sampleTasks/${sampleTaskId}/audit`, postBody)
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}

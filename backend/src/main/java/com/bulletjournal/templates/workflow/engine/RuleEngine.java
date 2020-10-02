@@ -43,6 +43,9 @@ public class RuleEngine {
     private SampleTaskRuleRepository sampleTaskRuleRepository;
 
     @Autowired
+    private SampleTaskRuleDaoJpa sampleTaskRuleDaoJpa;
+
+    @Autowired
     private UserDaoJpa userDaoJpa;
 
     @Autowired
@@ -50,9 +53,6 @@ public class RuleEngine {
 
     @Autowired
     private UserCategoryDaoJpa userCategoryDaoJpa;
-
-    @Autowired
-    private CategoryDaoJpa categoryDaoJpa;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.templates.controller.model.SampleTask> importTasks(String requester, ImportTasksParams importTasksParams) {
@@ -97,7 +97,8 @@ public class RuleEngine {
         this.taskDaoJpa.createTaskFromSampleTask(importTasksParams.getProjectId(), requester, tasksNeedTimingArrangement, importTasksParams.getReminderBefore(), importTasksParams.getAssignees(), importTasksParams.getLabels());
 
         if (importTasksParams.isSubscribed()) {
-            this.userCategoryDaoJpa.updateUserCategory(user, importTasksParams.getCategoryId(), importTasksParams.getSelections());
+            this.userCategoryDaoJpa.upsertUserCategories(user, importTasksParams.getCategoryId(),
+                    importTasksParams.getSelections(), importTasksParams.getProjectId());
         }
 
         return sampleTasks;
@@ -111,6 +112,7 @@ public class RuleEngine {
         return frequencyMap.get(selectionId);
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Set<Long> getSampleTasksForFinalStep(long stepId,
                                                 List<Long> selections,
                                                 List<Long> prevSelections) {
@@ -137,6 +139,7 @@ public class RuleEngine {
 
         // some choices are not applicable such as Intensity or 'Computer Science Category'
         Set<Long> applicableChoices = new HashSet<>();
+        validateRuleSelectionIds(rules);
         rules.forEach(rule -> rule.getSelectionIds()
                 .forEach(s -> {
                     Long choiceId = selectionMap.get(s).getChoice().getId();
@@ -189,5 +192,17 @@ public class RuleEngine {
         }
 
         return result;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    protected void validateRuleSelectionIds(List<SampleTaskRule> rules) {
+        for (SampleTaskRule rule : rules) {
+            List<Long> l = this.sampleTaskDaoJpa.findAllById(rule.getSampleTaskIds())
+                    .stream().map(s -> s.getId()).sorted().collect(Collectors.toList());
+            String valid = StringUtils.join(l, ",");
+            if (!Objects.equals(valid, rule.getTaskIds())) {
+                this.sampleTaskRuleDaoJpa.upsert(rule.getStep().getId(), rule.getSelectionCombo(), valid);
+            }
+        }
     }
 }

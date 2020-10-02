@@ -36,10 +36,11 @@ export const deleteChoice = (choiceId: number) => {
         });
 }
 
-export const updateChoice = (choiceId: number, name: string, multiple: boolean) => {
+export const updateChoice = (choiceId: number, name: string, multiple: boolean, instructionIncluded: boolean) => {
     const putBody = JSON.stringify({
         name: name,
         multiple: multiple,
+        instructionIncluded: instructionIncluded
     });
     return doPut(`/api/choices/${choiceId}`, putBody)
         .then(res => res.json())

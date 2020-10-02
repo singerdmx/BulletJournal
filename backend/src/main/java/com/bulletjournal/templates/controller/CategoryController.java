@@ -7,11 +7,10 @@ import com.bulletjournal.hierarchy.CategoryRelationsProcessor;
 import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.repository.UserDaoJpa;
-import com.bulletjournal.templates.controller.model.Category;
-import com.bulletjournal.templates.controller.model.CreateCategoryParams;
-import com.bulletjournal.templates.controller.model.UpdateCategoryParams;
+import com.bulletjournal.templates.controller.model.*;
 import com.bulletjournal.templates.repository.CategoriesHierarchyDaoJpa;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
+import com.bulletjournal.templates.repository.UserCategoryDaoJpa;
 import com.bulletjournal.templates.repository.model.CategoriesHierarchy;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.MDC;
@@ -34,6 +33,8 @@ public class CategoryController {
 
     public static final String PUBLIC_CATEGORY_ROUTE = "/api/public/categories/{categoryId}";
 
+    public static final String CATEGORY_UNSUBSCRIBE_ROUTE = "/api/categories/{categoryId}/unsubscribe";
+
     protected static final String CATEGORY_SET_CHOICES_ROUTE = "/api/categories/{categoryId}/setChoices";
 
     private CategoryDaoJpa categoryDaoJpa;
@@ -42,6 +43,11 @@ public class CategoryController {
 
     private UserDaoJpa userDaoJpa;
 
+    @Autowired
+    private UserCategoryDaoJpa userCategoryDaoJpa;
+
+    @Autowired
+    private WorkflowController workflowController;
 
     @Autowired
     public CategoryController(
@@ -130,6 +136,15 @@ public class CategoryController {
             category.getSubCategories().forEach(deque::offer);
         }
         throw new ResourceNotFoundException("Category id does not exist");
+    }
+
+    @PostMapping(CATEGORY_UNSUBSCRIBE_ROUTE)
+    public List<SubscribedCategory> unsubscribeCategory(
+            @NotNull @PathVariable Long categoryId,
+            @Valid @RequestBody CategoryUnsubscribeParams categoryUnsubscribeParams) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.userCategoryDaoJpa.removeUserCategory(username, categoryId, categoryUnsubscribeParams);
+        return this.workflowController.getUserSubscribedCategories();
     }
 
     @PutMapping(CATEGORY_SET_CHOICES_ROUTE)

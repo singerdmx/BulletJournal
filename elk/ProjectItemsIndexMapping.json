@@ -15,8 +15,7 @@
       },
       "value": {
         "type": "text",
-        "analyzer": "standard",
-        "ignore_above": 8191
+        "analyzer": "standard"
       },
       "parentId": {
         "type": "keyword"

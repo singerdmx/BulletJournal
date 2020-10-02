@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {
+  AlertOutlined,
   ContactsOutlined,
   DeleteOutlined,
   EyeOutlined,
@@ -66,6 +67,9 @@ const TitleAvatar = ({source, type, originator}: titleAvatarProps) => {
       break;
     case EventType.RevokeSharableEvent:
       icon = <StopOutlined/>;
+      break;
+    case EventType.NewSampleTaskEvent:
+      icon = <AlertOutlined />;
       break;
     default:
       icon = <EyeOutlined/>;

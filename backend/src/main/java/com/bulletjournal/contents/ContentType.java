@@ -1,7 +1,7 @@
 package com.bulletjournal.contents;
 
 public enum ContentType {
-    PROJECT, TASK, NOTE, TRANSACTION, GROUP, LABEL, CONTENT;
+    PROJECT, TASK, NOTE, TRANSACTION, GROUP, LABEL, CONTENT, SAMPLE_TASK;
 
     public static String getContentLink(ContentType type, Long contentId) {
         switch (type) {

@@ -3,16 +3,15 @@ package com.bulletjournal.templates.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.UserDaoJpa;
+import com.bulletjournal.templates.controller.model.SampleTask;
+import com.bulletjournal.templates.controller.model.SampleTaskRule;
 import com.bulletjournal.templates.controller.model.*;
 import com.bulletjournal.templates.redis.RedisSampleTasksRepository;
-import com.bulletjournal.templates.repository.CategoryDaoJpa;
-import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
-import com.bulletjournal.templates.repository.SampleTaskRuleDaoJpa;
-import com.bulletjournal.templates.repository.StepDaoJpa;
+import com.bulletjournal.templates.repository.*;
 import com.bulletjournal.templates.repository.model.Category;
-import com.bulletjournal.templates.repository.model.CategoryRule;
+import com.bulletjournal.templates.repository.model.Choice;
 import com.bulletjournal.templates.repository.model.Step;
-import com.bulletjournal.templates.repository.model.StepRule;
+import com.bulletjournal.templates.repository.model.*;
 import com.bulletjournal.templates.workflow.engine.RuleEngine;
 import com.bulletjournal.templates.workflow.models.RuleExpression;
 import com.google.gson.Gson;
@@ -23,10 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -41,6 +37,8 @@ public class WorkflowController {
     public static final String SAMPLE_TASK_RULE_ROUTE = "/api/sampleTaskRule";
     public static final String SAMPLE_TASKS_RULE_ROUTE = "/api/sampleTaskRules";
     public static final String CATEGORY_STEPS_ROUTE = "/api/categories/{categoryId}/steps";
+    public static final String SUBSCRIBED_CATEGORIES_ROUTE = "/api/subscribedCategories";
+    public static final String AUDIT_SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}/audit";
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
@@ -63,7 +61,27 @@ public class WorkflowController {
     @Autowired
     private RuleEngine ruleEngine;
 
+    @Autowired
+    private UserCategoryDaoJpa userCategoryDaoJpa;
+
     private static final Gson GSON = new Gson();
+
+    @GetMapping(SUBSCRIBED_CATEGORIES_ROUTE)
+    public List<SubscribedCategory> getUserSubscribedCategories() {
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+        List<UserCategory> userCategoryList = userCategoryDaoJpa.getUserCategoriesByUserName(requester);
+        Map<Category, SubscribedCategory> map = new HashMap<>();
+        userCategoryList.forEach(uc -> {
+            if (!map.containsKey(uc.getCategory())) {
+                map.put(uc.getCategory(), new SubscribedCategory());
+            }
+            SubscribedCategory sc = map.get(uc.getCategory());
+            sc.addProject(uc.getProject().toPresentationModel());
+            sc.addSelection(uc.getMetadataKeyword().getSelection().toPresentationModel());
+            sc.setCategory(uc.getCategory().toSimplePresentationModel());
+        });
+        return new ArrayList<>(map.values());
+    }
 
     @GetMapping(NEXT_STEP_ROUTE)
     public NextStep getNext(
@@ -240,7 +258,14 @@ public class WorkflowController {
     @GetMapping(SAMPLE_TASK_ROUTE)
     public SampleTask getSampleTask(@NotNull @PathVariable Long sampleTaskId) {
         validateRequester();
-        return sampleTaskDaoJpa.findSampleTaskById(sampleTaskId).toPresentationModel();
+        com.bulletjournal.templates.repository.model.SampleTask sampleTask =
+                this.sampleTaskDaoJpa.findSampleTaskById(sampleTaskId);
+        SampleTask result = sampleTask.toPresentationModel();
+        Choice choice = this.sampleTaskDaoJpa.getSampleTaskChoice(sampleTask);
+        if (choice != null) {
+            result.setChoice(choice.toPresentationModel());
+        }
+        return result;
     }
 
     @GetMapping(SAMPLE_TASK_BY_METADATA)
@@ -282,7 +307,14 @@ public class WorkflowController {
     @GetMapping(CATEGORY_STEPS_ROUTE)
     public CategorySteps getCategorySteps(@NotNull @PathVariable Long categoryId) {
         validateRequester();
-        return null;
+        return categoryDaoJpa.getCategorySteps(categoryId);
+    }
+
+    @PostMapping(AUDIT_SAMPLE_TASK_ROUTE)
+    public SampleTask auditSampleTask(@NotNull @PathVariable Long sampleTaskId,
+                                @Valid @RequestBody AuditSampleTaskParams auditSampleTaskParams) {
+        validateRequester();
+        return this.sampleTaskDaoJpa.auditSampleTask(sampleTaskId, auditSampleTaskParams).toPresentationModel();
     }
 
     private void validateRequester() {

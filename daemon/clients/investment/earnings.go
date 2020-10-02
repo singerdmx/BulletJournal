@@ -2,13 +2,15 @@ package investment
 
 import (
 	"encoding/json"
-	"github.com/pkg/errors"
 	"fmt"
-	"regexp"
+	"github.com/pkg/errors"
+	"github.com/singerdmx/BulletJournal/daemon/persistence"
+	"time"
 )
 
 type EarningClient struct {
-	requester *Requester
+	BaseTemplateClient
+	data *Earnings
 }
 
 type Earnings struct {
@@ -44,39 +46,54 @@ type EarningData struct {
 }
 
 const (
-	earningsClientName = "earnings"
 	earningsDefaultPageSize = 500
 	earningsDefaultImportance = 0
 )
 
-func NewEarningsClient() (*EarningClient, error) {
+func NewEarningsClient() (*TemplateClient, error) {
 	c := EarningClient{
-		NewRequester(earningsClientName),
+		BaseTemplateClient: NewBaseTemplateClient(),
 	}
-	return &c, nil
+	return &TemplateClient{&c}, nil
 }
 
-func (c *EarningClient) fetchEarnings(date string) (em *Earnings, err error) {
+func (c *EarningClient) FetchData() error {
+	t := time.Now().Local()
+	date := t.Format("2006-01-02")
 	baseURL := "https://www.benzinga.com/services/webapps/calendar/earnings"
-	timeRegex := regexp.MustCompile(`\d{4}-\d{2}-\d{2}`)
-	match := timeRegex.FindStringSubmatch(date)
-	if len(match) == 0 {
-		return nil, errors.New(fmt.Sprintf("invalid date for earnings parameter %+v", date))
-	}
 
 	url := fmt.Sprintf("%s?tpagesize=%+v&parameters[date]=%d&parameters[importance]+%d", baseURL, earningsDefaultPageSize, date, earningsDefaultImportance)
-	resp, err := c.requester.RequestREST("GET", url, nil, nil)
+	resp, err := c.restClient.R().Get(url)
 	if err != nil {
-		return nil, errors.Wrap(err, "sending request failed")
+		return errors.Wrap(err, "sending request failed")
 	}
-	if resp.StatusCode != 200 {
-		log.Error("Earnings request Status Code: %+v", resp.StatusCode)
-		return nil, errors.Wrap(err, fmt.Sprintf("Invalid response status code: %+v", resp.StatusCode))
+	data := Earnings{}
+	if err := json.Unmarshal(resp.Body(), &data); err != nil {
+		return errors.Wrap(err, fmt.Sprintf("Unmarshal earnings response failed: %s", string(resp.Body())))
 	}
-	content := resp.Body
-	earnings := Earnings{}
-	if err := json.Unmarshal(content, &earnings); err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("Unmarshal earnings response failed: %s", string(resp.Body)))
+	c.data = &data
+	return nil
+}
+func (c *EarningClient)SendData() error {
+	if c.data == nil {
+		return errors.New("Empty Earnings data, please fetch data first.")
 	}
-	return &earnings, nil
+	for i := range c.data.EarningData {
+		target := c.data.EarningData[i]
+		item := persistence.SampleTask{
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			MetaData: "INVESTMENT_EARNINGS_RECORD",
+			Content: "",
+			Name: target.Name,
+			Uid: target.ID,
+			AvailableBefore: target.Date,
+			ReminderBeforeTask: 0,
+			DueDate: target.Date,
+			DueTime: target.Time,
+			Pending: true,
+		}
+		c.sampleDao.Upsert(&item)
+	}
+	return nil
 }
