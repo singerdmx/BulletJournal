@@ -4,15 +4,13 @@ import {connect} from "react-redux";
 import {getCategory, getSteps, deleteStep, cloneStep} from "../../features/templates/actions";
 import {IState} from "../../store";
 import {Category, Step} from "../../features/templates/interface";
-import {BackTop, Divider, Typography} from "antd";
+import {BackTop, Divider} from "antd";
 import './steps.styles.less'
 import {Container} from "react-floating-action-button";
 import AddStep from "../../components/modals/templates/add-step.component";
 import {getCategorySteps} from "../../features/admin/actions";
 import {CategorySteps} from "../../features/admin/interface";
 import {ArrowRightOutlined} from "@ant-design/icons";
-
-const {Title, Text} = Typography;
 
 type AdminStepsProps = {
     category: Category | undefined;

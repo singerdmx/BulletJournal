@@ -6,10 +6,15 @@ import {connect} from "react-redux";
 import {
     getChoiceMetadata,
     getSelectionMetadata,
+    getStepMetadata,
     removeChoiceMetadata,
-    updateChoiceMetadata, updateSelectionMetadata
+    updateChoiceMetadata,
+    updateSelectionMetadata,
+    removeSelectionMetadata,
+    updateStepMetadata,
+    removeStepMetadata,
 } from "../../features/admin/actions";
-import {ChoiceMetadata, SelectionMetadata} from "../../features/admin/interface";
+import {ChoiceMetadata, SelectionMetadata, StepMetadata} from "../../features/admin/interface";
 import {DeleteTwoTone} from "@ant-design/icons";
 
 const { Text } = Typography;
@@ -17,16 +22,23 @@ const { Text } = Typography;
 type AdminMetadataProps = {
     choiceMetadata: ChoiceMetadata[];
     selectionMetadata: SelectionMetadata[];
+    stepMetadata: StepMetadata[];
     getChoiceMetadata: () => void;
     getSelectionMetadata: () => void;
+    getStepMetadata: () => void;
     updateChoiceMetadata: (keyword: string, choiceId: number) => void;
     updateSelectionMetadata: (keyword: string, selectionId: number) => void;
+    removeChoiceMetadata: (keywords: string[]) => void;
+    removeSelectionMetadata: (keywords: string[]) => void;
+    updateStepMetadata: (keyword: string, stepId: number) => void;
+    removeStepMetadata: (keywords: string[]) => void;
 };
 
 const AdminMetadataPage: React.FC<AdminMetadataProps> = (
     {
-        choiceMetadata, getChoiceMetadata, updateChoiceMetadata,
-        selectionMetadata, getSelectionMetadata, updateSelectionMetadata
+        choiceMetadata, getChoiceMetadata, updateChoiceMetadata, removeChoiceMetadata,
+        selectionMetadata, getSelectionMetadata, updateSelectionMetadata, removeSelectionMetadata,
+        stepMetadata, getStepMetadata, updateStepMetadata, removeStepMetadata
     }) => {
 
     const [checkedChoices, setCheckedChoices] = useState<string[]>([]);
@@ -37,6 +49,7 @@ const AdminMetadataPage: React.FC<AdminMetadataProps> = (
         document.title = 'Bullet Journal - Metadata';
         getChoiceMetadata();
         getSelectionMetadata();
+        getStepMetadata();
     }, []);
 
     const convertMetadata = (data: any) => {
@@ -61,7 +74,7 @@ const AdminMetadataPage: React.FC<AdminMetadataProps> = (
             dataIndex: 'keyword',
             key: 'keyword',
             sorter: {
-                compare: (a: any, b: any) => a.key.localeCompare(b.keyword),
+                compare: (a: any, b: any) => a.key.localeCompare(b.key),
                 multiple: 1,
             },
         },
@@ -102,7 +115,7 @@ const AdminMetadataPage: React.FC<AdminMetadataProps> = (
             dataIndex: 'keyword',
             key: 'keyword',
             sorter: {
-                compare: (a: any, b: any) => a.key.localeCompare(b.keyword),
+                compare: (a: any, b: any) => a.key.localeCompare(b.key),
                 multiple: 1,
             },
         },
@@ -127,18 +140,109 @@ const AdminMetadataPage: React.FC<AdminMetadataProps> = (
         },
     };
 
+    const onStepChange = (e: string, row: any) => {
+        console.log(row)
+        console.log(e);
+        if (!/^\d+$/.test(e)) {
+            message.error("Invalid ID: " + e);
+            return;
+        }
+        updateStepMetadata(row.key, parseInt(e));
+    }
+
+    const stepMetadataColumns = [
+        {
+            title: 'Keyword',
+            dataIndex: 'keyword',
+            key: 'keyword',
+            sorter: {
+                compare: (a: any, b: any) => a.key.localeCompare(b.keyword),
+                multiple: 1,
+            },
+        },
+        {
+            title: 'Step',
+            dataIndex: 'step',
+            key: 'step',
+            render: (step: any, row: any) => (<span>
+                {step.name}{'  '}
+                (<Text editable={{
+                onChange: (e) => onStepChange(e, row),
+            }}>{step.id}
+                </Text>)
+            </span>),
+        },
+    ];
+
+    const stepRowSelection = {
+        onChange: (selectedRowKeys: any, selectedRows: any) => {
+            console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+            setCheckedSteps(selectedRows.map((r: any) => r.key));
+        },
+    };
+
+    const onDeleteChoiceMetadata = () => {
+        if (checkedChoices.length === 0) {
+            message.error('None selected!');
+            return;
+        }
+
+        removeChoiceMetadata(checkedChoices);
+        setCheckedChoices([]);
+    }
+
+    const onDeleteSelectionMetadata = () => {
+        if (checkedSelections.length === 0) {
+            message.error('None selected!');
+            return;
+        }
+
+        removeSelectionMetadata(checkedSelections);
+        setCheckedSelections([]);
+    }
+
+    const onDeleteStepMetadata = () => {
+        if (checkedSteps.length === 0) {
+            message.error('None selected!');
+            return;
+        }
+
+        removeStepMetadata(checkedSteps);
+        setCheckedSteps([]);
+    }
+
     return (
         <div className='metadata-page'>
             <BackTop/>
             <div>
-                <h3>Choice Metadata {'  '} <Tooltip title='Delete Choice Metadata'><Button shape="circle" icon={<DeleteTwoTone />} /></Tooltip></h3>
+                <h3>
+                    Choice Metadata {'  '}
+                    <Tooltip title='Delete Choice Metadata'>
+                        <Button onClick={onDeleteChoiceMetadata} shape="circle" icon={<DeleteTwoTone />} />
+                    </Tooltip>
+                </h3>
                 <Table rowSelection={choiceRowSelection}
                        columns={choiceMetadataColumns} dataSource={choiceMetadata.map(c => convertMetadata(c))}/>
             </div>
             <div>
-                <h3>Selection Metadata {'  '} <Tooltip title='Delete Selection Metadata'><Button shape="circle" icon={<DeleteTwoTone />} /></Tooltip></h3>
+                <h3>
+                    Selection Metadata {'  '}
+                    <Tooltip title='Delete Selection Metadata'>
+                        <Button onClick={onDeleteSelectionMetadata} shape="circle" icon={<DeleteTwoTone />} />
+                    </Tooltip>
+                </h3>
                 <Table rowSelection={selectionRowSelection}
                        columns={selectionMetadataColumns} dataSource={selectionMetadata.map(c => convertMetadata(c))}/>
+            </div>
+            <div>
+                <h3>
+                    Step Metadata {'  '}
+                    <Tooltip title='Delete Step Metadata'>
+                        <Button onClick={onDeleteStepMetadata} shape="circle" icon={<DeleteTwoTone />} />
+                    </Tooltip>
+                </h3>
+                <Table rowSelection={stepRowSelection}
+                       columns={stepMetadataColumns} dataSource={stepMetadata.map(c => convertMetadata(c))}/>
             </div>
         </div>
     );
@@ -146,7 +250,8 @@ const AdminMetadataPage: React.FC<AdminMetadataProps> = (
 
 const mapStateToProps = (state: IState) => ({
     choiceMetadata: state.admin.choiceMetadata,
-    selectionMetadata: state.admin.selectionMetadata
+    selectionMetadata: state.admin.selectionMetadata,
+    stepMetadata: state.admin.stepMetadata
 });
 
 export default connect(mapStateToProps, {
@@ -154,5 +259,9 @@ export default connect(mapStateToProps, {
     updateChoiceMetadata,
     removeChoiceMetadata,
     getSelectionMetadata,
-    updateSelectionMetadata
+    updateSelectionMetadata,
+    removeSelectionMetadata,
+    getStepMetadata,
+    updateStepMetadata,
+    removeStepMetadata,
 })(AdminMetadataPage);
