@@ -20,6 +20,26 @@ services:
     depends_on:
       - controller
 
+  daemon:
+    container_name: daemon_app
+    image: mwangxx/bulletjournal-daemon:BULLETJOURNAL_VERSION
+    ports:
+      - "50051:50051"
+    depends_on:
+      cache:
+        condition: service_started
+      database:
+        condition: service_healthy
+    environment: 
+      tier: prod
+    volumes: 
+      - $HOME/docker/daemon/log:/var/log
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://daemon:9091/daemon/healthcheck"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   controller:
     image: mwangxx/bulletjournal-backend:BULLETJOURNAL_VERSION
     container_name: springboot_app
