@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +23,7 @@ public class MetadataController {
     public static final String CHOICE_METADATA_ROUTE = "/api/choiceMetadata";
     public static final String STEP_METADATA_ROUTE = "/api/stepMetadata";
     public static final String SELECTION_METADATA_ROUTE = "/api/selectionMetadata";
-    public static final String CHOICES_METADATA_ROUTE = "/api/choicesMetadata/{keyword}";
+    public static final String CHOICES_METADATA_ROUTE = "/api/choiceMetadata/{keyword}";
     public static final String STEPS_METADATA_ROUTE = "/api/stepMetadata/{keyword}";
     public static final String SELECTIONS_METADATA_ROUTE = "/api/selectionMetadata/{keyword}";
 
@@ -48,21 +49,27 @@ public class MetadataController {
     public List<ChoiceMetadata> getChoiceMetadata() {
         validateRequester();
         return this.choiceMetadataKeywordRepository.findAll()
-                .stream().map(c -> c.toPresentationModel()).collect(Collectors.toList());
+                .stream().map(c -> c.toPresentationModel())
+                .sorted(Comparator.comparing(c -> c.getChoice().getId()))
+                .collect(Collectors.toList());
     }
 
     @GetMapping(STEP_METADATA_ROUTE)
     public List<StepMetadata> getStepMetadata() {
         validateRequester();
         return this.stepMetadataKeywordRepository.findAll()
-                .stream().map(c -> c.toPresentationModel()).collect(Collectors.toList());
+                .stream().map(c -> c.toPresentationModel())
+                .sorted(Comparator.comparing(c -> c.getStep().getId()))
+                .collect(Collectors.toList());
     }
 
     @GetMapping(SELECTION_METADATA_ROUTE)
     public List<SelectionMetadata> getSelectionMetadata() {
         validateRequester();
         return this.selectionMetadataKeywordRepository.findAll()
-                .stream().map(c -> c.toPresentationModel()).collect(Collectors.toList());
+                .stream().map(c -> c.toPresentationModel())
+                .sorted(Comparator.comparing(c -> c.getSelection().getId()))
+                .collect(Collectors.toList());
     }
 
     @PostMapping(CHOICE_METADATA_ROUTE)
@@ -87,25 +94,25 @@ public class MetadataController {
         return getStepMetadata();
     }
 
-    @DeleteMapping(CHOICES_METADATA_ROUTE)
-    public void deleteChoiceMetadata(@NotNull @PathVariable String keyword) {
+    @DeleteMapping(CHOICE_METADATA_ROUTE)
+    public List<ChoiceMetadata> deleteChoiceMetadata(@Valid @RequestParam List<String> keywords) {
         validateRequester();
-        choiceMetadataKeywordDaoJpa.deleteByKeyword(keyword);
-
+        choiceMetadataKeywordDaoJpa.deleteByKeywords(keywords);
+        return getChoiceMetadata();
     }
 
-    @DeleteMapping(STEPS_METADATA_ROUTE)
-    public void deleteStepMetadata(@NotNull @PathVariable String keyword) {
+    @DeleteMapping(STEP_METADATA_ROUTE)
+    public List<StepMetadata> deleteStepMetadata(@Valid @RequestParam List<String> keywords) {
         validateRequester();
-        stepMetadataKeywordDaoJpa.deleteByKeyword(keyword);
-
+        stepMetadataKeywordDaoJpa.deleteByKeywords(keywords);
+        return getStepMetadata();
     }
 
-    @DeleteMapping(SELECTIONS_METADATA_ROUTE)
-    public void deleteSelectionMetadata(@NotNull @PathVariable String keyword) {
+    @DeleteMapping(SELECTION_METADATA_ROUTE)
+    public List<SelectionMetadata> deleteSelectionMetadata(@Valid @RequestParam List<String> keywords) {
         validateRequester();
-        selectionMetadataKeywordDaoJpa.deleteByKeyword(keyword);
-
+        selectionMetadataKeywordDaoJpa.deleteByKeywords(keywords);
+        return getSelectionMetadata();
     }
 
     @PutMapping(CHOICES_METADATA_ROUTE)

@@ -51,6 +51,12 @@ export type UnsubscribedCategory = {
   selectionId: number;
 };
 
+export type UpdateCategorySubscription = {
+  categoryId: number;
+  selectionId: number;
+  projectId: number;
+};
+
 export type UserPointActivities = {
    userPointActivities: UserPointActivity[];
 };
@@ -135,6 +141,7 @@ const slice = createSlice({
     },
     getSubscribedCategories: (state, action: PayloadAction<GetSubscribedCategories>) => state,
     unsubscribedCategory: (state, action: PayloadAction<UnsubscribedCategory>) => state,
+    updateCategorySubscription: (state, action: PayloadAction<UpdateCategorySubscription>) => state,
   },
 });
 

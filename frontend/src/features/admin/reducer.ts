@@ -1,5 +1,14 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
-import {Role, LockedUser, LockedIP, UserInfo, CategorySteps, ChoiceMetadata} from './interface';
+import {
+  Role,
+  LockedUser,
+  LockedIP,
+  UserInfo,
+  CategorySteps,
+  ChoiceMetadata,
+  SelectionMetadata,
+  StepMetadata
+} from './interface';
 import { User } from '../group/interface';
 
 export type setRoleAction = {
@@ -77,7 +86,39 @@ export type ChoiceMetadataAction = {
   choiceMetadata: ChoiceMetadata[];
 }
 
-export type GetChoiceMetadataAction = {};
+export type SelectionMetadataAction = {
+  selectionMetadata: SelectionMetadata[];
+}
+
+export type StepMetadataAction = {
+  stepMetadata: StepMetadata[];
+}
+
+export type GetMetadataAction = {};
+
+export type UpdateChoiceMetadataAction = {
+  keyword: string;
+  choiceId: number;
+};
+
+export type UpdateSelectionMetadataAction = {
+  keyword: string;
+  selectionId: number;
+};
+
+export type UpdateStepMetadataAction = {
+  keyword: string;
+  stepId: number;
+};
+
+export type RemoveMetadataAction = {
+  keywords: string[];
+};
+
+export type AddMetadataAction = {
+  id: number;
+  keyword: string;
+};
 
 let initialState = {
   usersByRole: [] as User[],
@@ -85,7 +126,9 @@ let initialState = {
   lockedIPs: [] as LockedIP[],
   userInfo: {} as UserInfo,
   categorySteps: undefined as CategorySteps | undefined,
-  choiceMetadata: [] as ChoiceMetadata[]
+  choiceMetadata: [] as ChoiceMetadata[],
+  selectionMetadata: [] as SelectionMetadata[],
+  stepMetadata: [] as StepMetadata[],
 };
 
 const slice = createSlice({
@@ -138,7 +181,26 @@ const slice = createSlice({
       const { choiceMetadata } = action.payload;
       state.choiceMetadata = choiceMetadata;
     },
-    getChoiceMetadata: (state, action: PayloadAction<GetChoiceMetadataAction>) => state,
+    getChoiceMetadata: (state, action: PayloadAction<GetMetadataAction>) => state,
+    updateChoiceMetadata: (state, action: PayloadAction<UpdateChoiceMetadataAction>) => state,
+    removeChoiceMetadata: (state, action: PayloadAction<RemoveMetadataAction>) => state,
+    selectionMetadataReceived: (state, action: PayloadAction<SelectionMetadataAction>) => {
+      const { selectionMetadata } = action.payload;
+      state.selectionMetadata = selectionMetadata;
+    },
+    getSelectionMetadata: (state, action: PayloadAction<GetMetadataAction>) => state,
+    updateSelectionMetadata: (state, action: PayloadAction<UpdateSelectionMetadataAction>) => state,
+    removeSelectionMetadata: (state, action: PayloadAction<RemoveMetadataAction>) => state,
+    stepMetadataReceived: (state, action: PayloadAction<StepMetadataAction>) => {
+      const { stepMetadata } = action.payload;
+      state.stepMetadata = stepMetadata;
+    },
+    getStepMetadata: (state, action: PayloadAction<GetMetadataAction>) => state,
+    updateStepMetadata: (state, action: PayloadAction<UpdateStepMetadataAction>) => state,
+    removeStepMetadata: (state, action: PayloadAction<RemoveMetadataAction>) => state,
+    addStepMetadata: (state, action: PayloadAction<AddMetadataAction>) => state,
+    addSelectionMetadata: (state, action: PayloadAction<AddMetadataAction>) => state,
+    addChoiceMetadata: (state, action: PayloadAction<AddMetadataAction>) => state,
   },
 });
 

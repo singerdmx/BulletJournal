@@ -10,7 +10,15 @@ import {
   LockUserAndIPAction,
   ChangePointsAction,
   SetPointsAction,
-  GetUserInfoAction, GetCategoryStepsAction, ApproveSampleTaskAction, GetChoiceMetadataAction,
+  GetUserInfoAction,
+  GetCategoryStepsAction,
+  ApproveSampleTaskAction,
+  GetMetadataAction,
+  UpdateChoiceMetadataAction,
+  RemoveMetadataAction,
+  UpdateSelectionMetadataAction,
+  UpdateStepMetadataAction,
+  AddMetadataAction,
 } from './reducer';
 import {
   setRole,
@@ -22,11 +30,17 @@ import {
   fetchUserInfo,
   setPoints,
 } from '../../apis/adminApis';
-import {CategorySteps, ChoiceMetadata, UserInfo} from './interface';
+import {CategorySteps, ChoiceMetadata, SelectionMetadata, StepMetadata, UserInfo} from './interface';
 import {auditSampleTask, fetchCategorySteps} from "../../apis/templates/workflowApis";
-import {SampleTask} from "../templates/interface";
+import {Choice, SampleTask} from "../templates/interface";
 import {sampleTaskReceived} from "../templates/actions";
-import {fetchChoiceMetadata} from "../../apis/templates/metadataApis";
+import {
+  createChoiceMetadata, createSelectionMetadata, createStepMetadata,
+  deleteChoiceMetadata, deleteSelectionMetadata, deleteStepMetadata,
+  fetchChoiceMetadata,
+  fetchSelectionMetadata, fetchStepMetadata,
+  putChoiceMetadata, putSelectionMetadata, putStepMetadata
+} from "../../apis/templates/metadataApis";
 
 function* setUserRole(action: PayloadAction<setRoleAction>) {
   try {
@@ -166,12 +180,120 @@ function* approveSampleTask(action: PayloadAction<ApproveSampleTaskAction>) {
   }
 }
 
-function* getChoiceMetadata(action: PayloadAction<GetChoiceMetadataAction>) {
+function* getChoiceMetadata(action: PayloadAction<GetMetadataAction>) {
   try {
     const data : ChoiceMetadata[] = yield call(fetchChoiceMetadata);
     yield put(adminActions.choiceMetadataReceived({choiceMetadata: data}));
   } catch (error) {
     yield call(message.error, `getChoiceMetadata Error Received: ${error}`);
+  }
+}
+
+function* getSelectionMetadata(action: PayloadAction<GetMetadataAction>) {
+  try {
+    const data : SelectionMetadata[] = yield call(fetchSelectionMetadata);
+    yield put(adminActions.selectionMetadataReceived({selectionMetadata: data}));
+  } catch (error) {
+    yield call(message.error, `getSelectionMetadata Error Received: ${error}`);
+  }
+}
+
+function* getStepMetadata(action: PayloadAction<GetMetadataAction>) {
+  try {
+    const data : StepMetadata[] = yield call(fetchStepMetadata);
+    yield put(adminActions.stepMetadataReceived({stepMetadata: data}));
+  } catch (error) {
+    yield call(message.error, `getStepMetadata Error Received: ${error}`);
+  }
+}
+
+function* updateChoiceMetadata(action: PayloadAction<UpdateChoiceMetadataAction>) {
+  const { keyword, choiceId } = action.payload;
+  try {
+    const data : ChoiceMetadata[] = yield call(putChoiceMetadata, keyword, choiceId);
+    yield put(adminActions.choiceMetadataReceived({choiceMetadata: data}));
+  } catch (error) {
+    yield call(message.error, `updateChoiceMetadata Error Received: ${error}`);
+  }
+}
+
+function* updateSelectionMetadata(action: PayloadAction<UpdateSelectionMetadataAction>) {
+  const { keyword, selectionId } = action.payload;
+  try {
+    const data : SelectionMetadata[] = yield call(putSelectionMetadata, keyword, selectionId);
+    yield put(adminActions.selectionMetadataReceived({selectionMetadata: data}));
+  } catch (error) {
+    yield call(message.error, `updateSelectionMetadata Error Received: ${error}`);
+  }
+}
+
+function* updateStepMetadata(action: PayloadAction<UpdateStepMetadataAction>) {
+  const { keyword, stepId } = action.payload;
+  try {
+    const data : StepMetadata[] = yield call(putStepMetadata, keyword, stepId);
+    yield put(adminActions.stepMetadataReceived({stepMetadata: data}));
+  } catch (error) {
+    yield call(message.error, `updateStepMetadata Error Received: ${error}`);
+  }
+}
+
+function* removeChoiceMetadata(action: PayloadAction<RemoveMetadataAction>) {
+  const { keywords } = action.payload;
+  try {
+    const data : ChoiceMetadata[] = yield call(deleteChoiceMetadata, keywords);
+    yield put(adminActions.choiceMetadataReceived({choiceMetadata: data}));
+  } catch (error) {
+    yield call(message.error, `removeChoiceMetadata Error Received: ${error}`);
+  }
+}
+
+function* removeSelectionMetadata(action: PayloadAction<RemoveMetadataAction>) {
+  const { keywords } = action.payload;
+  try {
+    const data : SelectionMetadata[] = yield call(deleteSelectionMetadata, keywords);
+    yield put(adminActions.selectionMetadataReceived({selectionMetadata: data}));
+  } catch (error) {
+    yield call(message.error, `removeSelectionMetadata Error Received: ${error}`);
+  }
+}
+
+function* removeStepMetadata(action: PayloadAction<RemoveMetadataAction>) {
+  const { keywords } = action.payload;
+  try {
+    const data : StepMetadata[] = yield call(deleteStepMetadata, keywords);
+    yield put(adminActions.stepMetadataReceived({stepMetadata: data}));
+  } catch (error) {
+    yield call(message.error, `removeStepMetadata Error Received: ${error}`);
+  }
+}
+
+function* addChoiceMetadata(action: PayloadAction<AddMetadataAction>) {
+  const { id, keyword } = action.payload;
+  try {
+    const data : ChoiceMetadata[] = yield call(createChoiceMetadata, keyword, id);
+    yield put(adminActions.choiceMetadataReceived({choiceMetadata: data}));
+  } catch (error) {
+    yield call(message.error, `addChoiceMetadata Error Received: ${error}`);
+  }
+}
+
+function* addStepMetadata(action: PayloadAction<AddMetadataAction>) {
+  const { id, keyword } = action.payload;
+  try {
+    const data : StepMetadata[] = yield call(createStepMetadata, keyword, id);
+    yield put(adminActions.stepMetadataReceived({stepMetadata: data}));
+  } catch (error) {
+    yield call(message.error, `addStepMetadata Error Received: ${error}`);
+  }
+}
+
+function* addSelectionMetadata(action: PayloadAction<AddMetadataAction>) {
+  const { id, keyword } = action.payload;
+  try {
+    const data : SelectionMetadata[] = yield call(createSelectionMetadata, keyword, id);
+    yield put(adminActions.selectionMetadataReceived({selectionMetadata: data}));
+  } catch (error) {
+    yield call(message.error, `addSelectionMetadata Error Received: ${error}`);
   }
 }
 
@@ -190,5 +312,16 @@ export default function* AdminSagas() {
     yield takeLatest(adminActions.getCategorySteps.type, getCategorySteps),
     yield takeLatest(adminActions.approveSampleTask.type, approveSampleTask),
     yield takeLatest(adminActions.getChoiceMetadata.type, getChoiceMetadata),
+    yield takeLatest(adminActions.getSelectionMetadata.type, getSelectionMetadata),
+    yield takeLatest(adminActions.getStepMetadata.type, getStepMetadata),
+    yield takeLatest(adminActions.updateChoiceMetadata.type, updateChoiceMetadata),
+    yield takeLatest(adminActions.updateSelectionMetadata.type, updateSelectionMetadata),
+    yield takeLatest(adminActions.removeChoiceMetadata.type, removeChoiceMetadata),
+    yield takeLatest(adminActions.removeSelectionMetadata.type, removeSelectionMetadata),
+    yield takeLatest(adminActions.updateStepMetadata.type, updateStepMetadata),
+    yield takeLatest(adminActions.removeStepMetadata.type, removeStepMetadata),
+    yield takeLatest(adminActions.addChoiceMetadata.type, addChoiceMetadata),
+    yield takeLatest(adminActions.addStepMetadata.type, addStepMetadata),
+    yield takeLatest(adminActions.addSelectionMetadata.type, addSelectionMetadata),
   ])
 }

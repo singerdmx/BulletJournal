@@ -1,7 +1,7 @@
 version: '2.1'
 services:
   auth-proxy:
-    image: xcode1024/auth-proxy:v71
+    image: xcode1024/auth-proxy:v72
     container_name: auth-proxy
     ports:
       - "80:80"
@@ -19,6 +19,26 @@ services:
       - "3000:3000"
     depends_on:
       - controller
+
+  daemon:
+    container_name: daemon_app
+    image: mwangxx/bulletjournal-daemon:BULLETJOURNAL_VERSION
+    ports:
+      - "50051:50051"
+    depends_on:
+      cache:
+        condition: service_started
+      database:
+        condition: service_healthy
+    environment: 
+      tier: prod
+    volumes: 
+      - $HOME/docker/daemon/log:/var/log
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://daemon:9091/daemon/healthcheck"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   controller:
     image: mwangxx/bulletjournal-backend:BULLETJOURNAL_VERSION

@@ -8,7 +8,11 @@ import {
     ThemeUpdate,
     UpdateExpandedMyself,
     ClearMyself,
-    FetchUserPointActivities, SubscribedCategories, GetSubscribedCategories, UnsubscribedCategory
+    FetchUserPointActivities,
+    SubscribedCategories,
+    GetSubscribedCategories,
+    UnsubscribedCategory,
+    UpdateCategorySubscription
 } from './reducer';
 import { IState } from '../../store';
 import { actions as settingsActions } from '../../components/settings/reducer';
@@ -25,7 +29,7 @@ import {expandedMyselfLoading, reloadReceived} from './actions';
 import {UserPointActivity} from "../../pages/points/interface";
 import {getUserSubscribedCategories} from "../../apis/templates/workflowApis";
 import {SubscribedCategory} from "./interface";
-import {removeUserCategory} from "../../apis/templates/categoryApis";
+import {removeUserCategory, updateSubscription} from "../../apis/templates/categoryApis";
 
 function* myselfApiErrorAction(action: PayloadAction<MyselfApiErrorAction>) {
   yield call(message.error, `Myself Error Received: ${action.payload.error}`);
@@ -219,6 +223,24 @@ function* unsubscribedCategory(action: PayloadAction<UnsubscribedCategory>) {
     }
 }
 
+function* updateCategorySubscription(action: PayloadAction<UpdateCategorySubscription>) {
+    try {
+        const { categoryId, selectionId, projectId } = action.payload;
+        const data : SubscribedCategory[] = yield call(updateSubscription, categoryId, selectionId, projectId);
+        yield put(
+            myselfActions.subscribedCategoriesReceived( {
+                subscribedCategories: data
+            })
+        );
+    } catch (error) {
+        if (error.message === 'reload') {
+            yield put(reloadReceived(true));
+        } else {
+            yield call(message.error, `updateCategorySubscription Error Received: ${error}`);
+        }
+    }
+}
+
 export default function* myselfSagas() {
   yield all([
     yield takeLatest(
@@ -236,6 +258,7 @@ export default function* myselfSagas() {
     yield takeLatest(myselfActions.getUserPointActivities.type, fetchUserPointActivities),
     yield takeLatest(myselfActions.getSubscribedCategories.type, getSubscribedCategories),
     yield takeLatest(myselfActions.unsubscribedCategory.type, unsubscribedCategory),
+    yield takeLatest(myselfActions.updateCategorySubscription.type, updateCategorySubscription),
   ]);
 }
 

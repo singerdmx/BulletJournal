@@ -9,6 +9,7 @@ mkdir -p "$HOME/docker/volumes/etc/key"
 mkdir -p "$HOME/docker/volumes/elasticsearch"
 mkdir -p "$HOME/docker/auth_proxy/bin"
 mkdir -p "$HOME/docker/auth_proxy/log"
+mkdir -p "$HOME/docker/daemon/log"
 
 ./db_backup.sh
 

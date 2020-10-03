@@ -84,9 +84,9 @@ func GetLoggerConfig(DevEnv bool,
 
 func InitLogging(env *string) {
 	if *env == "prod" {
-		config = GetLoggerConfig(false, true, Info, true, true, Info, true, "./tmp/daemon-prod.log")
+		config = GetLoggerConfig(false, true, Info, true, true, Info, true, "/var/log/daemon-prod.log")
 	} else {
-		config = GetLoggerConfig(true, true, Debug, false, false, Info, false, "./tmp/daemon-dev.log")
+		config = GetLoggerConfig(true, true, Debug, false, false, Info, false, "/var/log/daemon-dev.log")
 	}
 
 	err := newLogger(config)
@@ -172,7 +172,6 @@ func newZapLogger(config Configuration) (*Logger, error) {
 		sugaredLogger: logger.Sugar(),
 	}, nil
 }
-
 
 func (l *Logger) Debug(v ...interface{}) {
 	l.sugaredLogger.Debug(v)

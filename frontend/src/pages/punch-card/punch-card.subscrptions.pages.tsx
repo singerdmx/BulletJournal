@@ -3,7 +3,7 @@ import './punch-card.styles.less';
 import {Avatar, Empty, Select, Tooltip} from "antd";
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {getSubscribedCategories, unsubscribedCategory} from "../../features/myself/actions";
+import {getSubscribedCategories, unsubscribedCategory, updateCategorySubscription} from "../../features/myself/actions";
 import {SubscribedCategory} from "../../features/myself/interface";
 import {renderCategory} from "../templates/categories.page";
 import '../templates/category.styles.less';
@@ -21,6 +21,7 @@ type TemplateSubscriptionsProps = {
     subscribedCategories: SubscribedCategory[];
     getSubscribedCategories: () => void;
     unsubscribedCategory: (categoryId: number, selectionId: number) => void;
+    updateCategorySubscription: (categoryId: number, selectionId: number, projectId: number) => void;
 };
 
 const TemplateSubscriptions: React.FC<TemplateSubscriptionsProps> = (
@@ -29,7 +30,8 @@ const TemplateSubscriptions: React.FC<TemplateSubscriptionsProps> = (
         ownedProjects,
         sharedProjects,
         getSubscribedCategories,
-        unsubscribedCategory
+        unsubscribedCategory,
+        updateCategorySubscription
     }) => {
 
     const [projects, setProjects] = useState<Project[]>([]);
@@ -79,6 +81,9 @@ const TemplateSubscriptions: React.FC<TemplateSubscriptionsProps> = (
                                     <Select
                                         style={{padding: '3px', minWidth: '40%'}}
                                         placeholder="Choose BuJo"
+                                        onChange={(id: number) => {
+                                            updateCategorySubscription(subscribedCategory.category.id, s.id, id);
+                                        }}
                                         value={projectId}
                                     >
                                         {projects.map((project) => {
@@ -117,5 +122,6 @@ const mapStateToProps = (state: IState) => ({
 
 export default connect(mapStateToProps, {
     getSubscribedCategories,
-    unsubscribedCategory
+    unsubscribedCategory,
+    updateCategorySubscription
 })(TemplateSubscriptions);

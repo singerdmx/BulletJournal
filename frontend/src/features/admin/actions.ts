@@ -33,3 +33,34 @@ export const approveSampleTask = (sampleTaskId: number, choiceId: number, select
     actions.approveSampleTask({sampleTaskId: sampleTaskId, choiceId: choiceId, selections: selections});
 
 export const getChoiceMetadata = () => actions.getChoiceMetadata({});
+
+export const getSelectionMetadata = () => actions.getSelectionMetadata({});
+
+export const getStepMetadata = () => actions.getStepMetadata({});
+
+export const updateChoiceMetadata = (keyword: string, choiceId: number) => actions.updateChoiceMetadata({
+   keyword: keyword, choiceId: choiceId});
+
+export const updateSelectionMetadata = (keyword: string, selectionId: number) => actions.updateSelectionMetadata({
+   keyword: keyword, selectionId: selectionId});
+
+export const updateStepMetadata = (keyword: string, stepId: number) => actions.updateStepMetadata({
+   keyword: keyword, stepId: stepId});
+
+export const removeChoiceMetadata = (keywords: string[]) => actions.removeChoiceMetadata({
+   keywords: keywords});
+
+export const removeSelectionMetadata = (keywords: string[]) => actions.removeSelectionMetadata({
+   keywords: keywords});
+
+export const removeStepMetadata = (keywords: string[]) => actions.removeStepMetadata({
+   keywords: keywords});
+
+export const addStepMetadata = (keyword: string, id: number) => actions.addStepMetadata({
+   keyword: keyword, id: id});
+
+export const addChoiceMetadata = (keyword: string, id: number) => actions.addChoiceMetadata({
+   keyword: keyword, id: id});
+
+export const addSelectionMetadata = (keyword: string, id: number) => actions.addSelectionMetadata({
+   keyword: keyword, id: id});

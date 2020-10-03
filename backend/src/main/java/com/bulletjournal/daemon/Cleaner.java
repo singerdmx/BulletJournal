@@ -1,6 +1,5 @@
 package com.bulletjournal.daemon;
 
-import com.bulletjournal.clients.GoogleCalClient;
 import com.bulletjournal.config.NotificationConfig;
 import com.bulletjournal.repository.AuditableDaoJpa;
 import com.bulletjournal.repository.GoogleCalendarProjectDaoJpa;
@@ -20,6 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@Deprecated
 @Service
 public class Cleaner {
 
@@ -37,7 +37,7 @@ public class Cleaner {
 
     @Autowired
     public Cleaner(NotificationDaoJpa notificationDaoJpa, PublicProjectItemDaoJpa publicProjectItemDaoJpa,
-                   GoogleCalendarProjectDaoJpa googleCalendarProjectDaoJpa, GoogleCalClient googleCalClient) {
+                   GoogleCalendarProjectDaoJpa googleCalendarProjectDaoJpa) {
         this.executorService = Executors.newSingleThreadScheduledExecutor(new CustomThreadFactory("cleaner"));
         this.notificationDaoJpa = notificationDaoJpa;
         this.publicProjectItemDaoJpa = publicProjectItemDaoJpa;
@@ -46,12 +46,12 @@ public class Cleaner {
 
     @PostConstruct
     public void postConstruct() {
-        int intervalInSeconds = notificationConfig.getCleaner().getIntervalInSeconds();
-        if (intervalInSeconds <= 0) {
-            throw new IllegalArgumentException("Invalid intervalInSeconds: " + intervalInSeconds);
-        }
-
-        this.executorService.scheduleWithFixedDelay(this::clean, 0, intervalInSeconds, TimeUnit.SECONDS);
+//        int intervalInSeconds = notificationConfig.getCleaner().getIntervalInSeconds();
+//        if (intervalInSeconds <= 0) {
+//            throw new IllegalArgumentException("Invalid intervalInSeconds: " + intervalInSeconds);
+//        }
+//
+//        this.executorService.scheduleWithFixedDelay(this::clean, 0, intervalInSeconds, TimeUnit.SECONDS);
     }
 
     public void clean() {
