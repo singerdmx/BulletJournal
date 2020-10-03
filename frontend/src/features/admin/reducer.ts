@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
-import {Role, LockedUser, LockedIP, UserInfo, CategorySteps, ChoiceMetadata} from './interface';
+import {Role, LockedUser, LockedIP, UserInfo, CategorySteps, ChoiceMetadata, SelectionMetadata} from './interface';
 import { User } from '../group/interface';
 
 export type setRoleAction = {
@@ -77,7 +77,25 @@ export type ChoiceMetadataAction = {
   choiceMetadata: ChoiceMetadata[];
 }
 
-export type GetChoiceMetadataAction = {};
+export type SelectionMetadataAction = {
+  selectionMetadata: SelectionMetadata[];
+}
+
+export type GetMetadataAction = {};
+
+export type UpdateChoiceMetadataAction = {
+  keyword: string;
+  choiceId: number;
+};
+
+export type UpdateSelectionMetadataAction = {
+  keyword: string;
+  selectionId: number;
+};
+
+export type RemoveChoiceMetadataAction = {
+  keyword: string;
+};
 
 let initialState = {
   usersByRole: [] as User[],
@@ -85,7 +103,8 @@ let initialState = {
   lockedIPs: [] as LockedIP[],
   userInfo: {} as UserInfo,
   categorySteps: undefined as CategorySteps | undefined,
-  choiceMetadata: [] as ChoiceMetadata[]
+  choiceMetadata: [] as ChoiceMetadata[],
+  selectionMetadata: [] as SelectionMetadata[]
 };
 
 const slice = createSlice({
@@ -138,7 +157,15 @@ const slice = createSlice({
       const { choiceMetadata } = action.payload;
       state.choiceMetadata = choiceMetadata;
     },
-    getChoiceMetadata: (state, action: PayloadAction<GetChoiceMetadataAction>) => state,
+    getChoiceMetadata: (state, action: PayloadAction<GetMetadataAction>) => state,
+    updateChoiceMetadata: (state, action: PayloadAction<UpdateChoiceMetadataAction>) => state,
+    removeChoiceMetadata: (state, action: PayloadAction<RemoveChoiceMetadataAction>) => state,
+    selectionMetadataReceived: (state, action: PayloadAction<SelectionMetadataAction>) => {
+      const { selectionMetadata } = action.payload;
+      state.selectionMetadata = selectionMetadata;
+    },
+    getSelectionMetadata: (state, action: PayloadAction<GetMetadataAction>) => state,
+    updateSelectionMetadata: (state, action: PayloadAction<UpdateSelectionMetadataAction>) => state,
   },
 });
 

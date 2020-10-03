@@ -33,3 +33,14 @@ export const approveSampleTask = (sampleTaskId: number, choiceId: number, select
     actions.approveSampleTask({sampleTaskId: sampleTaskId, choiceId: choiceId, selections: selections});
 
 export const getChoiceMetadata = () => actions.getChoiceMetadata({});
+
+export const getSelectionMetadata = () => actions.getSelectionMetadata({});
+
+export const updateChoiceMetadata = (keyword: string, choiceId: number) => actions.updateChoiceMetadata({
+   keyword: keyword, choiceId: choiceId});
+
+export const updateSelectionMetadata = (keyword: string, selectionId: number) => actions.updateSelectionMetadata({
+   keyword: keyword, selectionId: selectionId});
+
+export const removeChoiceMetadata = (keyword: string) => actions.removeChoiceMetadata({
+   keyword: keyword});
