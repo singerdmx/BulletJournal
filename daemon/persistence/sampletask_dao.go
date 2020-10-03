@@ -36,9 +36,10 @@ func (s *SampleTaskDao) Upsert(sampleTask *SampleTask) {
 		available_before,
 		reminder_before_task,
 		due_date,
-		due_time
+		due_time,
+		time_zone,
 	) values(
-		%v,%v,%v,%v,%v,%v,%v,%v,%v,%v
+		%v,%v,%v,%v,%v,%v,%v,%v,%v,%v, "America/New_York"
 	) ON CONFLICT (uid) DO UPDATE
 		SET updated_at = %v,
 		available_before = %v
