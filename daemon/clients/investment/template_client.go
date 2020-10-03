@@ -42,7 +42,6 @@ func NewTemplateClient(TemplateName string) (*TemplateClient, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("cannot create template for %s", TemplateName))
 	}
-	log.Info("Template Client started")
 	return TemplateClientInstance, nil
 }
 
