@@ -106,10 +106,10 @@ public class MetadataController {
     }
 
     @PutMapping(CHOICES_METADATA_ROUTE)
-    public ChoiceMetadata updateChoiceMetadata(@NotNull @PathVariable String keyword, @Valid @RequestBody UpdateChoiceMetadataKeywordsParams params) {
+    public List<ChoiceMetadata> updateChoiceMetadata(@NotNull @PathVariable String keyword, @Valid @RequestBody UpdateChoiceMetadataKeywordsParams params) {
         validateRequester();
-        return choiceMetadataKeywordDaoJpa.updateByKeyword(keyword, params.getChoiceId()).toPresentationModel();
-
+        choiceMetadataKeywordDaoJpa.updateByKeyword(keyword, params.getChoiceId()).toPresentationModel();
+        return getChoiceMetadata();
     }
 
     private void validateRequester() {
