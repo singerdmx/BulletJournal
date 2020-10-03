@@ -85,28 +85,28 @@ public class MetadataController {
     }
 
     @DeleteMapping(CHOICES_METADATA_ROUTE)
-    public void deleteChoiceMetadataRoute(@NotNull @PathVariable String keyword) {
+    public void deleteChoiceMetadata(@NotNull @PathVariable String keyword) {
         validateRequester();
         choiceMetadataKeywordDaoJpa.deleteByKeyword(keyword);
 
     }
 
     @DeleteMapping(STEPS_METADATA_ROUTE)
-    public void deleteStepMetadataRoute(@NotNull @PathVariable String keyword) {
+    public void deleteStepMetadata(@NotNull @PathVariable String keyword) {
         validateRequester();
         stepMetadataKeywordDaoJpa.deleteByKeyword(keyword);
 
     }
 
     @DeleteMapping(SELECTIONS_METADATA_ROUTE)
-    public void deleteSelectionMetadataRoute(@NotNull @PathVariable String keyword) {
+    public void deleteSelectionMetadata(@NotNull @PathVariable String keyword) {
         validateRequester();
         selectionMetadataKeywordDaoJpa.deleteByKeyword(keyword);
 
     }
 
     @PutMapping(CHOICES_METADATA_ROUTE)
-    public ChoiceMetadata updateChoiceMetadataRoute(@NotNull @PathVariable String keyword, @Valid @RequestBody UpdateChoiceMetadataKeywordsParams params) {
+    public ChoiceMetadata updateChoiceMetadata(@NotNull @PathVariable String keyword, @Valid @RequestBody UpdateChoiceMetadataKeywordsParams params) {
         validateRequester();
         return choiceMetadataKeywordDaoJpa.updateByKeyword(keyword, params.getChoiceId()).toPresentationModel();
 
