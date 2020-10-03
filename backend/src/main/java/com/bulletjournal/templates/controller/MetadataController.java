@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,21 +49,27 @@ public class MetadataController {
     public List<ChoiceMetadata> getChoiceMetadata() {
         validateRequester();
         return this.choiceMetadataKeywordRepository.findAll()
-                .stream().map(c -> c.toPresentationModel()).collect(Collectors.toList());
+                .stream().map(c -> c.toPresentationModel())
+                .sorted(Comparator.comparing(c -> c.getChoice().getId()))
+                .collect(Collectors.toList());
     }
 
     @GetMapping(STEP_METADATA_ROUTE)
     public List<StepMetadata> getStepMetadata() {
         validateRequester();
         return this.stepMetadataKeywordRepository.findAll()
-                .stream().map(c -> c.toPresentationModel()).collect(Collectors.toList());
+                .stream().map(c -> c.toPresentationModel())
+                .sorted(Comparator.comparing(c -> c.getStep().getId()))
+                .collect(Collectors.toList());
     }
 
     @GetMapping(SELECTION_METADATA_ROUTE)
     public List<SelectionMetadata> getSelectionMetadata() {
         validateRequester();
         return this.selectionMetadataKeywordRepository.findAll()
-                .stream().map(c -> c.toPresentationModel()).collect(Collectors.toList());
+                .stream().map(c -> c.toPresentationModel())
+                .sorted(Comparator.comparing(c -> c.getSelection().getId()))
+                .collect(Collectors.toList());
     }
 
     @PostMapping(CHOICE_METADATA_ROUTE)
