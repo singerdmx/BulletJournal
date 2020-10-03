@@ -193,7 +193,6 @@ const StepsPage: React.FC<StepsProps> = (
     }
 
     const renderChoice = (choice: Choice) => {
-        const selections = getSelections();
         return <div key={choice.id} className='choice-card'>
             <Select mode={choice.multiple ? 'multiple' : undefined}
                     clearIcon={<CloseSquareTwoTone/>}
