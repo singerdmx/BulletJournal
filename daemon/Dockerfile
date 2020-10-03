@@ -34,7 +34,7 @@ RUN apk update && apk add curl
 COPY --from=builder /go/bin/daemon-server /go/bin/
 
 # Copy configuration files to /config folder
-ARG tier=dev
+ARG tier=prod
 ARG sourceConfigPath=config/config-${tier}.yaml
 ARG destConfigPath=/${sourceConfigPath}
 ENV tierEnv $tier

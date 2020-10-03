@@ -11,6 +11,8 @@ services:
         condition: service_started
       database:
         condition: service_healthy
+    environment: 
+      tier : prod
     healthcheck:
       test: ["CMD", "curl", "-f", "http://daemon:9091/daemon/healthcheck"]
       interval: 10s
