@@ -36,11 +36,22 @@ export const getChoiceMetadata = () => actions.getChoiceMetadata({});
 
 export const getSelectionMetadata = () => actions.getSelectionMetadata({});
 
+export const getStepMetadata = () => actions.getStepMetadata({});
+
 export const updateChoiceMetadata = (keyword: string, choiceId: number) => actions.updateChoiceMetadata({
    keyword: keyword, choiceId: choiceId});
 
 export const updateSelectionMetadata = (keyword: string, selectionId: number) => actions.updateSelectionMetadata({
    keyword: keyword, selectionId: selectionId});
 
-export const removeChoiceMetadata = (keyword: string) => actions.removeChoiceMetadata({
-   keyword: keyword});
+export const updateStepMetadata = (keyword: string, stepId: number) => actions.updateStepMetadata({
+   keyword: keyword, stepId: stepId});
+
+export const removeChoiceMetadata = (keywords: string[]) => actions.removeChoiceMetadata({
+   keywords: keywords});
+
+export const removeSelectionMetadata = (keywords: string[]) => actions.removeSelectionMetadata({
+   keywords: keywords});
+
+export const removeStepMetadata = (keywords: string[]) => actions.removeStepMetadata({
+   keywords: keywords});

@@ -3,7 +3,6 @@ import './workflow.styles.less';
 import {BackTop, Tabs} from "antd";
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {useHistory} from "react-router-dom";
 import AdminWorkflowChoices from "./workflow.choices";
 import AdminWorkflowTasks from "./workflow.tasks";
 
@@ -12,8 +11,7 @@ const {TabPane} = Tabs;
 type WorkflowPageProps = {};
 
 const AdminWorkflowPage: React.FC<WorkflowPageProps> = (
-    {}) => {
-    const history = useHistory();
+    props) => {
 
     useEffect(() => {
         document.title = 'Bullet Journal - Workflow';

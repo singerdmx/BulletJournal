@@ -14,7 +14,6 @@ import {Category, Choice, NextStep, SampleTask, SampleTasks, Step} from "../../f
 import {Button, Card, Empty, notification, Select, Tooltip} from "antd";
 import {isSubsequence} from "../../utils/Util";
 import {
-    CloseCircleTwoTone,
     CloseOutlined,
     CloseSquareTwoTone,
     ExclamationCircleFilled,

@@ -22,7 +22,7 @@ public class MetadataController {
     public static final String CHOICE_METADATA_ROUTE = "/api/choiceMetadata";
     public static final String STEP_METADATA_ROUTE = "/api/stepMetadata";
     public static final String SELECTION_METADATA_ROUTE = "/api/selectionMetadata";
-    public static final String CHOICES_METADATA_ROUTE = "/api/choicesMetadata/{keyword}";
+    public static final String CHOICES_METADATA_ROUTE = "/api/choiceMetadata/{keyword}";
     public static final String STEPS_METADATA_ROUTE = "/api/stepMetadata/{keyword}";
     public static final String SELECTIONS_METADATA_ROUTE = "/api/selectionMetadata/{keyword}";
 

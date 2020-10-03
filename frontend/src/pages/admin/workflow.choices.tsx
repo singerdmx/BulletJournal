@@ -6,7 +6,6 @@ import {connect} from "react-redux";
 import {addSelection, getChoices} from "../../features/templates/actions";
 import {Choice} from "../../features/templates/interface";
 import AdminChoiceElem from "./admin-choice-elem";
-import {useHistory} from "react-router-dom";
 import {Container} from "react-floating-action-button";
 import AddChoice from "../../components/modals/templates/add-choice.component";
 
@@ -22,7 +21,6 @@ const AdminWorkflowChoices: React.FC<WorkflowPageProps> = (
         getChoices,
         addSelection,
     }) => {
-    const history = useHistory();
 
     useEffect(() => {
         getChoices();

@@ -51,3 +51,8 @@ export interface SelectionMetadata {
   keyword: string;
   selection: Selection;
 }
+
+export interface StepMetadata {
+  keyword: string;
+  step: Step;
+}
