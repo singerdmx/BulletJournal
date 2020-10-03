@@ -42,6 +42,8 @@ type IPO struct {
 	Updated                        int           `json:"updated"`
 }
 
+const layoutISO = "2006-01-02"
+
 func NewIPOClient() (*TemplateClient, error) {
 	c := IPOClient{
 		BaseTemplateClient: NewBaseTemplateClient(),
@@ -98,6 +100,8 @@ func (c *IPOClient) SendData() error {
 	}
 	for i := range c.data.IPO {
 		target := c.data.IPO[i]
+		availBefore := target.Date
+		t, _ := time.Parse(layoutISO, availBefore)
 		item := persistence.SampleTask{
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
@@ -105,8 +109,7 @@ func (c *IPOClient) SendData() error {
 			Content: "",
 			Name: target.Name,
 			Uid: target.ID,
-			AvailableBefore: target.Date, // TODO
-			ReminderBeforeTask: 0,
+			AvailableBefore: t, // TODO
 			DueDate: target.PricingDate,			
 			DueTime: "",
 			Pending: true,

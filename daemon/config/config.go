@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"testing"
 
 	"github.com/spf13/viper"
 )
@@ -111,7 +112,6 @@ func InitConfig() {
 	isProd := flag.Bool("prod", false, "set config to production env")
 	isDev := flag.Bool("dev", false, "set config to development env")
 	flag.Parse()
-
 	SetConfig(configNameBase)
 	if *isProd == true {
 		environment = "prod"
@@ -124,6 +124,11 @@ func InitConfig() {
 		SetConfig(configNameDev)
 	}
 	PrintConfig()
+}
+
+func init()  {
+	testing.Init()
+	InitConfig()
 }
 
 func SetConfig(configName string) {

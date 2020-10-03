@@ -118,8 +118,6 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 }
 
 func main() {
-
-	config.InitConfig()
 	logging.InitLogging(config.GetEnv())
 	log = *logging.GetLogger()
 

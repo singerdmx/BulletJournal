@@ -3,7 +3,6 @@ package persistence
 import (
 	"context"
 	"encoding/json"
-	log "github.com/singerdmx/BulletJournal/daemon/logging"
 	"time"
 
 	"github.com/go-redis/redis/v8"

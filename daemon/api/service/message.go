@@ -36,8 +36,8 @@ func (m *MessageService) SendJoinGroupEmail(username, email string, groupId, uid
 	if err != nil {
 		log.Fatalf("failed to persist username to redis %v", username)
 	}
-
-	group := persistence.GetGroupDao().FindGroup(groupId)
+	groupDao := persistence.NewGroupDao()
+	group := groupDao.FindGroup(groupId)
 	if group == nil {
 		log.Fatalf("cannot find group with group id %v", groupId)
 		return

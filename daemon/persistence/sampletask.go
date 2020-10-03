@@ -3,17 +3,16 @@ package persistence
 import "time"
 
 type SampleTask struct {
-	ID					uint64 		`db:"id"`
-	CreatedAt			time.Time 	`db:"created_at"`
-	UpdatedAt			time.Time 	`db:"updated_at"`
-	MetaData			string 		`db:"metadata"`
-	Content				string 		`db:"content"`
-	Name				string		`db:"name"`
-	Uid					string		`db:"uid"`
-	AvailableBefore		string  	`db:"available_before"` // TODO
-	ReminderBeforeTask 	int 		`db:"reminder_before_task"`
-	DueDate				string		`db:"due_date"`
-	DueTime 			string		`db:"due_time"`
-	TimeZone			string		`db:"time_zone"`
-	Pending				bool		`db:"pending"`
+	ID					int64 		`json:"id,omitempty" gorm:"primary_key"`
+	CreatedAt			time.Time 	`json:"-" gorm:"index:created_at;PRECISION:6"`
+	UpdatedAt			time.Time 	`json:"-" gorm:"PRECISION:6"`
+	MetaData			string 		`json:"metadata"`
+	Content				string 		`json:"content"`
+	Name				string		`json:"name" gorm:"type:varchar;size:100"`
+	Uid					string		`json:"uid" gorm:"type:varchar;size:500"`
+	AvailableBefore		time.Time  	`json:"available_before"`
+	DueDate				string		`json:"due_date" gorm:"type:varchar;size:15"`
+	DueTime 			string		`json:"due_time" gorm:"type:varchar;size:10"`
+	TimeZone            string      `json:"time_zone" gorm:"type:varchar;size:100"`
+	Pending				bool		`json:"pending"`
 }

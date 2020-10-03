@@ -48,6 +48,7 @@ type EarningData struct {
 const (
 	earningsDefaultPageSize = 500
 	earningsDefaultImportance = 0
+	RFC3339 = "2006-01-02T15:04:05Z07:00"
 )
 
 func NewEarningsClient() (*TemplateClient, error) {
@@ -62,7 +63,7 @@ func (c *EarningClient) FetchData() error {
 	date := t.Format("2006-01-02")
 	baseURL := "https://www.benzinga.com/services/webapps/calendar/earnings"
 
-	url := fmt.Sprintf("%s?tpagesize=%+v&parameters[date]=%d&parameters[importance]+%d", baseURL, earningsDefaultPageSize, date, earningsDefaultImportance)
+	url := fmt.Sprintf("%s?pagesize=%+v&parameters[date]=%s&parameters[importance]=%d", baseURL, earningsDefaultPageSize, date, earningsDefaultImportance)
 	resp, err := c.restClient.R().Get(url)
 	if err != nil {
 		return errors.Wrap(err, "sending request failed")
@@ -74,12 +75,15 @@ func (c *EarningClient) FetchData() error {
 	c.data = &data
 	return nil
 }
+
 func (c *EarningClient)SendData() error {
 	if c.data == nil {
 		return errors.New("Empty Earnings data, please fetch data first.")
 	}
 	for i := range c.data.EarningData {
 		target := c.data.EarningData[i]
+		availBefore := target.Date + "T" + target.Time + "Z00:00"
+		t, _ := time.Parse(RFC3339, availBefore)
 		item := persistence.SampleTask{
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
@@ -87,8 +91,7 @@ func (c *EarningClient)SendData() error {
 			Content: "",
 			Name: target.Name,
 			Uid: target.ID,
-			AvailableBefore: target.Date,
-			ReminderBeforeTask: 0,
+			AvailableBefore: t,
 			DueDate: target.Date,
 			DueTime: target.Time,
 			Pending: true,
