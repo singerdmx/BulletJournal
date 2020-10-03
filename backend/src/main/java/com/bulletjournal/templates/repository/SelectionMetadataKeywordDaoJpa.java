@@ -1,5 +1,6 @@
 package com.bulletjournal.templates.repository;
 
+import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.templates.repository.model.Selection;
 import com.bulletjournal.templates.repository.model.SelectionMetadataKeyword;
@@ -10,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Repository
 public class SelectionMetadataKeywordDaoJpa {
@@ -56,7 +59,11 @@ public class SelectionMetadataKeywordDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void deleteByKeywords(List<String> keywords) {
-        List<SelectionMetadataKeyword> list = selectionMetadataKeywordRepository.findAllById(keywords);
+        if (keywords.isEmpty()) {
+            throw new BadRequestException("keywords is empty");
+        }
+        List<SelectionMetadataKeyword> list = selectionMetadataKeywordRepository.findAllById(keywords)
+                .stream().filter(Objects::nonNull).collect(Collectors.toList());
         selectionMetadataKeywordRepository.deleteAll(list);
     }
 }
