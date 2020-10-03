@@ -33,4 +33,8 @@ public class StepMetadataKeyword extends AuditModel {
     public void setStep(Step step) {
         this.step = step;
     }
+
+    public com.bulletjournal.templates.controller.model.StepMetadata toPresentationModel() {
+        return new com.bulletjournal.templates.controller.model.StepMetadata(keyword, step.toPresentationModel());
+    }
 }

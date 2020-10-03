@@ -6,6 +6,16 @@ public class ChoiceMetadata {
 
     private Choice choice;
 
+    public ChoiceMetadata() {
+    }
+
+    public ChoiceMetadata(String keyword, Choice choice) {
+        this.keyword = keyword;
+        this.choice = choice;
+    }
+
+
+
     public String getKeyword() {
         return keyword;
     }
