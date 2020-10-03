@@ -44,4 +44,13 @@ public class SelectionMetadataKeywordDaoJpa {
         }
         selectionMetadataKeywordRepository.deleteById(keyword);
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public SelectionMetadataKeyword updateByKeyword(String keyword, Long selectionId) {
+        SelectionMetadataKeyword selectionMetadataKeyword = selectionMetadataKeywordRepository.findById(keyword)
+                .orElseThrow(() -> new ResourceNotFoundException("Keyword not found"));
+        Selection selection = selectionDaoJpa.getById(selectionId);
+        selectionMetadataKeyword.setSelection(selection);
+        return selectionMetadataKeywordRepository.save(selectionMetadataKeyword);
+    }
 }

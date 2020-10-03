@@ -66,22 +66,25 @@ public class MetadataController {
     }
 
     @PostMapping(CHOICE_METADATA_ROUTE)
-    public ChoiceMetadata createChoiceMetadata(@NotNull @RequestBody CreateChoiceMetadataParams params) {
+    public List<ChoiceMetadata> createChoiceMetadata(@NotNull @RequestBody CreateChoiceMetadataParams params) {
         validateRequester();
-        return this.choiceMetadataKeywordDaoJpa.save(params.getChoiceId(), params.getKeyword())
+        this.choiceMetadataKeywordDaoJpa.save(params.getChoiceId(), params.getKeyword())
                 .toPresentationModel();
+        return getChoiceMetadata();
     }
 
     @PostMapping(SELECTION_METADATA_ROUTE)
-    public SelectionMetadata createSelectionMetadata(@NotNull @RequestBody CreateSelectionMetadataParams params) {
+    public List<SelectionMetadata> createSelectionMetadata(@NotNull @RequestBody CreateSelectionMetadataParams params) {
         validateRequester();
-        return this.selectionMetadataKeywordDaoJpa.save(params.getSelectionId(), params.getKeyword()).toPresentationModel();
+        this.selectionMetadataKeywordDaoJpa.save(params.getSelectionId(), params.getKeyword()).toPresentationModel();
+        return getSelectionMetadata();
     }
 
     @PostMapping(STEP_METADATA_ROUTE)
-    public StepMetadata createStepMetadata(@NotNull @RequestBody CreateStepMetadataParams params) {
+    public List<StepMetadata> createStepMetadata(@NotNull @RequestBody CreateStepMetadataParams params) {
         validateRequester();
-        return this.stepMetadataKeywordDaoJpa.save(params.getStepId(), params.getKeyword()).toPresentationModel();
+        this.stepMetadataKeywordDaoJpa.save(params.getStepId(), params.getKeyword()).toPresentationModel();
+        return getStepMetadata();
     }
 
     @DeleteMapping(CHOICES_METADATA_ROUTE)
@@ -110,6 +113,20 @@ public class MetadataController {
         validateRequester();
         choiceMetadataKeywordDaoJpa.updateByKeyword(keyword, params.getChoiceId()).toPresentationModel();
         return getChoiceMetadata();
+    }
+
+    @PutMapping(SELECTIONS_METADATA_ROUTE)
+    public List<SelectionMetadata> updateSelectionMetadata(@NotNull @PathVariable String keyword, @Valid @RequestBody UpdateSelectionMetadataKeywordsParams params) {
+        validateRequester();
+        selectionMetadataKeywordDaoJpa.updateByKeyword(keyword, params.getSelectionId()).toPresentationModel();
+        return getSelectionMetadata();
+    }
+
+    @PutMapping(STEPS_METADATA_ROUTE)
+    public List<StepMetadata> updateStepMetadata(@NotNull @PathVariable String keyword, @Valid @RequestBody UpdateStepMetadataKeywordsParams params) {
+        validateRequester();
+        stepMetadataKeywordDaoJpa.updateByKeyword(keyword, params.getStepId()).toPresentationModel();
+        return getStepMetadata();
     }
 
     private void validateRequester() {

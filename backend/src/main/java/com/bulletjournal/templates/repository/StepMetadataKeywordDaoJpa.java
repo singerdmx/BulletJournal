@@ -32,4 +32,13 @@ public class StepMetadataKeywordDaoJpa {
         }
         stepMetadataKeywordRepository.deleteById(keyword);
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public StepMetadataKeyword updateByKeyword(String keyword, Long choiceId) {
+        StepMetadataKeyword stepMetadataKeyword = stepMetadataKeywordRepository.findById(keyword)
+                .orElseThrow(() -> new ResourceNotFoundException("Keyword not found"));
+        Step step = stepDaoJpa.getById(choiceId);
+        stepMetadataKeyword.setStep(step);
+        return stepMetadataKeywordRepository.save(stepMetadataKeyword);
+    }
 }
