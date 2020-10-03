@@ -1,13 +1,19 @@
 package com.bulletjournal.templates.repository;
 
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.NewSampleTaskEvent;
 import com.bulletjournal.notifications.NotificationService;
+import com.bulletjournal.repository.TaskDaoJpa;
+import com.bulletjournal.repository.UserDaoJpa;
+import com.bulletjournal.repository.models.Task;
+import com.bulletjournal.repository.models.User;
 import com.bulletjournal.templates.controller.model.AuditSampleTaskParams;
 import com.bulletjournal.templates.controller.model.CreateSampleTaskParams;
 import com.bulletjournal.templates.controller.model.UpdateSampleTaskParams;
 import com.bulletjournal.templates.repository.model.*;
+import com.google.common.collect.ImmutableList;
 import org.apache.http.util.TextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -37,6 +43,12 @@ public class SampleTaskDaoJpa {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private TaskDaoJpa taskDaoJpa;
+
+    @Autowired
+    private UserDaoJpa userDaoJpa;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SampleTask createSampleTask(CreateSampleTaskParams createSampleTaskParams) {
@@ -138,11 +150,38 @@ public class SampleTaskDaoJpa {
         // send notification to subscribed users
         List<UserCategory> users = this.userCategoryDaoJpa.getSubscribedUsersByMetadataKeyword(
                 keywords.stream().map(SelectionMetadataKeyword::getKeyword).collect(Collectors.toList()));
+
+
+        // if sample task has due date, directly push to task table
+        if (sampleTask.hasDueDate()) {
+            Map<String, User> userMap = this.userDaoJpa.getUsersByNames(
+                    users.stream().map(u -> u.getUser().getName()).collect(Collectors.toSet()))
+                    .stream().collect(Collectors.toMap(User::getName, u -> u));
+            for (UserCategory user : users) {
+                String username = user.getUser().getName();
+                List<Task> createdTasks = this.taskDaoJpa.createTaskFromSampleTask(
+                        user.getProject().getId(),
+                        username,
+                        ImmutableList.of(sampleTask.toPresentationModel()),
+                        userMap.get(username).getReminderBeforeTask().getValue(),
+                        ImmutableList.of(username),
+                        Collections.emptyList());
+                this.notificationService.inform(
+                        new NewSampleTaskEvent(
+                                new Event(username, sampleTaskId, sampleTask.getName()),
+                                "BulletJournal",
+                                ContentType.getContentLink(ContentType.TASK, createdTasks.get(0).getId())));
+            }
+            return sampleTask;
+        }
+
+        // otherwise show up in punchCard page
         List<Event> events = new ArrayList<>();
         for (UserCategory user : users) {
             events.add(new Event(user.getUser().getName(), sampleTaskId, sampleTask.getName()));
         }
         this.notificationService.inform(new NewSampleTaskEvent(events, "BulletJournal"));
+
         return sampleTask;
     }
 }
