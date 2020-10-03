@@ -12,6 +12,7 @@ import com.bulletjournal.templates.repository.CategoriesHierarchyDaoJpa;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
 import com.bulletjournal.templates.repository.UserCategoryDaoJpa;
 import com.bulletjournal.templates.repository.model.CategoriesHierarchy;
+import com.bulletjournal.templates.repository.model.UserCategory;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,8 @@ public class CategoryController {
     public static final String PUBLIC_CATEGORY_ROUTE = "/api/public/categories/{categoryId}";
 
     public static final String CATEGORY_UNSUBSCRIBE_ROUTE = "/api/categories/{categoryId}/unsubscribe";
+
+    public static final String UPDATE_CATEGORY_SUBSCRIPTION = "/api/categories/{categoryId}/updateCategorySubscription";
 
     protected static final String CATEGORY_SET_CHOICES_ROUTE = "/api/categories/{categoryId}/setChoices";
 
@@ -155,6 +158,16 @@ public class CategoryController {
         categoryDaoJpa.updateChoicesForCategory(categoryId, choicesIds);
         return getCategory(categoryId);
     }
+
+    @PutMapping(UPDATE_CATEGORY_SUBSCRIPTION)
+    public UserCategory updateCategorySubscription(
+            @NotNull @PathVariable Long categoryId,
+            @Valid @RequestBody UpdateCategorySubscriptionParams updateCategorySubscriptionParams) {
+
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return userCategoryDaoJpa.updateUserCategoryProject(username, categoryId, updateCategorySubscriptionParams);
+    }
+
 
     private void validateRequester() {
         String requester = MDC.get(UserClient.USER_NAME_KEY);
