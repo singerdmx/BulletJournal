@@ -26,6 +26,7 @@ public class MetadataController {
     public static final String STEPS_METADATA_ROUTE = "/api/stepMetadata/{keyword}";
     public static final String SELECTIONS_METADATA_ROUTE = "/api/selectionMetadata/{keyword}";
 
+
     @Autowired
     private ChoiceMetadataKeywordRepository choiceMetadataKeywordRepository;
 
@@ -87,25 +88,25 @@ public class MetadataController {
         return getStepMetadata();
     }
 
-    @DeleteMapping(CHOICES_METADATA_ROUTE)
-    public void deleteChoiceMetadata(@NotNull @PathVariable String keyword) {
+    @DeleteMapping(CHOICE_METADATA_ROUTE)
+    public void deleteChoiceMetadata(@NotNull @RequestBody List<String> keywords) {
         validateRequester();
-        choiceMetadataKeywordDaoJpa.deleteByKeyword(keyword);
+        choiceMetadataKeywordDaoJpa.deleteByKeywords(keywords);
 
     }
 
-    @DeleteMapping(STEPS_METADATA_ROUTE)
-    public void deleteStepMetadata(@NotNull @PathVariable String keyword) {
+    @DeleteMapping(STEP_METADATA_ROUTE)
+    public List<StepMetadata> deleteStepMetadata(@NotNull @RequestBody List<String> keywords) {
         validateRequester();
-        stepMetadataKeywordDaoJpa.deleteByKeyword(keyword);
-
+       stepMetadataKeywordDaoJpa.deleteByKeywords(keywords);
+       return getStepMetadata();
     }
 
-    @DeleteMapping(SELECTIONS_METADATA_ROUTE)
-    public void deleteSelectionMetadata(@NotNull @PathVariable String keyword) {
+    @DeleteMapping(SELECTION_METADATA_ROUTE)
+    public List<SelectionMetadata> deleteSelectionMetadata(@NotNull @RequestBody List<String> keywords) {
         validateRequester();
-        selectionMetadataKeywordDaoJpa.deleteByKeyword(keyword);
-
+        selectionMetadataKeywordDaoJpa.deleteByKeywords(keywords);
+        return getSelectionMetadata();
     }
 
     @PutMapping(CHOICES_METADATA_ROUTE)
