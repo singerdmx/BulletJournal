@@ -12,7 +12,6 @@ import com.bulletjournal.templates.repository.CategoriesHierarchyDaoJpa;
 import com.bulletjournal.templates.repository.CategoryDaoJpa;
 import com.bulletjournal.templates.repository.UserCategoryDaoJpa;
 import com.bulletjournal.templates.repository.model.CategoriesHierarchy;
-import com.bulletjournal.templates.repository.model.UserCategory;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +35,7 @@ public class CategoryController {
 
     public static final String CATEGORY_UNSUBSCRIBE_ROUTE = "/api/categories/{categoryId}/unsubscribe";
 
-    public static final String UPDATE_CATEGORY_SUBSCRIPTION = "/api/categories/{categoryId}/updateCategorySubscription";
+    public static final String UPDATE_CATEGORY_SUBSCRIPTION = "/api/categories/{categoryId}/updateSubscription";
 
     protected static final String CATEGORY_SET_CHOICES_ROUTE = "/api/categories/{categoryId}/setChoices";
 
@@ -159,13 +158,14 @@ public class CategoryController {
         return getCategory(categoryId);
     }
 
-    @PutMapping(UPDATE_CATEGORY_SUBSCRIPTION)
-    public UserCategory updateCategorySubscription(
+    @PostMapping(UPDATE_CATEGORY_SUBSCRIPTION)
+    public List<SubscribedCategory> updateCategorySubscription(
             @NotNull @PathVariable Long categoryId,
             @Valid @RequestBody UpdateCategorySubscriptionParams updateCategorySubscriptionParams) {
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return userCategoryDaoJpa.updateUserCategoryProject(username, categoryId, updateCategorySubscriptionParams);
+        userCategoryDaoJpa.updateUserCategoryProject(username, categoryId, updateCategorySubscriptionParams);
+        return this.workflowController.getUserSubscribedCategories();
     }
 
 
