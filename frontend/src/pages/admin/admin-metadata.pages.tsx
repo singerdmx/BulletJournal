@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import './admin-metadata.styles.less';
-import {BackTop, Button, message, Table, Tooltip, Typography} from "antd";
+import {BackTop, Button, message, Table, Tooltip, Typography, Radio, Divider, InputNumber, Input} from "antd";
 import {IState} from "../../store";
 import {connect} from "react-redux";
 import {
@@ -13,9 +13,12 @@ import {
     removeSelectionMetadata,
     updateStepMetadata,
     removeStepMetadata,
+    addStepMetadata,
+    addSelectionMetadata,
+    addChoiceMetadata
 } from "../../features/admin/actions";
 import {ChoiceMetadata, SelectionMetadata, StepMetadata} from "../../features/admin/interface";
-import {DeleteTwoTone} from "@ant-design/icons";
+import {DeleteTwoTone, PlusCircleTwoTone} from "@ant-design/icons";
 
 const { Text } = Typography;
 
@@ -32,15 +35,22 @@ type AdminMetadataProps = {
     removeSelectionMetadata: (keywords: string[]) => void;
     updateStepMetadata: (keyword: string, stepId: number) => void;
     removeStepMetadata: (keywords: string[]) => void;
+    addStepMetadata: (keyword: string, id: number) => void;
+    addSelectionMetadata: (keyword: string, id: number) => void;
+    addChoiceMetadata: (keyword: string, id: number) => void;
 };
 
 const AdminMetadataPage: React.FC<AdminMetadataProps> = (
     {
         choiceMetadata, getChoiceMetadata, updateChoiceMetadata, removeChoiceMetadata,
         selectionMetadata, getSelectionMetadata, updateSelectionMetadata, removeSelectionMetadata,
-        stepMetadata, getStepMetadata, updateStepMetadata, removeStepMetadata
+        stepMetadata, getStepMetadata, updateStepMetadata, removeStepMetadata,
+        addStepMetadata, addSelectionMetadata, addChoiceMetadata
     }) => {
 
+    const [type, setType] = useState<string>('Choice');
+    const [keyword, setKeyword] = useState<string>('');
+    const [id, setId] = useState<number>(0);
     const [checkedChoices, setCheckedChoices] = useState<string[]>([]);
     const [checkedSelections, setCheckedSelections] = useState<string[]>([]);
     const [checkedSteps, setCheckedSteps] = useState<string[]>([]);
@@ -211,9 +221,65 @@ const AdminMetadataPage: React.FC<AdminMetadataProps> = (
         setCheckedSteps([]);
     }
 
+    const onChangeType = (e: any) => {
+        setType(e.target.value);
+    }
+
+    const addMetadata = () => {
+        if (!keyword) {
+            message.error("Empty Keyword Input");
+            return;
+        }
+
+        if (!id) {
+            message.error("Empty ID Input");
+            return;
+        }
+        switch (type) {
+            case 'Choice':
+                addChoiceMetadata(keyword, id);
+                break;
+            case 'Selection':
+                addSelectionMetadata(keyword, id);
+                break;
+            case 'Step':
+                addStepMetadata(keyword, id);
+                break;
+        }
+    }
+
     return (
         <div className='metadata-page'>
             <BackTop/>
+            <Divider/>
+            <div>
+                <Radio.Group onChange={onChangeType} value={type}>
+                    <Radio.Button value="Choice">Choice</Radio.Button>
+                    <Radio.Button value="Selection">Selection</Radio.Button>
+                    <Radio.Button value="Step">Step</Radio.Button>
+                </Radio.Group>
+                <Input
+                    allowClear={true}
+                    style={{ width: '120px', marginLeft: '12px', marginRight: '12px'}}
+                    placeholder='Keyword'
+                    value={keyword}
+                    onChange={(value) => {
+                        const s = value.target.value;
+                        console.log(s);
+                        setKeyword(s);
+                    }}/>
+                <InputNumber
+                    style={{ width: '70px', marginLeft: '12px', marginRight: '12px'}}
+                    placeholder='ID'
+                    onChange={(value) => {
+                        if (!value || isNaN(value)) setId(0);
+                        else setId(value);
+                    }}/>
+                <Button onClick={addMetadata} type="primary" shape="round" icon={<PlusCircleTwoTone />}>
+                    Add
+                </Button>
+            </div>
+            <Divider/>
             <div>
                 <h3>
                     Choice Metadata {'  '}
@@ -264,4 +330,7 @@ export default connect(mapStateToProps, {
     getStepMetadata,
     updateStepMetadata,
     removeStepMetadata,
+    addStepMetadata,
+    addSelectionMetadata,
+    addChoiceMetadata
 })(AdminMetadataPage);

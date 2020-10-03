@@ -115,6 +115,11 @@ export type RemoveMetadataAction = {
   keywords: string[];
 };
 
+export type AddMetadataAction = {
+  id: number;
+  keyword: string;
+};
+
 let initialState = {
   usersByRole: [] as User[],
   lockedUsers: [] as LockedUser[],
@@ -193,6 +198,9 @@ const slice = createSlice({
     getStepMetadata: (state, action: PayloadAction<GetMetadataAction>) => state,
     updateStepMetadata: (state, action: PayloadAction<UpdateStepMetadataAction>) => state,
     removeStepMetadata: (state, action: PayloadAction<RemoveMetadataAction>) => state,
+    addStepMetadata: (state, action: PayloadAction<AddMetadataAction>) => state,
+    addSelectionMetadata: (state, action: PayloadAction<AddMetadataAction>) => state,
+    addChoiceMetadata: (state, action: PayloadAction<AddMetadataAction>) => state,
   },
 });
 

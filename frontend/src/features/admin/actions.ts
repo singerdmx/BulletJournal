@@ -55,3 +55,12 @@ export const removeSelectionMetadata = (keywords: string[]) => actions.removeSel
 
 export const removeStepMetadata = (keywords: string[]) => actions.removeStepMetadata({
    keywords: keywords});
+
+export const addStepMetadata = (keyword: string, id: number) => actions.addStepMetadata({
+   keyword: keyword, id: id});
+
+export const addChoiceMetadata = (keyword: string, id: number) => actions.addChoiceMetadata({
+   keyword: keyword, id: id});
+
+export const addSelectionMetadata = (keyword: string, id: number) => actions.addSelectionMetadata({
+   keyword: keyword, id: id});

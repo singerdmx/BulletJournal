@@ -1,4 +1,4 @@
-import {doDelete, doFetch, doPut} from '../api-helper';
+import {doDelete, doFetch, doPost, doPut} from '../api-helper';
 
 export const fetchChoiceMetadata = () => {
     return doFetch('/api/choiceMetadata')
@@ -80,6 +80,42 @@ export const deleteStepMetadata = (keywords: string[]) => {
     return doDelete('/api/stepMetadata?' + keywords.map(k => `keywords=${k}`).join('&'))
         .then(res => res.json())
         .catch((err) => {
+            throw Error(err.message);
+        });
+}
+
+export const createChoiceMetadata = (keyword: string, choiceId: number) => {
+    const postBody = JSON.stringify({
+        keyword: keyword,
+        choiceId: choiceId,
+    });
+    return doPost('/api/choiceMetadata', postBody)
+        .then(res => res.json())
+        .catch(err => {
+            throw Error(err.message);
+        });
+}
+
+export const createStepMetadata = (keyword: string, stepId: number) => {
+    const postBody = JSON.stringify({
+        keyword: keyword,
+        stepId: stepId,
+    });
+    return doPost('/api/stepMetadata', postBody)
+        .then(res => res.json())
+        .catch(err => {
+            throw Error(err.message);
+        });
+}
+
+export const createSelectionMetadata = (keyword: string, selectionId: number) => {
+    const postBody = JSON.stringify({
+        keyword: keyword,
+        selectionId: selectionId,
+    });
+    return doPost('/api/selectionMetadata', postBody)
+        .then(res => res.json())
+        .catch(err => {
             throw Error(err.message);
         });
 }
