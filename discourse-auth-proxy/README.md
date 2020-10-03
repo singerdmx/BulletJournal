@@ -60,7 +60,7 @@ SSL Certificate Renewal
 
 1. Stop auth-proxy container
 2. Run `certbot renew`
-3. Copy the pem files to local machine `scp root@198.199.76.77:/etc/letsencrypt/live/bulletjournal.us-0003/* .`
+3. Copy the pem files to local machine `scp root@167.71.117.149:/etc/letsencrypt/live/bulletjournal.us-0003/* .`
 4. Rename `fullchain.pem` to `bulletjournal.us.cert` and `privkey.pem` to `bulletjournal.us.key`
 5. Update `discourse-auth-proxy/start.sh` for sso-secret
 6. Upgrade image by running `docker build -t xcode1024/auth-proxy:[version] .`
