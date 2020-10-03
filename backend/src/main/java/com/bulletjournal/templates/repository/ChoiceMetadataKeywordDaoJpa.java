@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Repository
 public class ChoiceMetadataKeywordDaoJpa {
     @Autowired
@@ -41,5 +43,11 @@ public class ChoiceMetadataKeywordDaoJpa {
         Choice choice = choiceDaoJpa.getById(choiceId);
         choiceMetadataKeyword.setChoice(choice);
         return choiceMetadataKeywordRepository.save(choiceMetadataKeyword);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void deleteByKeywords(List<String> keywords) {
+        List<ChoiceMetadataKeyword> list = choiceMetadataKeywordRepository.findAllById(keywords);
+        choiceMetadataKeywordRepository.deleteAll(list);
     }
 }

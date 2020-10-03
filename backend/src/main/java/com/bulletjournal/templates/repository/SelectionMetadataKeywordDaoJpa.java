@@ -53,4 +53,10 @@ public class SelectionMetadataKeywordDaoJpa {
         selectionMetadataKeyword.setSelection(selection);
         return selectionMetadataKeywordRepository.save(selectionMetadataKeyword);
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void deleteByKeywords(List<String> keywords) {
+        List<SelectionMetadataKeyword> list = selectionMetadataKeywordRepository.findAllById(keywords);
+        selectionMetadataKeywordRepository.deleteAll(list);
+    }
 }
