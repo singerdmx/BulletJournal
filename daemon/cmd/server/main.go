@@ -2,6 +2,10 @@ package main
 
 import (
 	"context"
+	"github.com/singerdmx/BulletJournal/daemon/api/middleware"
+	daemon "github.com/singerdmx/BulletJournal/daemon/api/service"
+	scheduler "github.com/zywangzy/JobScheduler"
+	"google.golang.org/grpc/metadata"
 	"net"
 	"net/http"
 	"os"
@@ -10,10 +14,7 @@ import (
 	"strings"
 	"syscall"
 	"time"
-
-	"github.com/singerdmx/BulletJournal/daemon/api/middleware"
-	daemon "github.com/singerdmx/BulletJournal/daemon/api/service"
-	"google.golang.org/grpc/metadata"
+	"upper.io/db.v3/postgresql"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/singerdmx/BulletJournal/daemon/config"
@@ -21,9 +22,7 @@ import (
 	uid "github.com/singerdmx/BulletJournal/daemon/utils"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types"
-	scheduler "github.com/zywangzy/JobScheduler"
 	"google.golang.org/grpc"
-	"upper.io/db.v3/postgresql"
 )
 
 const (
