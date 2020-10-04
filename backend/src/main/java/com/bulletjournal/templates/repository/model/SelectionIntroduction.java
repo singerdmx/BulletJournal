@@ -64,4 +64,9 @@ public class SelectionIntroduction extends AuditModel {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    public com.bulletjournal.templates.controller.model.SelectionIntroduction toPresentationModel() {
+        return new com.bulletjournal.templates.controller.model.SelectionIntroduction(selection.toPresentationModel(), imageLink, description, title);
+    }
+
 }
