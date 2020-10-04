@@ -147,7 +147,7 @@ func main() {
 	services.RegisterDaemonServer(rpcServer, daemonRpc)
 
 	gatewayMux := runtime.NewServeMux(runtime.WithIncomingHeaderMatcher(middleware.IncomingHeaderMatcher), runtime.WithOutgoingHeaderMatcher(middleware.OutgoingHeaderMatcher))
-	endpoint := daemonRpc.serviceConfig.Host + rpcPort
+	endpoint := "127.0.0.1" + rpcPort
 	err = services.RegisterDaemonHandlerFromEndpoint(ctx, gatewayMux, endpoint, []grpc.DialOption{grpc.WithInsecure()})
 	if err != nil {
 		log.Fatalf("failed to register rpc server to gateway server: %v", err)
