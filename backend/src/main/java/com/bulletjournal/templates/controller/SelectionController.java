@@ -20,6 +20,7 @@ public class SelectionController {
     public static final String SELECTION_ROUTE = "/api/selections/{selectionId}";
     public static final String PUBLIC_SELECTION_ROUTE = "/api/public/selections/{selectionId}";
     public static final String SELECTION_INTRODUCTION_ROUTE = "/api/selections/{selectionId}/introductions";
+    public static final String SPECIFIC_SELECTION_INTRODUCTION_ROUTE = "/api/introductions/{selectionIntroductionId}";
     private final UserDaoJpa userDaoJpa;
     private final SelectionDaoJpa selectionDaoJpa;
 
@@ -42,6 +43,20 @@ public class SelectionController {
             @NotNull @PathVariable Long selectionId, @NotNull @RequestBody CreateSelectionIntroductionParams params) {
         validateRequester();
         long choiceId = this.selectionDaoJpa.saveSelectionIntroduction(selectionId, params.getImageLink(), params.getDescription(), params.getTitle());
+        return getSelectionIntroductions(choiceId);
+    }
+
+    @DeleteMapping(SPECIFIC_SELECTION_INTRODUCTION_ROUTE)
+    public void deleteSelectionIntroduction(@NotNull @PathVariable Long selectionIntroductionId) {
+        validateRequester();
+        this.selectionDaoJpa.deleteIntroductionById(selectionIntroductionId);
+    }
+
+    @PutMapping(SPECIFIC_SELECTION_INTRODUCTION_ROUTE)
+    public List<SelectionIntroduction> updateSelectionIntroduction(@NotNull @PathVariable Long selectionIntroductionId,
+                                     @NotNull @RequestBody UpdateSelectionIntroductionParams params) {
+        validateRequester();
+        long choiceId = this.selectionDaoJpa.updateSelectionIntroduction(selectionIntroductionId, params.getImageLink(), params.getDescription(), params.getTitle());
         return getSelectionIntroductions(choiceId);
     }
 
