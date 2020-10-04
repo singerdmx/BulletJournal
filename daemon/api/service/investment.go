@@ -5,12 +5,11 @@ import (
 	"time"
 )
 
-//Cleaner ...
+
 type Investment struct {
 }
 
-//Clean ...Main method for executing cleaning jobs
-func (i *Investment) Pull(params ...interface{}) {
+func (i *Investment) pull(params ...interface{}) {
 	logger := *logging.GetLogger()
 	logger.Infof("Investment starts at %v", time.Now().In(params[0].(*time.Location)).Format(time.RFC3339))
 }

@@ -191,24 +191,17 @@ func main() {
 	}
 
 	PST, _ := time.LoadLocation("America/Los_Angeles")
-
-	jobScheduler.AddRecurrentJob(
-		func(...interface{}) {
-			cleaner.Clean(daemonRpc.serviceConfig.MaxRetentionTimeInDays)
-		},
-		time.Now().In(PST),
-		time.Second*time.Duration(daemonRpc.serviceConfig.IntervalInSeconds),
-	)
-
 	year, month, day := time.Now().AddDate(0, 0, daemonRpc.serviceConfig.IntervalInDays).In(PST).Date()
 	start := time.Date(year, month, day, 0, 0, 0, 0, PST)
-	invest := daemon.Investment{}
-	log.Infof("The next investment data pull will start at %v", start.Format(time.RFC3339))
+
+	daemonBackgroundJob := daemon.Job{Cleaner: cleaner, Reminder: daemon.Reminder{}, Investment: daemon.Investment{}}
+	log.Infof("The next daemon job will start at %v", start.Format(time.RFC3339))
 	jobScheduler.AddRecurrentJob(
-		invest.Pull,
+		daemonBackgroundJob.Run,
 		start,
-		time.Hour*24*time.Duration(daemonRpc.serviceConfig.IntervalInDays),
+		time.Second*24*time.Duration(daemonRpc.serviceConfig.IntervalInDays),
 		PST,
+		daemonRpc.serviceConfig.MaxRetentionTimeInDays,
 	)
 
 	<-shutdown
