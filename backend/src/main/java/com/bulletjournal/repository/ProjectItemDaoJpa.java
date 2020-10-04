@@ -157,6 +157,9 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         int maxSize = Math.min(contents.size(), CONTENT_BATCH_SIZE);
         for (int i = 0; i < maxSize; i++) {
             K content = contents.get(i);
+            if (StringUtils.isBlank(content.getText())) {
+                continue;
+            }
             String owner = owners.get(i);
             T projectItem = projectItems.get(i);
             populateContent(owner, content, projectItem);
