@@ -12,7 +12,7 @@ type ClientTestSuite struct {
 }
 
 func (suite *ClientTestSuite) SetupTest() {
-	earningClient,_ := investment.NewTemplateClient("Earnings")
+	earningClient,_ := investment.NewTemplateClient(investment.IPOTemplate)
 	earningClient.FetchData()
 	earningClient.SendData()
 }

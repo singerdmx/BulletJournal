@@ -25,7 +25,7 @@ func (c *Cleaner) getExpiringGoogleCalendarProjects(tableName string) []persiste
 	defer sess.Close()
 
 	t := time.Now()
-	t.AddDate(0, 0, 1)
+	t.AddDate(0, 0, 2)
 	var expirationTimeBeforeCond = db.Cond{
 		"expiration <": t,
 	}
