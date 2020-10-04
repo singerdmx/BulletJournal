@@ -2,6 +2,10 @@ package main
 
 import (
 	"context"
+	"github.com/singerdmx/BulletJournal/daemon/api/middleware"
+	daemon "github.com/singerdmx/BulletJournal/daemon/api/service"
+	scheduler "github.com/zywangzy/JobScheduler"
+	"google.golang.org/grpc/metadata"
 	"net"
 	"net/http"
 	"os"
@@ -10,21 +14,17 @@ import (
 	"strings"
 	"syscall"
 	"time"
-
 	"github.com/singerdmx/BulletJournal/daemon/api/middleware"
 	daemon "github.com/singerdmx/BulletJournal/daemon/api/service"
 	"github.com/singerdmx/BulletJournal/daemon/persistence"
 	"google.golang.org/grpc/metadata"
-
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/singerdmx/BulletJournal/daemon/config"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
 	uid "github.com/singerdmx/BulletJournal/daemon/utils"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types"
-	scheduler "github.com/zywangzy/JobScheduler"
 	"google.golang.org/grpc"
-	"upper.io/db.v3/postgresql"
 )
 
 const (
@@ -199,12 +199,19 @@ func main() {
 		},
 	}
 
+	PST, _ := time.LoadLocation("America/Los_Angeles")
+	log.Infof("PST [%T] [%v]", PST, PST)
+	year, month, day := time.Now().AddDate(0, 0, daemonRpc.serviceConfig.IntervalInDays).In(PST).Date()
+	start := time.Date(year, month, day, 0, 0, 0, 0, PST)
+
+	daemonBackgroundJob := daemon.Job{Cleaner: cleaner, Reminder: daemon.Reminder{}, Investment: daemon.Investment{}}
+	log.Infof("The next daemon job will start at %v", start.Format(time.RFC3339))
 	jobScheduler.AddRecurrentJob(
-		func(...interface{}) {
-			cleaner.Clean(daemonRpc.serviceConfig.MaxRetentionTimeInDays)
-		},
-		time.Now(),
-		time.Second*time.Duration(daemonRpc.serviceConfig.IntervalInSeconds),
+		daemonBackgroundJob.Run,
+		start,
+		time.Hour*24*time.Duration(daemonRpc.serviceConfig.IntervalInDays),
+		PST,
+		daemonRpc.serviceConfig.MaxRetentionTimeInDays,
 	)
 
 	<-shutdown

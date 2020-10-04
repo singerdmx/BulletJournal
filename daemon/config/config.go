@@ -36,6 +36,7 @@ type Config struct {
 	ApiKeyPrivate          string
 	MaxRetentionTimeInDays int
 	IntervalInSeconds      int
+	IntervalInDays         int
 }
 
 func GetEnv() *string {
@@ -126,7 +127,7 @@ func InitConfig() {
 	PrintConfig()
 }
 
-func init()  {
+func init() {
 	testing.Init()
 	InitConfig()
 }
@@ -167,5 +168,6 @@ func PrintConfig() {
 	fmt.Printf("Private APIKey:%s{%s}\n", tab, serviceConfig.ApiKeyPrivate)
 	fmt.Printf("IntervalInSeconds:\t\t%v\n", serviceConfig.IntervalInSeconds)
 	fmt.Printf("MaxRetentionTimeInDays:\t\t%v\n", serviceConfig.MaxRetentionTimeInDays)
+	fmt.Printf("IntervalInDays:\t\t%v\n", serviceConfig.IntervalInDays)
 	fmt.Print("****************************************************\n")
 }
