@@ -68,7 +68,7 @@ func (s *server) HandleJoinGroupResponse(ctx context.Context, request *types.Joi
 	}
 	log.Printf("Received JoinGroupResponse request: %v", request.String())
 	// get username from uid
-	joinGroupInvitationDao := persistence.InitializeJoinGroupInvitationDao(ctx, config.GetConfig())
+	joinGroupInvitationDao := persistence.InitializeJoinGroupInvitationDao(config.GetConfig())
 	invitation := joinGroupInvitationDao.Find(request.Uid)
 	// then delete etags
 	etagDao := persistence.InitializeEtagDao(ctx, config.GetConfig())

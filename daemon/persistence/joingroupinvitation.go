@@ -1,10 +1,12 @@
 package persistence
 
 type JoinGroupInvitation struct {
-	Uid      string `json:"uid"`
-	Username string `json:"username"`
+	Uid            string `json:"uid"`
+	Username       string `json:"username"`
+	GroupId        string `json:"groupid"`
+	NotificationId string `json:"notificationid"`
 }
 
-func NewJoinGroupInvitation(uid string, username string) *JoinGroupInvitation {
-	return &JoinGroupInvitation{uid, username}
+func NewJoinGroupInvitation(uid, username, groupId, notificationId string) *JoinGroupInvitation {
+	return &JoinGroupInvitation{uid, username, groupId, notificationId}
 }

@@ -19,14 +19,14 @@ type JoinGroupInvitationDao struct {
 	Rdb *redis.Client
 }
 
-func InitializeJoinGroupInvitationDao(ctx context.Context, serviceConfig *config.Config) *JoinGroupInvitationDao {
+func InitializeJoinGroupInvitationDao(serviceConfig *config.Config) *JoinGroupInvitationDao {
 	client := GetRedisClient(serviceConfig)
-	return &JoinGroupInvitationDao{Ctx: ctx, Rdb: client}
+	return &JoinGroupInvitationDao{Rdb: client}
 }
 
 func (j *JoinGroupInvitationDao) SingleCache(joinGroupInvitation *JoinGroupInvitation) {
 	key := JoinGroupInvitationPrefix + ":" + joinGroupInvitation.Uid
-	b, err := json.Marshal(joinGroupInvitation.Username)
+	b, err := json.Marshal(joinGroupInvitation)
 	if err != nil {
 		log.Errorf("JoinGroupInvitation encoding failed with %v", err)
 		return
