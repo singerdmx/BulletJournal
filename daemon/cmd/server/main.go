@@ -68,8 +68,7 @@ func (s *server) HandleJoinGroupResponse(ctx context.Context, request *types.Joi
 	}
 	log.Printf("Received JoinGroupResponse request: %v", request.String())
 	// get username from uid
-	redisClient := persistence.GetRedisClient(config.GetConfig())
-	joinGroupInvitationDao := persistence.JoinGroupInvitationDao{ctx, redisClient}
+	joinGroupInvitationDao := persistence.InitializeJoinGroupInvitationDao(ctx, config.GetConfig())
 	invitation := joinGroupInvitationDao.Find(request.Uid)
 	// then delete etags
 	etagDao := persistence.InitializeEtagDao(ctx, config.GetConfig())
