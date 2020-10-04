@@ -96,7 +96,8 @@ func (c *Cleaner) CountForTable(tableName string) *uint64 {
 //Clean ...Main method for executing cleaning jobs
 func (c *Cleaner) Clean(maxRetentionTimeInDays int) {
 	log = *logging.GetLogger()
-	t := time.Now()
+	PST, _ := time.LoadLocation("America/Los_Angeles")
+	t := time.Now().In(PST)
 	t = t.AddDate(0, 0, -maxRetentionTimeInDays)
 	log.Infof("Cleaner starts at %v", t.Format(time.RFC3339))
 	c.deleteByUpdatedAtBefore(t, "notifications")
