@@ -22,6 +22,7 @@ public class SampleTask extends NamedModel {
     @Column(name = "refreshable")
     private boolean refreshable;
 
+
     @Column(name = "metadata")
     private String metadata;
 
@@ -118,6 +119,14 @@ public class SampleTask extends NamedModel {
 
     public void setPending(boolean pending) {
         this.pending = pending;
+    }
+
+    public boolean isRefreshable() {
+        return refreshable;
+    }
+
+    public void setRefreshable(boolean refreshable) {
+        this.refreshable = refreshable;
     }
 
     public com.bulletjournal.templates.controller.model.SampleTask toPresentationModel() {
