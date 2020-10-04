@@ -14,8 +14,10 @@ import (
 	"strings"
 	"syscall"
 	"time"
-	"upper.io/db.v3/postgresql"
-
+	"github.com/singerdmx/BulletJournal/daemon/api/middleware"
+	daemon "github.com/singerdmx/BulletJournal/daemon/api/service"
+	"github.com/singerdmx/BulletJournal/daemon/persistence"
+	"google.golang.org/grpc/metadata"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/singerdmx/BulletJournal/daemon/config"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
@@ -64,7 +66,15 @@ func (s *server) HandleJoinGroupResponse(ctx context.Context, request *types.Joi
 			grpc.SendHeader(ctx, metadata.Pairs(middleware.RequestIDKey, requestId))
 		}
 	}
-	log.Printf("Received request: %v", request.String())
+	log.Printf("Received JoinGroupResponse request: %v", request.String())
+	// get username from uid
+	joinGroupInvitationDao := persistence.InitializeJoinGroupInvitationDao(config.GetConfig())
+	invitation := joinGroupInvitationDao.Find(request.Uid)
+	// then delete etags
+	etagDao := persistence.InitializeEtagDao(ctx, config.GetConfig())
+	etagDao.DeleteEtagByUserName(invitation.Username)
+	// finally delete edges
+	// TODO: call usergroup dao
 	return &types.ReplyMessage{Message: "Hello daemon"}, nil
 }
 
