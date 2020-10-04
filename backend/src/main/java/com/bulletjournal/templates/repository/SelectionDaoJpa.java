@@ -24,7 +24,6 @@ public class SelectionDaoJpa {
     @Autowired
     private ChoiceDaoJpa choiceDaoJpa;
 
-    @Autowired
     SelectionDaoJpa(SelectionRepository selectionRepository,
                     ChoiceRepository choiceRepository) {
         this.selectionRepository = selectionRepository;
@@ -101,5 +100,24 @@ public class SelectionDaoJpa {
         }
         return introductions.stream().map(com.bulletjournal.templates.repository.model.SelectionIntroduction::toPresentationModel).collect(Collectors.toList());
 
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void deleteIntroductionById(Long selectionIntroductionId) {
+        if (!this.selectionIntroductionRepository.existsById(selectionIntroductionId)) {
+            throw new ResourceNotFoundException("Selection Introduction with id: " + selectionIntroductionId + " doesn't exist, cannot delete.");
+        }
+        selectionIntroductionRepository.deleteById(selectionIntroductionId);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public long updateSelectionIntroduction(long selectionIntroductionId, String imageLink, String description, String title) {
+        SelectionIntroduction selectionIntroduction = this.selectionIntroductionRepository.findById(selectionIntroductionId)
+                .orElseThrow(() -> new ResourceNotFoundException("No selection introduction found"));
+        selectionIntroduction.setTitle(title);
+        selectionIntroduction.setDescription(description);
+        selectionIntroduction.setImageLink(imageLink);
+        selectionIntroductionRepository.save(selectionIntroduction);
+        return selectionIntroduction.getSelection().getChoice().getId();
     }
 }

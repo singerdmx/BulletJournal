@@ -9,6 +9,5 @@ import java.util.List;
 
 @Repository
 public interface SelectionIntroductionRepository extends JpaRepository<SelectionIntroduction, Long> {
-    SelectionIntroduction getById(Long id);
     List<SelectionIntroduction> findBySelectionIn(List<Selection> selections);
 }
