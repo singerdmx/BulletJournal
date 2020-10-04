@@ -200,7 +200,7 @@ func main() {
 	jobScheduler.AddRecurrentJob(
 		daemonBackgroundJob.Run,
 		start,
-		time.Second*24*time.Duration(daemonRpc.serviceConfig.IntervalInDays),
+		time.Hour*24*time.Duration(daemonRpc.serviceConfig.IntervalInDays),
 		PST,
 		daemonRpc.serviceConfig.MaxRetentionTimeInDays,
 	)
