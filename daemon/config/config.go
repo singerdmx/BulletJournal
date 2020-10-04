@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"testing"
 
 	"github.com/spf13/viper"
 )
@@ -35,6 +36,7 @@ type Config struct {
 	ApiKeyPrivate          string
 	MaxRetentionTimeInDays int
 	IntervalInSeconds      int
+	IntervalInDays         int
 }
 
 func GetEnv() *string {
@@ -111,7 +113,6 @@ func InitConfig() {
 	isProd := flag.Bool("prod", false, "set config to production env")
 	isDev := flag.Bool("dev", false, "set config to development env")
 	flag.Parse()
-
 	SetConfig(configNameBase)
 	if *isProd == true {
 		environment = "prod"
@@ -124,6 +125,11 @@ func InitConfig() {
 		SetConfig(configNameDev)
 	}
 	PrintConfig()
+}
+
+func init() {
+	testing.Init()
+	InitConfig()
 }
 
 func SetConfig(configName string) {
@@ -162,5 +168,6 @@ func PrintConfig() {
 	fmt.Printf("Private APIKey:%s{%s}\n", tab, serviceConfig.ApiKeyPrivate)
 	fmt.Printf("IntervalInSeconds:\t\t%v\n", serviceConfig.IntervalInSeconds)
 	fmt.Printf("MaxRetentionTimeInDays:\t\t%v\n", serviceConfig.MaxRetentionTimeInDays)
+	fmt.Printf("IntervalInDays:\t\t%v\n", serviceConfig.IntervalInDays)
 	fmt.Print("****************************************************\n")
 }

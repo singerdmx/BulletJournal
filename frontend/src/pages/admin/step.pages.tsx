@@ -12,7 +12,7 @@ import AdminChoices from "./admin-choices";
 import {Container} from "react-floating-action-button";
 import AddRule from "../../components/modals/templates/add-rule.component";
 
-const {Title, Text} = Typography;
+const {Title} = Typography;
 
 type AdminStepProps = {
     step: Step | undefined;

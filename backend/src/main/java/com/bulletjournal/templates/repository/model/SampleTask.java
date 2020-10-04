@@ -85,6 +85,10 @@ public class SampleTask extends NamedModel {
         return dueDate;
     }
 
+    public boolean hasDueDate() {
+        return this.dueDate != null;
+    }
+
     public void setDueDate(String dueDate) {
         this.dueDate = dueDate;
     }

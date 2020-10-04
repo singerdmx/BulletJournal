@@ -2,6 +2,10 @@ package main
 
 import (
 	"context"
+	"github.com/singerdmx/BulletJournal/daemon/api/middleware"
+	daemon "github.com/singerdmx/BulletJournal/daemon/api/service"
+	scheduler "github.com/zywangzy/JobScheduler"
+	"google.golang.org/grpc/metadata"
 	"net"
 	"net/http"
 	"os"
@@ -10,20 +14,17 @@ import (
 	"strings"
 	"syscall"
 	"time"
-
 	"github.com/singerdmx/BulletJournal/daemon/api/middleware"
 	daemon "github.com/singerdmx/BulletJournal/daemon/api/service"
+	"github.com/singerdmx/BulletJournal/daemon/persistence"
 	"google.golang.org/grpc/metadata"
-
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/singerdmx/BulletJournal/daemon/config"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
 	uid "github.com/singerdmx/BulletJournal/daemon/utils"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types"
-	scheduler "github.com/zywangzy/JobScheduler"
 	"google.golang.org/grpc"
-	"upper.io/db.v3/postgresql"
 )
 
 const (
@@ -65,7 +66,15 @@ func (s *server) HandleJoinGroupResponse(ctx context.Context, request *types.Joi
 			grpc.SendHeader(ctx, metadata.Pairs(middleware.RequestIDKey, requestId))
 		}
 	}
-	log.Printf("Received request: %v", request.String())
+	log.Printf("Received JoinGroupResponse request: %v", request.String())
+	// get username from uid
+	joinGroupInvitationDao := persistence.InitializeJoinGroupInvitationDao(config.GetConfig())
+	invitation := joinGroupInvitationDao.Find(request.Uid)
+	// then delete etags
+	etagDao := persistence.InitializeEtagDao(ctx, config.GetConfig())
+	etagDao.DeleteEtagByUserName(invitation.Username)
+	// finally delete edges
+	// TODO: call usergroup dao
 	return &types.ReplyMessage{Message: "Hello daemon"}, nil
 }
 
@@ -118,8 +127,6 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 }
 
 func main() {
-
-	config.InitConfig()
 	logging.InitLogging(config.GetEnv())
 	log = *logging.GetLogger()
 
@@ -149,7 +156,7 @@ func main() {
 	services.RegisterDaemonServer(rpcServer, daemonRpc)
 
 	gatewayMux := runtime.NewServeMux(runtime.WithIncomingHeaderMatcher(middleware.IncomingHeaderMatcher), runtime.WithOutgoingHeaderMatcher(middleware.OutgoingHeaderMatcher))
-	endpoint := daemonRpc.serviceConfig.Host + rpcPort
+	endpoint := "127.0.0.1" + rpcPort
 	err = services.RegisterDaemonHandlerFromEndpoint(ctx, gatewayMux, endpoint, []grpc.DialOption{grpc.WithInsecure()})
 	if err != nil {
 		log.Fatalf("failed to register rpc server to gateway server: %v", err)
@@ -192,12 +199,19 @@ func main() {
 		},
 	}
 
+	PST, _ := time.LoadLocation("America/Los_Angeles")
+	log.Infof("PST [%T] [%v]", PST, PST)
+	year, month, day := time.Now().AddDate(0, 0, daemonRpc.serviceConfig.IntervalInDays).In(PST).Date()
+	start := time.Date(year, month, day, 0, 0, 0, 0, PST)
+
+	daemonBackgroundJob := daemon.Job{Cleaner: cleaner, Reminder: daemon.Reminder{}, Investment: daemon.Investment{}}
+	log.Infof("The next daemon job will start at %v", start.Format(time.RFC3339))
 	jobScheduler.AddRecurrentJob(
-		func(...interface{}) {
-			cleaner.Clean(daemonRpc.serviceConfig.MaxRetentionTimeInDays)
-		},
-		time.Now(),
-		time.Second*time.Duration(daemonRpc.serviceConfig.IntervalInSeconds),
+		daemonBackgroundJob.Run,
+		start,
+		time.Hour*24*time.Duration(daemonRpc.serviceConfig.IntervalInDays),
+		PST,
+		daemonRpc.serviceConfig.MaxRetentionTimeInDays,
 	)
 
 	<-shutdown

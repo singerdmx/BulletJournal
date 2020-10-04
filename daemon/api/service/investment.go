@@ -1,0 +1,15 @@
+package service
+
+import (
+	"github.com/singerdmx/BulletJournal/daemon/logging"
+	"time"
+)
+
+
+type Investment struct {
+}
+
+func (i *Investment) pull(params ...interface{}) {
+	logger := *logging.GetLogger()
+	logger.Infof("Investment starts at %v", time.Now().In(params[0].(*time.Location)).Format(time.RFC3339))
+}

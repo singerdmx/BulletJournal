@@ -22,6 +22,7 @@ import {Note} from "../notes/interface";
 import {updateTransactionContents} from "../transactions/actions";
 import {Transaction} from "../transactions/interface";
 import {History} from "history";
+import {getCookie} from "../../index";
 
 type MyselfProps = {
   username: string;
@@ -55,7 +56,10 @@ class Myself extends React.Component<MyselfProps & PathProps, ModalState> {
   interval: any = 0;
 
   componentDidMount() {
-    this.props.updateMyself();
+    const loginCookie = getCookie('__discourse_proxy');
+    if (loginCookie) {
+      this.props.updateMyself();
+    }
     this.interval = setInterval(() => {
       this.props.updateSystem(false, this.props.history);
     }, 50000);

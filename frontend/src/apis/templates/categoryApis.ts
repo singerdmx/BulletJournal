@@ -97,3 +97,15 @@ export const removeUserCategory = (categoryId: number, selectionId: number) => {
             throw Error(err.message);
         });
 }
+
+export const updateSubscription = (categoryId: number, selectionId: number, projectId: number) => {
+    const postBody = JSON.stringify({
+        selectionId: selectionId,
+        projectId: projectId
+    });
+    return doPost(`/api/categories/${categoryId}/updateSubscription`, postBody)
+        .then(res => res.json())
+        .catch(err => {
+            throw Error(err.message);
+        });
+}

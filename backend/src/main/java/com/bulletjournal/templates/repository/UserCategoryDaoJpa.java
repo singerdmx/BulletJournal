@@ -1,11 +1,13 @@
 package com.bulletjournal.templates.repository;
 
+import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.ProjectRepository;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.templates.controller.model.CategoryUnsubscribeParams;
+import com.bulletjournal.templates.controller.model.UpdateCategorySubscriptionParams;
 import com.bulletjournal.templates.repository.model.Category;
 import com.bulletjournal.templates.repository.model.SelectionMetadataKeyword;
 import com.bulletjournal.templates.repository.model.UserCategory;
@@ -135,5 +137,41 @@ public class UserCategoryDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<UserCategory> getSubscribedUsersByMetadataKeyword(List<String> keywords) {
         return this.userCategoryRepository.findByKeywordIn(keywords);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public UserCategory updateUserCategoryProject(String requester,
+                                                  Long categoryId,
+                                                  UpdateCategorySubscriptionParams updateCategorySubscriptionParams) {
+        Long selectionId = updateCategorySubscriptionParams.getSelectionId();
+        Long projectId = updateCategorySubscriptionParams.getProjectId();
+        Category category = this.categoryRepository.getById(categoryId);
+        if (category == null) {
+            throw new ResourceNotFoundException("Category with id " + categoryId + " doesn't exist");
+        }
+
+        List<SelectionMetadataKeyword> keywords = this.selectionMetadataKeywordDaoJpa
+                .getKeywordsBySelections(ImmutableList.of(selectionId));
+        if (keywords.size() == 0) {
+            throw new ResourceNotFoundException("SelectionID not found");
+        }
+
+        Project project = this.projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project " + projectId + " not found"));
+
+        String metadataKeyword = keywords.get(0).getKeyword();
+        User user = this.userDaoJpa.getByName(requester);
+        UserCategoryKey userCategoryKey = new UserCategoryKey(user.getId(), categoryId, metadataKeyword);
+        UserCategory userCategory = this.userCategoryRepository.findById(userCategoryKey)
+                .orElseThrow(() -> new ResourceNotFoundException("UserCategory not found"));
+
+        if (projectId == userCategory.getProject().getId()) {
+            throw new BadRequestException("New project Id " + projectId + " is same as original one.");
+        }
+
+        userCategory.setProject(project);
+        userCategoryRepository.save(userCategory);
+
+        return this.userCategoryRepository.findById(userCategoryKey).get();
     }
 }

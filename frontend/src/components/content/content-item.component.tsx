@@ -155,7 +155,7 @@ const ContentItem: React.FC<ContentProps> = ({
   return (
     <div className="content-item-page-contianer">
       <div className="ql-container ql-snow" style={{position: 'relative', borderWidth: '0', width: '100%'}}>
-        <div className="ql-editor" data-gramm="false" contentEditable="true">
+        <div className="ql-editor" data-gramm="false" contentEditable="false">
           <div
             className="content-item-page"
             dangerouslySetInnerHTML={{

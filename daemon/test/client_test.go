@@ -1,22 +1,25 @@
 package main
 
-//type ClientTestSuite struct {
-//	suite.Suite
-//}
-//
-//// Fetched ipo is not nil
-//func TestIPOClientFetchInfo(t *testing.T) {
-//	data, err := investment.FetchIPO()
-//	assert.Nil(t, err)
-//	assert.NotNil(t, data)
-//}
-//
-//// Fetched dividend is not nil
-//func TestDividendFetchInfo(t *testing.T) {
-//	data, err := investment.FetchDividends()
-//	assert.Nil(t, err)
-//	assert.NotNil(t, data)
-//}
-//
-//func (c *ClientTestSuite) TestClients() {
-//}
+import (
+	"github.com/singerdmx/BulletJournal/daemon/clients/investment"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
+	"testing"
+)
+
+type ClientTestSuite struct {
+	suite.Suite
+}
+
+func (suite *ClientTestSuite) SetupTest() {
+	earningClient,_ := investment.NewTemplateClient(investment.IPOTemplate)
+	earningClient.FetchData()
+	earningClient.SendData()
+}
+func (suite *ClientTestSuite) TestClient() {
+	assert.True(suite.T(), true, true)
+}
+
+func TestClients(t *testing.T) {
+	suite.Run(t, new(ClientTestSuite))
+}

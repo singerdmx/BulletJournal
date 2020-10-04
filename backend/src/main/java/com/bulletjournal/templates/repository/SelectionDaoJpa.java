@@ -4,6 +4,7 @@ import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.templates.repository.model.Choice;
 import com.bulletjournal.templates.repository.model.Selection;
+import com.bulletjournal.templates.repository.model.SelectionIntroduction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -14,8 +15,14 @@ import java.util.stream.Collectors;
 
 @Repository
 public class SelectionDaoJpa {
+    @Autowired
     private SelectionRepository selectionRepository;
+    @Autowired
     private ChoiceRepository choiceRepository;
+    @Autowired
+    private SelectionIntroductionRepository selectionIntroductionRepository;
+    @Autowired
+    private ChoiceDaoJpa choiceDaoJpa;
 
     @Autowired
     SelectionDaoJpa(SelectionRepository selectionRepository,
@@ -70,5 +77,29 @@ public class SelectionDaoJpa {
         selectionRepository.deleteById(id);
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public Long saveSelectionIntroduction(
+            Long selectionId, String imageLink, String description, String title) {
+        Selection selection = this.selectionRepository.findById(selectionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Id not found"));
+        SelectionIntroduction selectionIntroduction = new SelectionIntroduction();
+        selectionIntroduction.setSelection(selection);
+        selectionIntroduction.setImageLink(imageLink);
+        selectionIntroduction.setDescription(description);
+        selectionIntroduction.setTitle(title);
+        selectionIntroductionRepository.save(selectionIntroduction);
+        return selection.getChoice().getId();
+    }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<com.bulletjournal.templates.controller.model.SelectionIntroduction> getSelectionIntroductionsByChoiceId(Long choiceId) {
+        Choice choice = choiceDaoJpa.getById(choiceId);
+        List<Selection> selections = choice.getSelections();
+        List<SelectionIntroduction> introductions = selectionIntroductionRepository.findBySelectionIn(selections);
+        if (introductions == null) {
+            throw new ResourceNotFoundException("There is no selection introductions in the choice");
+        }
+        return introductions.stream().map(com.bulletjournal.templates.repository.model.SelectionIntroduction::toPresentationModel).collect(Collectors.toList());
+
+    }
 }

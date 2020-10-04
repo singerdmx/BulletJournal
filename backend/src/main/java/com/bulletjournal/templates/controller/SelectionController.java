@@ -3,29 +3,29 @@ package com.bulletjournal.templates.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.UserDaoJpa;
-import com.bulletjournal.templates.controller.model.CreateSelectionParams;
-import com.bulletjournal.templates.controller.model.Selection;
-import com.bulletjournal.templates.controller.model.UpdateSelectionParams;
+import com.bulletjournal.templates.controller.model.*;
 import com.bulletjournal.templates.repository.SelectionDaoJpa;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @RestController
 public class SelectionController {
 
     public static final String SELECTIONS_ROUTE = "/api/choices/{choiceId}/selections";
+    public static final String SELECTION_INTRODUCTIONS_ROUTE = "/api/choices/{choiceId}/selectionIntroductions";
     public static final String SELECTION_ROUTE = "/api/selections/{selectionId}";
     public static final String PUBLIC_SELECTION_ROUTE = "/api/public/selections/{selectionId}";
-
+    public static final String SELECTION_INTRODUCTION_ROUTE = "/api/selections/{selectionId}/introductions";
     private final UserDaoJpa userDaoJpa;
     private final SelectionDaoJpa selectionDaoJpa;
 
     @Autowired
     public SelectionController(UserDaoJpa userDaoJpa,
-                        SelectionDaoJpa selectionDaoJpa) {
+                               SelectionDaoJpa selectionDaoJpa) {
         this.userDaoJpa = userDaoJpa;
         this.selectionDaoJpa = selectionDaoJpa;
     }
@@ -35,6 +35,14 @@ public class SelectionController {
                                      @NotNull @RequestBody CreateSelectionParams params) {
         validateRequester();
         return this.selectionDaoJpa.save(choiceId, params.getIcon(), params.getText()).toPresentationModel();
+    }
+
+    @PostMapping(SELECTION_INTRODUCTION_ROUTE)
+    public List<SelectionIntroduction> createSelectionIntroduction(
+            @NotNull @PathVariable Long selectionId, @NotNull @RequestBody CreateSelectionIntroductionParams params) {
+        validateRequester();
+        long choiceId = this.selectionDaoJpa.saveSelectionIntroduction(selectionId, params.getImageLink(), params.getDescription(), params.getTitle());
+        return getSelectionIntroductions(choiceId);
     }
 
     @GetMapping(PUBLIC_SELECTION_ROUTE)
@@ -57,6 +65,12 @@ public class SelectionController {
     public void deleteSelection(@NotNull @PathVariable Long selectionId) {
         validateRequester();
         this.selectionDaoJpa.deleteById(selectionId);
+    }
+
+    @GetMapping(SELECTION_INTRODUCTIONS_ROUTE)
+    public List<SelectionIntroduction> getSelectionIntroductions(@NotNull @PathVariable Long choiceId) {
+        validateRequester();
+        return selectionDaoJpa.getSelectionIntroductionsByChoiceId(choiceId);
     }
 
     private void validateRequester() {

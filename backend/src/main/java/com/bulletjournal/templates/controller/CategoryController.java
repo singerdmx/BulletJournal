@@ -35,6 +35,8 @@ public class CategoryController {
 
     public static final String CATEGORY_UNSUBSCRIBE_ROUTE = "/api/categories/{categoryId}/unsubscribe";
 
+    public static final String UPDATE_CATEGORY_SUBSCRIPTION = "/api/categories/{categoryId}/updateSubscription";
+
     protected static final String CATEGORY_SET_CHOICES_ROUTE = "/api/categories/{categoryId}/setChoices";
 
     private CategoryDaoJpa categoryDaoJpa;
@@ -155,6 +157,17 @@ public class CategoryController {
         categoryDaoJpa.updateChoicesForCategory(categoryId, choicesIds);
         return getCategory(categoryId);
     }
+
+    @PostMapping(UPDATE_CATEGORY_SUBSCRIPTION)
+    public List<SubscribedCategory> updateCategorySubscription(
+            @NotNull @PathVariable Long categoryId,
+            @Valid @RequestBody UpdateCategorySubscriptionParams updateCategorySubscriptionParams) {
+
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        userCategoryDaoJpa.updateUserCategoryProject(username, categoryId, updateCategorySubscriptionParams);
+        return this.workflowController.getUserSubscribedCategories();
+    }
+
 
     private void validateRequester() {
         String requester = MDC.get(UserClient.USER_NAME_KEY);

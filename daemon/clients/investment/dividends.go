@@ -94,6 +94,8 @@ func(c *DividendsClient) SendData() error{
 	}
 	for i := range c.data.Dividends {
 		target := c.data.Dividends[i]
+		availBefore := target.Date
+		t, _ := time.Parse(layoutISO, availBefore)
 		item := persistence.SampleTask{
 			CreatedAt:          time.Now(),
 			UpdatedAt:          time.Now(),
@@ -101,8 +103,7 @@ func(c *DividendsClient) SendData() error{
 			Content:            "",
 			Name:               target.Name,
 			Uid:                target.ID,
-			AvailableBefore:    target.Date, //TODO
-			ReminderBeforeTask: 0,
+			AvailableBefore:    t, //TODO
 			DueDate:            "",
 			DueTime:            "",
 			Pending:            true,

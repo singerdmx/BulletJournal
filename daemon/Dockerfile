@@ -28,13 +28,13 @@ RUN apk update && \
 FROM alpine:latest
 
 # Add curl for health check
-RUN apk update && apk add curl
+RUN apk update && apk add curl && apk add --no-cache tzdata
 
 # Copy executable to target folder
 COPY --from=builder /go/bin/daemon-server /go/bin/
 
 # Copy configuration files to /config folder
-ARG tier=dev
+ARG tier=prod
 ARG sourceConfigPath=config/config-${tier}.yaml
 ARG destConfigPath=/${sourceConfigPath}
 ENV tierEnv $tier
