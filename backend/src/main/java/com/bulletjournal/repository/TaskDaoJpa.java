@@ -43,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -955,6 +956,26 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Override
     public <T extends ProjectItemModel> List<TaskContent> findContents(T projectItem) {
         return this.taskContentRepository.findTaskContentByTask((Task) projectItem);
+    }
+
+
+    @Override
+    public <T extends ProjectItemModel> List<TaskContent> getContents(Long projectItemId, String requester) {
+        List<TaskContent> contents = super.getContents(projectItemId, requester);
+        Task task = getProjectItem(projectItemId, requester);
+        if (task.getSampleTask() != null) {
+            String sampleTaskContent = task.getSampleTask().getContent();
+            TaskContent taskContent = new TaskContent(sampleTaskContent);
+            taskContent.setId(0L);
+            taskContent.setProjectItem(task);
+            taskContent.setCreatedAt(Timestamp.from(Instant.now()));
+            taskContent.setUpdatedAt(Timestamp.from(Instant.now()));
+            taskContent.setBaseText(sampleTaskContent);
+            taskContent.setOwner(task.getOwner());
+            taskContent.setRevisions("");
+            contents.add(0, taskContent);
+        }
+        return contents;
     }
 
     @Override
