@@ -6,6 +6,8 @@ import com.bulletjournal.templates.repository.SelectionRepository;
 import com.bulletjournal.templates.repository.model.SampleTask;
 import com.bulletjournal.templates.repository.model.Selection;
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -36,6 +38,8 @@ public class LeetCodeAnalyzer {
     private static final String ROOT_URL = "http://localhost:";
     private static final String MATCHESSTRING = "href=\"/company/";
     private static final String MATCHESSTRING2 = "<span class=\"text-sm text-gray\">";
+    private static final Gson GSON = new Gson();
+
     @LocalServerPort
     int randomServerPort;
 
@@ -111,6 +115,54 @@ public class LeetCodeAnalyzer {
                 }
             }
         }
+    }
+
+    @Ignore
+    @Test
+    public void generateDb() throws IOException, InterruptedException {
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.add("Cookie", "LEETCODE_SESSION=; Max-Age=31449600; Path=/; secure");
+        requestHeaders.add("content-type", "application/json");
+        HttpEntity requestEntity = new HttpEntity(requestHeaders);
+        ResponseEntity<String> responseEntity = this.restTemplate.exchange(
+                "https://leetcode.com/api/problems/database/",
+                HttpMethod.GET, requestEntity, String.class);
+
+        String result = responseEntity.getBody();
+
+        BufferedWriter bufferedWriter = getBufferedWriter("./src/main/resources/db/migration/V118__seed_db_sample_tasks.sql");
+
+        LinkedHashMap map = GSON.fromJson(result, LinkedHashMap.class);
+        List<LinkedTreeMap> questions = (List) map.get("stat_status_pairs");
+        String contentTemplate = "{\"delta\":{\"ops\":[{\"attributes\":{\"bold\":true},\"insert\":\"DIFFICULTY\"}," +
+                "{\"insert\":\"Link: \"},{\"attributes\":{\"link\":\"PROBLEM_LINK\"},\"insert\":\"PROBLEM_LINK\"}," +
+                "{\"insert\":\"\\n\"}]}," +
+                "\"###html###\":\"<p><strong>DIFFICULTY</strong></p><p>Link: <a href=\\\"PROBLEM_LINK\\\" rel=\\\"noopener noreferrer\\\" target=\\\"_blank\\\">PROBLEM_LINK</a></p>\"}";
+        for (LinkedTreeMap question : questions) {
+            LinkedTreeMap questionData = (LinkedTreeMap) question.get("stat");
+            double id = (double) questionData.get("frontend_question_id");
+            String questionId = Integer.toString((int) id);
+            String link = "https://leetcode.com/problems/" + questionData.get("question__title_slug") + "/";
+            String questionName = questionId + " " + questionData.get("question__title");
+            String metaData = "LEETCODE_DATABASE,";
+            String difficulty = "";
+            LinkedTreeMap diffLevel = (LinkedTreeMap) question.get("difficulty");
+            double dif = (double) diffLevel.get("level");
+            if (dif == 1.0) {
+                difficulty = "Easy";
+            } else if (dif == 2.0) {
+                difficulty = "Medium";
+            } else if (dif == 3.0) {
+                difficulty = "Hard";
+            }
+            metaData += difficulty;
+            String content = contentTemplate.replace("DIFFICULTY", difficulty).replace("PROBLEM_LINK", link);
+            bufferedWriter.write("INSERT INTO \"template\".sample_tasks (id,created_at,updated_at,metadata,content,name,uid) VALUES (nextval('template.sample_task_sequence'),'2020-08-29 10:21:46.593','2020-08-29 10:21:46.593','S_T_METADATA','S_T_CONTENT','S_T_NAME','S_T_UID');".replace("S_T_METADATA", metaData).replace("S_T_NAME", questionName).replace("S_T_UID", questionId).replace("S_T_CONTENT", content));
+            bufferedWriter.newLine();
+
+        }
+        bufferedWriter.close();
+        System.out.println();
     }
 
     @Test
