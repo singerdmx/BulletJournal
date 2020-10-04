@@ -24,12 +24,6 @@ public class SelectionDaoJpa {
     @Autowired
     private ChoiceDaoJpa choiceDaoJpa;
 
-    SelectionDaoJpa(SelectionRepository selectionRepository,
-                    ChoiceRepository choiceRepository) {
-        this.selectionRepository = selectionRepository;
-        this.choiceRepository = choiceRepository;
-    }
-
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Selection save(Long choiceId, String icon, String text) {
         Optional<Choice> choiceById = choiceRepository.findById(choiceId);
