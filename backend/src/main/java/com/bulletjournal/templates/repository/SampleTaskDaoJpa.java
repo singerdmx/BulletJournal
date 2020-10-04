@@ -166,6 +166,7 @@ public class SampleTaskDaoJpa {
                         userMap.get(username).getReminderBeforeTask().getValue(),
                         ImmutableList.of(username),
                         Collections.emptyList());
+              //  if (StringUtils.isBlank(sampleTask.getContent()))
                 this.notificationService.inform(
                         new NewSampleTaskEvent(
                                 new Event(username, sampleTaskId, sampleTask.getName()),

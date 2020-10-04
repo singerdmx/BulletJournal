@@ -19,6 +19,9 @@ public class SampleTask extends NamedModel {
     @Column(name = "content")
     private String content;
 
+    @Column(name = "refreshable")
+    private boolean refreshable;
+
     @Column(name = "metadata")
     private String metadata;
 
