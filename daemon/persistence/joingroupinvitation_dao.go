@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/singerdmx/BulletJournal/daemon/config"
 )
 
 const (
@@ -16,6 +17,11 @@ const (
 type JoinGroupInvitationDao struct {
 	Ctx context.Context
 	Rdb *redis.Client
+}
+
+func InitializeJoinGroupInvitationDao(ctx context.Context, serviceConfig *config.Config) *JoinGroupInvitationDao {
+	client := GetRedisClient(serviceConfig)
+	return &JoinGroupInvitationDao{Ctx: ctx, Rdb: client}
 }
 
 func (j *JoinGroupInvitationDao) SingleCache(joinGroupInvitation *JoinGroupInvitation) {
