@@ -157,7 +157,11 @@ public class LeetCodeAnalyzer {
             }
             metaData += difficulty;
             String content = contentTemplate.replace("DIFFICULTY", difficulty).replace("PROBLEM_LINK", link);
-            bufferedWriter.write("INSERT INTO \"template\".sample_tasks (id,created_at,updated_at,metadata,content,name,uid) VALUES (nextval('template.sample_task_sequence'),'2020-08-29 10:21:46.593','2020-08-29 10:21:46.593','S_T_METADATA','S_T_CONTENT','S_T_NAME','S_T_UID');".replace("S_T_METADATA", metaData).replace("S_T_NAME", questionName).replace("S_T_UID", questionId).replace("S_T_CONTENT", content));
+            bufferedWriter.write("INSERT INTO \"template\".sample_tasks (id,created_at,updated_at,metadata,content,name,uid) VALUES (S_T_ID,'2020-08-29 10:21:46.593','2020-08-29 10:21:46.593','S_T_METADATA','S_T_CONTENT','S_T_NAME','S_T_UID');".replace("S_T_METADATA", metaData)
+                    .replace("S_T_NAME", questionName)
+                    .replace("S_T_UID", questionId)
+                    .replace("S_T_ID", questionId)
+                    .replace("S_T_CONTENT", content));
             bufferedWriter.newLine();
 
         }
@@ -238,7 +242,12 @@ public class LeetCodeAnalyzer {
             String mDeltaCompanies = coms.stream().map(c -> "{\"insert\":\"\\n" + c + "\"},{\"attributes\":{\"block\":\"ul\"},\"insert\":\"\\n\"},").collect(Collectors.joining(""));
             String content = contentTemplate.replace("PROBLEM_LINK", sampleTask.getContent()).replace("DIFFICULTY", difficulty).replace("HTML_COMPANIES", htmlCompanies).replace("DELTA_COMPANIES", deltaCompanies).replace("M_COMPANIES", mDeltaCompanies);
             sampleTask.setContent(content);
-            bufferedWriterSampleTask.write("INSERT INTO \"template\".sample_tasks (id,created_at,updated_at,metadata,content,name,uid) VALUES (nextval('template.sample_task_sequence'),'2020-08-29 10:21:46.593','2020-08-29 10:21:46.593','S_T_METADATA','S_T_CONTENT','S_T_NAME','S_T_UID');".replace("S_T_METADATA", sampleTask.getMetadata()).replace("S_T_NAME", sampleTask.getName()).replace("S_T_UID", sampleTask.getUid()).replace("S_T_CONTENT", sampleTask.getContent()));
+            bufferedWriterSampleTask.write("INSERT INTO \"template\".sample_tasks (id,created_at,updated_at,metadata,content,name,uid) VALUES (S_T_ID,'2020-08-29 10:21:46.593','2020-08-29 10:21:46.593','S_T_METADATA','S_T_CONTENT','S_T_NAME','S_T_UID');"
+                    .replace("S_T_METADATA", sampleTask.getMetadata())
+                    .replace("S_T_NAME", sampleTask.getName())
+                    .replace("S_T_ID", sampleTask.getUid())
+                    .replace("S_T_UID", sampleTask.getUid())
+                    .replace("S_T_CONTENT", sampleTask.getContent()));
             bufferedWriterSampleTask.newLine();
         }
         bufferedWriterSelection.write("delete from \"template\".selections where choice_id=15;\n");
