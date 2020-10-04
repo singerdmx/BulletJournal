@@ -11,7 +11,7 @@ public class Step {
 
     private List<Choice> choices = new ArrayList<>();
 
-    private List<Selection> excludedSelections = new ArrayList<>();
+    private List<Long> excludedSelections = new ArrayList<>();
 
     private List<Rule> rules = new ArrayList<>();
 
@@ -23,11 +23,12 @@ public class Step {
         this.name = name;
     }
 
-    public Step(Long id, String name, List<Choice> choices, List<Rule> rules) {
+    public Step(Long id, String name, List<Choice> choices, List<Rule> rules, List<Long> excludedSelections) {
         this.id = id;
         this.name = name;
         this.choices = choices;
         this.rules = rules;
+        this.excludedSelections = excludedSelections;
     }
 
     public List<Rule> getRules() {
@@ -62,11 +63,11 @@ public class Step {
         this.choices = choices;
     }
 
-    public List<Selection> getExcludedSelections() {
+    public List<Long> getExcludedSelections() {
         return excludedSelections;
     }
 
-    public void setExcludedSelections(List<Selection> excludedSelections) {
+    public void setExcludedSelections(List<Long> excludedSelections) {
         this.excludedSelections = excludedSelections;
     }
 }

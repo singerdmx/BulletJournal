@@ -33,7 +33,7 @@ export interface Step {
     id: number;
     name: string;
     choices: Choice[];
-    excludedSelections: Selection[];
+    excludedSelections: number[];
     rules: Rule[];
     nextStepId?: number;
 }
