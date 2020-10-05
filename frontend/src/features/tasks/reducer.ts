@@ -349,6 +349,7 @@ const slice = createSlice({
     TasksCreate: (state, action: PayloadAction<CreateTask>) => state,
     TaskPut: (state, action: PayloadAction<PutTask>) => state,
     TaskGet: (state, action: PayloadAction<GetTask>) => state,
+    SampleTaskGet: (state, action: PayloadAction<GetTask>) => state,
     CompletedTaskGet: (state, action: PayloadAction<GetTask>) => state,
     TaskDelete: (state, action: PayloadAction<DeleteTask>) => state,
     TasksDelete: (state, action: PayloadAction<DeleteTasks>) => state,

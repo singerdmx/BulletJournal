@@ -76,6 +76,7 @@ import {recentItemsReceived} from '../recent/actions';
 import {ContentType} from '../myBuJo/constants';
 import {updateTargetContent} from "../content/actions";
 import {reloadReceived} from "../myself/actions";
+import {fetchSampleTask} from "../../apis/templates/workflowApis";
 
 function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -283,6 +284,26 @@ function* getTask(action: PayloadAction<GetTask>) {
       yield put(reloadReceived(true));
     } else {
       yield call(message.error, 'Task Unavailable');
+    }
+  }
+}
+
+function* getSampleTask(action: PayloadAction<GetTask>) {
+  try {
+    const data = yield call(fetchSampleTask, action.payload.taskId);
+    yield put(tasksActions.taskReceived({task: data.task}));
+    const content : Content = data.content;
+    yield put(
+        tasksActions.taskContentsReceived({
+          contents: [content],
+        })
+    );
+    yield put(updateTargetContent(content));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, 'Sample Task Unavailable');
     }
   }
 }
@@ -1268,6 +1289,7 @@ export default function* taskSagas() {
     yield takeLatest(tasksActions.TasksCreate.type, taskCreate),
     yield takeLatest(tasksActions.TaskPut.type, taskPut),
     yield takeLatest(tasksActions.TaskGet.type, getTask),
+    yield takeLatest(tasksActions.SampleTaskGet.type, getSampleTask),
     yield takeLatest(tasksActions.CompletedTaskGet.type, getCompletedTask),
     yield takeLatest(tasksActions.TaskPatch.type, patchTask),
     yield takeLatest(tasksActions.TaskComplete.type, completeTask),

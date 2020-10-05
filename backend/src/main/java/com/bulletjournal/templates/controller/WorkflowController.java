@@ -2,6 +2,8 @@ package com.bulletjournal.templates.controller;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.Content;
+import com.bulletjournal.controller.models.ReminderSetting;
+import com.bulletjournal.controller.models.User;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.templates.controller.model.SampleTask;
@@ -66,6 +68,9 @@ public class WorkflowController {
 
     @Autowired
     private UserCategoryDaoJpa userCategoryDaoJpa;
+
+    @Autowired
+    private UserClient userClient;
 
     private static final Gson GSON = new Gson();
 
@@ -274,11 +279,24 @@ public class WorkflowController {
     @GetMapping(SAMPLE_TASK_ROUTE)
     public SampleTaskView getSampleTask(@NotNull @PathVariable Long sampleTaskId) {
         // ContentType SAMPLE_TASK
-        return null;
+        SampleTask sampleTask = getAdminSampleTask(sampleTaskId);
+        User user = this.userClient.getUser("BulletJournal");
+        com.bulletjournal.controller.models.SampleTask task = new com.bulletjournal.controller.models.SampleTask(
+                sampleTaskId, user, Collections.emptyList(), null, null, null,
+                sampleTask.getName(), null, null, Collections.emptyList(),
+                new ReminderSetting(null, null, 6),
+                null, System.currentTimeMillis(), System.currentTimeMillis(), null);
+
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+        Content content = new Content(this.userDaoJpa.isAdmin(requester) ? sampleTaskId : 0L,
+                user, sampleTask.getContent(), sampleTask.getContent(),
+                System.currentTimeMillis(), System.currentTimeMillis(), "");
+        return new SampleTaskView(task, content);
     }
 
     @PutMapping(SAMPLE_TASK_CONTENT_ROUTE)
     public Content updateSampleTaskContent(@NotNull @PathVariable Long sampleTaskId) {
+        validateRequester();
         return null;
     }
 

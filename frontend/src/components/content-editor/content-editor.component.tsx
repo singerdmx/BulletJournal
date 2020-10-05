@@ -149,6 +149,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
     [ContentType.GROUP]: () => {},
     [ContentType.LABEL]: () => {},
     [ContentType.CONTENT]: () => {},
+    [ContentType.SAMPLE_TASK]: () => {},
   };
   let createContentFunction = createContentCall[contentType];
 
@@ -161,6 +162,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
     [ContentType.GROUP]: () => {},
     [ContentType.LABEL]: () => {},
     [ContentType.CONTENT]: () => {},
+    [ContentType.SAMPLE_TASK]: () => {},
   };
   let patchContentFunction = patchContentCall[contentType];
 

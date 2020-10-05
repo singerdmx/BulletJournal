@@ -1,17 +1,25 @@
 package com.bulletjournal.templates.controller.model;
 
 import com.bulletjournal.controller.models.Content;
-import com.bulletjournal.controller.models.Task;
+import com.bulletjournal.controller.models.SampleTask;
 
 public class SampleTaskView {
-    private Task task;
+    private SampleTask task;
     private Content content;
 
-    public Task getTask() {
+    public SampleTaskView() {
+    }
+
+    public SampleTaskView(SampleTask task, Content content) {
+        this.task = task;
+        this.content = content;
+    }
+
+    public SampleTask getTask() {
         return task;
     }
 
-    public void setTask(Task task) {
+    public void setTask(SampleTask task) {
         this.task = task;
     }
 
