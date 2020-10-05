@@ -32,7 +32,11 @@ import {
   UpdateSampleTaskAction,
   CloneStepAction,
   UpdateStepAction,
-  GetSampleTasksByScrollIdAction, ImportTasksAction, SetSampleTaskRuleAction, RemoveSampleTaskRuleAction
+  GetSampleTasksByScrollIdAction,
+  ImportTasksAction,
+  SetSampleTaskRuleAction,
+  RemoveSampleTaskRuleAction,
+  SetExcludedSelectionsAction
 } from './reducer';
 import {
   createCategory,
@@ -50,7 +54,16 @@ import {
 import {Category, Choice, NextStep, Rule, SampleTask, SampleTasks, Selection, Step, Steps} from './interface';
 import {createSelection, deleteSelection, updateSelection} from "../../apis/templates/selectionApis";
 import {IState} from "../../store";
-import {getSteps, createStep, getStep, deleteStep, updateChoicesForStep, cloneStep, putStep} from '../../apis/templates/stepApis';
+import {
+  getSteps,
+  createStep,
+  getStep,
+  deleteStep,
+  updateChoicesForStep,
+  cloneStep,
+  putStep,
+  updateExcludedSelectionsForStep
+} from '../../apis/templates/stepApis';
 import {
   createSampleTask,
   deleteSampleTask, deleteSampleTaskRule,
@@ -230,6 +243,21 @@ function* setStepChoices(action: PayloadAction<SetChoicesAction>) {
       yield put(reloadReceived(true));
     } else {
       yield call(message.error, `setStepChoices Error Received: ${error}`);
+    }
+  }
+}
+
+function* setStepExcludedSelections(action: PayloadAction<SetExcludedSelectionsAction>) {
+  try {
+    const {id, selections} = action.payload;
+    const data: Step = yield call(updateExcludedSelectionsForStep, id, selections);
+    console.log(data)
+    yield put(templatesActions.stepReceived({step: data}));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `setStepExcludedSelections Error Received: ${error}`);
     }
   }
 }
@@ -643,6 +671,7 @@ export default function* TemplatesSagas() {
     yield takeLatest(templatesActions.getCategory.type, fetchCategory),
     yield takeLatest(templatesActions.setCategoryChoices.type, setCategoryChoices),
     yield takeLatest(templatesActions.setStepChoices.type, setStepChoices),
+    yield takeLatest(templatesActions.setStepExcludedSelections.type, setStepExcludedSelections),
     yield takeLatest(templatesActions.addChoice.type, addChoice),
     yield takeLatest(templatesActions.updateChoice.type, putChoice),
     yield takeLatest(templatesActions.addSelection.type, addSelection),

@@ -135,6 +135,11 @@ export type SetChoicesAction = {
     choices: number[];
 };
 
+export type SetExcludedSelectionsAction = {
+    id: number;
+    selections: number[];
+};
+
 export type AddChoiceAction = {
     name: string;
     multiple: boolean;
@@ -277,6 +282,7 @@ const slice = createSlice({
         updateCategoryRelations: (state, action: PayloadAction<UpdateCategoryRelationsAction>) => state,
         setCategoryChoices: (state, action: PayloadAction<SetChoicesAction>) => state,
         setStepChoices: (state, action: PayloadAction<SetChoicesAction>) => state,
+        setStepExcludedSelections: (state, action: PayloadAction<SetExcludedSelectionsAction>) => state,
         addChoice: (state, action: PayloadAction<AddChoiceAction>) => state,
         updateChoice: (state, action: PayloadAction<UpdateChoiceAction>) => state,
         addSelection: (state, action: PayloadAction<AddSelectionAction>) => state,
