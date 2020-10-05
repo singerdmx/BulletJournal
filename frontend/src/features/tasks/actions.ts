@@ -150,6 +150,13 @@ export const patchContent = (taskId: number, contentId: number, text: string, di
     text: text,
     diff: diff,
   });
+export const patchSampleTaskContent = (taskId: number, contentId: number, text: string, diff: string) =>
+    actions.SampleTaskContentPatch({
+        taskId: taskId,
+        contentId: contentId,
+        text: text,
+        diff: diff,
+    });
 export const updateLoadingCompletedTask = (loadingCompletedTask: boolean) =>
   actions.updateLoadingCompletedTask({
     loadingCompletedTask: loadingCompletedTask,

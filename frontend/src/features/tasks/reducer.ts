@@ -381,6 +381,7 @@ const slice = createSlice({
     TaskContentCreate: (state, action: PayloadAction<CreateContent>) => state,
     TaskContentDelete: (state, action: PayloadAction<DeleteContent>) => state,
     TaskContentPatch: (state, action: PayloadAction<PatchContent>) => state,
+    SampleTaskContentPatch: (state, action: PayloadAction<PatchContent>) => state,
     TaskStatusSet: (state, action: PayloadAction<SetTaskStatus>) => state,
     TaskPatchRevisionContents: (state, action: PayloadAction<PatchRevisionContents>) => state,
     GetTaskStatistics: (state, action: PayloadAction<GetTaskStatisticsAction>) => state,

@@ -166,6 +166,9 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
         if (isPublic) {
             return null;
         }
+        if (window.location.hash.startsWith('#/sampleTasks')) {
+            return null;
+        }
         return <div
             className="task-statistic-card"
             style={getTaskBackgroundColor(task.status, theme)}

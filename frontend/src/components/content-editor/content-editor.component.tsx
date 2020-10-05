@@ -15,6 +15,7 @@ import {
 import {
   createContent as createTaskContent,
   patchContent as patchTaskContent,
+  patchSampleTaskContent
 } from '../../features/tasks/actions';
 import {
   createContent as createTransactionContent,
@@ -52,6 +53,12 @@ interface ContentEditorHandler {
     text: string,
     diff: string
   ) => void;
+  patchSampleTaskContent: (
+      taskId: number,
+      contentId: number,
+      text: string,
+      diff: string
+  ) => void;
   createTransactionContent: (transactionId: number, text: string) => void;
   patchTransactionContent: (
     transactionId: number,
@@ -75,6 +82,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
   createTransactionContent,
   patchTransactionContent,
   patchTaskContent,
+  patchSampleTaskContent
 }) => {
   const isEdit = !!delta;
   const [editorContent, setEditorContent] = useState(
@@ -162,7 +170,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
     [ContentType.GROUP]: () => {},
     [ContentType.LABEL]: () => {},
     [ContentType.CONTENT]: () => {},
-    [ContentType.SAMPLE_TASK]: () => {},
+    [ContentType.SAMPLE_TASK]: () => patchSampleTaskContent,
   };
   let patchContentFunction = patchContentCall[contentType];
 
@@ -229,4 +237,5 @@ export default connect(mapStateToProps, {
   patchTaskContent,
   createTransactionContent,
   patchTransactionContent,
+  patchSampleTaskContent
 })(ContentEditor);

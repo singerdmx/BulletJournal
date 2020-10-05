@@ -1066,7 +1066,7 @@ function* patchContent(action: PayloadAction<PatchContent>) {
   try {
     const {taskId, contentId, text, diff} = action.payload;
     const state: IState = yield select();
-    const order = state.note.contents.map(c => c.id);
+    const order = state.task.contents.map(c => c.id);
 
     const contents: Content[] = yield call(updateContent, taskId, contentId, text, state.content.content!.etag, diff);
     contents.sort((a: Content, b: Content) => {
@@ -1083,6 +1083,31 @@ function* patchContent(action: PayloadAction<PatchContent>) {
       yield put(reloadReceived(true));
     } else {
       yield call(message.error, `Patch Content Error Received: ${error}`);
+    }
+  }
+}
+
+function* patchSampleContent(action: PayloadAction<PatchContent>) {
+  try {
+    const {taskId, contentId, text, diff} = action.payload;
+    const state: IState = yield select();
+    const order = state.task.contents.map(c => c.id);
+
+    const contents: Content[] = yield call(updateContent, taskId, contentId, text, state.content.content!.etag, diff);
+    contents.sort((a: Content, b: Content) => {
+      return order.findIndex((o) => o === a.id) - order.findIndex((o) => o === b.id);
+    });
+    yield put(
+        tasksActions.taskContentsReceived({
+          contents: contents,
+        })
+    );
+    yield put(updateTargetContent(contents.filter(c => c.id === contentId)[0]));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Patch Sample Task Content Error Received: ${error}`);
     }
   }
 }
@@ -1316,6 +1341,7 @@ export default function* taskSagas() {
     ),
     yield takeLatest(tasksActions.TaskContentCreate.type, createTaskContent),
     yield takeLatest(tasksActions.TaskContentPatch.type, patchContent),
+    yield takeLatest(tasksActions.SampleTaskContentPatch.type, patchSampleContent),
     yield takeLatest(tasksActions.TaskContentDelete.type, deleteTaskContent),
     yield takeLatest(
         tasksActions.CompleteTaskContentsUpdate.type,

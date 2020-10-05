@@ -6,7 +6,7 @@ import {connect} from "react-redux";
 import {getSampleTask, removeSampleTask, updateSampleTask} from "../../features/templates/actions";
 import {SampleTask} from "../../features/templates/interface";
 import {useHistory, useParams} from "react-router-dom";
-import {CloseSquareTwoTone, DeleteFilled, DownloadOutlined} from "@ant-design/icons";
+import {CloseSquareTwoTone, DeleteFilled, DownloadOutlined, SearchOutlined} from "@ant-design/icons";
 import {Divider} from "antd/es";
 import {approveSampleTask} from "../../features/admin/actions";
 const {Title, Text} = Typography;
@@ -116,6 +116,13 @@ const AdminSampleTaskPage: React.FC<SampleTaskProps> = (
                         Confirm
                     </Button>
                 </div>}
+            </div>
+            <Divider/>
+            <div>
+                <Button type="primary" shape="round" icon={<SearchOutlined />}
+                        onClick={() => history.push(`/sampleTasks/${sampleTask.id}`)}>
+                    View Content
+                </Button>
             </div>
         </div>
     );
