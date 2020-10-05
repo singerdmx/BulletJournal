@@ -154,6 +154,11 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     public <T extends ProjectItemModel> void addContent(List<T> projectItems, List<String> owners, List<K> contents) {
         LOGGER.info("Adding {} contents", contents.size());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            LOGGER.error("addContent Interrupted", e);
+        }
         List<K> batch = new ArrayList<>();
         int maxSize = Math.min(contents.size(), CONTENT_BATCH_SIZE);
         for (int i = 0; i < maxSize; i++) {
