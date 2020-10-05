@@ -1,8 +1,8 @@
 package persistence
 
 type UserGroupKey struct {
-	UserID  int64
-	GroupID int64
+	UserID  int64 `gorm:"primaryKey;autoIncrement:false"`
+	GroupID int64 `gorm:"primaryKey;autoIncrement:false"`
 }
 
 type UserGroup struct {

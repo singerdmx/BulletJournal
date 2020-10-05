@@ -4,7 +4,9 @@ import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.templates.controller.model.CategorySteps;
 import com.bulletjournal.templates.controller.model.Rule;
+import com.bulletjournal.templates.controller.model.SampleTasks;
 import com.bulletjournal.templates.repository.model.*;
+import com.bulletjournal.templates.workflow.models.SelectionCombo;
 import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +25,11 @@ public class CategoryDaoJpa {
 
     private CategoryRepository categoryRepository;
     private CategoryRuleRepository categoryRuleRepository;
+    private SampleTaskRuleRepository sampleTaskRuleRepository;
     private ChoiceDaoJpa choiceDaoJpa;
     private StepDaoJpa stepDaoJpa;
     private RuleDaoJpa ruleDaoJpa;
+    private SampleTaskDaoJpa sampleTaskDaoJpa;
 
     @Autowired
     public CategoryDaoJpa(CategoryRepository categoryRepository, CategoryRuleRepository categoryRuleRepository, ChoiceDaoJpa choiceDaoJpa, StepDaoJpa stepDaoJpa) {
@@ -129,6 +133,7 @@ public class CategoryDaoJpa {
         CategorySteps categorySteps = new CategorySteps();
         List<Triple<com.bulletjournal.templates.controller.model.Step, Rule, com.bulletjournal.templates.controller.model.Step>> connections = new ArrayList<>();
         List<Long> allStepIds = new ArrayList<>();
+        Map<com.bulletjournal.templates.controller.model.Step, Map<SelectionCombo, SampleTasks>> finalSteps = new HashMap<>();
         allStepIds.add(categoryId);
 
         Category category = categoryRepository.getById(categoryId);
@@ -160,6 +165,8 @@ public class CategoryDaoJpa {
 
                             bfsQueue.add(nextStep);
                             allStepIds.add(nextStep.getId());
+                        } else {
+                            findSelectionComboAndSampleTaskForFinalStep(finalSteps, currentStep);
                         }
                     });
                 } else {
@@ -169,6 +176,8 @@ public class CategoryDaoJpa {
 
                         bfsQueue.add(nextStep);
                         allStepIds.add(nextStep.getId());
+                    } else {
+                        findSelectionComboAndSampleTaskForFinalStep(finalSteps, currentStep);
                     }
                 }
 
@@ -180,5 +189,29 @@ public class CategoryDaoJpa {
         categorySteps.setStepIds(allStepIds);
 
         return categorySteps;
+    }
+
+    private void findSelectionComboAndSampleTaskForFinalStep(Map<com.bulletjournal.templates.controller.model.Step, Map<SelectionCombo, SampleTasks>> finalSteps, Step currentStep) {
+        Map<SelectionCombo, SampleTasks> selectionToTask = new HashMap<>();
+        for (Choice choice : currentStep.getChoices()) {
+            SelectionCombo selectionCombo = new SelectionCombo();
+            selectionCombo.setSelections(new HashSet<>(choice.getSelections()));
+
+            String selectionComboStr = selectionCombo.getSelections().stream()
+                    .map(Selection::getId).map(id -> id + "").collect(Collectors.joining(","));
+
+            SampleTasks sampleTasks = new SampleTasks();
+            List<com.bulletjournal.templates.controller.model.SampleTask> allSampleTasks = new ArrayList<>();
+            for (SampleTaskRule sampleTaskRule : sampleTaskRuleRepository.findAllBySelectionCombo(selectionComboStr)) {
+                for (Long sampleTaskId : sampleTaskRule.getSampleTaskIds()) {
+                    allSampleTasks.add(sampleTaskDaoJpa.findSampleTaskById(sampleTaskId).toPresentationModel());
+                }
+            }
+            sampleTasks.setSampleTasks(allSampleTasks);
+
+            selectionToTask.put(selectionCombo, sampleTasks);
+        }
+
+        finalSteps.put(currentStep.toPresentationModel(), selectionToTask);
     }
 }

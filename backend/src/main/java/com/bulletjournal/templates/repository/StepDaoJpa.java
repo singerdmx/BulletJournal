@@ -98,15 +98,6 @@ public class StepDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public com.bulletjournal.templates.controller.model.Step getStepByIdWithExcludedSelections(Long stepId) {
-        Step step = getById(stepId);
-        com.bulletjournal.templates.controller.model.Step presentStep = step.toPresentationModel();
-        List<Selection> selections = selectionDaoJpa.getSelectionsById(step.getExcludedSelections());
-        presentStep.setExcludedSelections(selections.stream().map(Selection::toPresentationModel).collect(Collectors.toList()));
-        return presentStep;
-    }
-
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void updateStep(Long stepId, UpdateStepParams updateStepParams) {
         Step step = getById(stepId);
         step.setName(updateStepParams.getName());

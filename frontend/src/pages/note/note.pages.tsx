@@ -50,6 +50,10 @@ export const contentEditable = (
         return false;
     }
 
+    if (!content.id) {
+        return false;
+    }
+
     if (project && project.owner.name === myself) {
         return true;
     }

@@ -13,12 +13,7 @@ import {
 import {Category, Choice, NextStep, SampleTask, SampleTasks, Step} from "../../features/templates/interface";
 import {Button, Card, Empty, notification, Select, Tooltip} from "antd";
 import {isSubsequence} from "../../utils/Util";
-import {
-    CloseOutlined,
-    CloseSquareTwoTone,
-    ExclamationCircleFilled,
-    UpCircleTwoTone
-} from "@ant-design/icons";
+import {CloseOutlined, CloseSquareTwoTone, ExclamationCircleFilled, UpCircleTwoTone} from "@ant-design/icons";
 import ReactLoading from "react-loading";
 import {getCookie} from "../../index";
 import StepsImportTasksPage from "./steps.import.tasks.pages";
@@ -193,6 +188,7 @@ const StepsPage: React.FC<StepsProps> = (
     }
 
     const renderChoice = (choice: Choice) => {
+        const curStep = getCurrentStep();
         return <div key={choice.id} className='choice-card'>
             <Select mode={choice.multiple ? 'multiple' : undefined}
                     clearIcon={<CloseSquareTwoTone/>}
@@ -203,9 +199,10 @@ const StepsPage: React.FC<StepsProps> = (
                     value={getChoiceValue(choice)}
                     style={{padding: '3px', minWidth: choice.multiple ? '50%' : '5%'}}
                     allowClear>
-                {choice.selections.map(selection => {
-                    return <Option key={selection.text} value={selection.id}>{selection.text}</Option>
-                })}
+                {choice.selections.filter(selection => !curStep.excludedSelections.includes(selection.id))
+                    .map(selection => {
+                        return <Option key={selection.text} value={selection.id}>{selection.text}</Option>
+                    })}
             </Select>
             {choice.multiple && <Button
                 onClick={() => selectAll(choice)}

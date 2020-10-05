@@ -161,6 +161,7 @@ public class RuleEngine {
 
         // resulting sample task ids
         Set<Long> result = new HashSet<>();
+        boolean fistTime = true;
         // find choice combo if there is selection combo in any task rule
         for (SampleTaskRule rule : rules) {
             if (rule.getSelectionIds().size() < 2) {
@@ -173,6 +174,7 @@ public class RuleEngine {
             }
             // union for choice combo
             result.addAll(rule.getSampleTaskIds());
+            fistTime = false;
 
             choiceIds.forEach(choiceId -> allChoices.remove(choiceId));
         }
@@ -188,7 +190,12 @@ public class RuleEngine {
             }
 
             // Selections between choices => intersection of List<SampleTask>
-            result.retainAll(tmpResult);
+            if (fistTime) {
+                result.addAll(tmpResult);
+                fistTime = false;
+            } else {
+                result.retainAll(tmpResult);
+            }
         }
 
         return result;

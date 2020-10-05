@@ -168,6 +168,6 @@ func PrintConfig() {
 	fmt.Printf("Private APIKey:%s{%s}\n", tab, serviceConfig.ApiKeyPrivate)
 	fmt.Printf("IntervalInSeconds:\t\t%v\n", serviceConfig.IntervalInSeconds)
 	fmt.Printf("MaxRetentionTimeInDays:\t\t%v\n", serviceConfig.MaxRetentionTimeInDays)
-	fmt.Printf("IntervalInDays:\t\t%v\n", serviceConfig.IntervalInDays)
+	fmt.Printf("IntervalInDays:%s%v\n", tab, serviceConfig.IntervalInDays)
 	fmt.Print("****************************************************\n")
 }

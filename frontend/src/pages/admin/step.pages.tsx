@@ -94,8 +94,8 @@ const AdminStepPage: React.FC<AdminStepProps> = (
             </div>
             <div>
                 {step.excludedSelections.map(s => <span>
-                            {s.text} ({s.id})
-                    <DeleteFilled style={{cursor: 'pointer'}} onClick={() => removeExcludedSelection(s.id)}/>
+                            {s}
+                    <DeleteFilled style={{cursor: 'pointer'}} onClick={() => removeExcludedSelection(s)}/>
                         </span>)}
             </div>
         </div>
