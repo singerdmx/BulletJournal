@@ -103,7 +103,7 @@ func (c *DividendsClient) SendData() error {
 			Content:         "",
 			Name:            target.Name,
 			Uid:             target.ID,
-			AvailableBefore: t, //TODO
+			AvailableBefore: t,
 			DueDate:         "",
 			DueTime:         "",
 			Pending:         true,

@@ -109,7 +109,7 @@ func (c *IPOClient) SendData() error {
 			Content: "",
 			Name: target.Name,
 			Uid: target.ID,
-			AvailableBefore: t, // TODO
+			AvailableBefore: t,
 			DueDate: target.PricingDate,			
 			DueTime: "",
 			Pending: true,
