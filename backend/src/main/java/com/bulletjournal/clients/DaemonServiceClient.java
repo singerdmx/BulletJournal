@@ -23,11 +23,9 @@ public class DaemonServiceClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DaemonServiceClient.class);
 
-    private static final String CLIENT_ID = "bulletJournal";
+    private static final String SERVICE_NAME = "controller";
 
-    private static final String CLEANER_SERVICE_NAME = "cleaner";
-
-    private static final String REMINDER_SERVICE_NAME = "reminder";
+    private static final String RENEW_GOOGLE_CALENDAR = "RenewGoogleCalendarWatch";
 
     @Autowired
     private DaemonClientConfig daemonClientConfig;
@@ -45,7 +43,7 @@ public class DaemonServiceClient {
     public void postConstruct() {
         if (this.daemonClientConfig.isEnabled()) {
             LOGGER.info("We're enabling daemon streaming...");
-            subscribeNotification(SubscribeNotification.newBuilder().setId(CLIENT_ID).build(), newResponseObserver());
+            subscribeNotification(SubscribeNotification.newBuilder().setId(SERVICE_NAME).build(), newResponseObserver());
         } else {
             LOGGER.info("We don't enable daemon streaming as for now...");
         }
@@ -77,12 +75,8 @@ public class DaemonServiceClient {
                 LOGGER.info("Got a daemon streaming message");
                 try {
                     switch (stream.getId()) {
-                        case CLEANER_SERVICE_NAME:
+                        case RENEW_GOOGLE_CALENDAR:
                             DaemonServiceClient.this.googleCalendarProjectDaoJpa.renewGoogleCalendarWatch(stream.getMessage());
-                            break;
-                        case REMINDER_SERVICE_NAME:
-                            // TODO: implement reminder handler
-                            LOGGER.info("Reminder service message is not handled: {}", stream);
                             break;
                         default:
                             LOGGER.warn("No need to handle unsupported service message: {}", stream);
@@ -102,7 +96,7 @@ public class DaemonServiceClient {
                 LOGGER.info("Will retry subscribing to daemon server again in {}s", wait / 1000);
                 try {
                     Thread.sleep(wait);
-                    subscribeNotification(SubscribeNotification.newBuilder().setId(CLIENT_ID).build(), newResponseObserver());
+                    subscribeNotification(SubscribeNotification.newBuilder().setId(SERVICE_NAME).build(), newResponseObserver());
                 } catch (InterruptedException interruptedException) {
                     LOGGER.error("Internal error happened before attempting to retry subscribing to daemon server: {}", interruptedException.getMessage());
                     LOGGER.error("Stop subscribing to daemon server due to the previous server side error");
