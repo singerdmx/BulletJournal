@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/singerdmx/BulletJournal/daemon/config"
 )
 
 const (
@@ -19,9 +18,8 @@ type EtagDao struct {
 	Rdb *redis.Client
 }
 
-func InitializeEtagDao(ctx context.Context, serviceConfig *config.Config) *EtagDao {
-	client := GetRedisClient(serviceConfig)
-	return &EtagDao{Ctx: ctx, Rdb: client}
+func InitializeEtagDao(ctx context.Context, redisClient *redis.Client) *EtagDao {
+	return &EtagDao{Ctx: ctx, Rdb: redisClient}
 }
 
 func (e *EtagDao) SingleCache(etag *Etag) {
