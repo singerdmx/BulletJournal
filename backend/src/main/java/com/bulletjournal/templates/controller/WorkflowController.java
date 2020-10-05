@@ -1,6 +1,7 @@
 package com.bulletjournal.templates.controller;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.controller.models.Content;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.templates.controller.model.SampleTask;
@@ -32,7 +33,9 @@ public class WorkflowController {
     public static final String PUBLIC_SAMPLE_TASKS_ROUTE = "/api/public/sampleTasks";
     public static final String SAMPLE_TASKS_IMPORT_ROUTE = "/api/sampleTasks/import";
     public static final String SAMPLE_TASKS_ROUTE = "/api/sampleTasks";
+    public static final String ADMIN_SAMPLE_TASK_ROUTE = "/api/admin/sampleTasks/{sampleTaskId}";
     public static final String SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}";
+    public static final String SAMPLE_TASK_CONTENT_ROUTE = "/api/sampleTasks/{sampleTaskId}/contents";
     public static final String SAMPLE_TASK_BY_METADATA = "/api/sampleTasks";
     public static final String SAMPLE_TASK_RULE_ROUTE = "/api/sampleTaskRule";
     public static final String SAMPLE_TASKS_RULE_ROUTE = "/api/sampleTaskRules";
@@ -255,8 +258,8 @@ public class WorkflowController {
         return sampleTaskDaoJpa.createSampleTask(createSampleTaskParams).toPresentationModel();
     }
 
-    @GetMapping(SAMPLE_TASK_ROUTE)
-    public SampleTask getSampleTask(@NotNull @PathVariable Long sampleTaskId) {
+    @GetMapping(ADMIN_SAMPLE_TASK_ROUTE)
+    public SampleTask getAdminSampleTask(@NotNull @PathVariable Long sampleTaskId) {
         validateRequester();
         com.bulletjournal.templates.repository.model.SampleTask sampleTask =
                 this.sampleTaskDaoJpa.findSampleTaskById(sampleTaskId);
@@ -266,6 +269,17 @@ public class WorkflowController {
             result.setChoice(choice.toPresentationModel());
         }
         return result;
+    }
+
+    @GetMapping(SAMPLE_TASK_ROUTE)
+    public SampleTaskView getSampleTask(@NotNull @PathVariable Long sampleTaskId) {
+        // ContentType SAMPLE_TASK
+        return null;
+    }
+
+    @PutMapping(SAMPLE_TASK_CONTENT_ROUTE)
+    public Content updateSampleTaskContent(@NotNull @PathVariable Long sampleTaskId) {
+        return null;
     }
 
     @GetMapping(SAMPLE_TASK_BY_METADATA)

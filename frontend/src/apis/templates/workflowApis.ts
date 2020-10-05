@@ -46,8 +46,8 @@ export const createSampleTask = (name: string, uid: string, content: string, met
         });
 }
 
-export const fetchSampleTask = (sampleTaskId: number) => {
-    return doFetch(`/api/sampleTasks/${sampleTaskId}`)
+export const fetchAdminSampleTask = (sampleTaskId: number) => {
+    return doFetch(`/api/admin/sampleTasks/${sampleTaskId}`)
         .then((res) => res.json())
         .catch((err) => {
             throw Error(err.message);
