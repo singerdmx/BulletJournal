@@ -2,6 +2,7 @@ version: '2.1'
 services:
   daemon:
     container_name: daemon_app
+    image: bulletjournal-daemon:latest
     build:
       context: .
     ports:

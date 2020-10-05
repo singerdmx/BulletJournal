@@ -6,7 +6,7 @@ type SampleTask struct {
 	ID					int64 		`json:"id,omitempty" gorm:"primary_key"`
 	CreatedAt			time.Time 	`json:"-" gorm:"index:created_at;PRECISION:6"`
 	UpdatedAt			time.Time 	`json:"-" gorm:"PRECISION:6"`
-	MetaData			string 		`json:"metadata"`
+	Metadata			string 		`json:"metadata"`
 	Content				string 		`json:"content"`
 	Name				string		`json:"name" gorm:"type:varchar;size:100"`
 	Uid					string		`json:"uid" gorm:"type:varchar;size:500"`
@@ -15,4 +15,9 @@ type SampleTask struct {
 	DueTime 			string		`json:"due_time" gorm:"type:varchar;size:10"`
 	TimeZone            string      `json:"time_zone" gorm:"type:varchar;size:100"`
 	Pending				bool		`json:"pending"`
+	Refreshable			bool		`json:"refreshable"`
+}
+
+func (SampleTask) TableName() string {
+	return "template.sample_tasks"
 }

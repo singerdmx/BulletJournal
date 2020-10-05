@@ -1,6 +1,8 @@
 package com.bulletjournal.templates.repository.model;
 
 import com.bulletjournal.repository.models.AuditModel;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -14,6 +16,7 @@ public class SelectionIntroduction extends AuditModel {
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "selection_id", referencedColumnName = "id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Selection selection;
 
     @Column
@@ -64,4 +67,9 @@ public class SelectionIntroduction extends AuditModel {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    public com.bulletjournal.templates.controller.model.SelectionIntroduction toPresentationModel() {
+        return new com.bulletjournal.templates.controller.model.SelectionIntroduction(selection.toPresentationModel(), imageLink, description, title);
+    }
+
 }

@@ -177,10 +177,6 @@ export type ShareLinkAction = {
   link: string;
 };
 
-export type GetCompletedTasks = {
-  projectId: number;
-};
-
 export type LoadingCompletedTaskAction = {
   loadingCompletedTask: boolean;
 };

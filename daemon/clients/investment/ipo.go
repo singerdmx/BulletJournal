@@ -105,14 +105,15 @@ func (c *IPOClient) SendData() error {
 		item := persistence.SampleTask{
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
-			MetaData: "INVESTMENT_IPO_RECORD",
+			Metadata: "INVESTMENT_IPO_RECORD",
 			Content: "",
 			Name: target.Name,
 			Uid: target.ID,
-			AvailableBefore: t, // TODO
+			AvailableBefore: t,
 			DueDate: target.PricingDate,			
 			DueTime: "",
 			Pending: true,
+			Refreshable: true,
 		}
 		c.sampleDao.Upsert(&item)
 	}
