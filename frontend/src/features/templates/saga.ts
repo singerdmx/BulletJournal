@@ -95,6 +95,7 @@ function* fetchChoice(action: PayloadAction<GetChoiceAction>) {
     const {choiceId} = action.payload;
     const data: Choice = yield call(getChoice, choiceId);
     console.log(data)
+    yield put(templatesActions.choiceReceived({choice: data}));
     const state: IState = yield select();
     const choices : Choice[] = [];
     state.templates.choices.forEach(c => {

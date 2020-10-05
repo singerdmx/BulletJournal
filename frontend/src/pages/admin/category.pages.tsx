@@ -189,7 +189,7 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
             <h3>Choices</h3>
             {category.choices.map(c => {
                 return <div>
-                    <AdminChoiceElem choice={c}/>
+                    <AdminChoiceElem c={c}/>
                     {' '}
                     <Tooltip title='Remove Choice'>
                         <DeleteTwoTone style={{cursor: 'pointer'}} onClick={() => deleteChoice(category, c.id)}/>

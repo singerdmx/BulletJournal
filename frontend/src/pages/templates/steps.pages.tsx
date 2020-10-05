@@ -170,7 +170,8 @@ const StepsPage: React.FC<StepsProps> = (
     const selectAll = (choice: Choice) => {
         const curStep = getCurrentStep();
         const selections = getSelections();
-        selections[choice.id] = curStep.choices.filter(c => c.id === choice.id)[0].selections.map(s => s.id);
+        selections[choice.id] = curStep.choices.filter(c => c.id === choice.id)[0].selections
+            .filter(selection => !curStep.excludedSelections.includes(selection.id)).map(s => s.id);
         setSelections(selections);
         setShowConfirmButton(curStep.choices.every(c => selections[c.id] && selections[c.id].length > 0));
     }

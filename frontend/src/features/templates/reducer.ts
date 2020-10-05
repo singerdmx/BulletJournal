@@ -84,6 +84,10 @@ export type ChoicesAction = {
     choices: Choice[];
 };
 
+export type ChoiceAction = {
+    choice: Choice;
+};
+
 export type CategoryAction = {
     category: Category;
 };
@@ -229,6 +233,7 @@ let initialState = {
     categories: [] as Category[],
     category: undefined as Category | undefined,
     choices: [] as Choice[],
+    choice: undefined as Choice | undefined,
     steps: [] as Step[],
     step: undefined as Step | undefined,
     nextStep: undefined as NextStep | undefined,
@@ -252,6 +257,10 @@ const slice = createSlice({
         choicesReceived: (state, action: PayloadAction<ChoicesAction>) => {
             const {choices} = action.payload;
             state.choices = choices;
+        },
+        choiceReceived: (state, action: PayloadAction<ChoiceAction>) => {
+            const {choice} = action.payload;
+            state.choice = choice;
         },
         categoryReceived: (state, action: PayloadAction<CategoryAction>) => {
             const {category} = action.payload;

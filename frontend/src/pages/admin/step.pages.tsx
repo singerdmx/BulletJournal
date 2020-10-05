@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {useHistory, useParams} from "react-router-dom";
 import {connect} from "react-redux";
 import {deleteStep, getStep, setStepChoices, updateStep, deleteRule} from "../../features/templates/actions";
@@ -27,6 +27,7 @@ const AdminStepPage: React.FC<AdminStepProps> = (
     {step, getStep, deleteStep, setStepChoices, updateStep, deleteRule}) => {
     const history = useHistory();
     const {stepId} = useParams();
+    const [exclusionId, setExclusionId] = useState(0);
 
     useEffect(() => {
         if (stepId) {
@@ -57,6 +58,10 @@ const AdminStepPage: React.FC<AdminStepProps> = (
         
     }
 
+    const addExcludedSelection = (id: number) => {
+
+    }
+
     const nameChange = (input: any) => {
         console.log(input);
         updateStep(step.id, input, step.nextStepId);
@@ -71,7 +76,7 @@ const AdminStepPage: React.FC<AdminStepProps> = (
         <h3>Choices</h3>
         {step.choices.map(c => {
             return <div>
-                <AdminChoiceElem choice={c}/>
+                <AdminChoiceElem c={c}/>
                 {' '}
                 <Tooltip title='Remove Choice'>
                     <DeleteTwoTone style={{cursor: 'pointer'}} onClick={() => removeChoice(step, c.id)}/>
@@ -90,7 +95,11 @@ const AdminStepPage: React.FC<AdminStepProps> = (
         <div>
             <h3>Excluded Selections</h3>
             <div>
-                <InputNumber/> <Button type='primary'>Add to Exclusion</Button>
+                <InputNumber  onChange={(value) => {
+                    if (!value || isNaN(value)) setExclusionId(0);
+                    else setExclusionId(value);
+                }}
+                /> <Button type='primary' onClick={() => addExcludedSelection(exclusionId)}>Add to Exclusion</Button>
             </div>
             <div>
                 {step.excludedSelections.map(s => <span>

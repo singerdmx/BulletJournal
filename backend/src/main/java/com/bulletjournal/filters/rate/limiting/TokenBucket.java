@@ -89,6 +89,9 @@ public class TokenBucket {
     }
 
     private boolean consumeToken(String subject, Map<String, Bucket> buckets, int limit) {
+        if (subject == null) {
+            return true;
+        }
         Bucket requestBucket = buckets.computeIfAbsent(subject, key -> standardBucket(limit));
         ConsumptionProbe probe = requestBucket.tryConsumeAndReturnRemaining(1);
         return probe.isConsumed();
