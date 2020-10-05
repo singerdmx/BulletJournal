@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-<<<<<<< HEAD:daemon/cmd/server/server.go
 	"log"
 	"strconv"
 	"strings"
@@ -16,29 +15,6 @@ import (
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
-=======
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/singerdmx/BulletJournal/daemon/api/middleware"
-	daemon "github.com/singerdmx/BulletJournal/daemon/api/service"
-	"github.com/singerdmx/BulletJournal/daemon/config"
-	"github.com/singerdmx/BulletJournal/daemon/logging"
-	"github.com/singerdmx/BulletJournal/daemon/persistence"
-	uid "github.com/singerdmx/BulletJournal/daemon/utils"
-	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services"
-	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types"
-	scheduler "github.com/zywangzy/JobScheduler"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
-	"net"
-	"net/http"
-	"os"
-	"os/signal"
-	"strconv"
-	"strings"
-	"syscall"
-	"time"
-	"upper.io/db.v3/postgresql"
->>>>>>> a2905b3c0aadf9b3594ab4ac624c33273a03493a:daemon/cmd/server/main.go
 )
 
 const (
@@ -72,9 +48,9 @@ func NewServer(ctx context.Context) *Server {
 	}
 
 	// Get DAOs
-	etagDao := persistence.InitializeEtagDao(ctx, redisClient)
+	etagDao := persistence.NewEtagDao(ctx, redisClient)
 	groupDao := persistence.NewGroupDao(ctx)
-	joinGroupInvitationDao := persistence.InitializeJoinGroupInvitationDao(ctx, redisClient)
+	joinGroupInvitationDao := persistence.NewJoinGroupInvitationDao(ctx, redisClient)
 
 	// Get services
 	messageService := daemon.NewMessageService(groupDao, joinGroupInvitationDao, mailClient)

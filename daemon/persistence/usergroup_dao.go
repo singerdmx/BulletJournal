@@ -2,14 +2,23 @@ package persistence
 
 import (
 	"context"
+
 	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"gorm.io/gorm"
 )
 
 type UserGroupDao struct {
 	Ctx context.Context
-	db *gorm.DB
+	db  *gorm.DB
 	log *logging.Logger
+}
+
+func NewUserGroupDao(ctx context.Context) *UserGroupDao {
+	userGroupDao := UserGroupDao{
+		Ctx: ctx,
+		db:  DB,
+	}
+	return &userGroupDao
 }
 
 func (u *UserGroupDao) Find(key UserGroupKey) (UserGroup, error) {

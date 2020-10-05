@@ -18,7 +18,7 @@ type EtagDao struct {
 	Rdb *redis.Client
 }
 
-func InitializeEtagDao(ctx context.Context, redisClient *redis.Client) *EtagDao {
+func NewEtagDao(ctx context.Context, redisClient *redis.Client) *EtagDao {
 	return &EtagDao{Ctx: ctx, Rdb: redisClient}
 }
 

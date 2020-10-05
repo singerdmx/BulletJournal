@@ -18,7 +18,7 @@ type JoinGroupInvitationDao struct {
 	Rdb *redis.Client
 }
 
-func InitializeJoinGroupInvitationDao(ctx context.Context, redisClient *redis.Client) *JoinGroupInvitationDao {
+func NewJoinGroupInvitationDao(ctx context.Context, redisClient *redis.Client) *JoinGroupInvitationDao {
 	return &JoinGroupInvitationDao{Ctx: ctx, Rdb: redisClient}
 }
 
