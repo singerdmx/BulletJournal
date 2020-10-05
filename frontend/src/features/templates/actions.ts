@@ -83,6 +83,11 @@ export const setStepChoices = (id: number, choices: number[]) => actions.setStep
     choices: choices
 });
 
+export const setStepExcludedSelections = (id: number, selections: number[]) => actions.setStepExcludedSelections({
+    id: id,
+    selections: selections
+});
+
 export const nextStepReceived = (nextStep: NextStep | undefined) => actions.nextStepReceived({step: nextStep});
 
 export const sampleTasksReceived = (sampleTasks: SampleTask[], scrollId: string) =>

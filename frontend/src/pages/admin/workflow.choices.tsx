@@ -36,8 +36,7 @@ const AdminWorkflowChoices: React.FC<WorkflowPageProps> = (
                 <h3>Choices</h3>
                 {choices.map(c => {
                     return <div onClick={() => setChoice(c)}>
-                        <AdminChoiceElem
-                            choice={c}/>
+                        <AdminChoiceElem c={c}/>
                     </div>
                 })}
             </div>

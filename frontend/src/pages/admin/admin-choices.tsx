@@ -33,7 +33,7 @@ const AdminChoices: React.FC<Choices> = (
         <div>
             {choices.filter(c => !choicesToExclude.includes(c.id)).map(c => {
                 return <div>
-                    <AdminChoiceElem choice={c} />
+                    <AdminChoiceElem c={c} />
                     {showAddChoice && <Tooltip title='Add Choice'>
                         <PlusCircleTwoTone onClick={() => addChoice(c.id)}/>
                     </Tooltip>}

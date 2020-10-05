@@ -84,6 +84,10 @@ export type ChoicesAction = {
     choices: Choice[];
 };
 
+export type ChoiceAction = {
+    choice: Choice;
+};
+
 export type CategoryAction = {
     category: Category;
 };
@@ -129,6 +133,11 @@ export type UpdateCategoryRelationsAction = {
 export type SetChoicesAction = {
     id: number;
     choices: number[];
+};
+
+export type SetExcludedSelectionsAction = {
+    id: number;
+    selections: number[];
 };
 
 export type AddChoiceAction = {
@@ -229,6 +238,7 @@ let initialState = {
     categories: [] as Category[],
     category: undefined as Category | undefined,
     choices: [] as Choice[],
+    choice: undefined as Choice | undefined,
     steps: [] as Step[],
     step: undefined as Step | undefined,
     nextStep: undefined as NextStep | undefined,
@@ -253,6 +263,10 @@ const slice = createSlice({
             const {choices} = action.payload;
             state.choices = choices;
         },
+        choiceReceived: (state, action: PayloadAction<ChoiceAction>) => {
+            const {choice} = action.payload;
+            state.choice = choice;
+        },
         categoryReceived: (state, action: PayloadAction<CategoryAction>) => {
             const {category} = action.payload;
             state.category = category;
@@ -268,6 +282,7 @@ const slice = createSlice({
         updateCategoryRelations: (state, action: PayloadAction<UpdateCategoryRelationsAction>) => state,
         setCategoryChoices: (state, action: PayloadAction<SetChoicesAction>) => state,
         setStepChoices: (state, action: PayloadAction<SetChoicesAction>) => state,
+        setStepExcludedSelections: (state, action: PayloadAction<SetExcludedSelectionsAction>) => state,
         addChoice: (state, action: PayloadAction<AddChoiceAction>) => state,
         updateChoice: (state, action: PayloadAction<UpdateChoiceAction>) => state,
         addSelection: (state, action: PayloadAction<AddSelectionAction>) => state,
