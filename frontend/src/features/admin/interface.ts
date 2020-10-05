@@ -1,4 +1,4 @@
-import {Choice, Rule, SampleTasks, Selection, Step} from "../templates/interface";
+import {Choice, Rule, SampleTask, Selection, Step} from "../templates/interface";
 
 export enum Role {
   BASIC = 'BASIC',
@@ -37,14 +37,18 @@ interface Connection {
   middle?: Rule;
 }
 
-export interface SelectionCombo {
+export interface SampleTaskRule {
+  step: Step;
+  selectionCombo: string;
+  taskIds: string;
+  tasks: SampleTask[];
   selections: Selection[];
 }
 
 export interface CategorySteps {
   connections: Connection[];
   stepIds: number[];
-  finalSteps: Object;
+  finalSteps: SampleTaskRule[];
 }
 
 export interface ChoiceMetadata {
