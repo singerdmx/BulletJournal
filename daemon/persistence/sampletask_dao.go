@@ -4,18 +4,20 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"gorm.io/gorm"
 )
 
 type SampleTaskDao struct {
 	Ctx context.Context
-	db *gorm.DB
+	db  *gorm.DB
 }
 
-func NewSampleTaskDao() (*SampleTaskDao, error) {
+func NewSampleTaskDao(ctx context.Context) (*SampleTaskDao, error) {
 
 	sampleTaskDao := SampleTaskDao{
-		db: DB,
+		Ctx: ctx,
+		db:  DB,
 	}
 	return &sampleTaskDao, nil
 }
@@ -24,7 +26,7 @@ func (s *SampleTaskDao) Upsert(t *SampleTask) {
 	prevReport := SampleTask{}
 	err := s.db.Where("uid = ?", t.Uid).Last(&prevReport).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		err :=s.db.Create(&t).Error
+		err := s.db.Create(&t).Error
 		if err != nil {
 			fmt.Println(err, t.ID)
 		}
@@ -65,5 +67,5 @@ func (s *SampleTaskDao) Upsert(t *SampleTask) {
 //		t.UpdatedAt,
 //		t.AvailableBefore,
 //	)
-	//s.db.Exec(query)
+//s.db.Exec(query)
 //}
