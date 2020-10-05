@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/singerdmx/BulletJournal/daemon/api/middleware"
-	"github.com/singerdmx/BulletJournal/daemon/api/service"
 	daemon "github.com/singerdmx/BulletJournal/daemon/api/service"
 	"github.com/singerdmx/BulletJournal/daemon/config"
 	"github.com/singerdmx/BulletJournal/daemon/persistence"
@@ -20,21 +19,24 @@ import (
 
 const (
 	bulletJournalId     string = "bulletJournal"
-	FanInServiceName    string = "fanIn"
-	CleanerServiceName  string = "cleaner"
-	ReminderServiceName string = "reminder"
+	fanInServiceName    string = "fanIn"
+	cleanerServiceName  string = "cleaner"
+	reminderServiceName string = "reminder"
 )
 
 // server should implement services.UnimplementedDaemonServer's methods
 type Server struct {
 	ServiceConfig          *config.Config
+	CleanerService         daemon.Streaming
+	FanInService           daemon.Streaming
+	MessageService         *daemon.MessageService
+	ReminderService        daemon.Streaming
 	subscriptions          map[string][]daemon.Streaming
-	messageService         *service.MessageService
 	etagDao                *persistence.EtagDao
 	joinGroupInvitationDao *persistence.JoinGroupInvitationDao
 }
 
-func NewServer(ctx context.Context, services []daemon.Streaming) *Server {
+func NewServer(ctx context.Context) *Server {
 	// Get config
 	serviceConfig := config.GetConfig()
 
@@ -52,11 +54,17 @@ func NewServer(ctx context.Context, services []daemon.Streaming) *Server {
 
 	// Get services
 	messageService := daemon.NewMessageService(groupDao, joinGroupInvitationDao, mailClient)
+	fanInService := daemon.Streaming{ServiceName: fanInServiceName, ServiceChannel: make(chan *daemon.StreamingMessage, 100)}
+	cleanerService := daemon.Streaming{ServiceName: cleanerServiceName, ServiceChannel: make(chan *daemon.StreamingMessage, 100)}
+	reminderService := daemon.Streaming{ServiceName: reminderServiceName, ServiceChannel: make(chan *daemon.StreamingMessage, 100)}
 
 	return &Server{
 		ServiceConfig:          serviceConfig,
-		subscriptions:          map[string][]daemon.Streaming{bulletJournalId: services},
-		messageService:         messageService,
+		CleanerService:         cleanerService,
+		FanInService:           fanInService,
+		MessageService:         messageService,
+		ReminderService:        reminderService,
+		subscriptions:          map[string][]daemon.Streaming{bulletJournalId: []daemon.Streaming{fanInService, cleanerService, reminderService}},
 		etagDao:                etagDao,
 		joinGroupInvitationDao: joinGroupInvitationDao,
 	}
@@ -106,7 +114,7 @@ func (s *Server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 		// Keep the subscription session alive
 		var fanInChannel chan *daemon.StreamingMessage
 		for _, service := range daemonServices {
-			if service.ServiceName == FanInServiceName {
+			if service.ServiceName == fanInServiceName {
 				fanInChannel = service.ServiceChannel
 			} else {
 				go func(service daemon.Streaming) {
@@ -123,9 +131,9 @@ func (s *Server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 				log.Printf("Service: %s for subscription: %s is closed", service.ServiceName, subscribe.String())
 				log.Printf("Closing streaming to subscription: %s", subscribe.String())
 				break
-			} else if service.ServiceName == CleanerServiceName {
+			} else if service.ServiceName == cleanerServiceName {
 				projectId := strconv.Itoa(int(service.Message))
-				if err := stream.Send(&types.StreamMessage{Id: CleanerServiceName, Message: projectId}); err != nil {
+				if err := stream.Send(&types.StreamMessage{Id: cleanerServiceName, Message: projectId}); err != nil {
 					log.Printf("Unexpected error happened to subscription: %s, error: %v", subscribe.String(), err)
 					// Allow future requests with the same subscribe.Id from new subscriptions
 					s.subscriptions[subscribe.Id] = daemonServices

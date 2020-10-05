@@ -36,10 +36,7 @@ func main() {
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, syscall.SIGTERM, syscall.SIGINT)
 
-	fanInService := daemon.Streaming{ServiceName: server.FanInServiceName, ServiceChannel: make(chan *daemon.StreamingMessage, 100)}
-	cleanerService := daemon.Streaming{ServiceName: server.CleanerServiceName, ServiceChannel: make(chan *daemon.StreamingMessage, 100)}
-	reminderService := daemon.Streaming{ServiceName: server.ReminderServiceName, ServiceChannel: make(chan *daemon.StreamingMessage, 100)}
-	daemonRpc := server.NewServer(ctx, []daemon.Streaming{fanInService, cleanerService, reminderService})
+	daemonRpc := server.NewServer(ctx)
 
 	rpcPort := ":" + daemonRpc.ServiceConfig.RPCPort
 	lis, err := net.Listen("tcp", rpcPort)
@@ -84,7 +81,7 @@ func main() {
 	jobScheduler := scheduler.NewJobScheduler()
 	jobScheduler.Start()
 	cleaner := daemon.Cleaner{
-		Service: cleanerService,
+		Service: daemonRpc.CleanerService,
 		Settings: postgresql.ConnectionURL{
 			Host:     daemonRpc.ServiceConfig.Host + ":" + daemonRpc.ServiceConfig.DBPort,
 			Database: daemonRpc.ServiceConfig.Database,
@@ -111,8 +108,8 @@ func main() {
 	<-shutdown
 	log.Infof("Shutdown signal received")
 	cleaner.Close()
-	close(reminderService.ServiceChannel)
-	close(fanInService.ServiceChannel)
+	close(daemonRpc.ReminderService.ServiceChannel)
+	close(daemonRpc.FanInService.ServiceChannel)
 	jobScheduler.Stop()
 	log.Infof("JobScheduler stopped")
 	rpcServer.GracefulStop()
