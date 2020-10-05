@@ -9,7 +9,7 @@ import './steps.styles.less'
 import {Container} from "react-floating-action-button";
 import AddStep from "../../components/modals/templates/add-step.component";
 import {getCategorySteps} from "../../features/admin/actions";
-import {CategorySteps} from "../../features/admin/interface";
+import {CategorySteps, SampleTaskRule} from "../../features/admin/interface";
 import {ArrowRightOutlined} from "@ant-design/icons";
 
 type AdminStepsProps = {
@@ -59,17 +59,23 @@ const AdminStepsPage: React.FC<AdminStepsProps> = (
         </div>
         <Divider/>
         <h4>Final Steps</h4>
-        {/*{categorySteps.finalSteps.forEach((v, k) => {*/}
-        {/*    return <div>*/}
-        {/*      <span style={{cursor: 'pointer'}} onClick={() => history.push(`/admin/steps/${k.id}`)}>*/}
-        {/*                {k.name} ({k.id})*/}
-        {/*      </span>*/}
-        {/*    </div>*/}
-        {/*})}*/}
-        {/*{categorySteps.finalSteps}*/}
-        {Object.keys(categorySteps.finalSteps).length === 0 ? <Empty/> : <div>
-            SSS
-        </div>}
+        {categorySteps.finalSteps.length === 0 ? <Empty/> : (<div>
+            {categorySteps.finalSteps.map((sampleTaskRule: SampleTaskRule) => {
+                return <div>
+                    <div>
+                    <span style={{cursor: 'pointer', padding: '5px'}}
+                          onClick={() => history.push(`/admin/steps/${sampleTaskRule.step.id}`)}>
+                        <b>{sampleTaskRule.step.name}</b> ({sampleTaskRule.step.id})
+                    </span> <b>Selections {sampleTaskRule.selectionCombo}</b>: {sampleTaskRule.selections.map(s => {
+                        return <span>{s.text} ({s.id}){' '}</span>
+                    })}
+                    </div>
+                    <div>
+                        {JSON.stringify(sampleTaskRule.tasks)}
+                    </div>
+                </div>
+            })}
+        </div>)}
         <Divider/>
         <div>
             {steps.filter(step => !categorySteps!.stepIds.includes(step.id)).map((s) => {

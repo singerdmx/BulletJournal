@@ -1,12 +1,9 @@
 package com.bulletjournal.templates.controller.model;
 
-import com.bulletjournal.templates.workflow.models.SelectionCombo;
 import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class CategorySteps {
 
@@ -17,7 +14,7 @@ public class CategorySteps {
      */
     private List<Triple<Step, Rule, Step>> connections = new ArrayList<>();
 
-    private Map<Step, Map<SelectionCombo, SampleTasks>> finalSteps = new HashMap<>();
+    private List<SampleTaskRuleView> finalSteps = new ArrayList<>();
 
     private List<Long> stepIds = new ArrayList<>();
 
@@ -29,11 +26,11 @@ public class CategorySteps {
         this.connections = connections;
     }
 
-    public Map<Step, Map<SelectionCombo, SampleTasks>> getFinalSteps() {
+    public List<SampleTaskRuleView> getFinalSteps() {
         return finalSteps;
     }
 
-    public void setFinalSteps(Map<Step, Map<SelectionCombo, SampleTasks>> finalSteps) {
+    public void setFinalSteps(List<SampleTaskRuleView> finalSteps) {
         this.finalSteps = finalSteps;
     }
 

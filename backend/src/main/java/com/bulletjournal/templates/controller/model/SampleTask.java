@@ -1,7 +1,10 @@
 package com.bulletjournal.templates.controller.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.sql.Timestamp;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SampleTask {
 
     private Long id;
@@ -25,6 +28,12 @@ public class SampleTask {
     private Choice choice;
 
     public SampleTask() {
+    }
+
+    public SampleTask(
+            Long id,
+            String name) {
+        this(id, name, null, null, null, null, null, null, null);
     }
 
     public SampleTask(
