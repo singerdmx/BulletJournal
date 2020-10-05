@@ -25,8 +25,9 @@ import AdminWorkflowPage from "../../pages/admin/workflow.pages";
 import AdminCategoryPage from "../../pages/admin/category.pages";
 import AdminStepsPage from "../../pages/admin/steps.pages";
 import AdminStepPage from "../../pages/admin/step.pages";
-import SampleTaskPage from "../../pages/admin/sample-task.pages";
 import AdminMetadataPage from "../../pages/admin/admin-metadata.pages";
+import AdminSampleTaskPage from "../../pages/admin/sample-task.pages";
+import SampleTaskPage from "../../pages/task/sample-task.pages";
 
 const { Content } = Layout;
 class ContentLayout extends React.Component {
@@ -65,7 +66,8 @@ class ContentLayout extends React.Component {
           <Route exact path='/admin/categories/:categoryId' component={AdminCategoryPage} />
           <Route exact path='/admin/categories/:categoryId/steps' component={AdminStepsPage} />
           <Route exact path='/admin/steps/:stepId' component={AdminStepPage} />
-          <Route exact path='/admin/sampleTasks/:sampleTaskId' component={SampleTaskPage} />
+          <Route exact path='/admin/sampleTasks/:sampleTaskId' component={AdminSampleTaskPage} />
+          <Route exact path='/sampleTasks/:sampleTaskId' component={SampleTaskPage} />
           <Route exact path='/admin/workflow' component={AdminWorkflowPage} />
           <Route exact path='/punchCard' component={PunchCardPage} />
           <Route exact path='/search/:term' component={SearchPage} />

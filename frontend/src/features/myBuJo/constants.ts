@@ -8,4 +8,5 @@ export enum ContentType {
   GROUP = 'GROUP',
   LABEL = 'LABEL',
   CONTENT = 'CONTENT',
+  SAMPLE_TASK = 'SAMPLE_TASK'
 }

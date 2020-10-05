@@ -67,7 +67,7 @@ import {
 import {
   createSampleTask,
   deleteSampleTask, deleteSampleTaskRule,
-  fetchSampleTask, fetchSampleTasksByScrollId,
+  fetchAdminSampleTask, fetchSampleTasksByScrollId,
   getNext,
   getSampleTasksByFilter, importSampleTasks, putSampleTask, upsertSampleTaskRule
 } from "../../apis/templates/workflowApis";
@@ -565,7 +565,7 @@ function* addSampleTask(action: PayloadAction<AddSampleTaskAction>) {
 function* getSampleTask(action: PayloadAction<GetSampleTaskAction>) {
   try {
     const {sampleTaskId} = action.payload;
-    const data : SampleTask = yield call(fetchSampleTask, sampleTaskId);
+    const data : SampleTask = yield call(fetchAdminSampleTask, sampleTaskId);
     yield put(templatesActions.sampleTaskReceived({task: data}));
   } catch (error) {
     if (error.message === 'reload') {

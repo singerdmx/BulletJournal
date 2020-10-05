@@ -255,6 +255,11 @@ public class TaskControllerTest {
                 task.getId());
         assertEquals(HttpStatus.OK, response.getStatusCode());
 
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+        }
+
         ResponseEntity<Notification[]> notificationsResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + NotificationController.NOTIFICATIONS_ROUTE,
                 HttpMethod.GET,

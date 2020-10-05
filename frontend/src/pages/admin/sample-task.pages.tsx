@@ -20,7 +20,7 @@ type SampleTaskProps = {
     updateSampleTask: (sampleTaskId: number, name: string, uid: string, content: string, metadata: string) => void;
 };
 
-const SampleTaskPage: React.FC<SampleTaskProps> = (
+const AdminSampleTaskPage: React.FC<SampleTaskProps> = (
     {
         sampleTask, getSampleTask, removeSampleTask, updateSampleTask, approveSampleTask
     }
@@ -131,4 +131,4 @@ export default connect(mapStateToProps, {
     removeSampleTask,
     updateSampleTask,
     approveSampleTask
-})(SampleTaskPage);
+})(AdminSampleTaskPage);
