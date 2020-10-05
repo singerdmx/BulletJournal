@@ -288,16 +288,26 @@ public class WorkflowController {
                 null, System.currentTimeMillis(), System.currentTimeMillis(), null);
 
         String requester = MDC.get(UserClient.USER_NAME_KEY);
-        Content content = new Content(this.userDaoJpa.isAdmin(requester) ? sampleTaskId : 0L,
-                user, sampleTask.getContent(), sampleTask.getContent(),
-                System.currentTimeMillis(), System.currentTimeMillis(), "");
+        Content content = getSampleTaskContent(sampleTaskId, sampleTask.getContent(), requester);
         return new SampleTaskView(task, content);
     }
 
-    @PutMapping(SAMPLE_TASK_CONTENT_ROUTE)
-    public Content updateSampleTaskContent(@NotNull @PathVariable Long sampleTaskId) {
+    private Content getSampleTaskContent(Long sampleTaskId, String content, String requester) {
+        User user = this.userClient.getUser("BulletJournal");
+        return new Content(this.userDaoJpa.isAdmin(requester) ? sampleTaskId : 0L,
+                user, content, content,
+                System.currentTimeMillis(), System.currentTimeMillis(), "");
+    }
+
+    @PatchMapping(SAMPLE_TASK_CONTENT_ROUTE)
+    public Content updateSampleTaskContent(
+            @NotNull @PathVariable Long sampleTaskId,
+            @NotNull @RequestBody UpdateSampleTaskContentParams updateSampleTaskContentParams) {
         validateRequester();
-        return null;
+        String content = this.sampleTaskDaoJpa.updateSampleTaskContent(
+                sampleTaskId, updateSampleTaskContentParams.getText()).getContent();
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+        return getSampleTaskContent(sampleTaskId, content, requester);
     }
 
     @GetMapping(SAMPLE_TASK_BY_METADATA)

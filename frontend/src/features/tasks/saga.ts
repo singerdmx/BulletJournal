@@ -61,7 +61,7 @@ import {
   setTaskStatus as setTaskStatusApi,
   shareTaskWithOther,
   uncompleteTaskById,
-  updateContent,
+  updateContent, updateSampleContent,
   updateTask
 } from '../../apis/taskApis';
 import {updateLoadingCompletedTask, updateTaskContents, updateTasks,} from './actions';
@@ -1093,16 +1093,13 @@ function* patchSampleContent(action: PayloadAction<PatchContent>) {
     const state: IState = yield select();
     const order = state.task.contents.map(c => c.id);
 
-    const contents: Content[] = yield call(updateContent, taskId, contentId, text, state.content.content!.etag, diff);
-    contents.sort((a: Content, b: Content) => {
-      return order.findIndex((o) => o === a.id) - order.findIndex((o) => o === b.id);
-    });
+    const content : Content = yield call(updateSampleContent, taskId, text);
     yield put(
         tasksActions.taskContentsReceived({
-          contents: contents,
+          contents: [content],
         })
     );
-    yield put(updateTargetContent(contents.filter(c => c.id === contentId)[0]));
+    yield put(updateTargetContent(content));
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));

@@ -118,6 +118,13 @@ public class SampleTaskDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public SampleTask updateSampleTaskContent(Long sampleTaskId, String content) {
+        SampleTask sampleTask = findSampleTaskById(sampleTaskId);
+        sampleTask.setContent(content);
+        return sampleTaskRepository.save(sampleTask);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void deleteSampleTaskById(Long sampleTaskId) {
         if (!sampleTaskRepository.existsById(sampleTaskId)) {
             throw new ResourceNotFoundException("sampleTask id " + sampleTaskId + " not exit");

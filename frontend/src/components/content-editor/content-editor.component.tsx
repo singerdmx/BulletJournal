@@ -170,7 +170,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
     [ContentType.GROUP]: () => {},
     [ContentType.LABEL]: () => {},
     [ContentType.CONTENT]: () => {},
-    [ContentType.SAMPLE_TASK]: () => patchSampleTaskContent,
+    [ContentType.SAMPLE_TASK]: patchSampleTaskContent,
   };
   let patchContentFunction = patchContentCall[contentType];
 
