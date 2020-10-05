@@ -87,7 +87,7 @@ func (c *EarningClient)SendData() error {
 		item := persistence.SampleTask{
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
-			MetaData: "INVESTMENT_EARNINGS_RECORD",
+			Metadata: "INVESTMENT_EARNINGS_RECORD",
 			Content: "",
 			Name: target.Name,
 			Uid: target.ID,
@@ -95,6 +95,7 @@ func (c *EarningClient)SendData() error {
 			DueDate: target.Date,
 			DueTime: target.Time,
 			Pending: true,
+			Refreshable: true,
 		}
 		c.sampleDao.Upsert(&item)
 	}

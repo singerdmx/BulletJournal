@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"errors"
+	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -16,29 +17,21 @@ func NewSampleTaskDao() (*SampleTaskDao, error) {
 	sampleTaskDao := SampleTaskDao{
 		db: DB,
 	}
-	sampleTaskDao.db.AutoMigrate(&SampleTask{})
 	return &sampleTaskDao, nil
 }
 
 func (s *SampleTaskDao) Upsert(t *SampleTask) {
-
-	//s.db.Create(&t)
 	prevReport := SampleTask{}
-	//
 	err := s.db.Where("uid = ?", t.Uid).Last(&prevReport).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		//fmt.Println("aaaaaa")
-		s.db.First(&t)
+		err :=s.db.Create(&t).Error
+		if err != nil {
+			fmt.Println(err, t.ID)
+		}
 	} else {
-		//db := s.db.Where("uid = ?", t.Uid).Last(&prevReport)
-		//fmt.Println("bbbbbbbbbbb")
 		s.db.First(&t)
 		s.db.Save(&t)
 	}
-	//fmt.Println("aaaa")
-	//err :=s.db.Create(&t).Error
-	//fmt.Println(err, t.ID)
-	//s.db.Save(&t)
 }
 
 //func (s *SampleTaskDao) Upsert(t *SampleTask) {

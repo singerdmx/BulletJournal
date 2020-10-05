@@ -8,7 +8,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	persistence "github.com/singerdmx/BulletJournal/daemon/persistence"
+	"github.com/singerdmx/BulletJournal/daemon/persistence"
 )
 
 type DividendsClient struct {
@@ -88,7 +88,7 @@ func (c *DividendsClient) FetchData() error {
 	c.data = &data
 	return nil
 }
-func(c *DividendsClient) SendData() error{
+func (c *DividendsClient) SendData() error {
 	if c.data == nil {
 		return errors.New("Empty Dividends data, please fetch data first.")
 	}
@@ -97,16 +97,17 @@ func(c *DividendsClient) SendData() error{
 		availBefore := target.Date
 		t, _ := time.Parse(layoutISO, availBefore)
 		item := persistence.SampleTask{
-			CreatedAt:          time.Now(),
-			UpdatedAt:          time.Now(),
-			MetaData:           "INVESTMENT_DIVIDENDS_RECORD",
-			Content:            "",
-			Name:               target.Name,
-			Uid:                target.ID,
-			AvailableBefore:    t, //TODO
-			DueDate:            "",
-			DueTime:            "",
-			Pending:            true,
+			CreatedAt:       time.Now(),
+			UpdatedAt:       time.Now(),
+			Metadata:        "INVESTMENT_DIVIDENDS_RECORD",
+			Content:         "",
+			Name:            target.Name,
+			Uid:             target.ID,
+			AvailableBefore: t, //TODO
+			DueDate:         "",
+			DueTime:         "",
+			Pending:         true,
+			Refreshable:     true,
 		}
 		c.sampleDao.Upsert(&item)
 	}
