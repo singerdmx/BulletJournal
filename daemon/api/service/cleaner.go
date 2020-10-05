@@ -110,7 +110,7 @@ func (c *Cleaner) Clean(maxRetentionTimeInDays int) {
 	c.deleteByUpdatedAtBefore(t, "notifications")
 	c.deleteByUpdatedAtBefore(t, "auditables")
 	c.deleteByExpirationTimeBefore("public_project_items")
-	c.deleteByAvailableBefore("sample_task")
+	c.deleteByAvailableBefore("template.sample_task")
 	c.renewExpiringGoogleCalendarWatch()
 }
 
