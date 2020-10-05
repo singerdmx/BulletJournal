@@ -67,6 +67,13 @@ func (c *Cleaner) deleteByExpirationTimeBefore(tableName string) {
 	c.deleteFromTableByCond(expirationTimeBeforeCond, tableName)
 }
 
+func (c *Cleaner) deleteByAvailableBefore(tableName string) {
+	var staleTimeBeforeCond = db.Cond {
+		"available_before <": time.Now(),
+	}
+	c.deleteFromTableByCond(staleTimeBeforeCond, tableName)
+}
+
 func (c *Cleaner) renewExpiringGoogleCalendarWatch() {
 	googleCalendarProjects := c.getExpiringGoogleCalendarProjects("google_calendar_projects")
 	for _, googleCalendarProject := range googleCalendarProjects {
@@ -103,6 +110,7 @@ func (c *Cleaner) Clean(maxRetentionTimeInDays int) {
 	c.deleteByUpdatedAtBefore(t, "notifications")
 	c.deleteByUpdatedAtBefore(t, "auditables")
 	c.deleteByExpirationTimeBefore("public_project_items")
+	c.deleteByAvailableBefore("sample_task")
 	c.renewExpiringGoogleCalendarWatch()
 }
 
