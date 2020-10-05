@@ -153,6 +153,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     }
 
     public <T extends ProjectItemModel> void addContent(List<T> projectItems, List<String> owners, List<K> contents) {
+        LOGGER.info("Adding {} contents", contents.size());
         List<K> batch = new ArrayList<>();
         int maxSize = Math.min(contents.size(), CONTENT_BATCH_SIZE);
         for (int i = 0; i < maxSize; i++) {
@@ -177,6 +178,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
                 contents.subList(CONTENT_BATCH_SIZE, contents.size()),
                 projectItems.subList(CONTENT_BATCH_SIZE, projectItems.size()),
                 owners.subList(CONTENT_BATCH_SIZE, owners.size()));
+        LOGGER.info("Next ContentBatch: {} contents", left.getContents().size());
         this.notificationService.addContentBatch(left);
     }
 
