@@ -50,6 +50,9 @@ public class SampleTaskDaoJpa {
     @Autowired
     private UserDaoJpa userDaoJpa;
 
+    @Autowired
+    private UserSampleTaskDaoJpa userSampleTaskDaoJpa;
+
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SampleTask createSampleTask(CreateSampleTaskParams createSampleTaskParams) {
         SampleTask sampleTask = new SampleTask();
@@ -158,7 +161,6 @@ public class SampleTaskDaoJpa {
         List<UserCategory> users = this.userCategoryDaoJpa.getSubscribedUsersByMetadataKeyword(
                 keywords.stream().map(SelectionMetadataKeyword::getKeyword).collect(Collectors.toList()));
 
-
         // if sample task has due date, directly push to task table
         if (sampleTask.hasDueDate()) {
             Map<String, User> userMap = this.userDaoJpa.getUsersByNames(
@@ -194,9 +196,12 @@ public class SampleTaskDaoJpa {
 
         // otherwise show up in punchCard page
         List<Event> events = new ArrayList<>();
+        List<UserSampleTask> userSampleTasks = new ArrayList<>();
         for (UserCategory user : users) {
+            userSampleTasks.add(new UserSampleTask(user.getUser(), sampleTask));
             events.add(new Event(user.getUser().getName(), sampleTaskId, sampleTask.getName()));
         }
+        this.userSampleTaskDaoJpa.save(userSampleTasks);
         this.notificationService.inform(new NewSampleTaskEvent(events, "BulletJournal"));
 
         return sampleTask;

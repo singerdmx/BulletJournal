@@ -211,7 +211,7 @@ public class WorkflowController {
                             }
                             break;
                         case IGNORE:
-                            break;
+                            return true;
                     }
                 }
                 return false;

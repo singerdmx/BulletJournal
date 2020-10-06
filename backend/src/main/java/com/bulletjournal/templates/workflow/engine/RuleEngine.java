@@ -8,7 +8,6 @@ import com.bulletjournal.repository.models.User;
 import com.bulletjournal.templates.controller.model.ImportTasksParams;
 import com.bulletjournal.templates.repository.*;
 import com.bulletjournal.templates.repository.model.*;
-import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,14 +20,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class RuleEngine {
-
-    private static final Map<Long, Integer> DEFAULT_INTENSITY_SELECTIONS = ImmutableMap.of(
-            247L, 2, // Low -> twice a day
-            248L, 4, // Medium -> 4 times a day
-            249L, 8); // Hard -> 8 times a day
-
-    // category id -> INTENSITY_SELECTIONS
-    private static final Map<Long, Map<Long, Integer>> CATEGORY_INTENSITY_SELECTIONS =  ImmutableMap.of();
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
@@ -53,6 +44,9 @@ public class RuleEngine {
 
     @Autowired
     private UserCategoryDaoJpa userCategoryDaoJpa;
+
+    @Autowired
+    private SelectionMetadataKeywordDaoJpa selectionMetadataKeywordDaoJpa;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.templates.controller.model.SampleTask> importTasks(String requester, ImportTasksParams importTasksParams) {
@@ -79,7 +73,7 @@ public class RuleEngine {
                 startDay = ZonedDateTimeHelper.getStartTime(
                         ZonedDateTime.now().plusDays(1).format(ZonedDateTimeHelper.DATE_FORMATTER), null, timezone);
             }
-            int frequency = getTimesOneDay(importTasksParams.getSelections(), importTasksParams.getCategoryId());
+            int frequency = getTimesOneDay(importTasksParams.getSelections());
             int startIndex = 0;
             int numOfDay = 0;
             while (startIndex < tasksNeedTimingArrangement.size()) {
@@ -104,12 +98,10 @@ public class RuleEngine {
         return sampleTasks;
     }
 
-    private int getTimesOneDay(List<Long> selections, long categoryId) {
-        Map<Long, Integer> frequencyMap = CATEGORY_INTENSITY_SELECTIONS
-                .getOrDefault(categoryId, DEFAULT_INTENSITY_SELECTIONS);
-        long selectionId = selections.stream().filter(s -> frequencyMap.containsKey(s)).findFirst().orElseThrow(
-                () -> new BadRequestException("Selections missing intensity"));
-        return frequencyMap.get(selectionId);
+    private int getTimesOneDay(List<Long> selections) {
+        return this.selectionMetadataKeywordDaoJpa.getFrequencyBySelections(selections)
+                .stream().findFirst().orElseThrow(
+                () -> new BadRequestException("Selections missing intensity")).getFrequency();
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
