@@ -21,7 +21,7 @@ public class CreateSelectionMetadataParams {
     public CreateSelectionMetadataParams() {
     }
 
-    public CreateSelectionMetadataParams(@NotNull String keyword, @NotNull Long selectionId, @NotNull Integer frequency) {
+    public CreateSelectionMetadataParams(@NotNull String keyword, @NotNull Long selectionId, Integer frequency) {
         this.keyword = keyword;
         this.selectionId = selectionId;
         this.frequency = frequency;
