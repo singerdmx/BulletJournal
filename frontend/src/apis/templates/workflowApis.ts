@@ -54,6 +54,14 @@ export const fetchAdminSampleTask = (sampleTaskId: number) => {
         });
 }
 
+export const fetchSampleTask = (sampleTaskId: number) => {
+    return doFetch(`/api/sampleTasks/${sampleTaskId}`)
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}
+
 export const deleteSampleTask = (sampleTaskId: number) => {
     return doDelete(`/api/sampleTasks/${sampleTaskId}`)
         .then(res => res)

@@ -67,7 +67,7 @@ class ContentLayout extends React.Component {
           <Route exact path='/admin/categories/:categoryId/steps' component={AdminStepsPage} />
           <Route exact path='/admin/steps/:stepId' component={AdminStepPage} />
           <Route exact path='/admin/sampleTasks/:sampleTaskId' component={AdminSampleTaskPage} />
-          <Route exact path='/sampleTasks/:sampleTaskId' component={SampleTaskPage} />
+          <Route exact path='/sampleTasks/:taskId' component={SampleTaskPage} />
           <Route exact path='/admin/workflow' component={AdminWorkflowPage} />
           <Route exact path='/punchCard' component={PunchCardPage} />
           <Route exact path='/search/:term' component={SearchPage} />

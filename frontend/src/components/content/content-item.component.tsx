@@ -111,8 +111,6 @@ const ContentItem: React.FC<ContentProps> = ({
         case ContentType.TRANSACTION:
           patchTransactionRevisionContents(projectItem.id, targetContent.id, revisionContents, targetContent.etag);
           break;
-        case ContentType.SAMPLE_TASK:
-          break;
       }
     }
   }
