@@ -7,7 +7,7 @@ public class CreateSelectionMetadataParams {
     private String keyword;
     @NotNull
     private Long selectionId;
-    @NotNull
+
     private  Integer frequency;
 
     public Integer getFrequency() {
