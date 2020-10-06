@@ -11,3 +11,4 @@ create table if not exists template.users_sample_tasks
     PRIMARY KEY (user_id, sample_task_id)
 );
 
+INSERT INTO template.users_sample_tasks (user_id, sample_task_id) VALUES (0, 5000);

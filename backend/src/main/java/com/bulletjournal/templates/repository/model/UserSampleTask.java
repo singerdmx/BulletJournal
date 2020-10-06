@@ -23,6 +23,12 @@ public class UserSampleTask {
     public UserSampleTask() {
     }
 
+    public UserSampleTask(User user, SampleTask sampleTask) {
+        this.userSampleTaskKey = new UserSampleTaskKey(user.getId(), sampleTask.getId());
+        this.user = user;
+        this.sampleTask = sampleTask;
+    }
+
     public UserSampleTaskKey getUserSampleTaskKey() {
         return userSampleTaskKey;
     }

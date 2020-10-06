@@ -24,10 +24,8 @@ public class UserSampleTaskDaoJpa {
   private UserSampleTaskRepository userSampleTaskRepository;
 
   @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-  public void save(UserSampleTask userSampleTask) {
-    if (userSampleTask != null) {
-      userSampleTaskRepository.save(userSampleTask);
-    }
+  public void save(List<UserSampleTask> userSampleTasks) {
+      userSampleTaskRepository.saveAll(userSampleTasks);
   }
 
   @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
