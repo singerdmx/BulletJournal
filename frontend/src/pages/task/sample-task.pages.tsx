@@ -9,7 +9,7 @@ import {Content} from "../../features/myBuJo/interface";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 import {EditOutlined} from "@ant-design/icons";
 import {setDisplayMore, setDisplayRevision} from "../../features/content/actions";
-
+import './task-page.styles.less';
 
 interface SampleTaskProps {
     task: Task | undefined;
