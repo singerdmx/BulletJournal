@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface SelectionMetadataKeywordRepository extends JpaRepository<SelectionMetadataKeyword, String> {
     List<SelectionMetadataKeyword> findBySelectionIn(List<Selection> selections);
+
+    List<SelectionMetadataKeyword> findByFrequencyNotNullAndSelectionIn(List<Selection> selections);
 }

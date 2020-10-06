@@ -32,6 +32,14 @@ public class SelectionMetadataKeywordDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<SelectionMetadataKeyword> getFrequencyBySelections(Collection<Long> ids) {
+        List<Selection> selections = this.selectionDaoJpa.getSelectionsById(ids);
+        List<SelectionMetadataKeyword> keywords = this.selectionMetadataKeywordRepository
+                .findByFrequencyNotNullAndSelectionIn(selections);
+        return keywords;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SelectionMetadataKeyword save(Long selctionId, String keyword) {
         Selection selection = this.selectionDaoJpa.getById(selctionId);
         SelectionMetadataKeyword selectionMetadataKeyword = new SelectionMetadataKeyword();
