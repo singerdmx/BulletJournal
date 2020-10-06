@@ -7,6 +7,7 @@ create table if not exists template.users_sample_tasks
 	sample_task_id bigint not null
 		constraint users_sample_tasks_sample_tasks_id_fk
 			references template.sample_tasks
-				on delete cascade
+				on delete cascade,
+    PRIMARY KEY (user_id, sample_task_id)
 );
 
