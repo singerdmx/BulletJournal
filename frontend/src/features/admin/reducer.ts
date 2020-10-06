@@ -104,6 +104,7 @@ export type UpdateChoiceMetadataAction = {
 export type UpdateSelectionMetadataAction = {
   keyword: string;
   selectionId: number;
+  frequency?: number;
 };
 
 export type UpdateStepMetadataAction = {

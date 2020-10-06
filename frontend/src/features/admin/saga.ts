@@ -218,9 +218,9 @@ function* updateChoiceMetadata(action: PayloadAction<UpdateChoiceMetadataAction>
 }
 
 function* updateSelectionMetadata(action: PayloadAction<UpdateSelectionMetadataAction>) {
-  const { keyword, selectionId } = action.payload;
+  const { keyword, selectionId, frequency } = action.payload;
   try {
-    const data : SelectionMetadata[] = yield call(putSelectionMetadata, keyword, selectionId);
+    const data : SelectionMetadata[] = yield call(putSelectionMetadata, keyword, selectionId, frequency);
     yield put(adminActions.selectionMetadataReceived({selectionMetadata: data}));
   } catch (error) {
     yield call(message.error, `updateSelectionMetadata Error Received: ${error}`);

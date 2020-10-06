@@ -59,6 +59,7 @@ export interface ChoiceMetadata {
 export interface SelectionMetadata {
   keyword: string;
   selection: Selection;
+  frequency?: number;
 }
 
 export interface StepMetadata {
