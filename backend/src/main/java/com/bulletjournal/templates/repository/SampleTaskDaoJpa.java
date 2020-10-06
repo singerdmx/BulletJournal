@@ -5,14 +5,17 @@ import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.NewSampleTaskEvent;
 import com.bulletjournal.notifications.NotificationService;
+import com.bulletjournal.repository.NotificationRepository;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
+import com.bulletjournal.repository.models.Notification;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.templates.controller.model.AuditSampleTaskParams;
 import com.bulletjournal.templates.controller.model.CreateSampleTaskParams;
 import com.bulletjournal.templates.controller.model.UpdateSampleTaskParams;
 import com.bulletjournal.templates.repository.model.*;
+import com.bulletjournal.util.StringUtil;
 import com.google.common.collect.ImmutableList;
 import org.apache.http.util.TextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +55,12 @@ public class SampleTaskDaoJpa {
 
     @Autowired
     private UserSampleTaskDaoJpa userSampleTaskDaoJpa;
+
+    @Autowired
+    private SampleTaskNotificationsRepository sampleTaskNotificationsRepository;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SampleTask createSampleTask(CreateSampleTaskParams createSampleTaskParams) {
@@ -152,7 +161,15 @@ public class SampleTaskDaoJpa {
         }
         this.save(sampleTask);
 
-        // read redis and clean other admin notifications as well as self's
+        // clean other admin notifications as well as self's
+        Optional<SampleTaskNotification> sampleTaskNotification =
+                this.sampleTaskNotificationsRepository.findById(sampleTaskId);
+
+        if (sampleTaskNotification.isPresent()) {
+            List<Long> notificationIds = StringUtil.convertNumArray(sampleTaskNotification.get().getNotifications());
+            List<Notification> notifications = this.notificationRepository.findAllById(notificationIds);
+            this.notificationRepository.deleteInBatch(notifications);
+        }
 
         this.sampleTaskRuleDaoJpa.updateSampleTaskRule(
                 sampleTask, originalKeyword, auditSampleTaskParams.getSelections());
