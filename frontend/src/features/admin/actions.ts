@@ -41,8 +41,8 @@ export const getStepMetadata = () => actions.getStepMetadata({});
 export const updateChoiceMetadata = (keyword: string, choiceId: number) => actions.updateChoiceMetadata({
    keyword: keyword, choiceId: choiceId});
 
-export const updateSelectionMetadata = (keyword: string, selectionId: number) => actions.updateSelectionMetadata({
-   keyword: keyword, selectionId: selectionId});
+export const updateSelectionMetadata = (keyword: string, selectionId: number, frequency?: number) => actions.updateSelectionMetadata({
+   keyword: keyword, selectionId: selectionId, frequency: frequency});
 
 export const updateStepMetadata = (keyword: string, stepId: number) => actions.updateStepMetadata({
    keyword: keyword, stepId: stepId});

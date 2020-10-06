@@ -45,6 +45,6 @@ public class SelectionMetadataKeyword extends AuditModel {
     }
 
     public com.bulletjournal.templates.controller.model.SelectionMetadata toPresentationModel() {
-        return new com.bulletjournal.templates.controller.model.SelectionMetadata(keyword, selection.toPresentationModel());
+        return new com.bulletjournal.templates.controller.model.SelectionMetadata(keyword, selection.toPresentationModel(), frequency);
     }
 }

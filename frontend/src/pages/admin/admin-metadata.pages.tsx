@@ -30,7 +30,7 @@ type AdminMetadataProps = {
     getSelectionMetadata: () => void;
     getStepMetadata: () => void;
     updateChoiceMetadata: (keyword: string, choiceId: number) => void;
-    updateSelectionMetadata: (keyword: string, selectionId: number) => void;
+    updateSelectionMetadata: (keyword: string, selectionId: number, frequency?: number) => void;
     removeChoiceMetadata: (keywords: string[]) => void;
     removeSelectionMetadata: (keywords: string[]) => void;
     updateStepMetadata: (keyword: string, stepId: number) => void;
@@ -116,7 +116,17 @@ const AdminMetadataPage: React.FC<AdminMetadataProps> = (
             message.error("Invalid ID: " + e);
             return;
         }
-        updateSelectionMetadata(row.key, parseInt(e));
+        updateSelectionMetadata(row.key, parseInt(e), row.frequency);
+    }
+
+    const onFrequencyChange = (e: string, row: any) => {
+        console.log(row)
+        console.log(e ? parseInt(e) : undefined);
+        if (e && !/^\d+$/.test(e)) {
+            message.error("Invalid Frequency: " + e);
+            return;
+        }
+        updateSelectionMetadata(row.key, row.selection.id, e ? parseInt(e) : undefined);
     }
 
     const selectionMetadataColumns = [
@@ -140,6 +150,16 @@ const AdminMetadataPage: React.FC<AdminMetadataProps> = (
             }}>{selection.id}
                 </Text>)
             </span>),
+        },
+        {
+            title: 'Frequency',
+            dataIndex: 'frequency',
+            key: 'frequency',
+            render: (frequency: any, row: any) => (<span>
+                    <Text editable={{
+                        onChange: (e) => onFrequencyChange(e, row),
+                    }}>{frequency}</Text>
+            </span>)
         },
     ];
 

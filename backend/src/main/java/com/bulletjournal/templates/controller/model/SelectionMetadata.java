@@ -4,14 +4,25 @@ public class SelectionMetadata {
 
     private String keyword;
     private Selection selection;
+    private Integer frequency;
+
+    public Integer getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(Integer frequency) {
+        this.frequency = frequency;
+    }
 
     public SelectionMetadata() {
     }
 
-    public SelectionMetadata(String keyword, Selection selection) {
+    public SelectionMetadata(String keyword, Selection selection, Integer frequency) {
         this.keyword = keyword;
         this.selection = selection;
+        this.frequency = frequency;
     }
+
 
     public String getKeyword() {
         return keyword;

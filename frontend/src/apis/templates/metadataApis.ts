@@ -36,9 +36,10 @@ export const fetchSelectionMetadata = () => {
         });
 }
 
-export const putSelectionMetadata = (keyword: string, selectionId: number) => {
+export const putSelectionMetadata = (keyword: string, selectionId: number, frequency?: number) => {
     const putBody = JSON.stringify({
         selectionId: selectionId,
+        frequency: frequency
     });
     return doPut(`/api/selectionMetadata/${keyword}`, putBody)
         .then((res) => res.json())

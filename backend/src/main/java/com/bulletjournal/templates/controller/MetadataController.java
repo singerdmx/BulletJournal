@@ -83,7 +83,7 @@ public class MetadataController {
     @PostMapping(SELECTION_METADATA_ROUTE)
     public List<SelectionMetadata> createSelectionMetadata(@NotNull @RequestBody CreateSelectionMetadataParams params) {
         validateRequester();
-        this.selectionMetadataKeywordDaoJpa.save(params.getSelectionId(), params.getKeyword()).toPresentationModel();
+        this.selectionMetadataKeywordDaoJpa.save(params.getSelectionId(), params.getKeyword(), params.getFrequency()).toPresentationModel();
         return getSelectionMetadata();
     }
 
@@ -125,7 +125,7 @@ public class MetadataController {
     @PutMapping(SELECTIONS_METADATA_ROUTE)
     public List<SelectionMetadata> updateSelectionMetadata(@NotNull @PathVariable String keyword, @Valid @RequestBody UpdateSelectionMetadataKeywordsParams params) {
         validateRequester();
-        selectionMetadataKeywordDaoJpa.updateByKeyword(keyword, params.getSelectionId()).toPresentationModel();
+        selectionMetadataKeywordDaoJpa.updateByKeyword(keyword, params.getSelectionId(), params.getFrequency()).toPresentationModel();
         return getSelectionMetadata();
     }
 

@@ -8,12 +8,23 @@ public class CreateSelectionMetadataParams {
     @NotNull
     private Long selectionId;
 
+    private  Integer frequency;
+
+    public Integer getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(Integer frequency) {
+        this.frequency = frequency;
+    }
+
     public CreateSelectionMetadataParams() {
     }
 
-    public CreateSelectionMetadataParams(@NotNull String keyword, @NotNull Long selectionId) {
+    public CreateSelectionMetadataParams(@NotNull String keyword, @NotNull Long selectionId, Integer frequency) {
         this.keyword = keyword;
         this.selectionId = selectionId;
+        this.frequency = frequency;
     }
 
     public String getKeyword() {

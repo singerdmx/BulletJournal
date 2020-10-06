@@ -222,6 +222,7 @@ public class LeetCodeAnalyzer {
 
     @Test
     @Ignore
+    @Deprecated
     public void findDataFromLeetCode() throws IOException, InterruptedException {
         BufferedWriter bufferedWriterSampleTask = getBufferedWriter("./src/main/resources/db/migration/V86__seed_sample_tasks.sql");
         BufferedWriter bufferedWriterSelection = getBufferedWriter("./src/main/resources/db/migration/V87__seed_algorithm_topic.sql");

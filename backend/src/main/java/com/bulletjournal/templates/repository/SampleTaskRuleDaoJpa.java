@@ -33,6 +33,10 @@ public class SampleTaskRuleDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void saveAll(Iterable<SampleTaskRule> sampleTaskRules) {
+        this.sampleTaskRuleRepository.saveAll(sampleTaskRules);
+    }
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SampleTaskRule upsert(Long stepId, String selectionCombo, String taskIds) {
         selectionCombo = StringUtils.join(StringUtil.convertNumArray(selectionCombo), ",");
         taskIds = StringUtils.join(StringUtil.convertNumArray(taskIds), ",");
