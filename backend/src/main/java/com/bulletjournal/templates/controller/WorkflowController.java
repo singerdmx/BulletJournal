@@ -48,7 +48,7 @@ public class WorkflowController {
     public static final String SUBSCRIBED_CATEGORIES_ROUTE = "/api/subscribedCategories";
     public static final String AUDIT_SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}/audit";
     public static final String USER_SAMPLE_TASKS_ROUTE = "/api/userSampleTasks";
-    public static final String REMOVE_USER_SAMPLE_TASKS_ROUTE = "/api/userSampleTasks/removeUserSampleTasks";
+    public static final String REMOVE_USER_SAMPLE_TASKS_ROUTE = "/api/userSampleTasks/remove";
     public static final String REMOVE_USER_SAMPLE_TASK_ROUTE = "/api/userSampleTasks/{sampleTaskId}";
 
     @Autowired
@@ -390,10 +390,11 @@ public class WorkflowController {
     }
 
     @PostMapping(REMOVE_USER_SAMPLE_TASKS_ROUTE)
-    public void removeUserSampleTasks(
+    public List<SampleTask> removeUserSampleTasks(
             @Valid @RequestBody RemoveUserSampleTasksParams removeUserSampleTasksParams) {
         String requester = MDC.get(UserClient.USER_NAME_KEY);
-        this.userSampleTaskDaoJpa.removeUserSampleTasks(requester, removeUserSampleTasksParams.getSampleTaskIds());
+        this.userSampleTaskDaoJpa.removeUserSampleTasks(requester, removeUserSampleTasksParams.getSampleTasks());
+        return getUserSampleTasks();
     }
 
     @DeleteMapping(REMOVE_USER_SAMPLE_TASK_ROUTE)

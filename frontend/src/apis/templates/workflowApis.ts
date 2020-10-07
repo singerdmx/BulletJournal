@@ -172,3 +172,23 @@ export const removeUserSampleTask = (sampleTaskId: number) => {
             throw Error(err.message);
         });
 }
+
+export const removeUserSampleTasks = (sampleTasks: number[],
+                                      projectId: number, assignees: string[],
+                                      reminderBefore: number, labels: number[],
+                                      startDate?: string, timezone?: string) => {
+    const postBody = JSON.stringify({
+        sampleTasks: sampleTasks,
+        projectId: projectId,
+        assignees: assignees,
+        reminderBefore: reminderBefore,
+        labels: labels,
+        startDate: startDate,
+        timezone: timezone
+    });
+    return doPost('/api/userSampleTasks/remove', postBody)
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}

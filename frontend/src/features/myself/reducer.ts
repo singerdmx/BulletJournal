@@ -66,7 +66,21 @@ export type SampleTasksAction = {
 
 export type DeleteSampleTaskAction = {
   id: number;
+}
+
+export type DeleteSampleTasksAction = {
+  sampleTasks: number[];
+  projectId: number;
+  assignees: string[];
+  reminderBefore: number;
+  labels: number[];
+  startDate?: string;
+  timezone?: string;
 };
+
+export type DeletingSampleTasksAction = {
+  deleting: boolean;
+}
 
 export type UserPointActivities = {
    userPointActivities: UserPointActivity[];
@@ -90,6 +104,7 @@ let initialState = {
   userPointActivities: [] as Array<UserPointActivity>,
   subscribedCategories: [] as SubscribedCategory[],
   sampleTasks: [] as SampleTask[],
+  removingSampleTasks: false,
 };
 
 const slice = createSlice({
@@ -163,6 +178,11 @@ const slice = createSlice({
       state.sampleTasks = sampleTasks;
     },
     deleteMySampleTask: (state, action: PayloadAction<DeleteSampleTaskAction>) => state,
+    deleteMySampleTasks: (state, action: PayloadAction<DeleteSampleTasksAction>) => state,
+    removingSampleTasksReceived: (state, action: PayloadAction<DeletingSampleTasksAction>) => {
+      const { deleting } = action.payload;
+      state.removingSampleTasks = deleting;
+    }
   },
 });
 

@@ -44,3 +44,11 @@ export const updateCategorySubscription = (categoryId: number, selectionId: numb
 export const getMySampleTasks = () => actions.getMySampleTasks({});
 
 export const deleteMySampleTask = (id: number) => actions.deleteMySampleTask({id: id});
+
+export const deleteMySampleTasks = (sampleTasks: number[],
+                                    projectId: number, assignees: string[],
+                                    reminderBefore: number, labels: number[],
+                                    startDate?: string, timezone?: string) => actions.deleteMySampleTasks({
+    sampleTasks: sampleTasks, projectId: projectId, assignees: assignees, reminderBefore: reminderBefore,
+    labels: labels, startDate: startDate, timezone: timezone
+});

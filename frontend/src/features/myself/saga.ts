@@ -12,7 +12,7 @@ import {
     SubscribedCategories,
     GetSubscribedCategories,
     UnsubscribedCategory,
-    UpdateCategorySubscription, MySampleTasksAction, DeleteSampleTaskAction
+    UpdateCategorySubscription, MySampleTasksAction, DeleteSampleTaskAction, DeleteSampleTasksAction
 } from './reducer';
 import { IState } from '../../store';
 import { actions as settingsActions } from '../../components/settings/reducer';
@@ -30,7 +30,8 @@ import {UserPointActivity} from "../../pages/points/interface";
 import {
     fetchUserSampleTasks,
     getUserSubscribedCategories,
-    removeUserSampleTask
+    removeUserSampleTask,
+    removeUserSampleTasks
 } from "../../apis/templates/workflowApis";
 import {SubscribedCategory} from "./interface";
 import {removeUserCategory, updateSubscription} from "../../apis/templates/categoryApis";
@@ -281,6 +282,28 @@ function* deleteMySampleTask(action: PayloadAction<DeleteSampleTaskAction>) {
     }
 }
 
+function* deleteMySampleTasks(action: PayloadAction<DeleteSampleTasksAction>) {
+    try {
+        yield put(myselfActions.removingSampleTasksReceived({deleting: true}));
+
+        const { sampleTasks, assignees, labels, projectId, reminderBefore, startDate, timezone } = action.payload;
+        const data : SampleTask[] = yield call(removeUserSampleTasks, sampleTasks, projectId, assignees,
+            reminderBefore, labels, startDate, timezone);
+        yield put(
+            myselfActions.sampleTasksReceived( {
+                sampleTasks: data
+            })
+        );
+    } catch (error) {
+        if (error.message === 'reload') {
+            yield put(reloadReceived(true));
+        } else {
+            yield call(message.error, `deleteMySampleTasks Error Received: ${error}`);
+        }
+    }
+    yield put(myselfActions.removingSampleTasksReceived({deleting: false}));
+}
+
 export default function* myselfSagas() {
   yield all([
     yield takeLatest(
@@ -301,6 +324,7 @@ export default function* myselfSagas() {
     yield takeLatest(myselfActions.updateCategorySubscription.type, updateCategorySubscription),
     yield takeLatest(myselfActions.getMySampleTasks.type, getMySampleTasks),
     yield takeLatest(myselfActions.deleteMySampleTask.type, deleteMySampleTask),
+    yield takeLatest(myselfActions.deleteMySampleTasks.type, deleteMySampleTasks),
   ]);
 }
 
