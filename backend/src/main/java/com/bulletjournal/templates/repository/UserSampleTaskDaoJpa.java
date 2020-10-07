@@ -1,5 +1,6 @@
 package com.bulletjournal.templates.repository;
 
+import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.templates.repository.model.UserSampleTask;
@@ -11,7 +12,10 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Repository
 public class UserSampleTaskDaoJpa {
@@ -37,5 +41,22 @@ public class UserSampleTaskDaoJpa {
   @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
   public boolean checkExist(UserSampleTaskKey userSampleTaskKey) {
     return userSampleTaskRepository.existsById(userSampleTaskKey);
+  }
+
+  @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+  public void removeUserSampleTasks(String requester, List<Long> sampleTaskIds) {
+    if (sampleTaskIds.isEmpty()) {
+      throw new BadRequestException("SampleTaskIds are empty.");
+    }
+    Long userId = this.userDaoJpa.getByName(requester).getId();
+
+    List<UserSampleTaskKey>  userSampleTaskKeys = new ArrayList<>();
+    for (Long sampleTaskId: sampleTaskIds) {
+      userSampleTaskKeys.add(new UserSampleTaskKey(userId, sampleTaskId));
+    }
+
+    List<UserSampleTask> userSampleTasks = this.userSampleTaskRepository.findAllById(userSampleTaskKeys)
+            .stream().filter(Objects::nonNull).collect(Collectors.toList());
+    this.userSampleTaskRepository.deleteAll(userSampleTasks);
   }
 }

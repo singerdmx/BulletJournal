@@ -17,10 +17,52 @@
     }
   }
 
+  div.control-task {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
   div.events-card {
+    display: flex !important;
+    justify-content: space-evenly !important;
     border-radius: 8px;
     padding: 10px;
     background-color: #e6faff;
+
+    div.sample-task {
+      cursor: pointer;
+
+      div.remove-task-icon {
+        position: absolute;
+        right: 12px;
+        top: -4px;
+
+        & span {
+          & svg {
+            width: 8px !important;
+            height: 8px !important;
+          }
+        }
+      }
+
+      position: relative;
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-evenly;
+      width: 100%;
+      border-radius: 5px;
+      padding: 3px;
+      margin: 3px;
+      max-width: 200px;
+      word-wrap: break-word;
+      background-color: #b8f1ed;
+      min-height: 65px;
+      text-overflow: ellipsis;
+      text-align: center;
+    }
   }
 
   div.selections-card {

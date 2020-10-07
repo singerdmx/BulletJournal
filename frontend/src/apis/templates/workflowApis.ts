@@ -54,6 +54,14 @@ export const fetchAdminSampleTask = (sampleTaskId: number) => {
         });
 }
 
+export const fetchUserSampleTasks = () => {
+    return doFetch('/api/userSampleTasks')
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}
+
 export const fetchSampleTask = (sampleTaskId: number) => {
     return doFetch(`/api/sampleTasks/${sampleTaskId}`)
         .then((res) => res.json())
@@ -151,6 +159,34 @@ export const auditSampleTask = (sampleTaskId: number, choiceId: number, selectio
         selections: selections,
     });
     return doPost(`/api/sampleTasks/${sampleTaskId}/audit`, postBody)
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}
+
+export const removeUserSampleTask = (sampleTaskId: number) => {
+    return doDelete(`/api/userSampleTasks/${sampleTaskId}`)
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}
+
+export const removeUserSampleTasks = (sampleTasks: number[],
+                                      projectId: number, assignees: string[],
+                                      reminderBefore: number, labels: number[],
+                                      startDate?: string, timezone?: string) => {
+    const postBody = JSON.stringify({
+        sampleTasks: sampleTasks,
+        projectId: projectId,
+        assignees: assignees,
+        reminderBefore: reminderBefore,
+        labels: labels,
+        startDate: startDate,
+        timezone: timezone
+    });
+    return doPost('/api/userSampleTasks/remove', postBody)
         .then((res) => res.json())
         .catch((err) => {
             throw Error(err.message);

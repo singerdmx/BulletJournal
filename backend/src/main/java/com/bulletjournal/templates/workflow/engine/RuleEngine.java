@@ -95,6 +95,11 @@ public class RuleEngine {
                     importTasksParams.getSelections(), importTasksParams.getProjectId());
         }
 
+        sampleTasks.forEach(sampleTask -> {
+            sampleTask.setContent(null);
+            sampleTask.setUid(null);
+            sampleTask.setMetadata(null);
+        });
         return sampleTasks;
     }
 

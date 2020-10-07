@@ -15,6 +15,8 @@ public class DeltaContent {
     public static final String DELTA = "delta";
     public static final String MDELTA = "mdelta";
     public static final String HTML_TAG = "###html###";
+    public static final String EMPTY_CONTENT = "{\"delta\":{\"ops\":[{\"insert\":\" \\n\"}]}," +
+            "\"###html###\":\"<p> </p>\"}";
     private static final Gson GSON = new GsonBuilder().
             registerTypeAdapter(Double.class,  new JsonSerializer<Double>() {
                 @Override
@@ -39,7 +41,7 @@ public class DeltaContent {
     private List<Object> diff;
 
     public DeltaContent(String text) {
-        LOGGER.info("DeltaContent {}", text);
+        // LOGGER.info("DeltaContent {}", text);
         LinkedHashMap<String, Object> map = GSON.fromJson(text, LinkedHashMap.class);
         deltaMap = (Map) map.get(DELTA);
         mdeltaList = (List) map.get(MDELTA);

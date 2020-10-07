@@ -12,7 +12,7 @@ import {
     SubscribedCategories,
     GetSubscribedCategories,
     UnsubscribedCategory,
-    UpdateCategorySubscription
+    UpdateCategorySubscription, MySampleTasksAction, DeleteSampleTaskAction, DeleteSampleTasksAction
 } from './reducer';
 import { IState } from '../../store';
 import { actions as settingsActions } from '../../components/settings/reducer';
@@ -27,9 +27,15 @@ import moment from 'moment';
 import { dateFormat } from '../myBuJo/constants';
 import {expandedMyselfLoading, reloadReceived} from './actions';
 import {UserPointActivity} from "../../pages/points/interface";
-import {getUserSubscribedCategories} from "../../apis/templates/workflowApis";
+import {
+    fetchUserSampleTasks,
+    getUserSubscribedCategories,
+    removeUserSampleTask,
+    removeUserSampleTasks
+} from "../../apis/templates/workflowApis";
 import {SubscribedCategory} from "./interface";
 import {removeUserCategory, updateSubscription} from "../../apis/templates/categoryApis";
+import {SampleTask} from "../templates/interface";
 
 function* myselfApiErrorAction(action: PayloadAction<MyselfApiErrorAction>) {
   yield call(message.error, `Myself Error Received: ${action.payload.error}`);
@@ -241,6 +247,63 @@ function* updateCategorySubscription(action: PayloadAction<UpdateCategorySubscri
     }
 }
 
+function* getMySampleTasks(action: PayloadAction<MySampleTasksAction>) {
+    try {
+        const data : SampleTask[] = yield call(fetchUserSampleTasks);
+        yield put(
+            myselfActions.sampleTasksReceived( {
+                sampleTasks: data
+            })
+        );
+    } catch (error) {
+        if (error.message === 'reload') {
+            yield put(reloadReceived(true));
+        } else {
+            yield call(message.error, `getMySampleTasks Error Received: ${error}`);
+        }
+    }
+}
+
+function* deleteMySampleTask(action: PayloadAction<DeleteSampleTaskAction>) {
+    try {
+        const { id } = action.payload;
+        const data : SampleTask[] = yield call(removeUserSampleTask, id);
+        yield put(
+            myselfActions.sampleTasksReceived( {
+                sampleTasks: data
+            })
+        );
+    } catch (error) {
+        if (error.message === 'reload') {
+            yield put(reloadReceived(true));
+        } else {
+            yield call(message.error, `deleteMySampleTask Error Received: ${error}`);
+        }
+    }
+}
+
+function* deleteMySampleTasks(action: PayloadAction<DeleteSampleTasksAction>) {
+    try {
+        yield put(myselfActions.removingSampleTasksReceived({deleting: true}));
+
+        const { sampleTasks, assignees, labels, projectId, reminderBefore, startDate, timezone } = action.payload;
+        const data : SampleTask[] = yield call(removeUserSampleTasks, sampleTasks, projectId, assignees,
+            reminderBefore, labels, startDate, timezone);
+        yield put(
+            myselfActions.sampleTasksReceived( {
+                sampleTasks: data
+            })
+        );
+    } catch (error) {
+        if (error.message === 'reload') {
+            yield put(reloadReceived(true));
+        } else {
+            yield call(message.error, `deleteMySampleTasks Error Received: ${error}`);
+        }
+    }
+    yield put(myselfActions.removingSampleTasksReceived({deleting: false}));
+}
+
 export default function* myselfSagas() {
   yield all([
     yield takeLatest(
@@ -259,6 +322,9 @@ export default function* myselfSagas() {
     yield takeLatest(myselfActions.getSubscribedCategories.type, getSubscribedCategories),
     yield takeLatest(myselfActions.unsubscribedCategory.type, unsubscribedCategory),
     yield takeLatest(myselfActions.updateCategorySubscription.type, updateCategorySubscription),
+    yield takeLatest(myselfActions.getMySampleTasks.type, getMySampleTasks),
+    yield takeLatest(myselfActions.deleteMySampleTask.type, deleteMySampleTask),
+    yield takeLatest(myselfActions.deleteMySampleTasks.type, deleteMySampleTasks),
   ]);
 }
 

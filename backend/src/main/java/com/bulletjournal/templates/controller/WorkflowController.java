@@ -17,6 +17,9 @@ import com.bulletjournal.templates.repository.model.Step;
 import com.bulletjournal.templates.repository.model.*;
 import com.bulletjournal.templates.workflow.engine.RuleEngine;
 import com.bulletjournal.templates.workflow.models.RuleExpression;
+import com.bulletjournal.util.DeltaContent;
+import com.bulletjournal.util.DeltaConverter;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
@@ -44,6 +47,9 @@ public class WorkflowController {
     public static final String CATEGORY_STEPS_ROUTE = "/api/categories/{categoryId}/steps";
     public static final String SUBSCRIBED_CATEGORIES_ROUTE = "/api/subscribedCategories";
     public static final String AUDIT_SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}/audit";
+    public static final String USER_SAMPLE_TASKS_ROUTE = "/api/userSampleTasks";
+    public static final String REMOVE_USER_SAMPLE_TASKS_ROUTE = "/api/userSampleTasks/remove";
+    public static final String REMOVE_USER_SAMPLE_TASK_ROUTE = "/api/userSampleTasks/{sampleTaskId}";
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
@@ -71,6 +77,10 @@ public class WorkflowController {
 
     @Autowired
     private UserClient userClient;
+
+    @Autowired
+    private UserSampleTaskDaoJpa userSampleTaskDaoJpa;
+
 
     private static final Gson GSON = new Gson();
 
@@ -103,24 +113,25 @@ public class WorkflowController {
             nextStep = checkIfSelectionsMatchCategoryRules(stepId, selections);
         } else {
             nextStep = checkIfSelectionsMatchStepRules(stepId, selections);
-            if (nextStep.getStep() != null && nextStep.getStep().getChoices().isEmpty()) {
-                // assume final step, try to get sample tasks using prevSelections
-                List<SampleTask> sampleTasks = sampleTaskDaoJpa.findAllById(
-                        this.ruleEngine.getSampleTasksForFinalStep(
-                                nextStep.getStep().getId(), selections, prevSelections))
-                        .stream().map(e -> e.toPresentationModel()).collect(Collectors.toList());
-                // store in redis and generate scrollId
-                // setSampleTasks with the first 10 tasks
-                if (sampleTasks.size() <= 10) {
-                    nextStep.setScrollId("");
-                    nextStep.setSampleTasks(sampleTasks);
-                    return nextStep;
-                }
-                String scrollId = UUID.randomUUID().toString();
-                nextStep.setScrollId(scrollId);
-                nextStep.setSampleTasks(sampleTasks.subList(0, 10));
-                sampleTasksRedisCache.save(new SampleTasks(scrollId, sampleTasks.subList(10, sampleTasks.size())));
+        }
+
+        if (nextStep.getStep() != null && nextStep.getStep().getChoices().isEmpty()) {
+            // assume final step, try to get sample tasks using prevSelections
+            List<SampleTask> sampleTasks = sampleTaskDaoJpa.findAllById(
+                    this.ruleEngine.getSampleTasksForFinalStep(
+                            nextStep.getStep().getId(), selections, prevSelections))
+                    .stream().map(e -> e.toSimplePresentationModel()).collect(Collectors.toList());
+            // store in redis and generate scrollId
+            // setSampleTasks with the first 10 tasks
+            if (sampleTasks.size() <= 10) {
+                nextStep.setScrollId("");
+                nextStep.setSampleTasks(sampleTasks);
+                return nextStep;
             }
+            String scrollId = UUID.randomUUID().toString();
+            nextStep.setScrollId(scrollId);
+            nextStep.setSampleTasks(sampleTasks.subList(0, 10));
+            sampleTasksRedisCache.save(new SampleTasks(scrollId, sampleTasks.subList(10, sampleTasks.size())));
         }
 
         return nextStep;
@@ -250,7 +261,7 @@ public class WorkflowController {
             Optional<SampleTasks> cachedSampleTasks = sampleTasksRedisCache.findById(scrollId);
             cachedSampleTasks.ifPresent(sampleTasks -> {
                 importTasksParams.getSampleTasks().addAll(
-                    sampleTasks.getSampleTasks().stream().map(SampleTask::getId).collect(Collectors.toList()));
+                        sampleTasks.getSampleTasks().stream().map(SampleTask::getId).collect(Collectors.toList()));
                 sampleTasksRedisCache.deleteById(scrollId);
             });
         }
@@ -294,6 +305,10 @@ public class WorkflowController {
 
     private Content getSampleTaskContent(Long sampleTaskId, String content, String requester) {
         User user = this.userClient.getUser("BulletJournal");
+        if (StringUtils.isBlank(content)) {
+            content = DeltaContent.EMPTY_CONTENT;
+        }
+        content = DeltaConverter.supplementContentText(content, false);
         return new Content(this.userDaoJpa.isAdmin(requester) ? sampleTaskId : 0L,
                 user, content, content,
                 System.currentTimeMillis(), System.currentTimeMillis(), "");
@@ -314,9 +329,11 @@ public class WorkflowController {
     public List<SampleTask> getSampleTasksByFilter(@RequestParam(value = "filter") String metadataFilter) {
         // http://localhost:8080/api/sampleTasks?filter={filter}
         validateRequester();
-        return sampleTaskDaoJpa.findSampleTasksByMetadataFilter(metadataFilter).stream()
-                .map(com.bulletjournal.templates.repository.model.SampleTask::toPresentationModel)
+        List<SampleTask> sampleTasks = sampleTaskDaoJpa.findSampleTasksByMetadataFilter(metadataFilter).stream()
+                .map(com.bulletjournal.templates.repository.model.SampleTask::toSimplePresentationModel)
                 .collect(Collectors.toList());
+
+        return sampleTasks;
     }
 
     @PutMapping(SAMPLE_TASK_ROUTE)
@@ -341,7 +358,7 @@ public class WorkflowController {
 
     @DeleteMapping(SAMPLE_TASK_RULE_ROUTE)
     public void deleteSampleTaskRule(@RequestParam(value = "stepId") Long stepId,
-                                 @RequestParam(value = "selectionCombo") String selectionCombo) {
+                                     @RequestParam(value = "selectionCombo") String selectionCombo) {
         validateRequester();
         sampleTaskRuleDaoJpa.deleteById(stepId, selectionCombo);
     }
@@ -354,9 +371,39 @@ public class WorkflowController {
 
     @PostMapping(AUDIT_SAMPLE_TASK_ROUTE)
     public SampleTask auditSampleTask(@NotNull @PathVariable Long sampleTaskId,
-                                @Valid @RequestBody AuditSampleTaskParams auditSampleTaskParams) {
+                                      @Valid @RequestBody AuditSampleTaskParams auditSampleTaskParams) {
         validateRequester();
         return this.sampleTaskDaoJpa.auditSampleTask(sampleTaskId, auditSampleTaskParams).toPresentationModel();
+    }
+
+    @GetMapping(USER_SAMPLE_TASKS_ROUTE)
+    public List<SampleTask> getUserSampleTasks() {
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+        List<UserSampleTask> userSampleTasks = userSampleTaskDaoJpa.getUserSampleTaskByUserName(requester);
+
+        List<SampleTask> sampleTasks = new ArrayList<>();
+        for (UserSampleTask userSampleTask : userSampleTasks) {
+            sampleTasks.add(userSampleTask.getSampleTask().toSimplePresentationModel());
+        }
+
+        return sampleTasks;
+    }
+
+    @PostMapping(REMOVE_USER_SAMPLE_TASKS_ROUTE)
+    public List<SampleTask> removeUserSampleTasks(
+            @Valid @RequestBody RemoveUserSampleTasksParams removeUserSampleTasksParams) {
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+        this.userSampleTaskDaoJpa.removeUserSampleTasks(requester, removeUserSampleTasksParams.getSampleTasks());
+        return getUserSampleTasks();
+    }
+
+    @DeleteMapping(REMOVE_USER_SAMPLE_TASK_ROUTE)
+    public List<SampleTask> removeUserSampleTask(
+            @NotNull @PathVariable Long sampleTaskId) {
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+        this.userSampleTaskDaoJpa.removeUserSampleTasks(requester,
+                ImmutableList.of(sampleTaskId));
+        return getUserSampleTasks();
     }
 
     private void validateRequester() {

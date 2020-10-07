@@ -39,7 +39,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectItemDaoJpa.class);
     private static final Gson GSON = new Gson();
 
-    private static final int CONTENT_BATCH_SIZE = 50;
+    private static final int CONTENT_BATCH_SIZE = 3;
 
     @Autowired
     protected LabelDaoJpa labelDaoJpa;
@@ -168,7 +168,9 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             }
             String owner = owners.get(i);
             T projectItem = projectItems.get(i);
-            populateContent(owner, content, projectItem);
+            content.setProjectItem(projectItem);
+            content.setOwner(owner);
+            content.setText(DeltaConverter.supplementContentText(content.getText(), false));
             batch.add(content);
         }
         if (!batch.isEmpty()) {

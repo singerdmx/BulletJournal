@@ -198,7 +198,7 @@ const StepsPage: React.FC<StepsProps> = (
                     onChange={(e) => onChoiceChange(e, choice)}
                     placeholder={choice.name}
                     value={getChoiceValue(choice)}
-                    style={{padding: '3px', minWidth: choice.multiple ? '50%' : '5%'}}
+                    style={{padding: '3px', minWidth: choice.multiple ? '50%' : '25%'}}
                     allowClear>
                 {choice.selections.filter(selection => !curStep.excludedSelections.includes(selection.id))
                     .map(selection => {
