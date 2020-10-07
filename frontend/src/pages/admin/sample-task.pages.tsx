@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import './sample-task.styles.less';
-import {BackTop, Button, message, Select, Tag, Typography} from "antd";
+import {BackTop, Button, Checkbox, message, Select, Tag, Typography} from "antd";
 import {IState} from "../../store";
 import {connect} from "react-redux";
 import {getSampleTask, removeSampleTask, updateSampleTask} from "../../features/templates/actions";
@@ -17,7 +17,7 @@ type SampleTaskProps = {
     getSampleTask: (sampleTaskId: number) => void;
     approveSampleTask: (sampleTaskId: number, choiceId: number, selections: number[]) => void;
     removeSampleTask: (sampleTaskId: number) => void;
-    updateSampleTask: (sampleTaskId: number, name: string, uid: string, content: string, metadata: string) => void;
+    updateSampleTask: (sampleTaskId: number, name: string, uid: string, content: string, metadata: string, pending: boolean) => void;
 };
 
 const AdminSampleTaskPage: React.FC<SampleTaskProps> = (
@@ -49,7 +49,7 @@ const AdminSampleTaskPage: React.FC<SampleTaskProps> = (
             message.error('name cannot be empty');
             return;
         }
-        updateSampleTask(sampleTask.id, input, sampleTask.uid, sampleTask.content, sampleTask.metadata);
+        updateSampleTask(sampleTask.id, input, sampleTask.uid, sampleTask.content, sampleTask.metadata, sampleTask.pending);
     }
 
     const metadataChange = (input: any) => {
@@ -58,7 +58,7 @@ const AdminSampleTaskPage: React.FC<SampleTaskProps> = (
             message.error('metadata cannot be empty');
             return;
         }
-        updateSampleTask(sampleTask.id, sampleTask.name, sampleTask.uid, sampleTask.content, input);
+        updateSampleTask(sampleTask.id, sampleTask.name, sampleTask.uid, sampleTask.content, input, sampleTask.pending);
     }
 
     const uidChange = (input: any) => {
@@ -67,7 +67,7 @@ const AdminSampleTaskPage: React.FC<SampleTaskProps> = (
             message.error('uid cannot be empty');
             return;
         }
-        updateSampleTask(sampleTask.id, sampleTask.name, input, sampleTask.content, sampleTask.metadata);
+        updateSampleTask(sampleTask.id, sampleTask.name, input, sampleTask.content, sampleTask.metadata, sampleTask.pending);
     }
 
     const onChoiceChange = (input: any) => {
@@ -85,6 +85,13 @@ const AdminSampleTaskPage: React.FC<SampleTaskProps> = (
         approveSampleTask(sampleTask.id, choiceId, selections);
     }
 
+    const onChangePending = (value: any) => {
+        console.log(value.target.checked);
+        if (sampleTask) {
+            updateSampleTask(sampleTask.id, sampleTask.name, sampleTask.uid, sampleTask.content, sampleTask.metadata, value.target.checked);
+        }
+    }
+
     const choice = sampleTask.choice;
     return (
         <div className='sample-task-page'>
@@ -96,6 +103,10 @@ const AdminSampleTaskPage: React.FC<SampleTaskProps> = (
                     editable={{onChange: metadataChange}}>{sampleTask.metadata}</Text></Tag>
                 (<Text
                 editable={{onChange: uidChange}}>{sampleTask.uid}</Text>)
+                &nbsp;&nbsp;&nbsp;
+                <Checkbox checked={sampleTask.pending} onChange={onChangePending}>
+                    pending
+                </Checkbox>
             </div>
             <Divider/>
             <div>

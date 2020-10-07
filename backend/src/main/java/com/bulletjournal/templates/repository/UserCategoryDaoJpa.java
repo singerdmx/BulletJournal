@@ -77,7 +77,7 @@ public class UserCategoryDaoJpa {
         Project project = this.projectRepository.findById(projectId).orElseThrow(() -> new ResourceNotFoundException(
                 "Project " + projectId + " not found"));
         List<SelectionMetadataKeyword> keywords = this.selectionMetadataKeywordDaoJpa
-                .getKeywordsBySelections(selections);
+                .getKeywordsBySelectionsWithoutFrequency(selections);
         for (SelectionMetadataKeyword keyword : keywords) {
             saveUserSubscription(user, categoryId, selections, project, keyword);
         }
@@ -151,7 +151,7 @@ public class UserCategoryDaoJpa {
         }
 
         List<SelectionMetadataKeyword> keywords = this.selectionMetadataKeywordDaoJpa
-                .getKeywordsBySelections(ImmutableList.of(selectionId));
+                .getKeywordsBySelectionsWithoutFrequency(ImmutableList.of(selectionId));
         if (keywords.size() == 0) {
             throw new ResourceNotFoundException("SelectionID not found");
         }

@@ -27,26 +27,36 @@ public class SampleTask {
 
     private Choice choice;
 
+    public boolean isPending() {
+        return pending;
+    }
+
+    public void setPending(boolean pending) {
+        this.pending = pending;
+    }
+
+    private boolean pending;
+
     public SampleTask() {
     }
 
     public SampleTask(
             Long id,
             String name) {
-        this(id, name, null, null, null, null, null, null, null);
+        this(id, name, null, null, null, null, null, null, null, false);
     }
 
     public SampleTask(
-        Long id,
-        String name,
-        String content,
-        String metadata,
-        String uid,
-        String dueDate,
-        String dueTime,
-        Timestamp availableBefore,
-        String timeZone
-    ) {
+            Long id,
+            String name,
+            String content,
+            String metadata,
+            String uid,
+            String dueDate,
+            String dueTime,
+            Timestamp availableBefore,
+            String timeZone,
+            boolean pending) {
         this.id = id;
         this.name = name;
         this.content = content;
@@ -56,7 +66,9 @@ public class SampleTask {
         this.dueTime = dueTime;
         this.availableBefore = availableBefore;
         this.timeZone = timeZone;
+        this.pending = pending;
     }
+
 
     public String getUid() {
         return uid;

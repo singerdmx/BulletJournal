@@ -22,6 +22,8 @@ public class SampleTask extends NamedModel {
     @Column(name = "refreshable")
     private boolean refreshable;
 
+    @Column(name = "pending")
+    private boolean pending;
 
     @Column(name = "metadata")
     private String metadata;
@@ -41,8 +43,6 @@ public class SampleTask extends NamedModel {
     @Column(name = "time_zone")
     private String timeZone;
 
-    @Column
-    private boolean pending;
 
     @Override
     public Long getId() {
@@ -139,7 +139,8 @@ public class SampleTask extends NamedModel {
                 dueDate,
                 dueTime,
                 availableBefore,
-                timeZone
+                timeZone,
+                pending
             );
     }
 
@@ -153,7 +154,8 @@ public class SampleTask extends NamedModel {
                 dueDate,
                 dueTime,
                 availableBefore,
-                timeZone
+                timeZone,
+                pending
         );
     }
 }

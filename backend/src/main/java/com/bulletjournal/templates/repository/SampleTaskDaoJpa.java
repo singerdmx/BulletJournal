@@ -126,6 +126,7 @@ public class SampleTaskDaoJpa {
         sampleTask.setMetadata(updateSampleTaskParams.getMetadata());
         sampleTask.setUid(updateSampleTaskParams.getUid());
         sampleTask.setTimeZone(updateSampleTaskParams.getTimeZone());
+        sampleTask.setPending(updateSampleTaskParams.isPending());
         return sampleTaskRepository.save(sampleTask);
     }
 
@@ -155,7 +156,7 @@ public class SampleTaskDaoJpa {
         sampleTask.setPending(false);
         String originalKeyword = sampleTask.getMetadata();
         List<SelectionMetadataKeyword> keywords =
-                this.selectionMetadataKeywordDaoJpa.getKeywordsBySelections(auditSampleTaskParams.getSelections());
+                this.selectionMetadataKeywordDaoJpa.getKeywordsBySelectionsWithoutFrequency(auditSampleTaskParams.getSelections());
         for (SelectionMetadataKeyword keyword : keywords) {
             sampleTask.setMetadata(sampleTask.getMetadata() + "," + keyword.getKeyword());
         }
