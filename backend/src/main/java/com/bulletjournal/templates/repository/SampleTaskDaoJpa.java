@@ -126,6 +126,7 @@ public class SampleTaskDaoJpa {
         sampleTask.setMetadata(updateSampleTaskParams.getMetadata());
         sampleTask.setUid(updateSampleTaskParams.getUid());
         sampleTask.setTimeZone(updateSampleTaskParams.getTimeZone());
+        sampleTask.setPending(updateSampleTaskParams.isPending());
         return sampleTaskRepository.save(sampleTask);
     }
 
