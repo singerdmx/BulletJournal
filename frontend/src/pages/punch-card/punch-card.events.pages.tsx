@@ -6,7 +6,7 @@ import {connect} from "react-redux";
 import {getMySampleTasks} from "../../features/myself/actions";
 import {SampleTask} from "../../features/templates/interface";
 import {CloseOutlined} from "@ant-design/icons";
-import '../templates/steps.styles.less'
+import {useHistory} from "react-router-dom";
 
 type TemplateEventsProps = {
     sampleTasks: SampleTask[];
@@ -18,6 +18,7 @@ const TemplateEvents: React.FC<TemplateEventsProps> = (
         sampleTasks,
         getMySampleTasks
     }) => {
+    const history = useHistory();
 
     useEffect(() => {
         getMySampleTasks();
@@ -34,7 +35,7 @@ const TemplateEvents: React.FC<TemplateEventsProps> = (
 
         return <div>
             {sampleTasks.map(sampleTask => {
-                return <div className='sample-task'>
+                return <div className='sample-task' onClick={() => history.push(`/sampleTasks/${sampleTask.id}`)}>
                     <div className='remove-task-icon'>
                         <Tooltip title='Remove this'>
                             <CloseOutlined onClick={() => onRemoveTask(sampleTask.id)}/>
