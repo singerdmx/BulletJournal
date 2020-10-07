@@ -1,6 +1,5 @@
 package com.bulletjournal.templates.repository;
 
-import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.templates.repository.model.Choice;
 import org.springframework.beans.factory.annotation.Autowired;
