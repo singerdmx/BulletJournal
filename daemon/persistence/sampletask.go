@@ -3,7 +3,7 @@ package persistence
 import "time"
 
 type SampleTask struct {
-	ID					uint64 		`json:"id,omitempty" gorm:"primaryKey;autoIncrement;not_null"`
+	ID					uint64 		`json:"id,omitempty" gorm:"primaryKey;not_null"`
 	CreatedAt			time.Time 	`json:"-" gorm:"index:created_at;PRECISION:6"`
 	UpdatedAt			time.Time 	`json:"-" gorm:"PRECISION:6"`
 	Metadata			string 		`json:"metadata"`
