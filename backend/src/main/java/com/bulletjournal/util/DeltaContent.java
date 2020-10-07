@@ -41,7 +41,7 @@ public class DeltaContent {
     private List<Object> diff;
 
     public DeltaContent(String text) {
-        LOGGER.info("DeltaContent {}", text);
+        // LOGGER.info("DeltaContent {}", text);
         LinkedHashMap<String, Object> map = GSON.fromJson(text, LinkedHashMap.class);
         deltaMap = (Map) map.get(DELTA);
         mdeltaList = (List) map.get(MDELTA);

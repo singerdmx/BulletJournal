@@ -113,24 +113,25 @@ public class WorkflowController {
             nextStep = checkIfSelectionsMatchCategoryRules(stepId, selections);
         } else {
             nextStep = checkIfSelectionsMatchStepRules(stepId, selections);
-            if (nextStep.getStep() != null && nextStep.getStep().getChoices().isEmpty()) {
-                // assume final step, try to get sample tasks using prevSelections
-                List<SampleTask> sampleTasks = sampleTaskDaoJpa.findAllById(
-                        this.ruleEngine.getSampleTasksForFinalStep(
-                                nextStep.getStep().getId(), selections, prevSelections))
-                        .stream().map(e -> e.toPresentationModel()).collect(Collectors.toList());
-                // store in redis and generate scrollId
-                // setSampleTasks with the first 10 tasks
-                if (sampleTasks.size() <= 10) {
-                    nextStep.setScrollId("");
-                    nextStep.setSampleTasks(sampleTasks);
-                    return nextStep;
-                }
-                String scrollId = UUID.randomUUID().toString();
-                nextStep.setScrollId(scrollId);
-                nextStep.setSampleTasks(sampleTasks.subList(0, 10));
-                sampleTasksRedisCache.save(new SampleTasks(scrollId, sampleTasks.subList(10, sampleTasks.size())));
+        }
+
+        if (nextStep.getStep() != null && nextStep.getStep().getChoices().isEmpty()) {
+            // assume final step, try to get sample tasks using prevSelections
+            List<SampleTask> sampleTasks = sampleTaskDaoJpa.findAllById(
+                    this.ruleEngine.getSampleTasksForFinalStep(
+                            nextStep.getStep().getId(), selections, prevSelections))
+                    .stream().map(e -> e.toSimplePresentationModel()).collect(Collectors.toList());
+            // store in redis and generate scrollId
+            // setSampleTasks with the first 10 tasks
+            if (sampleTasks.size() <= 10) {
+                nextStep.setScrollId("");
+                nextStep.setSampleTasks(sampleTasks);
+                return nextStep;
             }
+            String scrollId = UUID.randomUUID().toString();
+            nextStep.setScrollId(scrollId);
+            nextStep.setSampleTasks(sampleTasks.subList(0, 10));
+            sampleTasksRedisCache.save(new SampleTasks(scrollId, sampleTasks.subList(10, sampleTasks.size())));
         }
 
         return nextStep;
@@ -328,9 +329,11 @@ public class WorkflowController {
     public List<SampleTask> getSampleTasksByFilter(@RequestParam(value = "filter") String metadataFilter) {
         // http://localhost:8080/api/sampleTasks?filter={filter}
         validateRequester();
-        return sampleTaskDaoJpa.findSampleTasksByMetadataFilter(metadataFilter).stream()
-                .map(com.bulletjournal.templates.repository.model.SampleTask::toPresentationModel)
+        List<SampleTask> sampleTasks = sampleTaskDaoJpa.findSampleTasksByMetadataFilter(metadataFilter).stream()
+                .map(com.bulletjournal.templates.repository.model.SampleTask::toSimplePresentationModel)
                 .collect(Collectors.toList());
+
+        return sampleTasks;
     }
 
     @PutMapping(SAMPLE_TASK_ROUTE)
@@ -380,7 +383,7 @@ public class WorkflowController {
 
         List<SampleTask> sampleTasks = new ArrayList<>();
         for (UserSampleTask userSampleTask : userSampleTasks) {
-            sampleTasks.add(userSampleTask.getSampleTask().toPresentationModel());
+            sampleTasks.add(userSampleTask.getSampleTask().toSimplePresentationModel());
         }
 
         return sampleTasks;

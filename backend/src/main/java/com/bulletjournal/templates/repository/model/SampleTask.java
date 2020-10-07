@@ -142,4 +142,18 @@ public class SampleTask extends NamedModel {
                 timeZone
             );
     }
+
+    public com.bulletjournal.templates.controller.model.SampleTask toSimplePresentationModel() {
+        return new com.bulletjournal.templates.controller.model.SampleTask(
+                id,
+                getName(),
+                null,
+                null,
+                null,
+                dueDate,
+                dueTime,
+                availableBefore,
+                timeZone
+        );
+    }
 }
