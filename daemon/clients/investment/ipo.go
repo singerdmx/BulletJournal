@@ -103,15 +103,19 @@ func (c *IPOClient) SendData() error {
 		target := c.data.IPO[i]
 		availBefore := target.Date
 		t, _ := time.Parse(layoutISO, availBefore)
+		dueDate := target.PricingDate
+		if len(dueDate) > 10 {
+			dueDate = dueDate[0:11]  // yyyy-MM-dd
+		}
 		item := persistence.SampleTask{
 			CreatedAt:       time.Now(),
 			UpdatedAt:       time.Now(),
 			Metadata:        "INVESTMENT_IPO_RECORD",
 			Content:         "",
 			Name:            fmt.Sprintf("%v (%v) goes public on %v", target.Name, target.Ticker, t),
-			Uid:             target.ID,
+			Uid:             "INVESTMENT_IPO_RECORD_" + target.Ticker,
 			AvailableBefore: t,
-			DueDate:         target.PricingDate,
+			DueDate:         dueDate,
 			DueTime:         "",
 			Pending:         true,
 			Refreshable:     true,
