@@ -71,7 +71,12 @@ const AdminStepsPage: React.FC<AdminStepsProps> = (
                     })}
                     </div>
                     <div>
-                        {JSON.stringify(sampleTaskRule.tasks)}
+                        {sampleTaskRule.tasks.map(s => {
+                            return <span><span
+                                style={{cursor: 'pointer', backgroundColor: '#ffb3cc'}}
+                                onClick={() => history.push(`/admin/sampleTasks/${s.id}`)}>{s.name}</span>
+                                ({s.id}){' '}</span>
+                        })}
                     </div>
                 </div>
             })}

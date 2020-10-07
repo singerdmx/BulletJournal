@@ -223,7 +223,7 @@ public class CategoryDaoJpa {
 
     private void findSelectionComboAndSampleTaskForFinalStep(
             List<SampleTaskRuleView> finalSteps,
-            Step currentStep, Set<Long> allSelections, Set<Long> allTasks) {
+            Step currentStep, Set<Long> allTasks, Set<Long> allSelections) {
         // get task rules
         List<SampleTaskRule> rules = this.sampleTaskRuleRepository
                 .findAllByStep(currentStep);
