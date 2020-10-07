@@ -24,7 +24,8 @@ func (s *SampleTaskDao) Upsert(t *SampleTask) {
 	prevReport := SampleTask{}
 	err := s.db.Where("uid = ?", t.Uid).Last(&prevReport).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		err := s.db.Create(&t).Error
+		//TODO: db create not working.
+		err :=s.db.Create(&t).Error
 		if err != nil {
 			fmt.Println(err, t.ID)
 		}
