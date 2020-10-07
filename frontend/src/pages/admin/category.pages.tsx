@@ -218,11 +218,10 @@ const AdminCategoryPage: React.FC<AdminCategoryProps> = (
             </div>
             <Divider/>
             <div>
-                {category.choices.length > 0 && (
-                    <Button type='primary'
-                            onClick={() => history.push(`/admin/categories/${categoryId}/steps`)}>
-                        Go to Steps
-                    </Button>)}
+                <Button type='primary'
+                        onClick={() => history.push(`/admin/categories/${categoryId}/steps`)}>
+                    Go to Steps
+                </Button>
             </div>
             <Container>
                 <AddRule step={undefined} category={category}/>

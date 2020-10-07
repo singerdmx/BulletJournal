@@ -17,6 +17,7 @@ import com.bulletjournal.templates.repository.model.Step;
 import com.bulletjournal.templates.repository.model.*;
 import com.bulletjournal.templates.workflow.engine.RuleEngine;
 import com.bulletjournal.templates.workflow.models.RuleExpression;
+import com.bulletjournal.util.DeltaContent;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
@@ -46,8 +47,6 @@ public class WorkflowController {
     public static final String AUDIT_SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}/audit";
     public static final String USER_SAMPLE_TASKS_ROUTE = "/api/userSampleTasks";
     public static final String REMOVE_USER_SAMPLE_TASK_ROUTE = "/api/removeUserSampleTasks";
-
-
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
@@ -258,7 +257,7 @@ public class WorkflowController {
             Optional<SampleTasks> cachedSampleTasks = sampleTasksRedisCache.findById(scrollId);
             cachedSampleTasks.ifPresent(sampleTasks -> {
                 importTasksParams.getSampleTasks().addAll(
-                    sampleTasks.getSampleTasks().stream().map(SampleTask::getId).collect(Collectors.toList()));
+                        sampleTasks.getSampleTasks().stream().map(SampleTask::getId).collect(Collectors.toList()));
                 sampleTasksRedisCache.deleteById(scrollId);
             });
         }
@@ -302,6 +301,9 @@ public class WorkflowController {
 
     private Content getSampleTaskContent(Long sampleTaskId, String content, String requester) {
         User user = this.userClient.getUser("BulletJournal");
+        if (StringUtils.isBlank(content)) {
+            content = DeltaContent.EMPTY_CONTENT;
+        }
         return new Content(this.userDaoJpa.isAdmin(requester) ? sampleTaskId : 0L,
                 user, content, content,
                 System.currentTimeMillis(), System.currentTimeMillis(), "");
@@ -349,7 +351,7 @@ public class WorkflowController {
 
     @DeleteMapping(SAMPLE_TASK_RULE_ROUTE)
     public void deleteSampleTaskRule(@RequestParam(value = "stepId") Long stepId,
-                                 @RequestParam(value = "selectionCombo") String selectionCombo) {
+                                     @RequestParam(value = "selectionCombo") String selectionCombo) {
         validateRequester();
         sampleTaskRuleDaoJpa.deleteById(stepId, selectionCombo);
     }
@@ -362,7 +364,7 @@ public class WorkflowController {
 
     @PostMapping(AUDIT_SAMPLE_TASK_ROUTE)
     public SampleTask auditSampleTask(@NotNull @PathVariable Long sampleTaskId,
-                                @Valid @RequestBody AuditSampleTaskParams auditSampleTaskParams) {
+                                      @Valid @RequestBody AuditSampleTaskParams auditSampleTaskParams) {
         validateRequester();
         return this.sampleTaskDaoJpa.auditSampleTask(sampleTaskId, auditSampleTaskParams).toPresentationModel();
     }
@@ -378,10 +380,10 @@ public class WorkflowController {
     @GetMapping(USER_SAMPLE_TASKS_ROUTE)
     public List<SampleTask> getUserSampleTasks() {
         String requester = MDC.get(UserClient.USER_NAME_KEY);
-        List<UserSampleTask> userSampleTasks =  userSampleTaskDaoJpa.getUserSampleTaskByUserName(requester);
+        List<UserSampleTask> userSampleTasks = userSampleTaskDaoJpa.getUserSampleTaskByUserName(requester);
 
         List<SampleTask> sampleTasks = new ArrayList<>();
-        for (UserSampleTask userSampleTask: userSampleTasks) {
+        for (UserSampleTask userSampleTask : userSampleTasks) {
             sampleTasks.add(userSampleTask.getSampleTask().toPresentationModel());
         }
 
