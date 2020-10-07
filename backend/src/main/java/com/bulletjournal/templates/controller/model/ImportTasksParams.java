@@ -2,6 +2,7 @@ package com.bulletjournal.templates.controller.model;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ImportTasksParams {
     @NotNull
@@ -32,7 +33,7 @@ public class ImportTasksParams {
     }
 
     public List<Long> getSelections() {
-        return selections;
+        return selections.stream().filter(s -> s != null).collect(Collectors.toList());
     }
 
     public void setSelections(List<Long> selections) {
