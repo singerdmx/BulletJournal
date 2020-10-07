@@ -19,6 +19,7 @@ import com.bulletjournal.templates.workflow.engine.RuleEngine;
 import com.bulletjournal.templates.workflow.models.RuleExpression;
 import com.bulletjournal.util.DeltaContent;
 import com.bulletjournal.util.DeltaConverter;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
@@ -47,7 +48,8 @@ public class WorkflowController {
     public static final String SUBSCRIBED_CATEGORIES_ROUTE = "/api/subscribedCategories";
     public static final String AUDIT_SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}/audit";
     public static final String USER_SAMPLE_TASKS_ROUTE = "/api/userSampleTasks";
-    public static final String REMOVE_USER_SAMPLE_TASK_ROUTE = "/api/removeUserSampleTasks";
+    public static final String REMOVE_USER_SAMPLE_TASKS_ROUTE = "/api/userSampleTasks/removeUserSampleTasks";
+    public static final String REMOVE_USER_SAMPLE_TASK_ROUTE = "/api/userSampleTasks/{sampleTaskId}";
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
@@ -384,11 +386,19 @@ public class WorkflowController {
         return sampleTasks;
     }
 
-    @DeleteMapping(REMOVE_USER_SAMPLE_TASK_ROUTE)
+    @PostMapping(REMOVE_USER_SAMPLE_TASKS_ROUTE)
     public void removeUserSampleTasks(
             @Valid @RequestBody RemoveUserSampleTasksParams removeUserSampleTasksParams) {
         String requester = MDC.get(UserClient.USER_NAME_KEY);
         this.userSampleTaskDaoJpa.removeUserSampleTasks(requester, removeUserSampleTasksParams.getSampleTaskIds());
+    }
+
+    @DeleteMapping(REMOVE_USER_SAMPLE_TASK_ROUTE)
+    public void removeUserSampleTask(
+            @NotNull @PathVariable Long sampleTaskId) {
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+        this.userSampleTaskDaoJpa.removeUserSampleTasks(requester,
+                ImmutableList.of(sampleTaskId));
     }
 
     private void validateRequester() {
