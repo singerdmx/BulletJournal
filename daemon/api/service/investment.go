@@ -18,14 +18,12 @@ func (i *Investment) pull(params ...interface{}) {
 	earningClient,_ := investment.NewTemplateClient(investment.EarningsTemplate)
 	dividendsClient,_ := investment.NewTemplateClient(investment.DividendsTemplate)
 
-	//TODO: upsert is not working since gorm won't create instance, daemon will be stucked
+	ipoClient.FetchData()
+	ipoClient.SendData()
 
-	// ipoClient.FetchData()
-	// ipoClient.SendData()
+	earningClient.FetchData()
+	earningClient.SendData()
 
-	// earningClient.FetchData()
-	// earningClient.SendData()
-
-	// dividendsClient.FetchData()
-	// dividendsClient.SendData()
+	dividendsClient.FetchData()
+	dividendsClient.SendData()
 }
