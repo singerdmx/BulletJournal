@@ -42,3 +42,5 @@ export const updateCategorySubscription = (categoryId: number, selectionId: numb
 });
 
 export const getMySampleTasks = () => actions.getMySampleTasks({});
+
+export const deleteMySampleTask = (id: number) => actions.deleteMySampleTask({id: id});

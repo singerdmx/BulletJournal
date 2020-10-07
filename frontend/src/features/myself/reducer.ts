@@ -64,6 +64,10 @@ export type SampleTasksAction = {
   sampleTasks: SampleTask[];
 };
 
+export type DeleteSampleTaskAction = {
+  id: number;
+};
+
 export type UserPointActivities = {
    userPointActivities: UserPointActivity[];
 };
@@ -158,6 +162,7 @@ const slice = createSlice({
       const { sampleTasks } = action.payload;
       state.sampleTasks = sampleTasks;
     },
+    deleteMySampleTask: (state, action: PayloadAction<DeleteSampleTaskAction>) => state,
   },
 });
 

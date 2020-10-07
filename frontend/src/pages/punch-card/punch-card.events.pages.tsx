@@ -1,31 +1,50 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import './punch-card.styles.less';
-import {Empty, Tooltip} from "antd";
+import {Checkbox, Empty, Tooltip} from "antd";
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {getMySampleTasks} from "../../features/myself/actions";
+import {deleteMySampleTask, getMySampleTasks} from "../../features/myself/actions";
 import {SampleTask} from "../../features/templates/interface";
-import {CloseOutlined} from "@ant-design/icons";
+import {CheckCircleTwoTone, CloseCircleTwoTone, CloseOutlined} from "@ant-design/icons";
 import {useHistory} from "react-router-dom";
+import {Project} from "../../features/project/interface";
 
 type TemplateEventsProps = {
     sampleTasks: SampleTask[];
     getMySampleTasks: () => void;
+    deleteMySampleTask: (id: number) => void;
 };
 
 const TemplateEvents: React.FC<TemplateEventsProps> = (
     {
         sampleTasks,
-        getMySampleTasks
+        getMySampleTasks,
+        deleteMySampleTask
     }) => {
     const history = useHistory();
+    const [projects, setProjects] = useState<Project[]>([]);
+    const [tasks, setTasks] = useState<number[]>([]);
 
     useEffect(() => {
         getMySampleTasks();
     }, []);
 
-    const onRemoveTask = (id: number) => {
-        // const data = sampleTasks.filter(t => t.id !== id);
+
+    function onRemoveTask(e: React.MouseEvent<HTMLElement>, id: number) {
+        e.preventDefault();
+        e.stopPropagation();
+        deleteMySampleTask(id);
+    }
+
+    function onSelectSampleTask(e: any, id: number) {
+        console.log('onSelectSampleTask', e, id)
+        if (e.target.checked) {
+            const l = [...tasks];
+            l.push(id);
+            setTasks(l);
+        } else {
+            setTasks(tasks.filter(t => t !== id));
+        }
     }
 
     const getEvents = () => {
@@ -34,16 +53,35 @@ const TemplateEvents: React.FC<TemplateEventsProps> = (
         }
 
         return <div>
-            {sampleTasks.map(sampleTask => {
-                return <div className='sample-task' onClick={() => history.push(`/sampleTasks/${sampleTask.id}`)}>
-                    <div className='remove-task-icon'>
-                        <Tooltip title='Remove this'>
-                            <CloseOutlined onClick={() => onRemoveTask(sampleTask.id)}/>
-                        </Tooltip>
+            <div className='control-task'>
+                <Tooltip title='Select All'>
+                    <CheckCircleTwoTone onClick={() => setTasks(sampleTasks.map(t => t.id))}/>
+                </Tooltip>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <Tooltip title='Deselect All'>
+                    <CloseCircleTwoTone onClick={() => setTasks([])}/>
+                </Tooltip>
+            </div>
+            <div>
+                {sampleTasks.map(sampleTask => {
+                    return <div className='sample-task' onClick={() => history.push(`/sampleTasks/${sampleTask.id}`)}>
+                        <span>
+                            <Tooltip title="Select this">
+                                <Checkbox
+                                    checked={tasks.includes(sampleTask.id)}
+                                    onClick={(e) => e.stopPropagation()}
+                                    onChange={(e) => onSelectSampleTask(e, sampleTask.id)}/>
+                            </Tooltip>
+                        </span>
+                        <div className='remove-task-icon'>
+                            <Tooltip title='Remove this'>
+                                <CloseOutlined onClick={(e) => onRemoveTask(e, sampleTask.id)}/>
+                            </Tooltip>
+                        </div>
+                        {sampleTask.name}
                     </div>
-                    {sampleTask.name}
-                </div>
-            })}
+                })}
+            </div>
         </div>
     }
     return (
@@ -68,5 +106,6 @@ const mapStateToProps = (state: IState) => ({
 });
 
 export default connect(mapStateToProps, {
-    getMySampleTasks
+    getMySampleTasks,
+    deleteMySampleTask
 })(TemplateEvents);

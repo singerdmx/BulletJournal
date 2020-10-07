@@ -12,7 +12,7 @@ import {
     SubscribedCategories,
     GetSubscribedCategories,
     UnsubscribedCategory,
-    UpdateCategorySubscription, MySampleTasksAction
+    UpdateCategorySubscription, MySampleTasksAction, DeleteSampleTaskAction
 } from './reducer';
 import { IState } from '../../store';
 import { actions as settingsActions } from '../../components/settings/reducer';
@@ -27,7 +27,11 @@ import moment from 'moment';
 import { dateFormat } from '../myBuJo/constants';
 import {expandedMyselfLoading, reloadReceived} from './actions';
 import {UserPointActivity} from "../../pages/points/interface";
-import {fetchUserSampleTasks, getUserSubscribedCategories} from "../../apis/templates/workflowApis";
+import {
+    fetchUserSampleTasks,
+    getUserSubscribedCategories,
+    removeUserSampleTask
+} from "../../apis/templates/workflowApis";
 import {SubscribedCategory} from "./interface";
 import {removeUserCategory, updateSubscription} from "../../apis/templates/categoryApis";
 import {SampleTask} from "../templates/interface";
@@ -259,6 +263,24 @@ function* getMySampleTasks(action: PayloadAction<MySampleTasksAction>) {
     }
 }
 
+function* deleteMySampleTask(action: PayloadAction<DeleteSampleTaskAction>) {
+    try {
+        const { id } = action.payload;
+        const data : SampleTask[] = yield call(removeUserSampleTask, id);
+        yield put(
+            myselfActions.sampleTasksReceived( {
+                sampleTasks: data
+            })
+        );
+    } catch (error) {
+        if (error.message === 'reload') {
+            yield put(reloadReceived(true));
+        } else {
+            yield call(message.error, `deleteMySampleTask Error Received: ${error}`);
+        }
+    }
+}
+
 export default function* myselfSagas() {
   yield all([
     yield takeLatest(
@@ -278,6 +300,7 @@ export default function* myselfSagas() {
     yield takeLatest(myselfActions.unsubscribedCategory.type, unsubscribedCategory),
     yield takeLatest(myselfActions.updateCategorySubscription.type, updateCategorySubscription),
     yield takeLatest(myselfActions.getMySampleTasks.type, getMySampleTasks),
+    yield takeLatest(myselfActions.deleteMySampleTask.type, deleteMySampleTask),
   ]);
 }
 

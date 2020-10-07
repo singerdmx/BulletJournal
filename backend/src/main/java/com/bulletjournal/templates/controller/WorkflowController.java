@@ -397,11 +397,12 @@ public class WorkflowController {
     }
 
     @DeleteMapping(REMOVE_USER_SAMPLE_TASK_ROUTE)
-    public void removeUserSampleTask(
+    public List<SampleTask> removeUserSampleTask(
             @NotNull @PathVariable Long sampleTaskId) {
         String requester = MDC.get(UserClient.USER_NAME_KEY);
         this.userSampleTaskDaoJpa.removeUserSampleTasks(requester,
                 ImmutableList.of(sampleTaskId));
+        return getUserSampleTasks();
     }
 
     private void validateRequester() {

@@ -164,3 +164,11 @@ export const auditSampleTask = (sampleTaskId: number, choiceId: number, selectio
             throw Error(err.message);
         });
 }
+
+export const removeUserSampleTask = (sampleTaskId: number) => {
+    return doDelete(`/api/userSampleTasks/${sampleTaskId}`)
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}
