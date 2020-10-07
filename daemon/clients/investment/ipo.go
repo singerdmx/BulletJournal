@@ -52,6 +52,7 @@ func NewIPOClient() (*TemplateClient, error) {
 }
 
 func (c *IPOClient) FetchData() error {
+	fmt.Println("fetching IPO")
 	year, month, _ := time.Now().Date()
 
 	var datefrom string
@@ -107,7 +108,7 @@ func (c *IPOClient) SendData() error {
 			UpdatedAt:       time.Now(),
 			Metadata:        "INVESTMENT_IPO_RECORD",
 			Content:         "",
-			Name:            target.Name,
+			Name:            fmt.Sprintf("%v (%v) goes public on %v", target.Name, target.Ticker, t),
 			Uid:             target.ID,
 			AvailableBefore: t,
 			DueDate:         target.PricingDate,
@@ -115,6 +116,7 @@ func (c *IPOClient) SendData() error {
 			Pending:         true,
 			Refreshable:     true,
 		}
+		fmt.Println(item.AvailableBefore)
 		c.sampleDao.Upsert(&item)
 	}
 

@@ -199,11 +199,12 @@ func main() {
 
 	PST, _ := time.LoadLocation("America/Los_Angeles")
 	log.Infof("PST [%T] [%v]", PST, PST)
-	year, month, day := time.Now().AddDate(0, 0, daemonRpc.serviceConfig.IntervalInDays).In(PST).Date()
-	start := time.Date(year, month, day, 0, 0, 0, 0, PST)
+	start := time.Now()
 
 	daemonBackgroundJob := daemon.Job{Cleaner: cleaner, Reminder: daemon.Reminder{}, Investment: daemon.Investment{}}
 	log.Infof("The next daemon job will start at %v", start.Format(time.RFC3339))
+	log.Infof("And Now it's %v", time.Now().Format(time.RFC3339))
+
 	jobScheduler.AddRecurrentJob(
 		daemonBackgroundJob.Run,
 		start,
