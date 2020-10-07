@@ -156,7 +156,7 @@ public class SampleTaskDaoJpa {
         sampleTask.setPending(false);
         String originalKeyword = sampleTask.getMetadata();
         List<SelectionMetadataKeyword> keywords =
-                this.selectionMetadataKeywordDaoJpa.getKeywordsBySelections(auditSampleTaskParams.getSelections());
+                this.selectionMetadataKeywordDaoJpa.getKeywordsBySelectionsWithoutFrequency(auditSampleTaskParams.getSelections());
         for (SelectionMetadataKeyword keyword : keywords) {
             sampleTask.setMetadata(sampleTask.getMetadata() + "," + keyword.getKeyword());
         }
