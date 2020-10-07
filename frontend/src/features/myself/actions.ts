@@ -40,3 +40,5 @@ export const unsubscribedCategory = (categoryId: number, selectionId: number) =>
 export const updateCategorySubscription = (categoryId: number, selectionId: number, projectId: number) => actions.updateCategorySubscription({
     categoryId: categoryId, selectionId: selectionId, projectId: projectId
 });
+
+export const getMySampleTasks = () => actions.getMySampleTasks({});

@@ -18,6 +18,7 @@ import com.bulletjournal.templates.repository.model.*;
 import com.bulletjournal.templates.workflow.engine.RuleEngine;
 import com.bulletjournal.templates.workflow.models.RuleExpression;
 import com.bulletjournal.util.DeltaContent;
+import com.bulletjournal.util.DeltaConverter;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
@@ -304,6 +305,7 @@ public class WorkflowController {
         if (StringUtils.isBlank(content)) {
             content = DeltaContent.EMPTY_CONTENT;
         }
+        content = DeltaConverter.supplementContentText(content, false);
         return new Content(this.userDaoJpa.isAdmin(requester) ? sampleTaskId : 0L,
                 user, content, content,
                 System.currentTimeMillis(), System.currentTimeMillis(), "");
@@ -369,14 +371,6 @@ public class WorkflowController {
         return this.sampleTaskDaoJpa.auditSampleTask(sampleTaskId, auditSampleTaskParams).toPresentationModel();
     }
 
-    private void validateRequester() {
-        String requester = MDC.get(UserClient.USER_NAME_KEY);
-
-        if (!this.userDaoJpa.isAdmin(requester)) {
-            throw new UnAuthorizedException("User: " + requester + " is not admin");
-        }
-    }
-
     @GetMapping(USER_SAMPLE_TASKS_ROUTE)
     public List<SampleTask> getUserSampleTasks() {
         String requester = MDC.get(UserClient.USER_NAME_KEY);
@@ -397,4 +391,11 @@ public class WorkflowController {
         this.userSampleTaskDaoJpa.removeUserSampleTasks(requester, removeUserSampleTasksParams.getSampleTaskIds());
     }
 
+    private void validateRequester() {
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+
+        if (!this.userDaoJpa.isAdmin(requester)) {
+            throw new UnAuthorizedException("User: " + requester + " is not admin");
+        }
+    }
 }

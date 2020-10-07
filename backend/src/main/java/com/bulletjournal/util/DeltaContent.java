@@ -16,7 +16,7 @@ public class DeltaContent {
     public static final String MDELTA = "mdelta";
     public static final String HTML_TAG = "###html###";
     public static final String EMPTY_CONTENT = "{\"delta\":{\"ops\":[{\"insert\":\" \\n\"}]}," +
-            "\"mdelta\":[{\"insert\":\" \\n\"}],\"###html###\":\"<p> </p>\"}";
+            "\"###html###\":\"<p> </p>\"}";
     private static final Gson GSON = new GsonBuilder().
             registerTypeAdapter(Double.class,  new JsonSerializer<Double>() {
                 @Override

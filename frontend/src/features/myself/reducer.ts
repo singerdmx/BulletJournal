@@ -1,6 +1,7 @@
 import {createSlice, PayloadAction} from 'redux-starter-kit';
 import {UserPointActivity} from "../../pages/points/interface";
 import {SubscribedCategory} from "./interface";
+import {SampleTask} from "../templates/interface";
 
 export type MyselfWithAvatar = {
   username?: string;
@@ -57,6 +58,12 @@ export type UpdateCategorySubscription = {
   projectId: number;
 };
 
+export type MySampleTasksAction = {};
+
+export type SampleTasksAction = {
+  sampleTasks: SampleTask[];
+};
+
 export type UserPointActivities = {
    userPointActivities: UserPointActivity[];
 };
@@ -78,6 +85,7 @@ let initialState = {
   reload: false,
   userPointActivities: [] as Array<UserPointActivity>,
   subscribedCategories: [] as SubscribedCategory[],
+  sampleTasks: [] as SampleTask[],
 };
 
 const slice = createSlice({
@@ -142,6 +150,14 @@ const slice = createSlice({
     getSubscribedCategories: (state, action: PayloadAction<GetSubscribedCategories>) => state,
     unsubscribedCategory: (state, action: PayloadAction<UnsubscribedCategory>) => state,
     updateCategorySubscription: (state, action: PayloadAction<UpdateCategorySubscription>) => state,
+    getMySampleTasks: (state, action: PayloadAction<MySampleTasksAction>) => state,
+    sampleTasksReceived: (
+        state,
+        action: PayloadAction<SampleTasksAction>
+    ) => {
+      const { sampleTasks } = action.payload;
+      state.sampleTasks = sampleTasks;
+    },
   },
 });
 
