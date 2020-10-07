@@ -4,13 +4,15 @@ import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.User;
-import com.bulletjournal.templates.controller.model.ImportTasksParams;
+import com.bulletjournal.templates.controller.model.RemoveUserSampleTasksParams;
 import com.bulletjournal.templates.repository.*;
 import com.bulletjournal.templates.repository.model.SampleTask;
 import com.bulletjournal.templates.repository.model.SampleTaskRule;
 import com.bulletjournal.templates.repository.model.Selection;
 import com.bulletjournal.templates.repository.model.SelectionMetadataKeyword;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class RuleEngine {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RuleEngine.class);
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
@@ -48,7 +51,8 @@ public class RuleEngine {
     private SelectionMetadataKeywordDaoJpa selectionMetadataKeywordDaoJpa;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<com.bulletjournal.templates.controller.model.SampleTask> importTasks(String requester, ImportTasksParams importTasksParams) {
+    public List<com.bulletjournal.templates.controller.model.SampleTask> importTasks(
+            String requester, RemoveUserSampleTasksParams importTasksParams, int frequency) {
         List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasks = sampleTaskDaoJpa
                 .findAllById(importTasksParams.getSampleTasks()).stream().map(SampleTask::toPresentationModel).collect(Collectors.toList());
         // if there is any sample task that does not have due date, we need to set due date for it
@@ -72,7 +76,7 @@ public class RuleEngine {
                 startDay = ZonedDateTimeHelper.getStartTime(
                         ZonedDateTime.now().plusDays(1).format(ZonedDateTimeHelper.DATE_FORMATTER), null, timezone);
             }
-            int frequency = getTimesOneDay(importTasksParams.getSelections());
+
             int startIndex = 0;
             int numOfDay = 0;
             while (startIndex < tasksNeedTimingArrangement.size()) {
@@ -97,7 +101,7 @@ public class RuleEngine {
         return sampleTasks;
     }
 
-    private int getTimesOneDay(List<Long> selections) {
+    public int getTimesOneDay(List<Long> selections) {
         Optional<SelectionMetadataKeyword> selectionMetadataKeyword =
                 this.selectionMetadataKeywordDaoJpa.getFrequencyBySelections(selections)
                         .stream().findFirst();
@@ -105,6 +109,7 @@ public class RuleEngine {
             return selectionMetadataKeyword.get().getFrequency();
         }
 
+        LOGGER.error("Unable to get frequency for {}", selections);
         return 6;
     }
 

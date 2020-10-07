@@ -265,7 +265,8 @@ public class WorkflowController {
                 sampleTasksRedisCache.deleteById(scrollId);
             });
         }
-        List<SampleTask> sampleTasks = this.ruleEngine.importTasks(username, importTasksParams);
+        int frequency = this.ruleEngine.getTimesOneDay(importTasksParams.getSelections());
+        List<SampleTask> sampleTasks = this.ruleEngine.importTasks(username, importTasksParams, frequency);
         if (importTasksParams.isSubscribed()) {
             this.userCategoryDaoJpa.upsertUserCategories(username, importTasksParams.getCategoryId(),
                     importTasksParams.getSelections(), importTasksParams.getProjectId());
@@ -404,6 +405,7 @@ public class WorkflowController {
     public List<SampleTask> removeUserSampleTasks(
             @Valid @RequestBody RemoveUserSampleTasksParams removeUserSampleTasksParams) {
         String requester = MDC.get(UserClient.USER_NAME_KEY);
+        this.ruleEngine.importTasks(requester, removeUserSampleTasksParams, 6);
         this.userSampleTaskDaoJpa.removeUserSampleTasks(requester, removeUserSampleTasksParams.getSampleTasks());
         return getUserSampleTasks();
     }
