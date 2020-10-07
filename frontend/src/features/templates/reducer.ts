@@ -210,6 +210,7 @@ export type UpdateSampleTaskAction = {
     uid: string;
     content: string;
     metadata: string;
+    pending: boolean;
 };
 
 export type GetSampleTasksByScrollIdAction = {

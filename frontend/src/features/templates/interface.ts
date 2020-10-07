@@ -67,6 +67,7 @@ export interface SampleTask {
     uid: string;
     steps: Step[];
     choice?: Choice;
+    pending: boolean;
 }
 
 export interface SampleTasks {
