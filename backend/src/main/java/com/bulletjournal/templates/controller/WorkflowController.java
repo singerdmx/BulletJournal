@@ -44,6 +44,10 @@ public class WorkflowController {
     public static final String CATEGORY_STEPS_ROUTE = "/api/categories/{categoryId}/steps";
     public static final String SUBSCRIBED_CATEGORIES_ROUTE = "/api/subscribedCategories";
     public static final String AUDIT_SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}/audit";
+    public static final String USER_SAMPLE_TASKS_ROUTE = "/api/userSampleTasks";
+    public static final String REMOVE_USER_SAMPLE_TASK_ROUTE = "/api/removeUserSampleTasks";
+
+
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
@@ -71,6 +75,10 @@ public class WorkflowController {
 
     @Autowired
     private UserClient userClient;
+
+    @Autowired
+    private UserSampleTaskDaoJpa userSampleTaskDaoJpa;
+
 
     private static final Gson GSON = new Gson();
 
@@ -366,4 +374,25 @@ public class WorkflowController {
             throw new UnAuthorizedException("User: " + requester + " is not admin");
         }
     }
+
+    @GetMapping(USER_SAMPLE_TASKS_ROUTE)
+    public List<SampleTask> getUserSampleTasks() {
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+        List<UserSampleTask> userSampleTasks =  userSampleTaskDaoJpa.getUserSampleTaskByUserName(requester);
+
+        List<SampleTask> sampleTasks = new ArrayList<>();
+        for (UserSampleTask userSampleTask: userSampleTasks) {
+            sampleTasks.add(userSampleTask.getSampleTask().toPresentationModel());
+        }
+
+        return sampleTasks;
+    }
+
+    @DeleteMapping(REMOVE_USER_SAMPLE_TASK_ROUTE)
+    public void removeUserSampleTasks(
+            @Valid @RequestBody RemoveUserSampleTasksParams removeUserSampleTasksParams) {
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+        this.userSampleTaskDaoJpa.removeUserSampleTasks(requester, removeUserSampleTasksParams.getSampleTaskIds());
+    }
+
 }
