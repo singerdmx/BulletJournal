@@ -59,13 +59,14 @@ public class RuleEngine {
         List<com.bulletjournal.templates.controller.model.SampleTask> tasksNeedTimingArrangement = sampleTasks.stream()
                 .filter(t -> StringUtils.isBlank(t.getDueDate())).collect(Collectors.toList());
 
-        User user = this.userDaoJpa.getByName(requester);
-
-        String timezone = importTasksParams.getTimezone();
-        if (StringUtils.isBlank(timezone)) {
-            timezone = user.getTimezone();
-        }
         if (!tasksNeedTimingArrangement.isEmpty()) {
+            User user = this.userDaoJpa.getByName(requester);
+
+            String timezone = importTasksParams.getTimezone();
+            if (StringUtils.isBlank(timezone)) {
+                timezone = user.getTimezone();
+            }
+
             tasksNeedTimingArrangement.sort(Comparator.comparingInt(a -> Integer.parseInt(a.getUid())));
             // calculate start date
             ZonedDateTime startDay;
@@ -94,7 +95,7 @@ public class RuleEngine {
         this.taskDaoJpa.createTaskFromSampleTask(
                 importTasksParams.getProjectId(),
                 requester,
-                tasksNeedTimingArrangement,
+                sampleTasks,
                 importTasksParams.getReminderBefore(),
                 importTasksParams.getAssignees(),
                 importTasksParams.getLabels());
