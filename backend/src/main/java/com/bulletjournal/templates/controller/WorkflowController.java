@@ -265,7 +265,18 @@ public class WorkflowController {
                 sampleTasksRedisCache.deleteById(scrollId);
             });
         }
-        return this.ruleEngine.importTasks(username, importTasksParams);
+        List<SampleTask> sampleTasks = this.ruleEngine.importTasks(username, importTasksParams);
+        if (importTasksParams.isSubscribed()) {
+            this.userCategoryDaoJpa.upsertUserCategories(username, importTasksParams.getCategoryId(),
+                    importTasksParams.getSelections(), importTasksParams.getProjectId());
+        }
+
+        sampleTasks.forEach(sampleTask -> {
+            sampleTask.setContent(null);
+            sampleTask.setUid(null);
+            sampleTask.setMetadata(null);
+        });
+        return sampleTasks;
     }
 
     @PostMapping(SAMPLE_TASKS_ROUTE)

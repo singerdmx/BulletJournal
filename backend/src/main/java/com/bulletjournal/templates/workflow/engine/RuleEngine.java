@@ -1,13 +1,15 @@
 package com.bulletjournal.templates.workflow.engine;
 
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
-import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.templates.controller.model.ImportTasksParams;
 import com.bulletjournal.templates.repository.*;
-import com.bulletjournal.templates.repository.model.*;
+import com.bulletjournal.templates.repository.model.SampleTask;
+import com.bulletjournal.templates.repository.model.SampleTaskRule;
+import com.bulletjournal.templates.repository.model.Selection;
+import com.bulletjournal.templates.repository.model.SelectionMetadataKeyword;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,9 +43,6 @@ public class RuleEngine {
 
     @Autowired
     private TaskDaoJpa taskDaoJpa;
-
-    @Autowired
-    private UserCategoryDaoJpa userCategoryDaoJpa;
 
     @Autowired
     private SelectionMetadataKeywordDaoJpa selectionMetadataKeywordDaoJpa;
@@ -88,25 +87,25 @@ public class RuleEngine {
             }
         }
 
-        this.taskDaoJpa.createTaskFromSampleTask(importTasksParams.getProjectId(), requester, tasksNeedTimingArrangement, importTasksParams.getReminderBefore(), importTasksParams.getAssignees(), importTasksParams.getLabels());
-
-        if (importTasksParams.isSubscribed()) {
-            this.userCategoryDaoJpa.upsertUserCategories(user, importTasksParams.getCategoryId(),
-                    importTasksParams.getSelections(), importTasksParams.getProjectId());
-        }
-
-        sampleTasks.forEach(sampleTask -> {
-            sampleTask.setContent(null);
-            sampleTask.setUid(null);
-            sampleTask.setMetadata(null);
-        });
+        this.taskDaoJpa.createTaskFromSampleTask(
+                importTasksParams.getProjectId(),
+                requester,
+                tasksNeedTimingArrangement,
+                importTasksParams.getReminderBefore(),
+                importTasksParams.getAssignees(),
+                importTasksParams.getLabels());
         return sampleTasks;
     }
 
     private int getTimesOneDay(List<Long> selections) {
-        return this.selectionMetadataKeywordDaoJpa.getFrequencyBySelections(selections)
-                .stream().findFirst().orElseThrow(
-                () -> new BadRequestException("Selections missing intensity")).getFrequency();
+        Optional<SelectionMetadataKeyword> selectionMetadataKeyword =
+                this.selectionMetadataKeywordDaoJpa.getFrequencyBySelections(selections)
+                        .stream().findFirst();
+        if (selectionMetadataKeyword.isPresent()) {
+            return selectionMetadataKeyword.get().getFrequency();
+        }
+
+        return 6;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
