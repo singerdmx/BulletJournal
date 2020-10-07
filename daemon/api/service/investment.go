@@ -16,7 +16,7 @@ func (i *Investment) pull(params ...interface{}) {
 
 	ipoClient,_ := investment.NewTemplateClient(investment.IPOTemplate)
 	earningClient,_ := investment.NewTemplateClient(investment.EarningsTemplate)
-	dividendsClient,_ := investment.NewTemplateClient(investment.Dividen)
+	dividendsClient,_ := investment.NewTemplateClient(investment.DividendsTemplate)
 
 	ipoClient.FetchData()
 	ipoClient.SendData()
