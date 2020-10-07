@@ -42,9 +42,6 @@ public class ChoiceDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Choice save(String name, boolean multiple, boolean instructionIncluded) {
-        if (choiceRepository.getByName(name) != null) {
-            throw new ResourceAlreadyExistException("Choice with name " + name + " already exists.");
-        }
         Choice choice = new Choice(name, multiple, instructionIncluded);
         return choiceRepository.save(choice);
     }
