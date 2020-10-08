@@ -1,3 +1,5 @@
+// https://github.com/chenjuneking/quill-image-drop-and-paste
+
 class ImageData {
 
     constructor(dataUrl, type) {
