@@ -136,6 +136,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
       editor.insertEmbed(range.index, 'image', `${placeholder}`);
       try {
         const res = await apiPostNewsImage(formData); // API post, returns image location as string e.g. 'http://www.example.com/images/foo.png'
+        console.log("apiPostNewsImage", res)
         editor.deleteText(range.index, 1);
         const link = res.data;
         editor.insertEmbed(range.index, 'image', link);
@@ -147,6 +148,63 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = ({
     };
   };
   modules.toolbar.handlers = { image: imageUploader };
+
+  /**
+   * Do something to our dropped or pasted image
+   * @param.imageDataUrl {string} - image's dataURL
+   * @param.type {string} - image's mime type
+   * @param.imageData {object} - provided more functions to handle the image
+   *   - imageData.toBlob() {function} - convert image to a BLOB Object
+   *   - imageData.toFile(filename) {function} - convert image to a File Object
+   *   - imageData.minify(options) {function)- minify the image, return a promise
+   *      - options.maxWidth {number} - specify the max width of the image, default is 800
+   *      - options.maxHeight {number} - specify the max height of the image, default is 800
+   *      - options.quality {number} - specify the quality of the image, default is 0.8
+   */
+  const imageDropAndPasteHandler = (imageDataUrl: string, type: string, imageData: any) => {
+    if (!quillRef) return;
+    const editor = quillRef.current!.getEditor();
+    const filename = 'my_cool_image.png'
+    const blob = imageData.toBlob();
+    const file = imageData.toFile(filename)
+
+    // generate a form data
+    const formData = new FormData()
+
+    // append blob data
+    formData.append('filename', filename);
+    formData.append('file', blob);
+
+    // or just append the file
+    formData.append('image', file);
+
+    console.log(formData);
+
+    // Save current cursor state
+    const range = editor.getSelection(true);
+    editor.insertEmbed(range.index, 'image', `${placeholder}`);
+    try {
+      // const res = await apiPostNewsImage(formData); // API post, returns image location as string e.g. 'http://www.example.com/images/foo.png'
+      // console.log("apiPostNewsImage", res)
+      // editor.deleteText(range.index, 1);
+      // const link = res.data;
+      // editor.insertEmbed(range.index, 'image', link);
+    } catch (e) {
+      // message.error(e.response);
+      console.log(e.response.data.message);
+    }
+    // upload image to your server
+    // callUploadAPI(your_upload_url, formData, (err, res) => {
+    //   if (err) return
+    //   // success? you should return the uploaded image's url
+    //   // then insert into the quill editor
+    //   let index = (quill.getSelection() || {}).index;
+    //   if (index < 0) index = quill.getLength();
+    //   quill.insertEmbed(index, 'image', res.data.image_url, 'user')
+    // })
+  }
+
+  // modules.imageDropAndPaste = { handler: imageDropAndPasteHandler};
 
   //general create content function
   const createContentCall: { [key in ContentType]: Function } = {

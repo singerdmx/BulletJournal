@@ -1,15 +1,15 @@
-import ReactQuill, { Quill } from 'react-quill';
+import {Quill} from 'react-quill';
 import quillEmoji from 'quill-emoji';
 import 'quill-emoji/dist/quill-emoji.css';
 import 'react-quill/dist/quill.snow.css';
-import { message } from 'antd';
 import axios from 'axios';
 import ImageResize from '../../utils/image-resize/ImageResize';
 import ImageFormat from '../../utils/image-resize/ImageFormat';
-const DragAndDropModule = require('quill-drag-and-drop-module');
-
+// const QuillImageDropAndPaste = require('quill-image-drop-and-paste');
+import QuillImageDropAndPaste from '../../utils/image-drop-and-paste/quill-image-drop-and-paste.min';
 
 Quill.register('modules/imageResize', ImageResize);
+Quill.register('modules/imageDropAndPaste', QuillImageDropAndPaste);
 Quill.register(ImageFormat, true);
 
 // Custom Undo button çicon component for Quill editor. You can import it directly
@@ -47,6 +47,7 @@ Quill.register(ImageFormat, true);
 // }
 
 const apiPostNewsImage = (formData: FormData) => {
+  console.log(formData)
   const uploadConfig = {
     headers: {
       'Content-Type': 'multipart/form-data',
@@ -111,12 +112,8 @@ export const modules = {
     ],
     handlers: {},
   },
-  dragAndDrop: {
-    draggables: [{
-      content_type_pattern:'^image/',
-      tag:'img',
-      attr:'src'
-    }]
+  imageDropAndPaste: {
+    handler: (imageDataUrl: string, type: string, imageData: any) => {}
   },
   'emoji-toolbar': true,
   'emoji-shortname': true,
@@ -150,6 +147,8 @@ export const formats = [
   'height',
   'alt'
 ];
+
+
 
 // // Quill Toolbar component
 // export const QuillToolbar = () => (
