@@ -42,8 +42,18 @@ public class WorkflowControllerTest {
         restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
     }
 
+    /**
+     * Tests {@link WorkflowController#importSampleTasks(ImportTasksParams)}
+     */
     @Test
-    public void testWorkflow() {
+    public void testWorkflowImportTasksParams() {
+    }
+
+    /**
+     * Tests {@link WorkflowController#getNext(Long, List, List, boolean)}
+     */
+    @Test
+    public void testWorkflowGetNext() {
         CreateStepParams createStepParams1 = new CreateStepParams();
         createStepParams1.setName("step1");
         Step step1 = createStep(createStepParams1);
