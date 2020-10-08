@@ -6,6 +6,7 @@ import com.bulletjournal.templates.controller.RuleController;
 import com.bulletjournal.templates.controller.StepController;
 import com.bulletjournal.templates.controller.WorkflowController;
 import com.bulletjournal.templates.controller.model.*;
+import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,7 +47,32 @@ public class WorkflowControllerTest {
      * Tests {@link WorkflowController#importSampleTasks(ImportTasksParams)}
      */
     @Test
-    public void testWorkflowImportTasksParams() {
+    public void testWorkflowImportTasks() {
+        ImportTasksParams importTasksParams = new ImportTasksParams();
+        importTasksParams.setSampleTasks(ImmutableList.of(1479L, 1412L, 1384L, 1369L, 1159L, 1336L, 1225L, 1194L, 1127L, 1097L, 618L, 615L, 601L, 579L, 571L, 569L, 262L, 185L, 618L, 615L, 601L, 579L, 571L, 569L, 262L, 185L));
+        importTasksParams.setCategoryId(13L);
+        importTasksParams.setSelections(ImmutableList.of(56L, 15L, 248L));
+        importTasksParams.setScrollId("");
+        importTasksParams.setProjectId(16L);
+        importTasksParams.setSubscribed(true);
+        importTasksParams.setAssignees(ImmutableList.of("BulletJournal"));
+        importTasksParams.setLabels(ImmutableList.of());
+        importTasksParams.setTimezone("America/Los_Angeles");
+        importTasksParams.setStartDate("2020-10-01");
+        checkImportTasksParamsWorkflow(importTasksParams);
+    }
+
+    private List<SampleTask> checkImportTasksParamsWorkflow(ImportTasksParams importTasksParams) {
+        ResponseEntity<SampleTask[]> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + WorkflowController.SAMPLE_TASKS_IMPORT_ROUTE,
+                HttpMethod.POST,
+                TestHelpers.actAsOtherUser(importTasksParams, USER),
+                SampleTask[].class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        List<SampleTask> sampleTasks = Arrays.asList(response.getBody());
+        assertNotNull(sampleTasks);
+        assertEquals(18, sampleTasks.size());
+        return sampleTasks;
     }
 
     /**
