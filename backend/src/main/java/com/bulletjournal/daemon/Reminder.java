@@ -58,12 +58,12 @@ public class Reminder {
     public void postConstruct() {
         LOGGER.info(reminderConfig.toString());
 
-//        this.initLoad();
-//
-//        executorService.scheduleWithFixedDelay(this::cronJob,
-//                SECONDS_OF_DAY - ZonedDateTimeHelper.getPassedSecondsOfDay(reminderConfig.getTimeZone()),
-//                this.reminderConfig.getCronJobSeconds(),
-//                TimeUnit.SECONDS);
+        this.initLoad();
+
+        executorService.scheduleWithFixedDelay(this::cronJob,
+                SECONDS_OF_DAY - ZonedDateTimeHelper.getPassedSecondsOfDay(reminderConfig.getTimeZone()),
+                this.reminderConfig.getCronJobSeconds(),
+                TimeUnit.SECONDS);
     }
 
     private void initLoad() {
