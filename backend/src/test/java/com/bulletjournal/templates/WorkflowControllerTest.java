@@ -1,11 +1,15 @@
 package com.bulletjournal.templates;
 
+import com.bulletjournal.controller.TaskController;
+import com.bulletjournal.controller.models.Content;
+import com.bulletjournal.controller.models.Task;
 import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.templates.controller.CategoryController;
 import com.bulletjournal.templates.controller.RuleController;
 import com.bulletjournal.templates.controller.StepController;
 import com.bulletjournal.templates.controller.WorkflowController;
 import com.bulletjournal.templates.controller.model.*;
+import com.bulletjournal.util.DeltaContent;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,8 +28,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -47,7 +50,7 @@ public class WorkflowControllerTest {
      * Tests {@link WorkflowController#importSampleTasks(ImportTasksParams)}
      */
     @Test
-    public void testWorkflowImportTasks() {
+    public void testWorkflowImportTasks() throws Exception {
         ImportTasksParams importTasksParams = new ImportTasksParams();
         importTasksParams.setSampleTasks(ImmutableList.of(1479L, 1412L, 1384L, 1369L, 1159L, 1336L, 1225L, 1194L, 1127L, 1097L, 618L, 615L, 601L, 579L, 571L, 569L, 262L, 185L, 618L, 615L, 601L, 579L, 571L, 569L, 262L, 185L));
         importTasksParams.setCategoryId(13L);
@@ -59,10 +62,11 @@ public class WorkflowControllerTest {
         importTasksParams.setLabels(ImmutableList.of());
         importTasksParams.setTimezone("America/Los_Angeles");
         importTasksParams.setStartDate("2020-10-01");
+        importTasksParams.setReminderBefore(1);
         checkImportTasksParamsWorkflow(importTasksParams);
     }
 
-    private List<SampleTask> checkImportTasksParamsWorkflow(ImportTasksParams importTasksParams) {
+    private List<SampleTask> checkImportTasksParamsWorkflow(ImportTasksParams importTasksParams) throws Exception {
         ResponseEntity<SampleTask[]> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + WorkflowController.SAMPLE_TASKS_IMPORT_ROUTE,
                 HttpMethod.POST,
@@ -72,6 +76,44 @@ public class WorkflowControllerTest {
         List<SampleTask> sampleTasks = Arrays.asList(response.getBody());
         assertNotNull(sampleTasks);
         assertEquals(18, sampleTasks.size());
+
+        // Get Tasks
+        ResponseEntity<Task[]> tasksResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Task[].class,
+                16);
+        List<Task> tasks = Arrays.asList(tasksResponse.getBody());
+        assertEquals(18, tasks.size());
+        for (int i = 0; i < 16; i++) {
+            Task task = tasks.get(i);
+            assertEquals("America/Los_Angeles", task.getTimezone());
+            assertEquals("2020-10-0" + (i / 4 + 1), task.getDueDate());
+            assertEquals(18 + (i % 4) + ":00", task.getDueTime());
+            assertEquals(1, task.getReminderSetting().getBefore().intValue());
+            assertEquals(60, task.getDuration().intValue());
+            assertNull(task.getRecurrenceRule());
+            assertNull(task.getStatus());
+
+            Thread.sleep(1500);
+            ResponseEntity<Content[]> contentResponse = this.restTemplate.exchange(
+                    ROOT_URL + randomServerPort + TaskController.CONTENTS_ROUTE,
+                    HttpMethod.GET,
+                    null,
+                    Content[].class,
+                    task.getId());
+
+            assertEquals(HttpStatus.OK, contentResponse.getStatusCode());
+            Content[] contents = contentResponse.getBody();
+            assertEquals(1, contents.length);
+            Content content = contents[0];
+            assertEquals("BulletJournal", content.getOwner().getName());
+            assertNotNull(content.getId());
+            assertNotNull(content.getText());
+            assertTrue(content.getText().contains(DeltaContent.DELTA));
+            assertTrue(content.getText().contains(DeltaContent.HTML_TAG));
+        }
         return sampleTasks;
     }
 
