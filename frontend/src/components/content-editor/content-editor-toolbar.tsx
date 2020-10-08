@@ -1,15 +1,14 @@
-import ReactQuill, { Quill } from 'react-quill';
+import {Quill} from 'react-quill';
 import quillEmoji from 'quill-emoji';
 import 'quill-emoji/dist/quill-emoji.css';
 import 'react-quill/dist/quill.snow.css';
-import { message } from 'antd';
 import axios from 'axios';
 import ImageResize from '../../utils/image-resize/ImageResize';
 import ImageFormat from '../../utils/image-resize/ImageFormat';
-const DragAndDropModule = require('quill-drag-and-drop-module');
-
+import ImageDropAndPaste from '../../utils/image-drop-and-paste/quill-image-drop-and-paste';
 
 Quill.register('modules/imageResize', ImageResize);
+Quill.register('modules/imageDropAndPaste', ImageDropAndPaste);
 Quill.register(ImageFormat, true);
 
 // Custom Undo button çicon component for Quill editor. You can import it directly
@@ -111,13 +110,7 @@ export const modules = {
     ],
     handlers: {},
   },
-  dragAndDrop: {
-    draggables: [{
-      content_type_pattern:'^image/',
-      tag:'img',
-      attr:'src'
-    }]
-  },
+  imageDropAndPaste: {},
   'emoji-toolbar': true,
   'emoji-shortname': true,
   'emoji-textarea': false,
