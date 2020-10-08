@@ -343,6 +343,7 @@ public class WorkflowController {
         validateRequester();
         List<SampleTask> sampleTasks = sampleTaskDaoJpa.findSampleTasksByMetadataFilter(metadataFilter).stream()
                 .map(com.bulletjournal.templates.repository.model.SampleTask::toPresentationModel)
+                .sorted(Comparator.comparingLong(SampleTask::getId))
                 .collect(Collectors.toList());
 
         sampleTasks.forEach(s -> s.setContent(null));

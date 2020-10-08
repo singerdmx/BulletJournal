@@ -67,7 +67,12 @@ public class RuleEngine {
                 timezone = user.getTimezone();
             }
 
-            tasksNeedTimingArrangement.sort(Comparator.comparingInt(a -> Integer.parseInt(a.getUid())));
+            if (tasksNeedTimingArrangement.stream().allMatch(t -> StringUtils.isNumeric(t.getUid().trim()))) {
+                tasksNeedTimingArrangement.sort(Comparator.comparingInt(a -> Integer.parseInt(a.getUid().trim())));
+            } else {
+                tasksNeedTimingArrangement.sort(
+                        Comparator.comparing(com.bulletjournal.templates.controller.model.SampleTask::getUid));
+            }
             // calculate start date
             ZonedDateTime startDay;
             if (StringUtils.isNotBlank(importTasksParams.getStartDate())) {
