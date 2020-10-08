@@ -54,43 +54,6 @@ const apiPostNewsImage = (formData: FormData) => {
   };
   return axios.post('/api/uploadFile', formData, uploadConfig);
 };
-// uploader event handler
-export const imageHandler = (quillRef: ReactQuill | null) => {
-  console.log('uploading');
-  console.log(quillRef);
-  if (!quillRef) return;
-  const editor = quillRef.getEditor();
-  const input = document.createElement('input');
-  input.setAttribute('type', 'file');
-  input.setAttribute('accept', 'image/*');
-  input.click();
-  console.log('start upload');
-  input.onchange = async () => {
-    const file = input.files![0];
-    const formData = new FormData();
-    if (file.size > 20 * 1024 * 1024) {
-      message.error('The file can not be larger than 20MB');
-      return;
-    }
-
-    if (!file.type.match('image.*')) {
-      message.error('The file can only be image');
-      return;
-    }
-
-    formData.append('image', file);
-
-    // Save current cursor state
-    const range = editor.getSelection(true);
-
-    const res = await apiPostNewsImage(formData); // API post, returns image location as string e.g. 'http://www.example.com/images/foo.png'
-    const link = res.data;
-
-    // Insert uploaded image
-    // this.quill.insertEmbed(range.index, 'image', res.body.image);
-    editor.insertEmbed(range.index, 'image', link);
-  };
-};
 
 // Add emojii to whitelist and register them
 const { EmojiBlot, ShortNameEmoji, ToolbarEmoji, TextAreaEmoji } = quillEmoji;
