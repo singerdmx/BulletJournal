@@ -92,6 +92,9 @@ public class RuleEngine {
             }
         }
 
+        sampleTasks.sort(
+                Comparator.comparing(s -> (s.getDueDate() + (StringUtils.isBlank(s.getDueTime()) ? "00:00" : s.getDueTime()))));
+
         this.taskDaoJpa.createTaskFromSampleTask(
                 importTasksParams.getProjectId(),
                 requester,
