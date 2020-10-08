@@ -342,9 +342,10 @@ public class WorkflowController {
         // http://localhost:8080/api/sampleTasks?filter={filter}
         validateRequester();
         List<SampleTask> sampleTasks = sampleTaskDaoJpa.findSampleTasksByMetadataFilter(metadataFilter).stream()
-                .map(com.bulletjournal.templates.repository.model.SampleTask::toSimplePresentationModel)
+                .map(com.bulletjournal.templates.repository.model.SampleTask::toPresentationModel)
                 .collect(Collectors.toList());
 
+        sampleTasks.forEach(s -> s.setContent(null));
         return sampleTasks;
     }
 
