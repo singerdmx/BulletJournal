@@ -39,7 +39,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectItemDaoJpa.class);
     private static final Gson GSON = new Gson();
 
-    private static final int CONTENT_BATCH_SIZE = 3;
+    private static final int CONTENT_BATCH_SIZE = 18;
 
     @Autowired
     protected LabelDaoJpa labelDaoJpa;

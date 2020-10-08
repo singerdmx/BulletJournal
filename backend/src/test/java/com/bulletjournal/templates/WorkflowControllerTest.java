@@ -86,6 +86,7 @@ public class WorkflowControllerTest {
                 16);
         List<Task> tasks = Arrays.asList(tasksResponse.getBody());
         assertEquals(18, tasks.size());
+        Thread.sleep(3000);
         for (int i = 0; i < 16; i++) {
             Task task = tasks.get(i);
             assertEquals("America/Los_Angeles", task.getTimezone());
@@ -96,7 +97,6 @@ public class WorkflowControllerTest {
             assertNull(task.getRecurrenceRule());
             assertNull(task.getStatus());
 
-            Thread.sleep(1500);
             ResponseEntity<Content[]> contentResponse = this.restTemplate.exchange(
                     ROOT_URL + randomServerPort + TaskController.CONTENTS_ROUTE,
                     HttpMethod.GET,
