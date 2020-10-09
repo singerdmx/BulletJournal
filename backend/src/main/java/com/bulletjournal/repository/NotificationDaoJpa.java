@@ -1,18 +1,18 @@
 package com.bulletjournal.repository;
 
+import com.bulletjournal.clients.DaemonServiceClient;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.utils.EtagGenerator;
-import com.bulletjournal.clients.DaemonServiceClient;
 import com.bulletjournal.notifications.Action;
 import com.bulletjournal.notifications.Informed;
 import com.bulletjournal.notifications.JoinGroupEvent;
-import com.bulletjournal.protobuf.daemon.grpc.types.Event;
-import com.bulletjournal.protobuf.daemon.grpc.types.JoinGroupEvents;
 import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.factory.Etaggable;
 import com.bulletjournal.repository.models.Notification;
+import com.bulletjournal.util.StringUtil;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -74,29 +74,8 @@ public class NotificationDaoJpa implements Etaggable {
             notifications.addAll(list);
         });
         this.notificationRepository.saveAll(notifications);
-        sendEmail(joinGroupEventNotifications);
-    }
-
-    private void sendEmail(List<Notification> joinGroupEventNotifications) {
-        List<Event> eventListProto = new ArrayList<>();
-        joinGroupEventNotifications.forEach((notification -> {
-            Event event = Event.newBuilder()
-                    .setContentId(notification.getContentId())
-                    .setTargetUser(notification.getTargetUser())
-                    .setContentName(notification.getContent() == null ? "" : notification.getContent())
-                    .setOriginatorAlias(notification.getOriginator())
-                    .setNotificationId(notification.getId())
-                    .build();
-            eventListProto.add(event);
-        }));
-        com.bulletjournal.protobuf.daemon.grpc.types.JoinGroupEvent joinGroupEvent =
-                com.bulletjournal.protobuf.daemon.grpc.types.JoinGroupEvent.newBuilder()
-                        .addAllEvents(eventListProto)
-                        .build();
-        JoinGroupEvents joinGroupEvents = JoinGroupEvents.newBuilder()
-                .addJoinGroupEvents(joinGroupEvent)
-                .build();
-        daemonServiceClient.sendEmail(joinGroupEvents);
+        String uuid = RandomStringUtils.randomAlphanumeric(StringUtil.UUID_LENGTH);
+        // TODO: store in redis and sendEmail(joinGroupEventNotifications);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

@@ -16,6 +16,7 @@ import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.factory.ProjectItemDaos;
 import com.bulletjournal.repository.models.ProjectItemModel;
+import com.bulletjournal.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -261,7 +262,7 @@ public class SystemController {
     }
 
     private boolean isUUID(String itemId) {
-        if (itemId.length() != PublicProjectItemDaoJpa.UUID_LENGTH) {
+        if (itemId.length() != StringUtil.UUID_LENGTH) {
             return false;
         }
 
