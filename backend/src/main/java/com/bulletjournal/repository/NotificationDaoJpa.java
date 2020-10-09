@@ -1,6 +1,5 @@
 package com.bulletjournal.repository;
 
-import com.bulletjournal.clients.DaemonServiceClient;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.notifications.Action;
@@ -32,8 +31,6 @@ public class NotificationDaoJpa implements Etaggable {
     private UserClient userClient;
     @Autowired
     private UserAliasDaoJpa userAliasDaoJpa;
-    @Autowired
-    private DaemonServiceClient daemonServiceClient;
 
 
     public List<com.bulletjournal.controller.models.Notification> getNotifications(String username) {

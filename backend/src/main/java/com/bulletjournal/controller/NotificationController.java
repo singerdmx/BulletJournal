@@ -32,6 +32,7 @@ import java.util.List;
 public class NotificationController {
     protected static final String NOTIFICATIONS_ROUTE = "/api/notifications";
     protected static final String ANSWER_NOTIFICATION_ROUTE = "/api/notifications/{notificationId}/answer";
+    protected static final String ANSWER_PUBLIC_NOTIFICATION_ROUTE = "/api/public/notifications/{uid}/answer";
     private static final Logger LOGGER = LoggerFactory.getLogger(NotificationController.class);
     @Autowired
     private NotificationDaoJpa notificationDaoJpa;
@@ -135,5 +136,13 @@ public class NotificationController {
         }
 
         return null;
+    }
+
+    @GetMapping(ANSWER_PUBLIC_NOTIFICATION_ROUTE)
+    public void answerPublicNotification(@NotNull @PathVariable String uid, @NotNull @RequestParam String action) {
+        // /api/public/notifications/${id}/answer?action=${action}
+        // action is "accept" or "decline"
+
+        // read uid from redis
     }
 }

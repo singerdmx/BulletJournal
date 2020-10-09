@@ -7,7 +7,7 @@ import {useParams} from "react-router-dom";
 import {getRandomBackgroundImage} from "./assets/background";
 import {useLocation} from "react-use";
 import ReactLoading from "react-loading";
-import {answerPublicNotification} from "./apis/publicNotifications";
+import {answerPublicNotification} from "./apis/notificationApis";
 import {getCookie} from "./index";
 
 type PublicNotificationsProps = {};
