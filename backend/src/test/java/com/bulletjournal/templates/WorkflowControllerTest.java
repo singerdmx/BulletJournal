@@ -11,6 +11,7 @@ import com.bulletjournal.templates.controller.WorkflowController;
 import com.bulletjournal.templates.controller.model.*;
 import com.bulletjournal.util.DeltaContent;
 import com.google.common.collect.ImmutableList;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -64,6 +65,54 @@ public class WorkflowControllerTest {
         importTasksParams.setStartDate("2020-10-01");
         importTasksParams.setReminderBefore(1);
         checkImportTasksParamsWorkflow(importTasksParams);
+    }
+
+    /**
+     * Tests {@link WorkflowController#getUserSampleTasks()}
+     * Tests {@link WorkflowController#removeUserSampleTasks(RemoveUserSampleTasksParams)}
+     */
+    @Test
+    public void testUserSampleTasks() throws Exception {
+        List<SampleTask> sampleTasks = getUserSampleTasksWorkflow();
+        SampleTask sampleTask = sampleTasks.get(0);
+        assertEquals("AZYO", sampleTask.getName());
+        assertEquals("America/New_York", sampleTask.getTimeZone());
+        assertEquals("2020-09-28", sampleTask.getDueDate());
+        assertEquals("21:43", sampleTask.getDueTime());
+        assertEquals(true, sampleTask.isPending());
+        removeUserSampleTasksWorkflow(sampleTask.getId());
+    }
+
+    private List<SampleTask> getUserSampleTasksWorkflow() throws Exception {
+        ResponseEntity<SampleTask[]> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + WorkflowController.USER_SAMPLE_TASKS_ROUTE,
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, USER),
+                SampleTask[].class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        SampleTask[] sampleTasks = response.getBody();
+        assertNotNull(sampleTasks);
+        return Arrays.asList(response.getBody());
+    }
+
+    private List<SampleTask> removeUserSampleTasksWorkflow(Long sampleTaskId) throws Exception {
+        RemoveUserSampleTasksParams removeUserSampleTasksParams = new RemoveUserSampleTasksParams();
+        removeUserSampleTasksParams.setProjectId(5L);
+        removeUserSampleTasksParams.setAssignees(ImmutableList.of("BulletJournal", "Scarlet"));
+        removeUserSampleTasksParams.setLabels(ImmutableList.of(1L, 2L));
+        removeUserSampleTasksParams.setTimezone("");
+        removeUserSampleTasksParams.setStartDate("2020-10-01");
+        removeUserSampleTasksParams.setReminderBefore(5);
+        removeUserSampleTasksParams.setSampleTasks(ImmutableList.of(sampleTaskId));
+        ResponseEntity<SampleTask[]> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + WorkflowController.REMOVE_USER_SAMPLE_TASKS_ROUTE,
+                HttpMethod.POST,
+                TestHelpers.actAsOtherUser(removeUserSampleTasksParams, USER),
+                SampleTask[].class);
+        Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(0, response.getBody().length);
+        return Arrays.asList(response.getBody());
+
     }
 
     private List<SampleTask> checkImportTasksParamsWorkflow(ImportTasksParams importTasksParams) throws Exception {
