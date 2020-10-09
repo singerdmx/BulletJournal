@@ -11,7 +11,9 @@ import com.bulletjournal.filters.rate.limiting.TokenBucket;
 import com.bulletjournal.filters.rate.limiting.TokenBucketType;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
+import com.bulletjournal.redis.RedisNotificationRepository;
 import com.bulletjournal.redis.models.EtagType;
+import com.bulletjournal.redis.models.JoinGroupNotification;
 import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.User;
@@ -64,6 +66,9 @@ public class NotificationController {
 
     @Autowired
     private RedisEtagDaoJpa redisEtagDaoJpa;
+
+    @Autowired
+    private RedisNotificationRepository redisNotificationRepository;
 
     @GetMapping(NOTIFICATIONS_ROUTE)
     public ResponseEntity<List<Notification>> getNotifications() {
@@ -169,7 +174,11 @@ public class NotificationController {
         }
 
         // read notificationId from redis
-        return this.answerNotification(1L,
+        JoinGroupNotification joinGroupNotification = redisNotificationRepository
+                .findById(uid).orElseThrow(() -> {
+                    throw new ResourceNotFoundException("No uid found");
+                });
+        return this.answerNotification(joinGroupNotification.getNotificationId(),
                 new AnswerNotificationParams(action), AuthorizationService.SUPER_USER);
     }
 }

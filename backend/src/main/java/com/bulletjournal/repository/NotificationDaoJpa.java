@@ -5,7 +5,9 @@ import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.notifications.Action;
 import com.bulletjournal.notifications.Informed;
 import com.bulletjournal.notifications.JoinGroupEvent;
+import com.bulletjournal.redis.RedisNotificationRepository;
 import com.bulletjournal.redis.models.EtagType;
+import com.bulletjournal.redis.models.JoinGroupNotification;
 import com.bulletjournal.repository.factory.Etaggable;
 import com.bulletjournal.repository.models.Notification;
 import com.bulletjournal.util.StringUtil;
@@ -31,6 +33,8 @@ public class NotificationDaoJpa implements Etaggable {
     private UserClient userClient;
     @Autowired
     private UserAliasDaoJpa userAliasDaoJpa;
+    @Autowired
+    private RedisNotificationRepository redisNotificationRepository;
 
 
     public List<com.bulletjournal.controller.models.Notification> getNotifications(String username) {
@@ -70,9 +74,19 @@ public class NotificationDaoJpa implements Etaggable {
             }
             notifications.addAll(list);
         });
-        this.notificationRepository.saveAll(notifications);
-        String uid = RandomStringUtils.randomAlphanumeric(StringUtil.UUID_LENGTH);
-        // TODO: store in redis and sendEmail(joinGroupEventNotifications)
+        if (!notifications.isEmpty()) {
+            this.notificationRepository.saveAll(notifications);
+        }
+        if (!joinGroupEventNotifications.isEmpty()) {
+            List<JoinGroupNotification> joinGroupNotifications = new ArrayList<>();
+
+            joinGroupEventNotifications.forEach(n -> {
+                String uid = RandomStringUtils.randomAlphanumeric(StringUtil.UUID_LENGTH);
+                joinGroupNotifications.add(new JoinGroupNotification(uid, n.getId()));
+            });
+            this.redisNotificationRepository.saveAll(joinGroupNotifications);
+        }
+        // TODO: sendEmail(joinGroupEventNotifications)
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
