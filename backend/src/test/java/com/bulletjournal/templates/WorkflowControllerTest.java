@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableList;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Order;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -51,6 +52,7 @@ public class WorkflowControllerTest {
      * Tests {@link WorkflowController#importSampleTasks(ImportTasksParams)}
      */
     @Test
+    @Order(1)
     public void testWorkflowImportTasks() throws Exception {
         ImportTasksParams importTasksParams = new ImportTasksParams();
         importTasksParams.setSampleTasks(ImmutableList.of(1479L, 1412L, 1384L, 1369L, 1159L, 1336L, 1225L, 1194L, 1127L, 1097L, 618L, 615L, 601L, 579L, 571L, 569L, 262L, 185L, 618L, 615L, 601L, 579L, 571L, 569L, 262L, 185L));
@@ -72,6 +74,7 @@ public class WorkflowControllerTest {
      * Tests {@link WorkflowController#removeUserSampleTasks(RemoveUserSampleTasksParams)}
      */
     @Test
+    @Order(3)
     public void testUserSampleTasks() throws Exception {
         List<SampleTask> sampleTasks = getUserSampleTasksWorkflow();
         SampleTask sampleTask = sampleTasks.get(0);
@@ -170,6 +173,7 @@ public class WorkflowControllerTest {
      * Tests {@link WorkflowController#getNext(Long, List, List, boolean)}
      */
     @Test
+    @Order(2)
     public void testWorkflowGetNext() {
         CreateStepParams createStepParams1 = new CreateStepParams();
         createStepParams1.setName("step1");
