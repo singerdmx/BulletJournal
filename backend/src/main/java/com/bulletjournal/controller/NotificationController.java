@@ -1,10 +1,12 @@
 package com.bulletjournal.controller;
 
+import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.AnswerNotificationParams;
 import com.bulletjournal.controller.models.Notification;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
 import com.bulletjournal.redis.models.EtagType;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 public class NotificationController {
@@ -78,12 +81,23 @@ public class NotificationController {
             @NotNull @PathVariable Long notificationId,
             @Valid @RequestBody AnswerNotificationParams answerNotificationParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
+        return answerNotification(notificationId, answerNotificationParams, username);
+    }
+
+    private ResponseEntity<?> answerNotification(
+            Long notificationId, AnswerNotificationParams answerNotificationParams, String username) {
         com.bulletjournal.repository.models.Notification notification =
                 this.notificationRepository.findById(notificationId)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException("Notification " + notificationId + " not found"));
+        if (!AuthorizationService.ADMINS.contains(username) &&
+                !Objects.equals(username, notification.getTargetUser())) {
+            throw new UnAuthorizedException("Notification is sent to " + notification.getTargetUser() +
+                    " instead of " + username);
+        }
+
         deleteNotification(notification);
-        Informed informed = processNotification(notification, answerNotificationParams, username);
+        Informed informed = processNotification(notification, answerNotificationParams);
         if (informed != null) {
             this.notificationService.inform(informed);
         }
@@ -105,8 +119,7 @@ public class NotificationController {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Informed processNotification(
             com.bulletjournal.repository.models.Notification notification,
-            AnswerNotificationParams answerNotificationParams,
-            String owner) {
+            AnswerNotificationParams answerNotificationParams) {
         switch (notification.getType()) {
             case "JoinGroupEvent":
                 String answerAction = answerNotificationParams.getAction();
@@ -132,17 +145,20 @@ public class NotificationController {
                         notification.getOriginator(),
                         notification.getContentId(),
                         group.getName());
-                return new JoinGroupResponseEvent(event, owner, action);
+                return new JoinGroupResponseEvent(event, notification.getTargetUser(), action);
         }
 
         return null;
     }
 
     @GetMapping(ANSWER_PUBLIC_NOTIFICATION_ROUTE)
-    public void answerPublicNotification(@NotNull @PathVariable String uid, @NotNull @RequestParam String action) {
+    public ResponseEntity<?> answerPublicNotification(
+            @NotNull @PathVariable String uid, @NotNull @RequestParam String action) {
         // /api/public/notifications/${id}/answer?action=${action}
         // action is "accept" or "decline"
 
-        // read uid from redis
+        // read notificationId from redis
+        return this.answerNotification(1L,
+                new AnswerNotificationParams(action), AuthorizationService.SUPER_USER);
     }
 }

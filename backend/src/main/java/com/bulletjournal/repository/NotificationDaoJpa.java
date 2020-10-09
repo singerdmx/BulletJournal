@@ -71,8 +71,8 @@ public class NotificationDaoJpa implements Etaggable {
             notifications.addAll(list);
         });
         this.notificationRepository.saveAll(notifications);
-        String uuid = RandomStringUtils.randomAlphanumeric(StringUtil.UUID_LENGTH);
-        // TODO: store in redis and sendEmail(joinGroupEventNotifications);
+        String uid = RandomStringUtils.randomAlphanumeric(StringUtil.UUID_LENGTH);
+        // TODO: store in redis and sendEmail(joinGroupEventNotifications)
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
