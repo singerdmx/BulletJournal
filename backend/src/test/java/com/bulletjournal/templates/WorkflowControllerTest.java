@@ -70,7 +70,7 @@ public class WorkflowControllerTest {
     }
 
     /**
-     * Tests {@link WorkflowController#getUserSubscribedCategories()}()}
+     * Tests {@link WorkflowController#getUserSubscribedCategories()}
      * Tests {@link CategoryController#unsubscribeCategory(Long, CategoryUnsubscribeParams)}
      */
     @Test
