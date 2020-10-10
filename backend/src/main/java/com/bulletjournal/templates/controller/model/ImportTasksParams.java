@@ -4,33 +4,13 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ImportTasksParams {
-    @NotNull
-    private List<Long> sampleTasks;
+public class ImportTasksParams extends RemoveUserSampleTasksParams {
     @NotNull
     private List<Long> selections;
     @NotNull
     private Long categoryId;
-    @NotNull
-    private Long projectId;
-    @NotNull
-    private List<String> assignees;
-    @NotNull
-    private Integer reminderBefore;
-    @NotNull
-    private List<Long> labels;
     private boolean subscribed;
-    private String startDate;
-    private String timezone;
     private String scrollId;
-
-    public List<Long> getSampleTasks() {
-        return sampleTasks;
-    }
-
-    public void setSampleTasks(List<Long> sampleTasks) {
-        this.sampleTasks = sampleTasks;
-    }
 
     public List<Long> getSelections() {
         return selections.stream().filter(s -> s != null).collect(Collectors.toList());
@@ -46,54 +26,6 @@ public class ImportTasksParams {
 
     public void setCategoryId(Long categoryId) {
         this.categoryId = categoryId;
-    }
-
-    public Long getProjectId() {
-        return projectId;
-    }
-
-    public void setProjectId(Long projectId) {
-        this.projectId = projectId;
-    }
-
-    public List<String> getAssignees() {
-        return assignees;
-    }
-
-    public void setAssignees(List<String> assignees) {
-        this.assignees = assignees;
-    }
-
-    public Integer getReminderBefore() {
-        return reminderBefore;
-    }
-
-    public void setReminderBefore(Integer reminderBefore) {
-        this.reminderBefore = reminderBefore;
-    }
-
-    public List<Long> getLabels() {
-        return labels;
-    }
-
-    public void setLabels(List<Long> labels) {
-        this.labels = labels;
-    }
-
-    public String getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(String startDate) {
-        this.startDate = startDate;
-    }
-
-    public String getTimezone() {
-        return timezone;
-    }
-
-    public void setTimezone(String timezone) {
-        this.timezone = timezone;
     }
 
     public boolean isSubscribed() {

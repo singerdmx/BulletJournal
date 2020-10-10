@@ -55,7 +55,10 @@ public class UpdateSampleTaskParams {
     }
 
     public String getUid() {
-        return uid;
+        if (uid == null) {
+            return null;
+        }
+        return uid.trim();
     }
 
     public void setUid(String uid) {

@@ -35,7 +35,7 @@ import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 @RestController
 public class TaskController {
 
-    protected static final String TASKS_ROUTE = "/api/projects/{projectId}/tasks";
+    public static final String TASKS_ROUTE = "/api/projects/{projectId}/tasks";
     protected static final String TASK_ROUTE = "/api/tasks/{taskId}";
     protected static final String SET_TASK_STATUS_ROUTE = "/api/tasks/{taskId}/setStatus";
     protected static final String COMPLETED_TASK_ROUTE = "/api/completedTasks/{taskId}";
@@ -51,7 +51,7 @@ public class TaskController {
     protected static final String REMOVE_SHARED_ROUTE = "/api/tasks/{taskId}/removeShared";
     protected static final String ADD_CONTENT_ROUTE = "/api/tasks/{taskId}/addContent";
     protected static final String CONTENT_ROUTE = "/api/tasks/{taskId}/contents/{contentId}";
-    protected static final String CONTENTS_ROUTE = "/api/tasks/{taskId}/contents";
+    public static final String CONTENTS_ROUTE = "/api/tasks/{taskId}/contents";
     protected static final String COMPLETED_TASK_CONTENTS_ROUTE = "/api/completedTasks/{taskId}/contents";
     protected static final String CONTENT_REVISIONS_ROUTE = "/api/tasks/{taskId}/contents/{contentId}/revisions/{revisionId}";
     protected static final String TASK_STATISTICS_ROUTE = "/api/taskStatistics";

@@ -156,6 +156,7 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
       if (this.props.project) {
         this.props.projectLabelsUpdate(parseInt(projectId), this.props.project.shared);
       }
+      this.setState({labelsToRemove: [], labelsToKeep: []});
     }
     if (this.props.project) {
       document.title = this.props.project.name;

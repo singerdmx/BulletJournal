@@ -1,13 +1,19 @@
 package com.bulletjournal.controller;
 
+import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.AnswerNotificationParams;
 import com.bulletjournal.controller.models.Notification;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.exceptions.UnAuthorizedException;
+import com.bulletjournal.filters.rate.limiting.TokenBucket;
+import com.bulletjournal.filters.rate.limiting.TokenBucketType;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
+import com.bulletjournal.redis.RedisNotificationRepository;
 import com.bulletjournal.redis.models.EtagType;
+import com.bulletjournal.redis.models.JoinGroupNotification;
 import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.User;
@@ -19,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,12 +34,18 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 public class NotificationController {
     protected static final String NOTIFICATIONS_ROUTE = "/api/notifications";
     protected static final String ANSWER_NOTIFICATION_ROUTE = "/api/notifications/{notificationId}/answer";
+    protected static final String ANSWER_PUBLIC_NOTIFICATION_ROUTE = "/api/public/notifications/{uid}/answer";
     private static final Logger LOGGER = LoggerFactory.getLogger(NotificationController.class);
+
+    @Autowired
+    private TokenBucket tokenBucket;
+
     @Autowired
     private NotificationDaoJpa notificationDaoJpa;
 
@@ -53,6 +66,9 @@ public class NotificationController {
 
     @Autowired
     private RedisEtagDaoJpa redisEtagDaoJpa;
+
+    @Autowired
+    private RedisNotificationRepository redisNotificationRepository;
 
     @GetMapping(NOTIFICATIONS_ROUTE)
     public ResponseEntity<List<Notification>> getNotifications() {
@@ -77,12 +93,23 @@ public class NotificationController {
             @NotNull @PathVariable Long notificationId,
             @Valid @RequestBody AnswerNotificationParams answerNotificationParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
+        return answerNotification(notificationId, answerNotificationParams, username);
+    }
+
+    private ResponseEntity<?> answerNotification(
+            Long notificationId, AnswerNotificationParams answerNotificationParams, String username) {
         com.bulletjournal.repository.models.Notification notification =
                 this.notificationRepository.findById(notificationId)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException("Notification " + notificationId + " not found"));
+        if (!AuthorizationService.ADMINS.contains(username) &&
+                !Objects.equals(username, notification.getTargetUser())) {
+            throw new UnAuthorizedException("Notification is sent to " + notification.getTargetUser() +
+                    " instead of " + username);
+        }
+
         deleteNotification(notification);
-        Informed informed = processNotification(notification, answerNotificationParams, username);
+        Informed informed = processNotification(notification, answerNotificationParams);
         if (informed != null) {
             this.notificationService.inform(informed);
         }
@@ -104,8 +131,7 @@ public class NotificationController {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Informed processNotification(
             com.bulletjournal.repository.models.Notification notification,
-            AnswerNotificationParams answerNotificationParams,
-            String owner) {
+            AnswerNotificationParams answerNotificationParams) {
         switch (notification.getType()) {
             case "JoinGroupEvent":
                 String answerAction = answerNotificationParams.getAction();
@@ -131,9 +157,28 @@ public class NotificationController {
                         notification.getOriginator(),
                         notification.getContentId(),
                         group.getName());
-                return new JoinGroupResponseEvent(event, owner, action);
+                return new JoinGroupResponseEvent(event, notification.getTargetUser(), action);
         }
 
         return null;
+    }
+
+    @GetMapping(ANSWER_PUBLIC_NOTIFICATION_ROUTE)
+    public ResponseEntity<?> answerPublicNotification(
+            @NotNull @PathVariable String uid, @NotNull @RequestParam String action) {
+        // /api/public/notifications/${id}/answer?action=${action}
+        // action is "accept" or "decline"
+        if (this.tokenBucket.isLimitExceeded(TokenBucketType.PUBLIC_ITEM)) {
+            LOGGER.error("answerPublicNotification limit exceeded");
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(null);
+        }
+
+        // read notificationId from redis
+        JoinGroupNotification joinGroupNotification = redisNotificationRepository
+                .findById(uid).orElseThrow(() -> {
+                    throw new ResourceNotFoundException("No uid found");
+                });
+        return this.answerNotification(joinGroupNotification.getNotificationId(),
+                new AnswerNotificationParams(action), AuthorizationService.SUPER_USER);
     }
 }

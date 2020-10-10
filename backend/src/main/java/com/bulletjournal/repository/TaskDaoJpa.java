@@ -1099,7 +1099,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 sampleTask.getName(),
                 sampleTask.getDueDate(),
                 sampleTask.getDueTime(),
-                null,
+                60,
                 reminderBeforeTask == null ? null : new ReminderSetting(null, null, reminderBeforeTask),
                 assignees,
                 sampleTask.getTimeZone(),

@@ -36,6 +36,9 @@ public class SelectionMetadataKeywordDaoJpa {
         List<Selection> selections = this.selectionDaoJpa.getSelectionsById(ids);
         List<SelectionMetadataKeyword> keywords = this.selectionMetadataKeywordRepository
                 .findByFrequencyNullAndSelectionIn(selections);
+        if (keywords.isEmpty()) {
+            keywords = this.selectionMetadataKeywordRepository.findBySelectionIn(selections);
+        }
         return keywords;
     }
 

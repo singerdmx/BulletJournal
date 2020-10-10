@@ -200,6 +200,7 @@ const AdminWorkflowTasks: React.FC<WorkflowPageProps> = (
                                     <span onClick={() => history.push(`/admin/sampleTasks/${sampleTask.id}`)}>
                                         <b>{sampleTask.name}</b>{' '}
                                         <Tag>{sampleTask.metadata}</Tag>
+                                        &nbsp;({sampleTask.id})
                                     </span>
                                 </Checkbox>
                             </div>

@@ -2,13 +2,10 @@ package com.bulletjournal.clients;
 
 import com.bulletjournal.config.DaemonClientConfig;
 import com.bulletjournal.protobuf.daemon.grpc.services.DaemonGrpc;
-import com.bulletjournal.protobuf.daemon.grpc.types.JoinGroupEvents;
-import com.bulletjournal.protobuf.daemon.grpc.types.ReplyMessage;
 import com.bulletjournal.protobuf.daemon.grpc.types.StreamMessage;
 import com.bulletjournal.protobuf.daemon.grpc.types.SubscribeNotification;
 import com.bulletjournal.repository.GoogleCalendarProjectDaoJpa;
 import io.grpc.Status;
-import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.slf4j.Logger;
@@ -48,20 +45,6 @@ public class DaemonServiceClient {
             subscribeNotification(SubscribeNotification.newBuilder().setId(CLIENT_ID).build(), newResponseObserver());
         } else {
             LOGGER.info("We don't enable daemon streaming as for now...");
-        }
-    }
-
-    public void sendEmail(JoinGroupEvents joinGroupEvents) {
-        if (!this.daemonClientConfig.isEnabled()) {
-            LOGGER.info("Daemon Service not enabled: skip sending email");
-            return;
-        }
-        try {
-            ReplyMessage replyMessage = this.daemonBlockingStub.joinGroupEvents(joinGroupEvents);
-            LOGGER.info("joinGroupEvents reply: {}", replyMessage.getMessage());
-        } catch (final StatusRuntimeException e) {
-            LOGGER.error("joinGroupEvents sent and failed with " + e.getStatus().getCode().name(), e);
-            return;
         }
     }
 

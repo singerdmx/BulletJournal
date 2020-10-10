@@ -73,7 +73,8 @@ public class UserCategoryDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void upsertUserCategories(User user, Long categoryId, List<Long> selections, Long projectId) {
+    public void upsertUserCategories(String username, Long categoryId, List<Long> selections, Long projectId) {
+        User user = userDaoJpa.getByName(username);
         Project project = this.projectRepository.findById(projectId).orElseThrow(() -> new ResourceNotFoundException(
                 "Project " + projectId + " not found"));
         List<SelectionMetadataKeyword> keywords = this.selectionMetadataKeywordDaoJpa

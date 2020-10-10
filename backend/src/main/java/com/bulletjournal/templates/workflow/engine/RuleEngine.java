@@ -1,14 +1,18 @@
 package com.bulletjournal.templates.workflow.engine;
 
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
-import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.User;
-import com.bulletjournal.templates.controller.model.ImportTasksParams;
+import com.bulletjournal.templates.controller.model.RemoveUserSampleTasksParams;
 import com.bulletjournal.templates.repository.*;
-import com.bulletjournal.templates.repository.model.*;
+import com.bulletjournal.templates.repository.model.SampleTask;
+import com.bulletjournal.templates.repository.model.SampleTaskRule;
+import com.bulletjournal.templates.repository.model.Selection;
+import com.bulletjournal.templates.repository.model.SelectionMetadataKeyword;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -20,6 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class RuleEngine {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RuleEngine.class);
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
@@ -43,27 +48,31 @@ public class RuleEngine {
     private TaskDaoJpa taskDaoJpa;
 
     @Autowired
-    private UserCategoryDaoJpa userCategoryDaoJpa;
-
-    @Autowired
     private SelectionMetadataKeywordDaoJpa selectionMetadataKeywordDaoJpa;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<com.bulletjournal.templates.controller.model.SampleTask> importTasks(String requester, ImportTasksParams importTasksParams) {
+    public List<com.bulletjournal.templates.controller.model.SampleTask> importTasks(
+            String requester, RemoveUserSampleTasksParams importTasksParams, int frequency) {
         List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasks = sampleTaskDaoJpa
                 .findAllById(importTasksParams.getSampleTasks()).stream().map(SampleTask::toPresentationModel).collect(Collectors.toList());
         // if there is any sample task that does not have due date, we need to set due date for it
         List<com.bulletjournal.templates.controller.model.SampleTask> tasksNeedTimingArrangement = sampleTasks.stream()
                 .filter(t -> StringUtils.isBlank(t.getDueDate())).collect(Collectors.toList());
 
-        User user = this.userDaoJpa.getByName(requester);
-
-        String timezone = importTasksParams.getTimezone();
-        if (StringUtils.isBlank(timezone)) {
-            timezone = user.getTimezone();
-        }
         if (!tasksNeedTimingArrangement.isEmpty()) {
-            tasksNeedTimingArrangement.sort(Comparator.comparingInt(a -> Integer.parseInt(a.getUid())));
+            User user = this.userDaoJpa.getByName(requester);
+
+            String timezone = importTasksParams.getTimezone();
+            if (StringUtils.isBlank(timezone)) {
+                timezone = user.getTimezone();
+            }
+
+            if (tasksNeedTimingArrangement.stream().allMatch(t -> StringUtils.isNumeric(t.getUid().trim()))) {
+                tasksNeedTimingArrangement.sort(Comparator.comparingInt(a -> Integer.parseInt(a.getUid().trim())));
+            } else {
+                tasksNeedTimingArrangement.sort(
+                        Comparator.comparing(com.bulletjournal.templates.controller.model.SampleTask::getUid));
+            }
             // calculate start date
             ZonedDateTime startDay;
             if (StringUtils.isNotBlank(importTasksParams.getStartDate())) {
@@ -73,7 +82,7 @@ public class RuleEngine {
                 startDay = ZonedDateTimeHelper.getStartTime(
                         ZonedDateTime.now().plusDays(1).format(ZonedDateTimeHelper.DATE_FORMATTER), null, timezone);
             }
-            int frequency = getTimesOneDay(importTasksParams.getSelections());
+
             int startIndex = 0;
             int numOfDay = 0;
             while (startIndex < tasksNeedTimingArrangement.size()) {
@@ -88,25 +97,29 @@ public class RuleEngine {
             }
         }
 
-        this.taskDaoJpa.createTaskFromSampleTask(importTasksParams.getProjectId(), requester, tasksNeedTimingArrangement, importTasksParams.getReminderBefore(), importTasksParams.getAssignees(), importTasksParams.getLabels());
+        sampleTasks.sort(
+                Comparator.comparing(s -> (s.getDueDate() + (StringUtils.isBlank(s.getDueTime()) ? "00:00" : s.getDueTime()))));
 
-        if (importTasksParams.isSubscribed()) {
-            this.userCategoryDaoJpa.upsertUserCategories(user, importTasksParams.getCategoryId(),
-                    importTasksParams.getSelections(), importTasksParams.getProjectId());
-        }
-
-        sampleTasks.forEach(sampleTask -> {
-            sampleTask.setContent(null);
-            sampleTask.setUid(null);
-            sampleTask.setMetadata(null);
-        });
+        this.taskDaoJpa.createTaskFromSampleTask(
+                importTasksParams.getProjectId(),
+                requester,
+                sampleTasks,
+                importTasksParams.getReminderBefore(),
+                importTasksParams.getAssignees(),
+                importTasksParams.getLabels());
         return sampleTasks;
     }
 
-    private int getTimesOneDay(List<Long> selections) {
-        return this.selectionMetadataKeywordDaoJpa.getFrequencyBySelections(selections)
-                .stream().findFirst().orElseThrow(
-                () -> new BadRequestException("Selections missing intensity")).getFrequency();
+    public int getTimesOneDay(List<Long> selections) {
+        Optional<SelectionMetadataKeyword> selectionMetadataKeyword =
+                this.selectionMetadataKeywordDaoJpa.getFrequencyBySelections(selections)
+                        .stream().findFirst();
+        if (selectionMetadataKeyword.isPresent()) {
+            return selectionMetadataKeyword.get().getFrequency();
+        }
+
+        LOGGER.error("Unable to get frequency for {}", selections);
+        return 6;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

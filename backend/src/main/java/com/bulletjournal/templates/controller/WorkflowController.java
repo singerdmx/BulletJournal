@@ -265,7 +265,19 @@ public class WorkflowController {
                 sampleTasksRedisCache.deleteById(scrollId);
             });
         }
-        return this.ruleEngine.importTasks(username, importTasksParams);
+        int frequency = this.ruleEngine.getTimesOneDay(importTasksParams.getSelections());
+        List<SampleTask> sampleTasks = this.ruleEngine.importTasks(username, importTasksParams, frequency);
+        if (importTasksParams.isSubscribed()) {
+            this.userCategoryDaoJpa.upsertUserCategories(username, importTasksParams.getCategoryId(),
+                    importTasksParams.getSelections(), importTasksParams.getProjectId());
+        }
+
+        sampleTasks.forEach(sampleTask -> {
+            sampleTask.setContent(null);
+            sampleTask.setUid(null);
+            sampleTask.setMetadata(null);
+        });
+        return sampleTasks;
     }
 
     @PostMapping(SAMPLE_TASKS_ROUTE)
@@ -330,9 +342,11 @@ public class WorkflowController {
         // http://localhost:8080/api/sampleTasks?filter={filter}
         validateRequester();
         List<SampleTask> sampleTasks = sampleTaskDaoJpa.findSampleTasksByMetadataFilter(metadataFilter).stream()
-                .map(com.bulletjournal.templates.repository.model.SampleTask::toSimplePresentationModel)
+                .map(com.bulletjournal.templates.repository.model.SampleTask::toPresentationModel)
+                .sorted(Comparator.comparingLong(SampleTask::getId))
                 .collect(Collectors.toList());
 
+        sampleTasks.forEach(s -> s.setContent(null));
         return sampleTasks;
     }
 
@@ -393,6 +407,7 @@ public class WorkflowController {
     public List<SampleTask> removeUserSampleTasks(
             @Valid @RequestBody RemoveUserSampleTasksParams removeUserSampleTasksParams) {
         String requester = MDC.get(UserClient.USER_NAME_KEY);
+        this.ruleEngine.importTasks(requester, removeUserSampleTasksParams, 6);
         this.userSampleTaskDaoJpa.removeUserSampleTasks(requester, removeUserSampleTasksParams.getSampleTasks());
         return getUserSampleTasks();
     }

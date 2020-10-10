@@ -7,6 +7,7 @@ import com.bulletjournal.repository.models.Note;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.PublicProjectItem;
 import com.bulletjournal.repository.models.Task;
+import com.bulletjournal.util.StringUtil;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +24,6 @@ import java.util.Objects;
 
 @Repository
 public class PublicProjectItemDaoJpa {
-
-    public static final int UUID_LENGTH = 8;
     private static final Logger LOGGER = LoggerFactory.getLogger(PublicProjectItemDaoJpa.class);
 
     @Autowired
@@ -32,7 +31,7 @@ public class PublicProjectItemDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> SharableLink generatePublicItemLink(T projectItem, String requester, Long ttl) {
-        String uuid = RandomStringUtils.randomAlphanumeric(UUID_LENGTH);
+        String uuid = RandomStringUtils.randomAlphanumeric(StringUtil.UUID_LENGTH);
         PublicProjectItem publicProjectItem = new PublicProjectItem(uuid, requester);
         if (ttl != null) {
             ZonedDateTime zonedDateTime = ZonedDateTimeHelper.getNow();
