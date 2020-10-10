@@ -70,6 +70,60 @@ public class WorkflowControllerTest {
     }
 
     /**
+     * Tests {@link WorkflowController#getUserSubscribedCategories()}()}
+     * Tests {@link CategoryController#unsubscribeCategory(Long, CategoryUnsubscribeParams)}
+     */
+    @Test
+    public void testUserSubscribedCategories() throws Exception {
+        List<SubscribedCategory> subscribedCategories = getUserSubscribedCategories();
+        assertEquals(2, subscribedCategories.size());
+        SubscribedCategory subscribedCategory = subscribedCategories.get(0);
+        assertEquals(15L, subscribedCategory.getCategory().getId().intValue());
+        assertEquals(1, subscribedCategory.getSelections().size());
+        assertEquals(257L, subscribedCategory.getSelections().get(0).getId().intValue());
+        assertEquals(1, subscribedCategory.getProjects().size());
+        assertEquals(11L, subscribedCategory.getProjects().get(0).getId().intValue());
+        subscribedCategory = subscribedCategories.get(1);
+        assertEquals(13L, subscribedCategory.getCategory().getId().intValue());
+        assertEquals(2, subscribedCategory.getSelections().size());
+        assertEquals(52L, subscribedCategory.getSelections().get(0).getId().intValue());
+        assertEquals(56L, subscribedCategory.getSelections().get(1).getId().intValue());
+        assertEquals(2, subscribedCategory.getProjects().size());
+        assertEquals(11L, subscribedCategory.getProjects().get(0).getId().intValue());
+        assertEquals(11L, subscribedCategory.getProjects().get(1).getId().intValue());
+        unsubscribeCategory(15L, 257L, 1);
+        unsubscribeCategory(13L, 52L, 1);
+        unsubscribeCategory(13L, 56L, 0);
+    }
+
+    private List<SubscribedCategory> getUserSubscribedCategories() throws Exception {
+        ResponseEntity<SubscribedCategory[]> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + WorkflowController.SUBSCRIBED_CATEGORIES_ROUTE,
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, USER),
+                SubscribedCategory[].class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        SubscribedCategory[] subscribedCategories = response.getBody();
+        assertNotNull(subscribedCategories);
+        return Arrays.asList(response.getBody());
+    }
+
+    private List<SubscribedCategory> unsubscribeCategory(Long categoryId, Long selectionId, int expected) throws Exception {
+        CategoryUnsubscribeParams categoryUnsubscribeParams = new CategoryUnsubscribeParams();
+        categoryUnsubscribeParams.setSelectionId(selectionId);
+        ResponseEntity<SubscribedCategory[]> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + CategoryController.CATEGORY_UNSUBSCRIBE_ROUTE,
+                HttpMethod.POST,
+                TestHelpers.actAsOtherUser(categoryUnsubscribeParams, USER),
+                SubscribedCategory[].class,
+                categoryId);
+        Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expected, response.getBody().length);
+        return Arrays.asList(response.getBody());
+
+    }
+
+    /**
      * Tests {@link WorkflowController#getUserSampleTasks()}
      * Tests {@link WorkflowController#removeUserSampleTasks(RemoveUserSampleTasksParams)}
      */
