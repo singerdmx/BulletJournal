@@ -15,6 +15,8 @@ import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.utils.DaoHelper;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
@@ -28,6 +30,8 @@ import java.util.Set;
 
 @Repository
 public class UserDaoJpa {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserDaoJpa.class);
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -84,6 +88,7 @@ public class UserDaoJpa {
         this.firstTimeUserRepository.save(new FirstTimeUser(user.getName()));
 
         this.entityManager.flush();
+        LOGGER.info("Creating sample projects for {}", name);
         this.notificationService.createSampleProjects(new SampleProjectsCreation(name, group));
         return user;
     }
