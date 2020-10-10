@@ -14,7 +14,7 @@ services:
       - frontend
 
   frontend:
-    image: mwangxx/bulletjournal-frontend:1.1.202010092307
+    image: mwangxx/bulletjournal-frontend:1.1.202010100036
     container_name: react_app
     ports:
       - "3000:3000"
@@ -23,7 +23,7 @@ services:
 
   daemon:
     container_name: daemon_app
-    image: mwangxx/bulletjournal-daemon:1.1.202010092307
+    image: mwangxx/bulletjournal-daemon:1.1.202010100036
     ports:
       - "50051:50051"
     depends_on:
@@ -42,13 +42,13 @@ services:
       retries: 5
 
   controller:
-    image: mwangxx/bulletjournal-backend:1.1.202010092307
+    image: mwangxx/bulletjournal-backend:1.1.202010100036
     container_name: springboot_app
     ports:
       - "8080:8080"
     environment:
       spring_profiles_active: prod
-      API_VERSION: 1.1.202010092307
+      API_VERSION: 1.1.202010100036
       SSO_API_KEY: "${SSO_API_KEY}"
       AWS_ACCESS_KEY: "${AWS_ACCESS_KEY}"
       AWS_SECRET_KEY: "${AWS_SECRET_KEY}"
