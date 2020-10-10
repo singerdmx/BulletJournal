@@ -1089,10 +1089,7 @@ function* patchContent(action: PayloadAction<PatchContent>) {
 
 function* patchSampleContent(action: PayloadAction<PatchContent>) {
   try {
-    const {taskId, contentId, text, diff} = action.payload;
-    const state: IState = yield select();
-    const order = state.task.contents.map(c => c.id);
-
+    const {taskId, text} = action.payload;
     const content : Content = yield call(updateSampleContent, taskId, text);
     yield put(
         tasksActions.taskContentsReceived({

@@ -9,7 +9,6 @@ import {
     UpdateExpandedMyself,
     ClearMyself,
     FetchUserPointActivities,
-    SubscribedCategories,
     GetSubscribedCategories,
     UnsubscribedCategory,
     UpdateCategorySubscription, MySampleTasksAction, DeleteSampleTaskAction, DeleteSampleTasksAction

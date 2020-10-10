@@ -2,7 +2,6 @@ import {Quill} from 'react-quill';
 import quillEmoji from 'quill-emoji';
 import 'quill-emoji/dist/quill-emoji.css';
 import 'react-quill/dist/quill.snow.css';
-import axios from 'axios';
 import ImageResize from '../../utils/image-resize/ImageResize';
 import ImageFormat from '../../utils/image-resize/ImageFormat';
 import ImageDropAndPaste from '../../utils/image-drop-and-paste/quill-image-drop-and-paste';
@@ -44,15 +43,6 @@ Quill.register(ImageFormat, true);
 //   const editor = quillRef.getEditor();
 //   editor.history.redo();
 // }
-
-const apiPostNewsImage = (formData: FormData) => {
-  const uploadConfig = {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  };
-  return axios.post('/api/uploadFile', formData, uploadConfig);
-};
 
 // Add emojii to whitelist and register them
 const { EmojiBlot, ShortNameEmoji, ToolbarEmoji, TextAreaEmoji } = quillEmoji;

@@ -63,7 +63,7 @@ export const fetchUserSampleTasks = () => {
 }
 
 export const fetchSampleTask = (sampleTaskId: number) => {
-    return doFetch(`/api/sampleTasks/${sampleTaskId}`)
+    return doFetch(`/api/public/sampleTasks/${sampleTaskId}`)
         .then((res) => res.json())
         .catch((err) => {
             throw Error(err.message);

@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import {
   completeTask, deleteContent,
   deleteTask,
-  getTask, taskReceived,
+  getTask,
   updateTaskContents,
 } from '../../features/tasks/actions';
 import { IState } from '../../store';
@@ -47,7 +47,6 @@ import { getTaskAssigneesPopoverContent } from '../../components/project-item/ta
 import {setDisplayMore, setDisplayRevision} from "../../features/content/actions";
 import {Content} from "../../features/myBuJo/interface";
 import {DeleteOutlined, EditOutlined, HighlightOutlined} from "@ant-design/icons/lib";
-import {Task} from "../../features/tasks/interface";
 import {getProject} from "../../features/project/actions";
 import {Project} from "../../features/project/interface";
 import {contentEditable} from "../note/note.pages";
@@ -67,7 +66,6 @@ interface TaskPageHandler {
   setDisplayMore: (displayMore: boolean) => void;
   setDisplayRevision: (displayRevision: boolean) => void;
   deleteContent: (taskId: number, contentId: number) => void;
-  taskReceived: (task: Task | undefined) => void;
   getProject: (projectId: number) => void;
 }
 
@@ -85,7 +83,6 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
     setDisplayMore,
     setDisplayRevision,
     deleteContent,
-    taskReceived,
     getProject
   } = props;
   // get id of task from router
@@ -327,6 +324,5 @@ export default connect(mapStateToProps, {
   deleteContent,
   setDisplayMore,
   setDisplayRevision,
-  taskReceived,
   getProject
 })(TaskPage);

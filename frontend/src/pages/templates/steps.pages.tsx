@@ -298,7 +298,9 @@ const StepsPage: React.FC<StepsProps> = (
         return [];
     }
 
-    const onRemoveTask = (id: number) => {
+    const onRemoveTask = (e: React.MouseEvent<HTMLElement>, id: number) => {
+        e.preventDefault();
+        e.stopPropagation();
         const data = sampleTasks.filter(t => t.id !== id);
         sampleTasksReceived(data, scrollId);
         localStorage.setItem(SAMPLE_TASKS, JSON.stringify({
@@ -333,10 +335,10 @@ const StepsPage: React.FC<StepsProps> = (
                     </div>
                     {tasks.length > 0 && <div className='sample-tasks'>
                         {tasks.map((sampleTask: SampleTask) => {
-                            return <div className='sample-task'>
+                            return <div className='sample-task' onClick={() => window.location.href = `${window.location.protocol}//${window.location.host}/public/sampleTasks/${sampleTask.id}`}>
                                 <div className='remove-task-icon'>
                                     <Tooltip title='Remove this'>
-                                        <CloseOutlined onClick={() => onRemoveTask(sampleTask.id)}/>
+                                        <CloseOutlined onClick={(e) => onRemoveTask(e, sampleTask.id)}/>
                                     </Tooltip>
                                 </div>
                                 {sampleTask.name}

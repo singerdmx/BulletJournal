@@ -2,5 +2,6 @@
 .vscode/*
 .idea/*
 **/.DS_Store
+protobuf/.idea
 discourse-auth-proxy/.idea
 auth-proxy/.idea

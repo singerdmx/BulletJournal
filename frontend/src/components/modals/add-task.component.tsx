@@ -81,7 +81,6 @@ const AddTask: React.FC<
   const history = useHistory();
   const [dueType, setDueType] = useState('dueByTime');
   const [reminderType, setReminderType] = useState('remindBefore');
-  const [dueTimeVisible, setDueTimeVisible] = useState(false);
   const [reminderTimeVisible, setReminderTimeVisible] = useState(false);
   const [remindButton, setRemindButton] = useState('remindBefore');
   const { projectId } = useParams();
@@ -292,7 +291,6 @@ const AddTask: React.FC<
                       style={{ width: '100%' }}
                       placeholder="Due Date"
                       disabled={dueType !== 'dueByTime'}
-                      onChange={(value) => setDueTimeVisible(value !== null)}
                     />
                   </Form.Item>
                 </Tooltip>

@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import TaskDetailPage from "./task-detail.pages";
 import {IState} from "../../store";
 import {connect} from "react-redux";
 import {getSampleTask} from "../../features/tasks/actions";
-import {useHistory, useParams} from "react-router-dom";
+import {useParams} from "react-router-dom";
 import {Task} from "../../features/tasks/interface";
 import {Content} from "../../features/myBuJo/interface";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
@@ -25,10 +25,6 @@ const SampleTaskPage: React.FC<SampleTaskProps> = (
 ) => {
     // get id of task from router
     const {taskId} = useParams();
-    // state control drawer displaying
-    const [showEditor, setEditorShow] = useState(false);
-    // hook history in router
-    const history = useHistory();
 
     // listening on the empty state working as componentDidmount
     useEffect(() => {

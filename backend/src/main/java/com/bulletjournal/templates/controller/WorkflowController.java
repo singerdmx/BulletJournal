@@ -39,7 +39,7 @@ public class WorkflowController {
     public static final String SAMPLE_TASKS_IMPORT_ROUTE = "/api/sampleTasks/import";
     public static final String SAMPLE_TASKS_ROUTE = "/api/sampleTasks";
     public static final String ADMIN_SAMPLE_TASK_ROUTE = "/api/admin/sampleTasks/{sampleTaskId}";
-    public static final String SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}";
+    public static final String SAMPLE_TASK_ROUTE = "/api/public/sampleTasks/{sampleTaskId}";
     public static final String SAMPLE_TASK_CONTENT_ROUTE = "/api/sampleTasks/{sampleTaskId}/contents";
     public static final String SAMPLE_TASK_BY_METADATA = "/api/sampleTasks";
     public static final String SAMPLE_TASK_RULE_ROUTE = "/api/sampleTaskRule";
