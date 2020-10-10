@@ -69,6 +69,7 @@ func (c *Cleaner) deleteByExpirationTimeBefore(tableName string) {
 
 func (c *Cleaner) deleteByAvailableBefore(tableName string) {
 	var staleTimeBeforeCond = db.Cond {
+		"id >": 90970,
 		"available_before IS NOT": nil,
 		"available_before <": time.Now(),
 	}

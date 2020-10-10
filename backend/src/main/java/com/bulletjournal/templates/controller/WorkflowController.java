@@ -288,7 +288,6 @@ public class WorkflowController {
 
     @GetMapping(ADMIN_SAMPLE_TASK_ROUTE)
     public SampleTask getAdminSampleTask(@NotNull @PathVariable Long sampleTaskId) {
-        validateRequester();
         com.bulletjournal.templates.repository.model.SampleTask sampleTask =
                 this.sampleTaskDaoJpa.findSampleTaskById(sampleTaskId);
         SampleTask result = sampleTask.toPresentationModel();
