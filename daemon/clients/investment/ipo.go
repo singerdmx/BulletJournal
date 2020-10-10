@@ -119,6 +119,7 @@ func (c *IPOClient) SendData() error {
 			DueTime:         "",
 			Pending:         true,
 			Refreshable:     true,
+			TimeZone:        "America/New_York",
 		}
 		fmt.Println(item.AvailableBefore)
 		c.sampleDao.Upsert(&item)

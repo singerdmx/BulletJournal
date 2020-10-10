@@ -108,6 +108,7 @@ func (c *DividendsClient) SendData() error {
 			DueTime:         "",
 			Pending:         true,
 			Refreshable:     true,
+			TimeZone:        "America/New_York",
 		}
 		c.sampleDao.Upsert(&item)
 	}

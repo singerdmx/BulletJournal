@@ -96,6 +96,7 @@ func (c *EarningClient) SendData() error {
 			DueTime:         target.Time,
 			Pending:         true,
 			Refreshable:     true,
+			TimeZone:        "America/New_York",
 		}
 		c.sampleDao.Upsert(&item)
 	}
