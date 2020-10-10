@@ -112,7 +112,7 @@ func (c *IPOClient) SendData() error {
 			UpdatedAt:       time.Now(),
 			Metadata:        "INVESTMENT_IPO_RECORD",
 			Content:         "",
-			Name:            fmt.Sprintf("%v (%v) goes public on %v", target.Name, target.Ticker, t),
+			Name:            fmt.Sprintf("%v (%v) goes public on %v", target.Name, target.Ticker, dueDate),
 			Uid:             "INVESTMENT_IPO_RECORD_" + target.Ticker,
 			AvailableBefore: t,
 			DueDate:         dueDate,
