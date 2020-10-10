@@ -179,6 +179,10 @@ public class SampleTaskDaoJpa {
         List<UserCategory> users = this.userCategoryDaoJpa.getSubscribedUsersByMetadataKeyword(
                 keywords.stream().map(SelectionMetadataKeyword::getKeyword).collect(Collectors.toList()));
 
+        if (users.isEmpty()) {
+            return sampleTask;
+        }
+
         // if sample task has due date, directly push to task table
         if (sampleTask.hasDueDate()) {
             Map<String, User> userMap = this.userDaoJpa.getUsersByNames(
