@@ -175,9 +175,7 @@ public class NotificationController {
 
         // read notificationId from redis
         JoinGroupNotification joinGroupNotification = redisNotificationRepository
-                .findById(uid).orElseThrow(() -> {
-                    throw new ResourceNotFoundException("No uid found");
-                });
+                .findById(uid).orElseThrow(() -> new ResourceNotFoundException("No uid found"));
         return this.answerNotification(joinGroupNotification.getNotificationId(),
                 new AnswerNotificationParams(action), AuthorizationService.SUPER_USER);
     }
