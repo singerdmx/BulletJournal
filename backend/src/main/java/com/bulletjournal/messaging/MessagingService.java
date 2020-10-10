@@ -52,6 +52,10 @@ public class MessagingService {
 
     public static final String TASK_OWNER_AVATAR_PROPERTY = "owner_avatar";
 
+    public static final String CLICK_ACTION_KEY = "click_action";
+
+    private static final String CLICK_ACTION_VALUE = "FLUTTER_NOTIFICATION_CLICK";
+
     private FcmClient fcmClient;
 
     private MailjetEmailClient mailjetClient;
@@ -85,7 +89,7 @@ public class MessagingService {
         LOGGER.info("Sending notification to users: {}", usernames);
         List<DeviceToken> deviceTokens = deviceTokenDaoJpa.getTokensByUsers(usernames);
         List<FcmMessageParams> params = deviceTokens.stream()
-            .map(token -> new FcmMessageParams(token.getToken(), "type", "Notification"))
+            .map(token -> new FcmMessageParams(token.getToken(), "type", "Notification", CLICK_ACTION_KEY, CLICK_ACTION_VALUE))
             .collect(Collectors.toList());
         fcmClient.sendAllMessagesAsync(params);
     }
@@ -150,7 +154,9 @@ public class MessagingService {
                 "type",
                 "taskDueNotification",
                 "taskId",
-                String.valueOf(task.getId())
+                String.valueOf(task.getId()),
+                CLICK_ACTION_KEY,
+                CLICK_ACTION_VALUE
             ));
         }
         return paramsList;
