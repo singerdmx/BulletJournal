@@ -59,7 +59,6 @@ public class LeetCodeAnalyzer {
     );
 
     @Test
-    @Ignore
     public void linkTasksToSelection() {
         String url = UriComponentsBuilder.fromHttpUrl(
                 ROOT_URL + randomServerPort + WorkflowController.SAMPLE_TASK_BY_METADATA)
@@ -74,17 +73,27 @@ public class LeetCodeAnalyzer {
         List<com.bulletjournal.templates.controller.model.SampleTask> l = Arrays.asList(response.getBody());
         // Difficulty
         Set<Long> set = new TreeSet<>();
-        for (com.bulletjournal.templates.controller.model.SampleTask task : l) {
-            if (task.getMetadata().split(",")[1].equals("Hard")) {
-                set.add(task.getId());
-            }
+        String[] difficulties = new String[]{"Easy", "Medium", "Hard"};
+        for (int i = 0; i < difficulties.length; i++) {
+            String difficulty = difficulties[i];
+            set = new TreeSet<>(l.stream().filter(task -> task.getMetadata().split(",")[1].equals(difficulty))
+                    .map(task -> task.getId())
+                    .collect(Collectors.toSet()));
+            String s = String.format("UPDATE template.sample_task_rules " + "SET task_ids = '%s' " +
+                    "WHERE step_id = 11" +
+                    "  AND selection_combo = '%d';", set.toString().substring(1, set.toString().length() - 1), 11 + i * 2);
+            System.out.println(s);
         }
-        // System.out.println(set);
+
         // Topic
         List<Selection> selections = this.selectionRepository.findAll();
         for (long i = 1000L; i < 1040L; i++) {
             final long id = i;
-            Selection selection = selections.stream().filter(s -> s.getId().equals(id)).findFirst().get();
+            Optional<Selection> selectionOptional = selections.stream().filter(s -> s.getId().equals(id)).findFirst();
+            if (!selectionOptional.isPresent()) {
+                continue;
+            }
+            Selection selection = selectionOptional.get();
             set.clear();
             for (com.bulletjournal.templates.controller.model.SampleTask task : l) {
                 if (task.getMetadata().split(",")[2].contains(selection.getText())) {
@@ -92,12 +101,15 @@ public class LeetCodeAnalyzer {
                 }
             }
             String s = set.toString();
-            // System.out.println("('" + s.substring(1, s.length() - 1) + "', 11, '" + selection.getId() + "'),");
+            String ss = String.format("UPDATE template.sample_task_rules " + "SET task_ids = '%s' " +
+                    "WHERE step_id = 11" +
+                    "  AND selection_combo = '%d';", s.substring(1, s.length() - 1), selection.getId());
+            System.out.println(ss);
         }
 
         // Company
         // frequencytimeperiod#
-        for (long i = 300L; i < 536L; i++) {
+        for (long i = 300L; i < 537L; i++) {
             final long id = i;
             Optional<Selection> selectionOptional = selections.stream().filter(s -> s.getId().equals(id)).findFirst();
             if (!selectionOptional.isPresent()) {
@@ -114,8 +126,10 @@ public class LeetCodeAnalyzer {
                 }
                 if (!set.isEmpty()) {
                     String s = set.toString();
-                    System.out.println("('" + s.substring(1, s.length() - 1) + "', 11, '" + j + "," +
-                            selection.getId() + "'),");
+                    String s3 = String.format("UPDATE template.sample_task_rules " + "SET task_ids = '%s' " +
+                            "WHERE step_id = 11" +
+                            "  AND selection_combo = '%s';", s.substring(1, s.length() - 1), j + "," + selection.getId());
+                    System.out.println(s3);
                 }
             }
         }
