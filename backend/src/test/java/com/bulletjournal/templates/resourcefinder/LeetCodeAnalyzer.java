@@ -8,7 +8,6 @@ import com.bulletjournal.templates.repository.model.Selection;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
-import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -180,7 +179,7 @@ public class LeetCodeAnalyzer {
         List<Selection> selections = selectionRepository.getAllByChoiceId(13L);
         Set<String> companyNameSet = new HashSet<>(companyNames);
         Set<String> intersection = new HashSet<>(companyNames);
-        Set<String> selectionsSet = selections.stream().map(s->s.getText()).collect(Collectors.toSet());
+        Set<String> selectionsSet = selections.stream().map(s -> s.getText()).collect(Collectors.toSet());
         intersection.retainAll(selectionsSet);
         companyNameSet.removeAll(intersection);
         selectionsSet.removeAll(intersection);
@@ -191,6 +190,24 @@ public class LeetCodeAnalyzer {
                     selections.stream().filter(sel -> sel.getText().equals(s)).findFirst().get().getId());
         });
         Assert.assertEquals(selections.size(), companyNames.size());
+    }
+
+    private void testTopic(Set<String> algorithmTopics) {
+        Set<String> intersection = new HashSet<>(algorithmTopics);
+        List<Selection> selections = selectionRepository.getAllByChoiceId(15L);
+        Set<String> selectionsSet = selections.stream().map(s -> s.getText()).collect(Collectors.toSet());
+        intersection.retainAll(selectionsSet);
+        algorithmTopics.removeAll(intersection);
+        selectionsSet.removeAll(intersection);
+        System.out.println("new: " + algorithmTopics);
+        System.out.println("deleted: " + selectionsSet);
+        selectionsSet.forEach(s -> {
+            System.out.println(
+                    selections.stream().filter(sel -> sel.getText().equals(s)).findFirst().get().getId());
+        });
+        if (selections.size() != algorithmTopics.size()) {
+            System.err.println("Topic changed");
+        }
     }
 
     private List<String> readCompanyNamesFromLeetCode(String file) throws IOException {
