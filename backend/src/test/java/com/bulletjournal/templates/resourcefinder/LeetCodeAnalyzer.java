@@ -8,6 +8,7 @@ import com.bulletjournal.templates.repository.model.Selection;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
+import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -99,7 +100,11 @@ public class LeetCodeAnalyzer {
         // frequencytimeperiod#
         for (long i = 300L; i < 536L; i++) {
             final long id = i;
-            Selection selection = selections.stream().filter(s -> s.getId().equals(id)).findFirst().get();
+            Optional<Selection> selectionOptional = selections.stream().filter(s -> s.getId().equals(id)).findFirst();
+            if (!selectionOptional.isPresent()) {
+                continue;
+            }
+            Selection selection = selectionOptional.get();
             for (int j = 261; j < 265; j++) {
                 set.clear();
                 for (com.bulletjournal.templates.controller.model.SampleTask task : l) {
@@ -173,6 +178,18 @@ public class LeetCodeAnalyzer {
     public void testCompany() throws IOException {
         List<String> companyNames = readCompanyNamesFromLeetCode("./src/test/resources/leetcode-companies.html");
         List<Selection> selections = selectionRepository.getAllByChoiceId(13L);
+        Set<String> companyNameSet = new HashSet<>(companyNames);
+        Set<String> intersection = new HashSet<>(companyNames);
+        Set<String> selectionsSet = selections.stream().map(s->s.getText()).collect(Collectors.toSet());
+        intersection.retainAll(selectionsSet);
+        companyNameSet.removeAll(intersection);
+        selectionsSet.removeAll(intersection);
+        System.out.println("new: " + companyNameSet);
+        System.out.println("deleted: " + selectionsSet);
+        selectionsSet.forEach(s -> {
+            System.out.println(
+                    selections.stream().filter(sel -> sel.getText().equals(s)).findFirst().get().getId());
+        });
         Assert.assertEquals(selections.size(), companyNames.size());
     }
 
