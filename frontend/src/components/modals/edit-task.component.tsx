@@ -100,7 +100,6 @@ const EditTask: React.FC<
       : 'dueByTime'
   );
   const [reminderType, setReminderType] = useState('remindBefore');
-  const [dueTimeVisible, setDueTimeVisible] = useState(!!task.dueTime);
   const [reminderTimeVisible, setReminderTimeVisible] = useState(false);
   const [durationU, setDurationU] = useState(task && task.duration && task.duration % 60 === 0 ? 'Hours' : 'Minutes');
   const [remindButton, setRemindButton] = useState('remindBefore');
@@ -386,7 +385,6 @@ const EditTask: React.FC<
                       allowClear={true}
                       style={{ width: '100%' }}
                       placeholder="Due Date"
-                      onChange={(value) => setDueTimeVisible(value !== null)}
                       defaultValue={
                         //  defaultValue here not work try to set initail value on Form outside
                         task.dueDate

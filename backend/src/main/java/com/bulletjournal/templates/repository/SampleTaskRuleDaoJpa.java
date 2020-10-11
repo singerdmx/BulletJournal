@@ -5,6 +5,8 @@ import com.bulletjournal.templates.repository.model.SampleTask;
 import com.bulletjournal.templates.repository.model.SampleTaskRule;
 import com.bulletjournal.templates.repository.model.SampleTaskRuleId;
 import com.bulletjournal.templates.repository.model.Step;
+import com.bulletjournal.util.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -31,7 +33,13 @@ public class SampleTaskRuleDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void saveAll(Iterable<SampleTaskRule> sampleTaskRules) {
+        this.sampleTaskRuleRepository.saveAll(sampleTaskRules);
+    }
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SampleTaskRule upsert(Long stepId, String selectionCombo, String taskIds) {
+        selectionCombo = StringUtils.join(StringUtil.convertNumArray(selectionCombo), ",");
+        taskIds = StringUtils.join(StringUtil.convertNumArray(taskIds), ",");
         return this.sampleTaskRuleRepository.upsert(stepId, selectionCombo, taskIds);
     }
 

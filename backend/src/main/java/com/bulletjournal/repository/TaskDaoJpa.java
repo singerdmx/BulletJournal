@@ -43,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -441,12 +442,12 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     public List<Task> createTaskFromSampleTask(
-        Long projectId,
-        String owner,
-        List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasks,
-        Integer reminderBeforeTask,
-        List<String> assignees,
-        List<Long> labels
+            Long projectId,
+            String owner,
+            List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasks,
+            Integer reminderBeforeTask,
+            List<String> assignees,
+            List<Long> labels
     ) {
         Preconditions.checkNotNull(assignees);
         List<CreateTaskParams> createTaskParams = new ArrayList<>();
@@ -573,7 +574,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     private static ReminderSetting getReminderSetting(String dueDate, Task task, String time, String timezone,
-                                               String recurrenceRule, ReminderSetting reminderSetting) {
+                                                      String recurrenceRule, ReminderSetting reminderSetting) {
         if (dueDate != null) {
             task.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(dueDate, time, timezone).toInstant()));
             task.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(dueDate, time, timezone).toInstant()));
@@ -957,6 +958,26 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return this.taskContentRepository.findTaskContentByTask((Task) projectItem);
     }
 
+
+    @Override
+    public <T extends ProjectItemModel> List<TaskContent> getContents(Long projectItemId, String requester) {
+        List<TaskContent> contents = super.getContents(projectItemId, requester);
+        Task task = getProjectItem(projectItemId, requester);
+        if (task.getSampleTask() != null) {
+            String sampleTaskContent = task.getSampleTask().getContent();
+            TaskContent taskContent = new TaskContent(sampleTaskContent);
+            taskContent.setId(0L);
+            taskContent.setProjectItem(task);
+            taskContent.setCreatedAt(Timestamp.from(Instant.now()));
+            taskContent.setUpdatedAt(Timestamp.from(Instant.now()));
+            taskContent.setBaseText(sampleTaskContent);
+            taskContent.setOwner(task.getOwner());
+            taskContent.setRevisions("");
+            contents.add(0, taskContent);
+        }
+        return contents;
+    }
+
     @Override
     List<Long> findItemLabelsByProject(Project project) {
         return taskRepository.findUniqueLabelsByProject(project.getId());
@@ -1063,22 +1084,27 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void saveAll(List<Task> tasks) {
+        this.taskRepository.saveAll(tasks);
+    }
+
     private CreateTaskParams sampleTaskToCreateTaskParams(
-        com.bulletjournal.templates.controller.model.SampleTask sampleTask,
-        Integer reminderBeforeTask,
-        List<String> assignees,
-        List<Long> labels
+            com.bulletjournal.templates.controller.model.SampleTask sampleTask,
+            Integer reminderBeforeTask,
+            List<String> assignees,
+            List<Long> labels
     ) {
         return new CreateTaskParams(
-            sampleTask.getName(),
-            sampleTask.getDueDate(),
-            sampleTask.getDueTime(),
-            null,
-            reminderBeforeTask == null ? null : new ReminderSetting(null, null, reminderBeforeTask),
-            assignees,
-            sampleTask.getTimeZone(),
-            null,
-            labels
+                sampleTask.getName(),
+                sampleTask.getDueDate(),
+                sampleTask.getDueTime(),
+                60,
+                reminderBeforeTask == null ? null : new ReminderSetting(null, null, reminderBeforeTask),
+                assignees,
+                sampleTask.getTimeZone(),
+                null,
+                labels
         );
     }
 }

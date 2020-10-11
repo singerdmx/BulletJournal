@@ -177,10 +177,6 @@ export type ShareLinkAction = {
   link: string;
 };
 
-export type GetCompletedTasks = {
-  projectId: number;
-};
-
 export type LoadingCompletedTaskAction = {
   loadingCompletedTask: boolean;
 };
@@ -353,6 +349,7 @@ const slice = createSlice({
     TasksCreate: (state, action: PayloadAction<CreateTask>) => state,
     TaskPut: (state, action: PayloadAction<PutTask>) => state,
     TaskGet: (state, action: PayloadAction<GetTask>) => state,
+    SampleTaskGet: (state, action: PayloadAction<GetTask>) => state,
     CompletedTaskGet: (state, action: PayloadAction<GetTask>) => state,
     TaskDelete: (state, action: PayloadAction<DeleteTask>) => state,
     TasksDelete: (state, action: PayloadAction<DeleteTasks>) => state,
@@ -384,6 +381,7 @@ const slice = createSlice({
     TaskContentCreate: (state, action: PayloadAction<CreateContent>) => state,
     TaskContentDelete: (state, action: PayloadAction<DeleteContent>) => state,
     TaskContentPatch: (state, action: PayloadAction<PatchContent>) => state,
+    SampleTaskContentPatch: (state, action: PayloadAction<PatchContent>) => state,
     TaskStatusSet: (state, action: PayloadAction<SetTaskStatus>) => state,
     TaskPatchRevisionContents: (state, action: PayloadAction<PatchRevisionContents>) => state,
     GetTaskStatistics: (state, action: PayloadAction<GetTaskStatisticsAction>) => state,

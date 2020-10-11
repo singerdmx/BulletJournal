@@ -16,11 +16,11 @@ import java.util.List;
 public class SelectionController {
 
     public static final String SELECTIONS_ROUTE = "/api/choices/{choiceId}/selections";
-    public static final String SELECTION_INTRODUCTIONS_ROUTE = "/api/choices/{choiceId}/selectionIntroductions";
+    public static final String CHOICE_SELECTION_INTRODUCTIONS_ROUTE = "/api/choices/{choiceId}/selectionIntroductions";
     public static final String SELECTION_ROUTE = "/api/selections/{selectionId}";
     public static final String PUBLIC_SELECTION_ROUTE = "/api/public/selections/{selectionId}";
-    public static final String SELECTION_INTRODUCTION_ROUTE = "/api/selections/{selectionId}/introductions";
-    public static final String SPECIFIC_SELECTION_INTRODUCTION_ROUTE = "/api/introductions/{selectionIntroductionId}";
+    public static final String SELECTION_INTRODUCTIONS_ROUTE = "/api/selections/{selectionId}/introductions";
+    public static final String SELECTION_INTRODUCTION_ROUTE = "/api/selectionIntroductions/{selectionIntroductionId}";
     private final UserDaoJpa userDaoJpa;
     private final SelectionDaoJpa selectionDaoJpa;
 
@@ -38,7 +38,7 @@ public class SelectionController {
         return this.selectionDaoJpa.save(choiceId, params.getIcon(), params.getText()).toPresentationModel();
     }
 
-    @PostMapping(SELECTION_INTRODUCTION_ROUTE)
+    @PostMapping(SELECTION_INTRODUCTIONS_ROUTE)
     public List<SelectionIntroduction> createSelectionIntroduction(
             @NotNull @PathVariable Long selectionId, @NotNull @RequestBody CreateSelectionIntroductionParams params) {
         validateRequester();
@@ -46,15 +46,15 @@ public class SelectionController {
         return getSelectionIntroductions(choiceId);
     }
 
-    @DeleteMapping(SPECIFIC_SELECTION_INTRODUCTION_ROUTE)
+    @DeleteMapping(SELECTION_INTRODUCTION_ROUTE)
     public void deleteSelectionIntroduction(@NotNull @PathVariable Long selectionIntroductionId) {
         validateRequester();
         this.selectionDaoJpa.deleteIntroductionById(selectionIntroductionId);
     }
 
-    @PutMapping(SPECIFIC_SELECTION_INTRODUCTION_ROUTE)
+    @PutMapping(SELECTION_INTRODUCTION_ROUTE)
     public List<SelectionIntroduction> updateSelectionIntroduction(@NotNull @PathVariable Long selectionIntroductionId,
-                                     @NotNull @RequestBody UpdateSelectionIntroductionParams params) {
+                                                                   @NotNull @RequestBody UpdateSelectionIntroductionParams params) {
         validateRequester();
         long choiceId = this.selectionDaoJpa.updateSelectionIntroduction(selectionIntroductionId, params.getImageLink(), params.getDescription(), params.getTitle());
         return getSelectionIntroductions(choiceId);
@@ -82,7 +82,7 @@ public class SelectionController {
         this.selectionDaoJpa.deleteById(selectionId);
     }
 
-    @GetMapping(SELECTION_INTRODUCTIONS_ROUTE)
+    @GetMapping(CHOICE_SELECTION_INTRODUCTIONS_ROUTE)
     public List<SelectionIntroduction> getSelectionIntroductions(@NotNull @PathVariable Long choiceId) {
         validateRequester();
         return selectionDaoJpa.getSelectionIntroductionsByChoiceId(choiceId);

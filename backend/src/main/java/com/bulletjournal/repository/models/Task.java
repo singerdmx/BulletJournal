@@ -3,6 +3,9 @@ package com.bulletjournal.repository.models;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.TaskStatus;
+import com.bulletjournal.templates.repository.model.SampleTask;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.List;
@@ -20,6 +23,19 @@ public class Task extends TaskModel {
 
     @Column
     private Integer status;
+
+    public SampleTask getSampleTask() {
+        return sampleTask;
+    }
+
+    public void setSampleTask(SampleTask sampleTask) {
+        this.sampleTask = sampleTask;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "sample_task_id", referencedColumnName = "id", nullable = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private SampleTask sampleTask;
 
     @Column(name = "completed_slots", columnDefinition = "TEXT")
     private String completedSlots;

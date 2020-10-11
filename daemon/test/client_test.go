@@ -16,9 +16,11 @@ func (suite *ClientTestSuite) SetupTest() {
 	earningClient.FetchData()
 	earningClient.SendData()
 }
+
 func (suite *ClientTestSuite) TestClient() {
 	assert.True(suite.T(), true, true)
 }
+
 
 func TestClients(t *testing.T) {
 	suite.Run(t, new(ClientTestSuite))

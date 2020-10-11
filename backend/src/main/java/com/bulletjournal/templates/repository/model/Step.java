@@ -3,7 +3,19 @@ package com.bulletjournal.templates.repository.model;
 import com.bulletjournal.repository.models.NamedModel;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,6 +54,9 @@ public class Step extends NamedModel {
 
     @OneToMany(mappedBy = "step", fetch = FetchType.LAZY)
     private List<StepRule> stepRules = new ArrayList<>();
+
+    @OneToMany(mappedBy = "step", fetch = FetchType.LAZY)
+    private List<SampleTaskRule> sampleTaskRules = new ArrayList<>();
 
     @Column(name = "choice_order")
     private String choiceOrder;
@@ -116,6 +131,14 @@ public class Step extends NamedModel {
         this.excludedSelections = excludedSelections == null ? null : excludedSelections.toArray(new Long[0]);
     }
 
+    public List<SampleTaskRule> getSampleTaskRules() {
+        return sampleTaskRules == null ? Collections.emptyList() : sampleTaskRules;
+    }
+
+    public void setSampleTaskRules(List<SampleTaskRule> sampleTaskRules) {
+        this.sampleTaskRules = sampleTaskRules;
+    }
+
     @Override
     public Long getId() {
         return id;
@@ -128,13 +151,34 @@ public class Step extends NamedModel {
     public com.bulletjournal.templates.controller.model.Step toPresentationModel() {
         return new com.bulletjournal.templates.controller.model.Step(id, getName(),
                 getChoices().stream().map(Choice::toPresentationModel).collect(Collectors.toList()),
-                getStepRules().stream().map(StepRule::toPresentationModel).collect(Collectors.toList()));
+                getStepRules().stream().map(StepRule::toPresentationModel).collect(Collectors.toList()),
+                getExcludedSelections());
     }
 
-    public void clone(Step step) {
-        setName(step.getName());
-        setNextStep(step.getNextStep());
-        setExcludedSelections(step.getExcludedSelections());
-        setChoices(step.getChoices());
+    public void clone(Step oldStep) {
+
+        this.setName(oldStep.getName());
+        this.setNextStep(oldStep.getNextStep());
+        this.setExcludedSelections(oldStep.getExcludedSelections());
+        this.setChoices(oldStep.getChoices());
+
+        List<StepRule> clonedStepRules = new ArrayList<>();
+         for (StepRule rule : oldStep.getStepRules()) {
+            StepRule newRule = new StepRule();
+            newRule.clone(rule);
+            newRule.setStep(this);
+            clonedStepRules.add(newRule);
+        }
+
+        List<SampleTaskRule> clonedSampleTaskRules = new ArrayList<>();
+        for (SampleTaskRule rule : oldStep.getSampleTaskRules()) {
+            SampleTaskRule newRule = new SampleTaskRule();
+            newRule.clone(rule);
+            newRule.setStep(this);
+            clonedSampleTaskRules.add(newRule);
+        }
+
+        this.setStepRules(clonedStepRules);
+        this.setSampleTaskRules(clonedSampleTaskRules);
     }
 }

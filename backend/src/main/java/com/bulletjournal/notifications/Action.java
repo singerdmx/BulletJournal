@@ -16,10 +16,10 @@ public enum Action {
     }
 
     public static Action getAction(String description) {
-        switch (description) {
-            case "Accept":
+        switch (description.toLowerCase()) {
+            case "accept":
                 return ACCEPT;
-            case "Decline":
+            case "decline":
                 return DECLINE;
             default:
                 throw new BadRequestException("Invalid Action for description: " + description);

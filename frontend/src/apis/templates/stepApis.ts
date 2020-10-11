@@ -60,6 +60,17 @@ export const updateChoicesForStep = (stepId: number, choicesIds: number[]) => {
         );
 };
 
+export const updateExcludedSelectionsForStep = (stepId: number, excludedSelectionIds: number[]) => {
+    const putBody = JSON.stringify(excludedSelectionIds);
+    return doPut(`/api/steps/${stepId}/setExcludedSelections`, putBody)
+        .then(res => res.json())
+        .catch(
+            (err) => {
+                throw Error(err.message);
+            }
+        );
+};
+
 export const cloneStep = (stepId: number) => {
     return doPost(`/api/steps/${stepId}/clone`)
         .then(res => res.json())

@@ -2,29 +2,24 @@ package main
 
 import (
 	"context"
-	"github.com/singerdmx/BulletJournal/daemon/api/middleware"
-	daemon "github.com/singerdmx/BulletJournal/daemon/api/service"
-	scheduler "github.com/zywangzy/JobScheduler"
-	"google.golang.org/grpc/metadata"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
-	"strings"
 	"syscall"
 	"time"
+
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/singerdmx/BulletJournal/daemon/api/middleware"
 	daemon "github.com/singerdmx/BulletJournal/daemon/api/service"
-	"github.com/singerdmx/BulletJournal/daemon/persistence"
-	"google.golang.org/grpc/metadata"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/singerdmx/BulletJournal/daemon/config"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
-	uid "github.com/singerdmx/BulletJournal/daemon/utils"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types"
+	scheduler "github.com/zywangzy/JobScheduler"
 	"google.golang.org/grpc"
+	"upper.io/db.v3/postgresql"
 )
 
 const (
@@ -44,38 +39,8 @@ type server struct {
 
 // HealthCheck implements the rest endpoint healthcheck -> rpc
 func (s *server) HealthCheck(ctx context.Context, request *types.HealthCheckRequest) (*types.HealthCheckResponse, error) {
-	log.Printf("Received health check request: %v", request.String())
+	// log.Printf("Received health check request: %v", request.String())
 	return &types.HealthCheckResponse{}, nil
-}
-
-// Send implements the JoinGroupEvents rpc endpoint of services.DaemonServer
-func (s *server) JoinGroupEvents(ctx context.Context, request *types.JoinGroupEvents) (*types.ReplyMessage, error) {
-	log.Printf("Received rpc request: %v", request.String())
-	return &types.ReplyMessage{Message: "Hello daemon"}, nil
-}
-
-// Rest implements the Rest rest->rpc endpoint of services.DaemonServer
-func (s *server) HandleJoinGroupResponse(ctx context.Context, request *types.JoinGroupResponse) (*types.ReplyMessage, error) {
-	if meta, ok := metadata.FromIncomingContext(ctx); ok {
-		if requestId, ok := meta[strings.ToLower(middleware.RequestIDKey)]; ok {
-			log.Printf(middleware.RequestIDKey+": %v", requestId[0])
-			grpc.SendHeader(ctx, metadata.Pairs(middleware.RequestIDKey, requestId[0]))
-		} else {
-			requestId := uid.GenerateUID()
-			log.Printf(middleware.RequestIDKey+": %v", requestId)
-			grpc.SendHeader(ctx, metadata.Pairs(middleware.RequestIDKey, requestId))
-		}
-	}
-	log.Printf("Received JoinGroupResponse request: %v", request.String())
-	// get username from uid
-	joinGroupInvitationDao := persistence.InitializeJoinGroupInvitationDao(config.GetConfig())
-	invitation := joinGroupInvitationDao.Find(request.Uid)
-	// then delete etags
-	etagDao := persistence.InitializeEtagDao(ctx, config.GetConfig())
-	etagDao.DeleteEtagByUserName(invitation.Username)
-	// finally delete edges
-	// TODO: call usergroup dao
-	return &types.ReplyMessage{Message: "Hello daemon"}, nil
 }
 
 func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, stream services.Daemon_SubscribeNotificationServer) error {
@@ -201,11 +166,12 @@ func main() {
 
 	PST, _ := time.LoadLocation("America/Los_Angeles")
 	log.Infof("PST [%T] [%v]", PST, PST)
-	year, month, day := time.Now().AddDate(0, 0, daemonRpc.serviceConfig.IntervalInDays).In(PST).Date()
-	start := time.Date(year, month, day, 0, 0, 0, 0, PST)
+	start := time.Now()
 
 	daemonBackgroundJob := daemon.Job{Cleaner: cleaner, Reminder: daemon.Reminder{}, Investment: daemon.Investment{}}
 	log.Infof("The next daemon job will start at %v", start.Format(time.RFC3339))
+	log.Infof("And Now it's %v", time.Now().Format(time.RFC3339))
+
 	jobScheduler.AddRecurrentJob(
 		daemonBackgroundJob.Run,
 		start,

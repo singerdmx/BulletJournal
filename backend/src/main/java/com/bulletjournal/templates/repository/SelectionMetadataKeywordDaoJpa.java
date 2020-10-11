@@ -32,11 +32,31 @@ public class SelectionMetadataKeywordDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public SelectionMetadataKeyword save(Long selctionId, String keyword) {
+    public List<SelectionMetadataKeyword> getKeywordsBySelectionsWithoutFrequency(Collection<Long> ids) {
+        List<Selection> selections = this.selectionDaoJpa.getSelectionsById(ids);
+        List<SelectionMetadataKeyword> keywords = this.selectionMetadataKeywordRepository
+                .findByFrequencyNullAndSelectionIn(selections);
+        if (keywords.isEmpty()) {
+            keywords = this.selectionMetadataKeywordRepository.findBySelectionIn(selections);
+        }
+        return keywords;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<SelectionMetadataKeyword> getFrequencyBySelections(Collection<Long> ids) {
+        List<Selection> selections = this.selectionDaoJpa.getSelectionsById(ids);
+        List<SelectionMetadataKeyword> keywords = this.selectionMetadataKeywordRepository
+                .findByFrequencyNotNullAndSelectionIn(selections);
+        return keywords;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public SelectionMetadataKeyword save(Long selctionId, String keyword, Integer frequency) {
         Selection selection = this.selectionDaoJpa.getById(selctionId);
         SelectionMetadataKeyword selectionMetadataKeyword = new SelectionMetadataKeyword();
         selectionMetadataKeyword.setSelection(selection);
         selectionMetadataKeyword.setKeyword(keyword);
+        selectionMetadataKeyword.setFrequency(frequency);
         return this.selectionMetadataKeywordRepository.save(selectionMetadataKeyword);
     }
 
@@ -49,11 +69,12 @@ public class SelectionMetadataKeywordDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public SelectionMetadataKeyword updateByKeyword(String keyword, Long selectionId) {
+    public SelectionMetadataKeyword updateByKeyword(String keyword, Long selectionId, Integer frequency) {
         SelectionMetadataKeyword selectionMetadataKeyword = selectionMetadataKeywordRepository.findById(keyword)
                 .orElseThrow(() -> new ResourceNotFoundException("Keyword not found"));
         Selection selection = selectionDaoJpa.getById(selectionId);
         selectionMetadataKeyword.setSelection(selection);
+        selectionMetadataKeyword.setFrequency(frequency);
         return selectionMetadataKeywordRepository.save(selectionMetadataKeyword);
     }
 

@@ -5,6 +5,9 @@ public class SampleTaskRule {
     private String selectionCombo;
     private String taskIds;
 
+    public SampleTaskRule() {
+    }
+
     public SampleTaskRule(Step step, String selectionCombo, String taskIds) {
         this.step = step;
         this.selectionCombo = selectionCombo;

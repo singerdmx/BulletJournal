@@ -1,6 +1,9 @@
 package com.bulletjournal.templates.controller;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.controller.models.Content;
+import com.bulletjournal.controller.models.ReminderSetting;
+import com.bulletjournal.controller.models.User;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.templates.controller.model.SampleTask;
@@ -14,6 +17,9 @@ import com.bulletjournal.templates.repository.model.Step;
 import com.bulletjournal.templates.repository.model.*;
 import com.bulletjournal.templates.workflow.engine.RuleEngine;
 import com.bulletjournal.templates.workflow.models.RuleExpression;
+import com.bulletjournal.util.DeltaContent;
+import com.bulletjournal.util.DeltaConverter;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
@@ -32,13 +38,18 @@ public class WorkflowController {
     public static final String PUBLIC_SAMPLE_TASKS_ROUTE = "/api/public/sampleTasks";
     public static final String SAMPLE_TASKS_IMPORT_ROUTE = "/api/sampleTasks/import";
     public static final String SAMPLE_TASKS_ROUTE = "/api/sampleTasks";
-    public static final String SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}";
+    public static final String ADMIN_SAMPLE_TASK_ROUTE = "/api/admin/sampleTasks/{sampleTaskId}";
+    public static final String SAMPLE_TASK_ROUTE = "/api/public/sampleTasks/{sampleTaskId}";
+    public static final String SAMPLE_TASK_CONTENT_ROUTE = "/api/sampleTasks/{sampleTaskId}/contents";
     public static final String SAMPLE_TASK_BY_METADATA = "/api/sampleTasks";
     public static final String SAMPLE_TASK_RULE_ROUTE = "/api/sampleTaskRule";
     public static final String SAMPLE_TASKS_RULE_ROUTE = "/api/sampleTaskRules";
     public static final String CATEGORY_STEPS_ROUTE = "/api/categories/{categoryId}/steps";
     public static final String SUBSCRIBED_CATEGORIES_ROUTE = "/api/subscribedCategories";
     public static final String AUDIT_SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}/audit";
+    public static final String USER_SAMPLE_TASKS_ROUTE = "/api/userSampleTasks";
+    public static final String REMOVE_USER_SAMPLE_TASKS_ROUTE = "/api/userSampleTasks/remove";
+    public static final String REMOVE_USER_SAMPLE_TASK_ROUTE = "/api/userSampleTasks/{sampleTaskId}";
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
@@ -63,6 +74,13 @@ public class WorkflowController {
 
     @Autowired
     private UserCategoryDaoJpa userCategoryDaoJpa;
+
+    @Autowired
+    private UserClient userClient;
+
+    @Autowired
+    private UserSampleTaskDaoJpa userSampleTaskDaoJpa;
+
 
     private static final Gson GSON = new Gson();
 
@@ -95,24 +113,25 @@ public class WorkflowController {
             nextStep = checkIfSelectionsMatchCategoryRules(stepId, selections);
         } else {
             nextStep = checkIfSelectionsMatchStepRules(stepId, selections);
-            if (nextStep.getStep() != null && nextStep.getStep().getChoices().isEmpty()) {
-                // assume final step, try to get sample tasks using prevSelections
-                List<SampleTask> sampleTasks = sampleTaskDaoJpa.findAllById(
-                        this.ruleEngine.getSampleTasksForFinalStep(
-                                nextStep.getStep().getId(), selections, prevSelections))
-                        .stream().map(e -> e.toPresentationModel()).collect(Collectors.toList());
-                // store in redis and generate scrollId
-                // setSampleTasks with the first 10 tasks
-                if (sampleTasks.size() <= 10) {
-                    nextStep.setScrollId("");
-                    nextStep.setSampleTasks(sampleTasks);
-                    return nextStep;
-                }
-                String scrollId = UUID.randomUUID().toString();
-                nextStep.setScrollId(scrollId);
-                nextStep.setSampleTasks(sampleTasks.subList(0, 10));
-                sampleTasksRedisCache.save(new SampleTasks(scrollId, sampleTasks.subList(10, sampleTasks.size())));
+        }
+
+        if (nextStep.getStep() != null && nextStep.getStep().getChoices().isEmpty()) {
+            // assume final step, try to get sample tasks using prevSelections
+            List<SampleTask> sampleTasks = sampleTaskDaoJpa.findAllById(
+                    this.ruleEngine.getSampleTasksForFinalStep(
+                            nextStep.getStep().getId(), selections, prevSelections))
+                    .stream().map(e -> e.toSimplePresentationModel()).collect(Collectors.toList());
+            // store in redis and generate scrollId
+            // setSampleTasks with the first 10 tasks
+            if (sampleTasks.size() <= 10) {
+                nextStep.setScrollId("");
+                nextStep.setSampleTasks(sampleTasks);
+                return nextStep;
             }
+            String scrollId = UUID.randomUUID().toString();
+            nextStep.setScrollId(scrollId);
+            nextStep.setSampleTasks(sampleTasks.subList(0, 10));
+            sampleTasksRedisCache.save(new SampleTasks(scrollId, sampleTasks.subList(10, sampleTasks.size())));
         }
 
         return nextStep;
@@ -203,7 +222,7 @@ public class WorkflowController {
                             }
                             break;
                         case IGNORE:
-                            break;
+                            return true;
                     }
                 }
                 return false;
@@ -242,11 +261,23 @@ public class WorkflowController {
             Optional<SampleTasks> cachedSampleTasks = sampleTasksRedisCache.findById(scrollId);
             cachedSampleTasks.ifPresent(sampleTasks -> {
                 importTasksParams.getSampleTasks().addAll(
-                    sampleTasks.getSampleTasks().stream().map(SampleTask::getId).collect(Collectors.toList()));
+                        sampleTasks.getSampleTasks().stream().map(SampleTask::getId).collect(Collectors.toList()));
                 sampleTasksRedisCache.deleteById(scrollId);
             });
         }
-        return this.ruleEngine.importTasks(username, importTasksParams);
+        int frequency = this.ruleEngine.getTimesOneDay(importTasksParams.getSelections());
+        List<SampleTask> sampleTasks = this.ruleEngine.importTasks(username, importTasksParams, frequency);
+        if (importTasksParams.isSubscribed()) {
+            this.userCategoryDaoJpa.upsertUserCategories(username, importTasksParams.getCategoryId(),
+                    importTasksParams.getSelections(), importTasksParams.getProjectId());
+        }
+
+        sampleTasks.forEach(sampleTask -> {
+            sampleTask.setContent(null);
+            sampleTask.setUid(null);
+            sampleTask.setMetadata(null);
+        });
+        return sampleTasks;
     }
 
     @PostMapping(SAMPLE_TASKS_ROUTE)
@@ -255,9 +286,8 @@ public class WorkflowController {
         return sampleTaskDaoJpa.createSampleTask(createSampleTaskParams).toPresentationModel();
     }
 
-    @GetMapping(SAMPLE_TASK_ROUTE)
-    public SampleTask getSampleTask(@NotNull @PathVariable Long sampleTaskId) {
-        validateRequester();
+    @GetMapping(ADMIN_SAMPLE_TASK_ROUTE)
+    public SampleTask getAdminSampleTask(@NotNull @PathVariable Long sampleTaskId) {
         com.bulletjournal.templates.repository.model.SampleTask sampleTask =
                 this.sampleTaskDaoJpa.findSampleTaskById(sampleTaskId);
         SampleTask result = sampleTask.toPresentationModel();
@@ -268,13 +298,55 @@ public class WorkflowController {
         return result;
     }
 
+    @GetMapping(SAMPLE_TASK_ROUTE)
+    public SampleTaskView getSampleTask(@NotNull @PathVariable Long sampleTaskId) {
+        // ContentType SAMPLE_TASK
+        SampleTask sampleTask = getAdminSampleTask(sampleTaskId);
+        User user = this.userClient.getUser("BulletJournal");
+        com.bulletjournal.controller.models.SampleTask task = new com.bulletjournal.controller.models.SampleTask(
+                sampleTaskId, user, Collections.emptyList(), null, null, null,
+                sampleTask.getName(), null, null, Collections.emptyList(),
+                new ReminderSetting(null, null, 6),
+                null, System.currentTimeMillis(), System.currentTimeMillis(), null);
+
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+        Content content = getSampleTaskContent(sampleTaskId, sampleTask.getContent(), requester);
+        return new SampleTaskView(task, content);
+    }
+
+    private Content getSampleTaskContent(Long sampleTaskId, String content, String requester) {
+        User user = this.userClient.getUser("BulletJournal");
+        if (StringUtils.isBlank(content)) {
+            content = DeltaContent.EMPTY_CONTENT;
+        }
+        content = DeltaConverter.supplementContentText(content, false);
+        return new Content(this.userDaoJpa.isAdmin(requester) ? sampleTaskId : 0L,
+                user, content, content,
+                System.currentTimeMillis(), System.currentTimeMillis(), "");
+    }
+
+    @PatchMapping(SAMPLE_TASK_CONTENT_ROUTE)
+    public Content updateSampleTaskContent(
+            @NotNull @PathVariable Long sampleTaskId,
+            @NotNull @RequestBody UpdateSampleTaskContentParams updateSampleTaskContentParams) {
+        validateRequester();
+        String content = this.sampleTaskDaoJpa.updateSampleTaskContent(
+                sampleTaskId, updateSampleTaskContentParams.getText()).getContent();
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+        return getSampleTaskContent(sampleTaskId, content, requester);
+    }
+
     @GetMapping(SAMPLE_TASK_BY_METADATA)
     public List<SampleTask> getSampleTasksByFilter(@RequestParam(value = "filter") String metadataFilter) {
         // http://localhost:8080/api/sampleTasks?filter={filter}
         validateRequester();
-        return sampleTaskDaoJpa.findSampleTasksByMetadataFilter(metadataFilter).stream()
+        List<SampleTask> sampleTasks = sampleTaskDaoJpa.findSampleTasksByMetadataFilter(metadataFilter).stream()
                 .map(com.bulletjournal.templates.repository.model.SampleTask::toPresentationModel)
+                .sorted(Comparator.comparingLong(SampleTask::getId))
                 .collect(Collectors.toList());
+
+        sampleTasks.forEach(s -> s.setContent(null));
+        return sampleTasks;
     }
 
     @PutMapping(SAMPLE_TASK_ROUTE)
@@ -299,7 +371,7 @@ public class WorkflowController {
 
     @DeleteMapping(SAMPLE_TASK_RULE_ROUTE)
     public void deleteSampleTaskRule(@RequestParam(value = "stepId") Long stepId,
-                                 @RequestParam(value = "selectionCombo") String selectionCombo) {
+                                     @RequestParam(value = "selectionCombo") String selectionCombo) {
         validateRequester();
         sampleTaskRuleDaoJpa.deleteById(stepId, selectionCombo);
     }
@@ -312,9 +384,40 @@ public class WorkflowController {
 
     @PostMapping(AUDIT_SAMPLE_TASK_ROUTE)
     public SampleTask auditSampleTask(@NotNull @PathVariable Long sampleTaskId,
-                                @Valid @RequestBody AuditSampleTaskParams auditSampleTaskParams) {
+                                      @Valid @RequestBody AuditSampleTaskParams auditSampleTaskParams) {
         validateRequester();
         return this.sampleTaskDaoJpa.auditSampleTask(sampleTaskId, auditSampleTaskParams).toPresentationModel();
+    }
+
+    @GetMapping(USER_SAMPLE_TASKS_ROUTE)
+    public List<SampleTask> getUserSampleTasks() {
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+        List<UserSampleTask> userSampleTasks = userSampleTaskDaoJpa.getUserSampleTaskByUserName(requester);
+
+        List<SampleTask> sampleTasks = new ArrayList<>();
+        for (UserSampleTask userSampleTask : userSampleTasks) {
+            sampleTasks.add(userSampleTask.getSampleTask().toSimplePresentationModel());
+        }
+
+        return sampleTasks;
+    }
+
+    @PostMapping(REMOVE_USER_SAMPLE_TASKS_ROUTE)
+    public List<SampleTask> removeUserSampleTasks(
+            @Valid @RequestBody RemoveUserSampleTasksParams removeUserSampleTasksParams) {
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+        this.ruleEngine.importTasks(requester, removeUserSampleTasksParams, 6);
+        this.userSampleTaskDaoJpa.removeUserSampleTasks(requester, removeUserSampleTasksParams.getSampleTasks());
+        return getUserSampleTasks();
+    }
+
+    @DeleteMapping(REMOVE_USER_SAMPLE_TASK_ROUTE)
+    public List<SampleTask> removeUserSampleTask(
+            @NotNull @PathVariable Long sampleTaskId) {
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+        this.userSampleTaskDaoJpa.removeUserSampleTasks(requester,
+                ImmutableList.of(sampleTaskId));
+        return getUserSampleTasks();
     }
 
     private void validateRequester() {

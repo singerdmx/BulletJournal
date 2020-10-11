@@ -21,6 +21,7 @@ export const contentTypeIconMapper: { [key in ContentType]: React.ReactNode } = 
     [ContentType.GROUP]: <FileTextOutlined/>,
     [ContentType.LABEL]: <FileTextOutlined/>,
     [ContentType.CONTENT]: <FileTextOutlined/>,
+    [ContentType.SAMPLE_TASK]: <CarryOutOutlined/>,
 };
 
 const SearchResultItemElement: React.FC<SearchResultItemProps> =

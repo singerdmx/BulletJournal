@@ -83,6 +83,11 @@ export const setStepChoices = (id: number, choices: number[]) => actions.setStep
     choices: choices
 });
 
+export const setStepExcludedSelections = (id: number, selections: number[]) => actions.setStepExcludedSelections({
+    id: id,
+    selections: selections
+});
+
 export const nextStepReceived = (nextStep: NextStep | undefined) => actions.nextStepReceived({step: nextStep});
 
 export const sampleTasksReceived = (sampleTasks: SampleTask[], scrollId: string) =>
@@ -113,8 +118,8 @@ export const getSampleTask = (sampleTaskId: number) => actions.getSampleTask({sa
 export const removeSampleTask = (sampleTaskId: number) =>
     actions.removeSampleTask({taskId: sampleTaskId});
 
-export const updateSampleTask = (sampleTaskId: number, name: string, uid: string, content: string, metadata: string) =>
-    actions.updateSampleTask({sampleTaskId: sampleTaskId, name: name, uid: uid, content: content, metadata: metadata});
+export const updateSampleTask = (sampleTaskId: number, name: string, uid: string, content: string, metadata: string, pending: boolean) =>
+    actions.updateSampleTask({sampleTaskId: sampleTaskId, name: name, uid: uid, content: content, metadata: metadata, pending: pending});
 
 export const cloneStep = (stepId: number) => actions.copyStep({stepId: stepId});
 

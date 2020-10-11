@@ -4,11 +4,14 @@ import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.templates.controller.model.CategorySteps;
 import com.bulletjournal.templates.controller.model.Rule;
+import com.bulletjournal.templates.controller.model.SampleTaskRuleView;
 import com.bulletjournal.templates.repository.model.*;
+import com.bulletjournal.util.StringUtil;
 import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,19 +24,22 @@ public class CategoryDaoJpa {
 
     private static Logger LOGGER = LoggerFactory.getLogger(CategoryDaoJpa.class);
 
-    private CategoryRepository categoryRepository;
-    private CategoryRuleRepository categoryRuleRepository;
-    private ChoiceDaoJpa choiceDaoJpa;
-    private StepDaoJpa stepDaoJpa;
-    private RuleDaoJpa ruleDaoJpa;
-
     @Autowired
-    public CategoryDaoJpa(CategoryRepository categoryRepository, CategoryRuleRepository categoryRuleRepository, ChoiceDaoJpa choiceDaoJpa, StepDaoJpa stepDaoJpa) {
-        this.choiceDaoJpa = choiceDaoJpa;
-        this.categoryRepository = categoryRepository;
-        this.categoryRuleRepository = categoryRuleRepository;
-        this.stepDaoJpa = stepDaoJpa;
-    }
+    private CategoryRepository categoryRepository;
+    @Autowired
+    private SampleTaskRuleRepository sampleTaskRuleRepository;
+    @Autowired
+    private ChoiceDaoJpa choiceDaoJpa;
+    @Autowired
+    private StepDaoJpa stepDaoJpa;
+    @Autowired
+    private SelectionDaoJpa selectionDaoJpa;
+    @Lazy
+    @Autowired
+    private SampleTaskDaoJpa sampleTaskDaoJpa;
+    @Lazy
+    @Autowired
+    private RuleDaoJpa ruleDaoJpa;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Category create(String name, String description, String icon, String color, Long forumId, String image, Long nextStepId, Boolean needStartDate) {
@@ -129,6 +135,7 @@ public class CategoryDaoJpa {
         CategorySteps categorySteps = new CategorySteps();
         List<Triple<com.bulletjournal.templates.controller.model.Step, Rule, com.bulletjournal.templates.controller.model.Step>> connections = new ArrayList<>();
         List<Long> allStepIds = new ArrayList<>();
+        List<SampleTaskRuleView> finalSteps = new ArrayList<>();
         allStepIds.add(categoryId);
 
         Category category = categoryRepository.getById(categoryId);
@@ -140,9 +147,10 @@ public class CategoryDaoJpa {
             allStepIds.add(nextStep.getId());
 
             return nextStep;
-        })
-                .collect(Collectors.toCollection(LinkedList::new));
+        }).collect(Collectors.toCollection(LinkedList::new));
         int size = bfsQueue.size();
+        Set<Long> allTasks = new HashSet<>();
+        Set<Long> allSelections = new HashSet<>();
         while (size > 0) {
             for (int i = 0; i < size; i++) {
                 Step currentStep = bfsQueue.poll();
@@ -160,6 +168,8 @@ public class CategoryDaoJpa {
 
                             bfsQueue.add(nextStep);
                             allStepIds.add(nextStep.getId());
+                        } else {
+                            findSelectionComboAndSampleTaskForFinalStep(finalSteps, currentStep, allTasks, allSelections);
                         }
                     });
                 } else {
@@ -169,6 +179,8 @@ public class CategoryDaoJpa {
 
                         bfsQueue.add(nextStep);
                         allStepIds.add(nextStep.getId());
+                    } else {
+                        findSelectionComboAndSampleTaskForFinalStep(finalSteps, currentStep, allTasks, allSelections);
                     }
                 }
 
@@ -179,6 +191,47 @@ public class CategoryDaoJpa {
         categorySteps.setConnections(connections);
         categorySteps.setStepIds(allStepIds);
 
+        Map<Long, SampleTask> taskMap = this.sampleTaskDaoJpa.findAllById(allTasks)
+                .stream().collect(Collectors.toMap(SampleTask::getId, t -> t));
+
+        Map<Long, Selection> selectionMap = this.selectionDaoJpa.getSelectionsById(allSelections)
+                .stream().collect(Collectors.toMap(Selection::getId, s -> s));
+
+        finalSteps.forEach(finalStep -> {
+            for (long selectionId: StringUtil.convertNumArray(finalStep.getSelectionCombo())) {
+                if (selectionMap.containsKey(selectionId)) {
+                    finalStep.addSelection(selectionMap.get(selectionId).toPresentationModel());
+                }
+            }
+
+            for (long taskId: StringUtil.convertNumArray(finalStep.getTaskIds())) {
+                SampleTask sampleTask = taskMap.get(taskId);
+                if (sampleTask != null) {
+                    finalStep.addTask(new com.bulletjournal.templates.controller.model.SampleTask(
+                            sampleTask.getId(),
+                            sampleTask.getName()
+                    ));
+                }
+            }
+            finalStep.setTaskIds("");
+        });
+
+        categorySteps.setFinalSteps(finalSteps);
+
         return categorySteps;
+    }
+
+    private void findSelectionComboAndSampleTaskForFinalStep(
+            List<SampleTaskRuleView> finalSteps,
+            Step currentStep, Set<Long> allTasks, Set<Long> allSelections) {
+        // get task rules
+        List<SampleTaskRule> rules = this.sampleTaskRuleRepository
+                .findAllByStep(currentStep);
+        finalSteps.addAll(rules.stream().map(r -> new SampleTaskRuleView(r.toPresentationModel()))
+                .collect(Collectors.toList()));
+        rules.forEach(rule -> {
+            allTasks.addAll(rule.getSampleTaskIds());
+            allSelections.addAll(rule.getSelectionIds());
+        });
     }
 }

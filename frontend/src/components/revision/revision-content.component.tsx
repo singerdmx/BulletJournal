@@ -94,6 +94,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
     [ContentType.GROUP]: () => {},
     [ContentType.LABEL]: () => {},
     [ContentType.CONTENT]: () => {},
+    [ContentType.SAMPLE_TASK]: () => {},
   };
   const updateRevisionFunction = updateContentRevision[projectItem.contentType];
 
@@ -106,6 +107,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
     [ContentType.GROUP]: () => {},
     [ContentType.LABEL]: () => {},
     [ContentType.CONTENT]: () => {},
+    [ContentType.SAMPLE_TASK]: () => {},
   };
   const patchContentFunction = patchProjectContent[projectItem.contentType];
 

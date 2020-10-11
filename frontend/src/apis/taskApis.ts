@@ -317,6 +317,20 @@ export const updateContent = (
     });
 };
 
+export const updateSampleContent = (
+    taskId: number,
+    text: string,
+) => {
+  const patchBody = JSON.stringify({
+    text: text,
+  });
+  return doPatch(`/api/sampleTasks/${taskId}/contents`, patchBody)
+      .then((res) => res.json())
+      .catch((err) => {
+        throw Error(err);
+      });
+};
+
 export const getContentRevision = (
   taskId: number,
   contentId: number,

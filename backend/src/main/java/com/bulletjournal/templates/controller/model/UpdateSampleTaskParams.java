@@ -12,6 +12,16 @@ public class UpdateSampleTaskParams {
 
     private String timeZone;
 
+    private boolean pending;
+
+    public boolean isPending() {
+        return pending;
+    }
+
+    public void setPending(boolean pending) {
+        this.pending = pending;
+    }
+
     public String getName() {
         return name;
     }
@@ -45,7 +55,10 @@ public class UpdateSampleTaskParams {
     }
 
     public String getUid() {
-        return uid;
+        if (uid == null) {
+            return null;
+        }
+        return uid.trim();
     }
 
     public void setUid(String uid) {

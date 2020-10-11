@@ -12,7 +12,7 @@ import {
 import {
   deleteTransaction, deleteContent,
   getTransaction,
-  updateTransactionContents, transactionReceived,
+  updateTransactionContents,
 } from '../../features/transactions/actions';
 import { dateFormat } from '../../features/myBuJo/constants';
 // modals import
@@ -71,7 +71,6 @@ type TransactionProps = {
   contents: Content[];
   deleteTransaction: (transactionId: number, type: ProjectItemUIType) => void;
   updateTransactionContents: (transactionId: number) => void;
-  transactionReceived: (transaction: Transaction | undefined) => void;
   getProject: (projectId: number) => void;
 };
 
@@ -101,11 +100,10 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
     setDisplayMore,
     setDisplayRevision,
     deleteContent,
-    transactionReceived,
     getProject
   } = props;
 
-  // get id of Transaction from oruter
+  // get id of Transaction from router
   const { transactionId } = useParams();
   // state control drawer displaying
   const [showEditor, setEditorShow] = useState(false);
@@ -365,6 +363,5 @@ export default connect(mapStateToProps, {
   deleteContent,
   setDisplayMore,
   setDisplayRevision,
-  transactionReceived,
   getProject
 })(TransactionPage);

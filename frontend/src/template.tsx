@@ -8,7 +8,7 @@ import FooterLayout from "./layouts/footer/footer.layout";
 import SideLayout from './layouts/templates/side.layout';
 import ContentLayout from './layouts/templates/content.layout';
 import {SAMPLE_TASKS, SELECTIONS, STEPS} from "./pages/templates/steps.pages";
-
+import './template.styles.less';
 
 type TemplatesProps = {
     reload: boolean;

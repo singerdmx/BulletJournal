@@ -104,10 +104,10 @@ public class NotificationService {
     }
 
     public void addContentBatch(ContentBatch contentBatch) {
-        LOGGER.info("Received contentBatch: " + contentBatch);
         if (contentBatch == null) {
             return;
         }
+        LOGGER.info("Received contentBatch: {}", contentBatch.getContents().size());
         this.eventQueue.offer(contentBatch);
     }
 

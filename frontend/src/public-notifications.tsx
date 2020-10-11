@@ -7,7 +7,7 @@ import {useParams} from "react-router-dom";
 import {getRandomBackgroundImage} from "./assets/background";
 import {useLocation} from "react-use";
 import ReactLoading from "react-loading";
-import {answerPublicNotification} from "./apis/publicNotifications";
+import {answerPublicNotification} from "./apis/notificationApis";
 import {getCookie} from "./index";
 
 type PublicNotificationsProps = {};
@@ -35,7 +35,7 @@ const PublicNotificationsPage: React.FC<PublicNotificationsProps> = (props) => {
 
   if (id && location.search) {
     const action = location.search.substring(8).toLowerCase(); // location.search = ?action=
-    console.log(`/dae/public/notifications/${id}/answer?action=${action}`);
+    console.log(`/api/public/notifications/${id}/answer?action=${action}`);
     setTimeout(() => {
       handleAnswer(id, action);
     }, 3000);

@@ -12,11 +12,13 @@ import {
     updateSelection
 } from "../../features/templates/actions";
 import {useHistory} from "react-router-dom";
+import {IState} from "../../store";
 
 const {Title, Text} = Typography;
 
 type ChoiceProps = {
-    choice: Choice;
+    choice: Choice | undefined;
+    c: Choice;
     deleteChoice: (id: number) => void;
     deleteSelection: (id: number) => void;
     updateChoice: (id: number, name: string, multiple: boolean, instructionIncluded: boolean) => void;
@@ -27,6 +29,7 @@ type ChoiceProps = {
 const AdminChoiceElem: React.FC<ChoiceProps> = (
     {
         choice,
+        c,
         getChoice,
         deleteChoice,
         deleteSelection,
@@ -40,7 +43,7 @@ const AdminChoiceElem: React.FC<ChoiceProps> = (
 
     const openModal = () => {
         setVisible(true);
-        getChoice(choice.id);
+        getChoice(c.id);
     };
 
     const handleCancel = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
@@ -50,31 +53,44 @@ const AdminChoiceElem: React.FC<ChoiceProps> = (
 
     const nameChange = (input: any) => {
         console.log(input);
-        updateChoice(choice.id, input, choice.multiple, choice.instructionIncluded);
+        if (choice) {
+            updateChoice(choice.id, input, choice.multiple, choice.instructionIncluded);
+        }
     }
 
     const selectionTextChange = (e: string, id: number) => {
         console.log(e);
         updateSelection(id, e);
+        setVisible(false);
     }
 
-    const deleteSelectionElem = (id: number) => {
+    const deleteSelectionElem = (e: any, id: number) => {
+        e.preventDefault();
+        e.stopPropagation();
         deleteSelection(id);
+        setVisible(false);
     }
 
     const choiceMultipleChange = (input: any) => {
         console.log(input)
-        updateChoice(choice.id, choice.name, input.target.value, choice.instructionIncluded);
+        if (choice) {
+            updateChoice(choice.id, choice.name, input.target.value, choice.instructionIncluded);
+        }
         setVisible(false);
     }
 
     const onChangeInstructionIncluded = (value: any) => {
         console.log(value.target.checked);
-        updateChoice(choice.id, choice.name, choice.multiple, value.target.checked);
+        if (choice) {
+            updateChoice(choice.id, choice.name, choice.multiple, value.target.checked);
+        }
         setVisible(false);
     }
 
     const getModal = () => {
+        if (!choice) {
+            return <span/>
+        }
         return (
             <Modal
                 width={900}
@@ -99,7 +115,7 @@ const AdminChoiceElem: React.FC<ChoiceProps> = (
                     <div className='choices-popup'>
                         {choice.selections.map(s => <span>
                             <Text editable={{onChange: (e) => selectionTextChange(e, s.id)}}>{s.text}</Text> ({s.id})
-                            <DeleteFilled style={{cursor: 'pointer'}} onClick={() => deleteSelectionElem(s.id)}/>
+                            <DeleteFilled style={{cursor: 'pointer'}} onClick={(e) => deleteSelectionElem(e, s.id)}/>
                         </span>)}
                     </div>
                     <Divider/>
@@ -117,7 +133,12 @@ const AdminChoiceElem: React.FC<ChoiceProps> = (
                         <h3>Associated Steps</h3>
                         {choice.steps.length > 0 && choice.steps.map(step => {
                             return <span style={{cursor: 'pointer', padding: '5px'}}
-                                         onClick={() => history.push(`/admin/steps/${step.id}`)}>
+                                         onClick={(e) => {
+                                             e.preventDefault();
+                                             e.stopPropagation();
+                                             history.push(`/admin/steps/${step.id}`);
+                                             setVisible(false);
+                                         }}>
                                 {step.name} ({step.id})
                             </span>
                         })}
@@ -129,13 +150,16 @@ const AdminChoiceElem: React.FC<ChoiceProps> = (
     }
 
     return <span className='choice-elem' onClick={openModal}>
-            {choice.name} ({choice.id})
+            {c.name} ({c.id})
         {getModal()}
     </span>
 };
 
+const mapStateToProps = (state: IState) => ({
+    choice: state.templates.choice,
+});
 
-export default connect(null, {
+export default connect(mapStateToProps, {
     getChoice,
     deleteChoice,
     updateChoice,

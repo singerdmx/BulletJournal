@@ -5,14 +5,17 @@ import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.NewSampleTaskEvent;
 import com.bulletjournal.notifications.NotificationService;
+import com.bulletjournal.repository.NotificationRepository;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
+import com.bulletjournal.repository.models.Notification;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.User;
 import com.bulletjournal.templates.controller.model.AuditSampleTaskParams;
 import com.bulletjournal.templates.controller.model.CreateSampleTaskParams;
 import com.bulletjournal.templates.controller.model.UpdateSampleTaskParams;
 import com.bulletjournal.templates.repository.model.*;
+import com.bulletjournal.util.StringUtil;
 import com.google.common.collect.ImmutableList;
 import org.apache.http.util.TextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +52,15 @@ public class SampleTaskDaoJpa {
 
     @Autowired
     private UserDaoJpa userDaoJpa;
+
+    @Autowired
+    private UserSampleTaskDaoJpa userSampleTaskDaoJpa;
+
+    @Autowired
+    private SampleTaskNotificationsRepository sampleTaskNotificationsRepository;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SampleTask createSampleTask(CreateSampleTaskParams createSampleTaskParams) {
@@ -114,6 +126,14 @@ public class SampleTaskDaoJpa {
         sampleTask.setMetadata(updateSampleTaskParams.getMetadata());
         sampleTask.setUid(updateSampleTaskParams.getUid());
         sampleTask.setTimeZone(updateSampleTaskParams.getTimeZone());
+        sampleTask.setPending(updateSampleTaskParams.isPending());
+        return sampleTaskRepository.save(sampleTask);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public SampleTask updateSampleTaskContent(Long sampleTaskId, String content) {
+        SampleTask sampleTask = findSampleTaskById(sampleTaskId);
+        sampleTask.setContent(content);
         return sampleTaskRepository.save(sampleTask);
     }
 
@@ -136,13 +156,21 @@ public class SampleTaskDaoJpa {
         sampleTask.setPending(false);
         String originalKeyword = sampleTask.getMetadata();
         List<SelectionMetadataKeyword> keywords =
-                this.selectionMetadataKeywordDaoJpa.getKeywordsBySelections(auditSampleTaskParams.getSelections());
+                this.selectionMetadataKeywordDaoJpa.getKeywordsBySelectionsWithoutFrequency(auditSampleTaskParams.getSelections());
         for (SelectionMetadataKeyword keyword : keywords) {
             sampleTask.setMetadata(sampleTask.getMetadata() + "," + keyword.getKeyword());
         }
         this.save(sampleTask);
 
-        // read redis and clean other admin notifications as well as self's
+        // clean other admin notifications as well as self's
+        Optional<SampleTaskNotification> sampleTaskNotification =
+                this.sampleTaskNotificationsRepository.findById(sampleTaskId);
+
+        if (sampleTaskNotification.isPresent()) {
+            List<Long> notificationIds = StringUtil.convertNumArray(sampleTaskNotification.get().getNotifications());
+            List<Notification> notifications = this.notificationRepository.findAllById(notificationIds);
+            this.notificationRepository.deleteInBatch(notifications);
+        }
 
         this.sampleTaskRuleDaoJpa.updateSampleTaskRule(
                 sampleTask, originalKeyword, auditSampleTaskParams.getSelections());
@@ -151,6 +179,9 @@ public class SampleTaskDaoJpa {
         List<UserCategory> users = this.userCategoryDaoJpa.getSubscribedUsersByMetadataKeyword(
                 keywords.stream().map(SelectionMetadataKeyword::getKeyword).collect(Collectors.toList()));
 
+        if (users.isEmpty()) {
+            return sampleTask;
+        }
 
         // if sample task has due date, directly push to task table
         if (sampleTask.hasDueDate()) {
@@ -159,13 +190,23 @@ public class SampleTaskDaoJpa {
                     .stream().collect(Collectors.toMap(User::getName, u -> u));
             for (UserCategory user : users) {
                 String username = user.getUser().getName();
+                com.bulletjournal.templates.controller.model.SampleTask sampleTaskModel =
+                        sampleTask.toPresentationModel();
+                if (sampleTask.isRefreshable()) {
+                    sampleTaskModel.setContent(null);
+                }
                 List<Task> createdTasks = this.taskDaoJpa.createTaskFromSampleTask(
                         user.getProject().getId(),
                         username,
-                        ImmutableList.of(sampleTask.toPresentationModel()),
+                        ImmutableList.of(sampleTaskModel),
                         userMap.get(username).getReminderBeforeTask().getValue(),
                         ImmutableList.of(username),
                         Collections.emptyList());
+                if (sampleTask.isRefreshable()) {
+                    createdTasks.forEach(t -> t.setSampleTask(sampleTask));
+                }
+                this.taskDaoJpa.saveAll(createdTasks);
+
                 this.notificationService.inform(
                         new NewSampleTaskEvent(
                                 new Event(username, sampleTaskId, sampleTask.getName()),
@@ -177,9 +218,12 @@ public class SampleTaskDaoJpa {
 
         // otherwise show up in punchCard page
         List<Event> events = new ArrayList<>();
+        List<UserSampleTask> userSampleTasks = new ArrayList<>();
         for (UserCategory user : users) {
+            userSampleTasks.add(new UserSampleTask(user.getUser(), sampleTask));
             events.add(new Event(user.getUser().getName(), sampleTaskId, sampleTask.getName()));
         }
+        this.userSampleTaskDaoJpa.save(userSampleTasks);
         this.notificationService.inform(new NewSampleTaskEvent(events, "BulletJournal"));
 
         return sampleTask;

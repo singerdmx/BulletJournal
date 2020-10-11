@@ -11,55 +11,6 @@
     "application/json"
   ],
   "paths": {
-    "/dae/public/notifications/{uid}/{action}": {
-      "post": {
-        "summary": "Serve rest call",
-        "operationId": "Daemon_HandleJoinGroupResponse",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/typesReplyMessage"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "action",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "enum": [
-              "ACCEPT",
-              "DECLINE"
-            ]
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/typesJoinGroupResponse"
-            }
-          }
-        ],
-        "tags": [
-          "Daemon"
-        ]
-      }
-    },
     "/daemon/healthcheck": {
       "get": {
         "summary": "Serve rpc / rest call to health check",
@@ -72,7 +23,7 @@
             }
           },
           "default": {
-            "description": "An unexpected error response",
+            "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/runtimeError"
             }
@@ -161,75 +112,11 @@
         }
       }
     },
-    "typesActionEnum": {
-      "type": "string",
-      "enum": [
-        "ACCEPT",
-        "DECLINE"
-      ],
-      "default": "ACCEPT",
-      "title": "- ACCEPT: ACCEPT means 0\n - DECLINE: DECLINE means 1"
-    },
-    "typesEvent": {
-      "type": "object",
-      "properties": {
-        "targetUser": {
-          "type": "string"
-        },
-        "contentId": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "contentName": {
-          "type": "string"
-        },
-        "originatorAlias": {
-          "type": "string"
-        },
-        "notificationId": {
-          "type": "string",
-          "format": "uint64"
-        }
-      }
-    },
     "typesHealthCheckResponse": {
       "type": "object",
       "properties": {
         "status": {
           "$ref": "#/definitions/HealthCheckResponseServingStatus"
-        }
-      }
-    },
-    "typesJoinGroupEvent": {
-      "type": "object",
-      "properties": {
-        "events": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/typesEvent"
-          }
-        },
-        "originator": {
-          "type": "string"
-        }
-      }
-    },
-    "typesJoinGroupResponse": {
-      "type": "object",
-      "properties": {
-        "uid": {
-          "type": "string"
-        },
-        "action": {
-          "$ref": "#/definitions/typesActionEnum"
-        }
-      }
-    },
-    "typesReplyMessage": {
-      "type": "object",
-      "properties": {
-        "message": {
-          "type": "string"
         }
       }
     },

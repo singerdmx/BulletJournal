@@ -1,10 +1,10 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {useHistory, useParams} from "react-router-dom";
 import {connect} from "react-redux";
-import {deleteStep, getStep, setStepChoices, updateStep, deleteRule} from "../../features/templates/actions";
+import {deleteStep, getStep, setStepChoices, setStepExcludedSelections, updateStep, deleteRule} from "../../features/templates/actions";
 import {IState} from "../../store";
 import {Step} from "../../features/templates/interface";
-import {BackTop, Button, Divider, InputNumber, Tooltip, Typography, Tag} from "antd";
+import {BackTop, Button, Divider, InputNumber, Tooltip, Typography, Tag, message} from "antd";
 import './steps.styles.less'
 import {DeleteFilled, DeleteTwoTone} from "@ant-design/icons";
 import AdminChoiceElem from "./admin-choice-elem";
@@ -16,6 +16,7 @@ const {Title} = Typography;
 
 type AdminStepProps = {
     step: Step | undefined;
+    setStepExcludedSelections: (id: number, selections: number[]) => void;
     getStep: (stepId: number) => void;
     deleteStep: (stepId: number) => void;
     setStepChoices: (id: number, choices: number[]) => void;
@@ -24,9 +25,10 @@ type AdminStepProps = {
 }
 
 const AdminStepPage: React.FC<AdminStepProps> = (
-    {step, getStep, deleteStep, setStepChoices, updateStep, deleteRule}) => {
+    {step, getStep, deleteStep, setStepChoices, updateStep, deleteRule, setStepExcludedSelections}) => {
     const history = useHistory();
     const {stepId} = useParams();
+    const [exclusionId, setExclusionId] = useState(0);
 
     useEffect(() => {
         if (stepId) {
@@ -54,7 +56,17 @@ const AdminStepPage: React.FC<AdminStepProps> = (
     }
 
     const removeExcludedSelection = (id: number) => {
-        
+        setStepExcludedSelections(step.id, step.excludedSelections.filter(c => c !== id));
+    }
+
+    const addExcludedSelection = (id: number) => {
+        if (!id) {
+            message.error("Please input Selection ID")
+            return;
+        }
+        const excludedSelections = [...step.excludedSelections];
+        excludedSelections.push(id);
+        setStepExcludedSelections(step.id, excludedSelections);
     }
 
     const nameChange = (input: any) => {
@@ -71,7 +83,7 @@ const AdminStepPage: React.FC<AdminStepProps> = (
         <h3>Choices</h3>
         {step.choices.map(c => {
             return <div>
-                <AdminChoiceElem choice={c}/>
+                <AdminChoiceElem c={c}/>
                 {' '}
                 <Tooltip title='Remove Choice'>
                     <DeleteTwoTone style={{cursor: 'pointer'}} onClick={() => removeChoice(step, c.id)}/>
@@ -90,12 +102,16 @@ const AdminStepPage: React.FC<AdminStepProps> = (
         <div>
             <h3>Excluded Selections</h3>
             <div>
-                <InputNumber/> <Button type='primary'>Add to Exclusion</Button>
+                <InputNumber placeholder='Selection ID' style={{width: '200px'}} onChange={(value) => {
+                    if (!value || isNaN(value)) setExclusionId(0);
+                    else setExclusionId(value);
+                }}
+                /> <Button type='primary' onClick={() => addExcludedSelection(exclusionId)}>Add to Exclusion</Button>
             </div>
             <div>
                 {step.excludedSelections.map(s => <span>
-                            {s.text} ({s.id})
-                    <DeleteFilled style={{cursor: 'pointer'}} onClick={() => removeExcludedSelection(s.id)}/>
+                            {s}
+                    <DeleteFilled style={{cursor: 'pointer'}} onClick={() => removeExcludedSelection(s)}/>
                         </span>)}
             </div>
         </div>
@@ -122,5 +138,5 @@ const mapStateToProps = (state: IState) => ({
 });
 
 export default connect(mapStateToProps, {
-    getStep, deleteStep, setStepChoices, updateStep, deleteRule
+    getStep, deleteStep, setStepChoices, updateStep, deleteRule, setStepExcludedSelections
 })(AdminStepPage);

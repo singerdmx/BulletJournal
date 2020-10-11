@@ -77,4 +77,9 @@ public class SampleTaskRule implements Serializable {
         return new com.bulletjournal.templates.controller.model.SampleTaskRule(step.toPresentationModel(),
                 selectionCombo, taskIds);
     }
+
+    public void clone(SampleTaskRule sampleTaskRule) {
+        this.setSelectionCombo(sampleTaskRule.getSelectionCombo());
+        this.setTaskIds(sampleTaskRule.getTaskIds());
+    }
 }

@@ -18,6 +18,8 @@ public class SelectionMetadataKeyword extends AuditModel {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Selection selection;
 
+    private Integer frequency;
+
     public String getKeyword() {
         return keyword;
     }
@@ -34,7 +36,15 @@ public class SelectionMetadataKeyword extends AuditModel {
         this.selection = selection;
     }
 
+    public Integer getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(Integer frequency) {
+        this.frequency = frequency;
+    }
+
     public com.bulletjournal.templates.controller.model.SelectionMetadata toPresentationModel() {
-        return new com.bulletjournal.templates.controller.model.SelectionMetadata(keyword, selection.toPresentationModel());
+        return new com.bulletjournal.templates.controller.model.SelectionMetadata(keyword, selection.toPresentationModel(), frequency);
     }
 }

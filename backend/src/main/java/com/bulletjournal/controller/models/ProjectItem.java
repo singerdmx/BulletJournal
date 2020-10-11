@@ -43,7 +43,9 @@ public abstract class ProjectItem {
         this.id = id;
         this.name = name;
         this.owner = owner;
-        this.projectId = project.getId();
+        if (project != null) {
+            this.projectId = project.getId();
+        }
         this.labels = labels;
     }
 

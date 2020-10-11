@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class StringUtil {
+
+    public static final int UUID_LENGTH = 8;
+
     public static List<Long> convertNumArray(String numArray) {
         if (StringUtils.isBlank(numArray)) {
             return Collections.emptyList();

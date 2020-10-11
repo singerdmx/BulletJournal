@@ -15,12 +15,12 @@ public class DeltaConverter {
     private static final Logger LOGGER = LoggerFactory.getLogger(DeltaConverter.class);
     private static final Gson GSON = new Gson();
 
-    public static String supplementContentText(String text) {
+    public static String supplementContentText(String text, boolean invalidateBoth) {
         // from web: {delta: YYYYY2, ###html###:ZZZZZZ2}
         // from mobile: {mdelta:XXXXXX }
         DeltaContent deltaContent = new DeltaContent(text);
 
-        if (deltaContent.hasDeltaMap() && deltaContent.hasMdeltaList()) {
+        if (invalidateBoth && deltaContent.hasDeltaMap() && deltaContent.hasMdeltaList()) {
             throw new BadRequestException("Cannot have both delta and mdelta");
         }
         if (deltaContent.hasDeltaMap()) {
@@ -32,6 +32,10 @@ public class DeltaConverter {
         }
 
         return deltaContent.toJSON();
+    }
+
+    public static String supplementContentText(String text) {
+        return supplementContentText(text, true);
     }
 
     public static String mergeContentText(String webText, String mobileText) {

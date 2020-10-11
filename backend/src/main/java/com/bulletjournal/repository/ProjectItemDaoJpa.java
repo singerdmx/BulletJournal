@@ -39,7 +39,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectItemDaoJpa.class);
     private static final Gson GSON = new Gson();
 
-    private static final int CONTENT_BATCH_SIZE = 50;
+    private static final int CONTENT_BATCH_SIZE = 18;
 
     @Autowired
     protected LabelDaoJpa labelDaoJpa;
@@ -153,13 +153,24 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     }
 
     public <T extends ProjectItemModel> void addContent(List<T> projectItems, List<String> owners, List<K> contents) {
+        LOGGER.info("Adding {} contents", contents.size());
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            LOGGER.error("addContent Interrupted", e);
+        }
         List<K> batch = new ArrayList<>();
         int maxSize = Math.min(contents.size(), CONTENT_BATCH_SIZE);
         for (int i = 0; i < maxSize; i++) {
             K content = contents.get(i);
+            if (StringUtils.isBlank(content.getText())) {
+                continue;
+            }
             String owner = owners.get(i);
             T projectItem = projectItems.get(i);
-            populateContent(owner, content, projectItem);
+            content.setProjectItem(projectItem);
+            content.setOwner(owner);
+            content.setText(DeltaConverter.supplementContentText(content.getText(), false));
             batch.add(content);
         }
         if (!batch.isEmpty()) {
@@ -174,6 +185,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
                 contents.subList(CONTENT_BATCH_SIZE, contents.size()),
                 projectItems.subList(CONTENT_BATCH_SIZE, projectItems.size()),
                 owners.subList(CONTENT_BATCH_SIZE, owners.size()));
+        LOGGER.info("Next ContentBatch: {} contents", left.getContents().size());
         this.notificationService.addContentBatch(left);
     }
 

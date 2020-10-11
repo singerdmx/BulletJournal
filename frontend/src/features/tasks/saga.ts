@@ -61,7 +61,7 @@ import {
   setTaskStatus as setTaskStatusApi,
   shareTaskWithOther,
   uncompleteTaskById,
-  updateContent,
+  updateContent, updateSampleContent,
   updateTask
 } from '../../apis/taskApis';
 import {updateLoadingCompletedTask, updateTaskContents, updateTasks,} from './actions';
@@ -76,6 +76,7 @@ import {recentItemsReceived} from '../recent/actions';
 import {ContentType} from '../myBuJo/constants';
 import {updateTargetContent} from "../content/actions";
 import {reloadReceived} from "../myself/actions";
+import {fetchSampleTask} from "../../apis/templates/workflowApis";
 
 function* taskApiErrorReceived(action: PayloadAction<TaskApiErrorAction>) {
   yield call(message.error, `Notice Error Received: ${action.payload.error}`);
@@ -283,6 +284,26 @@ function* getTask(action: PayloadAction<GetTask>) {
       yield put(reloadReceived(true));
     } else {
       yield call(message.error, 'Task Unavailable');
+    }
+  }
+}
+
+function* getSampleTask(action: PayloadAction<GetTask>) {
+  try {
+    const data = yield call(fetchSampleTask, action.payload.taskId);
+    yield put(tasksActions.taskReceived({task: data.task}));
+    const content : Content = data.content;
+    yield put(
+        tasksActions.taskContentsReceived({
+          contents: [content],
+        })
+    );
+    yield put(updateTargetContent(content));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, 'Sample Task Unavailable');
     }
   }
 }
@@ -1045,7 +1066,7 @@ function* patchContent(action: PayloadAction<PatchContent>) {
   try {
     const {taskId, contentId, text, diff} = action.payload;
     const state: IState = yield select();
-    const order = state.note.contents.map(c => c.id);
+    const order = state.task.contents.map(c => c.id);
 
     const contents: Content[] = yield call(updateContent, taskId, contentId, text, state.content.content!.etag, diff);
     contents.sort((a: Content, b: Content) => {
@@ -1062,6 +1083,25 @@ function* patchContent(action: PayloadAction<PatchContent>) {
       yield put(reloadReceived(true));
     } else {
       yield call(message.error, `Patch Content Error Received: ${error}`);
+    }
+  }
+}
+
+function* patchSampleContent(action: PayloadAction<PatchContent>) {
+  try {
+    const {taskId, text} = action.payload;
+    const content : Content = yield call(updateSampleContent, taskId, text);
+    yield put(
+        tasksActions.taskContentsReceived({
+          contents: [content],
+        })
+    );
+    yield put(updateTargetContent(content));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Patch Sample Task Content Error Received: ${error}`);
     }
   }
 }
@@ -1268,6 +1308,7 @@ export default function* taskSagas() {
     yield takeLatest(tasksActions.TasksCreate.type, taskCreate),
     yield takeLatest(tasksActions.TaskPut.type, taskPut),
     yield takeLatest(tasksActions.TaskGet.type, getTask),
+    yield takeLatest(tasksActions.SampleTaskGet.type, getSampleTask),
     yield takeLatest(tasksActions.CompletedTaskGet.type, getCompletedTask),
     yield takeLatest(tasksActions.TaskPatch.type, patchTask),
     yield takeLatest(tasksActions.TaskComplete.type, completeTask),
@@ -1294,6 +1335,7 @@ export default function* taskSagas() {
     ),
     yield takeLatest(tasksActions.TaskContentCreate.type, createTaskContent),
     yield takeLatest(tasksActions.TaskContentPatch.type, patchContent),
+    yield takeLatest(tasksActions.SampleTaskContentPatch.type, patchSampleContent),
     yield takeLatest(tasksActions.TaskContentDelete.type, deleteTaskContent),
     yield takeLatest(
         tasksActions.CompleteTaskContentsUpdate.type,
