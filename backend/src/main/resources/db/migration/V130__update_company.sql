@@ -8,3 +8,23 @@ WHERE id = 495;
 DELETE
 FROM template.selections
 WHERE id = 489;
+
+DELETE
+FROM template.sample_task_rules
+WHERE step_id = 11
+  AND selection_combo = '264,495';
+
+DELETE
+FROM template.sample_task_rules
+WHERE step_id = 11
+  AND selection_combo = '263,495';
+
+DELETE
+FROM template.sample_task_rules
+WHERE step_id = 11
+  AND selection_combo = '264,489';
+
+DELETE
+FROM template.sample_task_rules
+WHERE step_id = 11
+  AND selection_combo = '263,489';
