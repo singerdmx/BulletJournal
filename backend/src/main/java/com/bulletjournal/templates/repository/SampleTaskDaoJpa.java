@@ -1,6 +1,7 @@
 package com.bulletjournal.templates.repository;
 
 import com.bulletjournal.contents.ContentType;
+import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.NewSampleTaskEvent;
@@ -155,6 +156,9 @@ public class SampleTaskDaoJpa {
         SampleTask sampleTask = this.findSampleTaskById(sampleTaskId);
         sampleTask.setPending(false);
         String originalKeyword = sampleTask.getMetadata();
+        if (auditSampleTaskParams.getSelections().isEmpty()) {
+            throw new BadRequestException("Empty Selections");
+        }
         List<SelectionMetadataKeyword> keywords =
                 this.selectionMetadataKeywordDaoJpa.getKeywordsBySelectionsWithoutFrequency(auditSampleTaskParams.getSelections());
         for (SelectionMetadataKeyword keyword : keywords) {

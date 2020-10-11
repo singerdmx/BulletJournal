@@ -70,9 +70,8 @@ const AdminSampleTaskPage: React.FC<SampleTaskProps> = (
         updateSampleTask(sampleTask.id, sampleTask.name, input, sampleTask.content, sampleTask.metadata, sampleTask.pending);
     }
 
-    const onChoiceChange = (input: any) => {
-        console.log(input);
-        setSelections(input);
+    const onChoiceChange = (e: any) => {
+        setSelections(Array.isArray(e) ? e : [e]);
     }
 
     const onConfirm = (choiceId: number) => {
