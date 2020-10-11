@@ -172,18 +172,6 @@ public class LeetCodeAnalyzer {
     @Test
     public void testCompany() throws IOException {
         List<String> companyNames = readCompanyNamesFromLeetCode("./src/test/resources/leetcode-companies.html");
-        File file = new File("./src/main/resources/db/migration/V84__replace_companies.sql");
-        FileOutputStream fos = new FileOutputStream(file);
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
-        bw.write("delete from \"template\".selections where choice_id=13;\n");
-        bw.newLine();
-        for (String company : companyNames) {
-            bw.write("INSERT INTO \"template\".selections (id,created_at,updated_at,icon,\"text\",choice_id) VALUES\n" +
-                    "(nextval('template.selection_sequence'),'2020-08-29 10:21:46.593','2020-08-29 10:21:46.593',null,'COMPANY_NAME',13);".replace("COMPANY_NAME", company));
-            bw.newLine();
-        }
-        bw.close();
-
         List<Selection> selections = selectionRepository.getAllByChoiceId(13L);
         Assert.assertEquals(selections.size(), companyNames.size());
     }
