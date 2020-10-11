@@ -49,7 +49,8 @@ public class MailjetEmailClient {
     private ExecutorService executorService;
 
     public enum Template {
-        TASK_DUE_NOTIFICATION(1625167);
+        TASK_DUE_NOTIFICATION(1625167),
+        JOIN_GROUP_NOTIFICATION(1768232);
 
         private final int value;
 
