@@ -87,7 +87,7 @@ public class LeetCodeAnalyzer {
                     .collect(Collectors.toSet()));
             String s = String.format("UPDATE template.sample_task_rules " + "SET task_ids = '%s' " +
                     "WHERE step_id = 11" +
-                    "  AND selection_combo = '%d';", set.toString().substring(1, set.toString().length() - 1), 11 + i * 2);
+                    " AND selection_combo = '%d';", set.toString().substring(1, set.toString().length() - 1), 11 + i * 2);
             System.out.println(s);
         }
 
@@ -109,7 +109,7 @@ public class LeetCodeAnalyzer {
             String s = set.toString();
             String ss = String.format("UPDATE template.sample_task_rules " + "SET task_ids = '%s' " +
                     "WHERE step_id = 11" +
-                    "  AND selection_combo = '%d';", s.substring(1, s.length() - 1), selection.getId());
+                    " AND selection_combo = '%d';", s.substring(1, s.length() - 1), selection.getId());
             System.out.println(ss);
         }
 
@@ -134,7 +134,7 @@ public class LeetCodeAnalyzer {
                     String s = set.toString();
                     String s3 = String.format("UPDATE template.sample_task_rules " + "SET task_ids = '%s' " +
                             "WHERE step_id = 11" +
-                            "  AND selection_combo = '%s';", s.substring(1, s.length() - 1), j + "," + selection.getId());
+                            " AND selection_combo = '%s';", s.substring(1, s.length() - 1), j + "," + selection.getId());
                     System.out.println(s3);
                 }
             }
