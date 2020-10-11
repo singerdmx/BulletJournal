@@ -56,6 +56,11 @@ public class MessagingService {
 
     private static final String CLICK_ACTION_VALUE = "FLUTTER_NOTIFICATION_CLICK";
 
+    private static final String GROUP_INVITATION_ACCEPT_URL = "groupInvitationAcceptURL";
+
+    private static final String GROUP_INVITATION_DECLINE_URL = "groupInvitationDeclineURL";
+
+
     private FcmClient fcmClient;
 
     private MailjetEmailClient mailjetClient;
