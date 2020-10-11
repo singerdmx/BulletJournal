@@ -58,8 +58,7 @@ public class LeetCodeAnalyzer {
             264, "#"
     );
 
-    @Test
-    public void linkTasksToSelection() {
+    private List<com.bulletjournal.templates.controller.model.SampleTask> getAlgorithmSampleTasks() {
         String url = UriComponentsBuilder.fromHttpUrl(
                 ROOT_URL + randomServerPort + WorkflowController.SAMPLE_TASK_BY_METADATA)
                 .queryParam("filter", "LEETCODE_ALGORITHM")
@@ -71,6 +70,13 @@ public class LeetCodeAnalyzer {
                 com.bulletjournal.templates.controller.model.SampleTask[].class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         List<com.bulletjournal.templates.controller.model.SampleTask> l = Arrays.asList(response.getBody());
+        return l;
+    }
+
+    @Test
+    @Ignore
+    public void linkTasksToSelection() {
+        List<com.bulletjournal.templates.controller.model.SampleTask> l = getAlgorithmSampleTasks();
         // Difficulty
         Set<Long> set = new TreeSet<>();
         String[] difficulties = new String[]{"Easy", "Medium", "Hard"};
@@ -260,17 +266,40 @@ public class LeetCodeAnalyzer {
     @Ignore
     @Deprecated
     public void findDataFromLeetCode() throws IOException, InterruptedException {
-        BufferedWriter bufferedWriterSampleTask = getBufferedWriter("./src/main/resources/db/migration/V86__seed_sample_tasks.sql");
-        BufferedWriter bufferedWriterSelection = getBufferedWriter("./src/main/resources/db/migration/V87__seed_algorithm_topic.sql");
+        BufferedWriter bufferedWriterSampleTask = getBufferedWriter("./src/main/resources/db/migration/V131__seed_sample_tasks.sql");
         List<String> companies = readCompaniesFromLeetCode("./src/test/resources/leetcode-companies.html");
         //companies = companies.subList(0, 1);
         Map<String, List<String>> mapForContent = new HashMap<>();
         Set<String> algorithmTopics = new HashSet<>();
         Map<String, SampleTask> dataMap = getDataForCompany(companies, mapForContent, algorithmTopics);
+
+        testTopic(algorithmTopics);
+
         String contentTemplate = "{\"delta\":{\"ops\":[{\"attributes\":{\"bold\":true},\"insert\":\"DIFFICULTY\"},DELTA_COMPANIES" +
                 "{\"insert\":\"Link: \"},{\"attributes\":{\"link\":\"PROBLEM_LINK\"},\"insert\":\"PROBLEM_LINK\"}," +
                 "{\"insert\":\"\\n\"}]}," +
                 "\"###html###\":\"<p><strong>DIFFICULTY</strong></p><ul>HTML_COMPANIES</ul><p>Link: <a href=\\\"PROBLEM_LINK\\\" rel=\\\"noopener noreferrer\\\" target=\\\"_blank\\\">PROBLEM_LINK</a></p>\"}";
+
+        List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasksFromDb = getAlgorithmSampleTasks();
+        for (com.bulletjournal.templates.controller.model.SampleTask sampleTaskFromDb : sampleTasksFromDb) {
+            if (dataMap.containsKey(sampleTaskFromDb.getUid())) {
+                SampleTask sampleTask = dataMap.get(sampleTaskFromDb.getUid());
+                String difficulty = mapForContent.get(sampleTask.getUid()).get(0);
+                List<String> coms = mapForContent.get(sampleTask.getUid()).subList(1, mapForContent.get(sampleTask.getUid()).size());
+                String htmlCompanies = coms.stream().map(c -> "<li>" + c + "</li>").collect(Collectors.joining(""));
+                String deltaCompanies = coms.stream().map(c -> "{\"insert\":\"\\n" + c + "\"},{\"attributes\":{\"list\":\"bullet\"},\"insert\":\"\\n\"},").collect(Collectors.joining(""));
+                String mDeltaCompanies = coms.stream().map(c -> "{\"insert\":\"\\n" + c + "\"},{\"attributes\":{\"block\":\"ul\"},\"insert\":\"\\n\"},").collect(Collectors.joining(""));
+                String content = contentTemplate.replace("PROBLEM_LINK", sampleTask.getContent()).replace("DIFFICULTY", difficulty).replace("HTML_COMPANIES", htmlCompanies).replace("DELTA_COMPANIES", deltaCompanies).replace("M_COMPANIES", mDeltaCompanies);
+                sampleTask.setContent(content);
+                bufferedWriterSampleTask.write("UPDATE \"template\".sample_tasks SET content='S_T_CONTENT', metadata='S_T_METADATA' WHERE id=S_T_ID;"
+                        .replace("S_T_METADATA", sampleTask.getMetadata())
+                        .replace("S_T_CONTENT", sampleTask.getContent())
+                        .replace("S_T_ID", sampleTask.getUid()));
+                bufferedWriterSampleTask.newLine();
+                dataMap.remove(sampleTaskFromDb.getUid());
+            }
+        }
+
         for (SampleTask sampleTask : dataMap.values()) {
             String difficulty = mapForContent.get(sampleTask.getUid()).get(0);
             List<String> coms = mapForContent.get(sampleTask.getUid()).subList(1, mapForContent.get(sampleTask.getUid()).size());
@@ -287,13 +316,8 @@ public class LeetCodeAnalyzer {
                     .replace("S_T_CONTENT", sampleTask.getContent()));
             bufferedWriterSampleTask.newLine();
         }
-        bufferedWriterSelection.write("delete from \"template\".selections where choice_id=15;\n");
-        for (String algorithmTopic : algorithmTopics) {
-            bufferedWriterSelection.write("INSERT INTO \"template\".selections (id,created_at,updated_at,icon,\"text\",choice_id) VALUES (nextval('template.selection_sequence'),'2020-08-29 10:21:46.593','2020-08-29 10:21:46.593',null,'ALGORITHM_TOPIC',15);".replace("ALGORITHM_TOPIC", algorithmTopic));
-            bufferedWriterSelection.newLine();
-        }
         bufferedWriterSampleTask.close();
-        bufferedWriterSelection.close();
+        //bufferedWriterSelection.close();
         System.out.println("Finished");
     }
 
@@ -315,7 +339,7 @@ public class LeetCodeAnalyzer {
         Map<String, List<String>> questionIdCompanyMap = new HashMap<>();
         for (String company : companies) {
             HttpHeaders requestHeaders = new HttpHeaders();
-            requestHeaders.add("Cookie", "LEETCODE_SESSION=SESSION_ID; Max-Age=31449600; Path=/; secure");
+            requestHeaders.add("Cookie", "LEETCODE_SESSION=; Max-Age=31449600; Path=/; secure");
             requestHeaders.add("content-type", "application/json");
             String query = "{\"operationName\":\"getCompanyTag\",\"variables\":{\"slug\":\"*****\"},\"query\":\"query getCompanyTag($slug: String!) {\\n  companyTag(slug: $slug) {\\n    name\\n    translatedName\\n    frequencies\\n    questions {\\n      ...questionFields\\n      __typename\\n    }\\n    __typename\\n  }\\n  favoritesLists {\\n    publicFavorites {\\n      ...favoriteFields\\n      __typename\\n    }\\n    privateFavorites {\\n      ...favoriteFields\\n      __typename\\n    }\\n    __typename\\n  }\\n}\\n\\nfragment favoriteFields on FavoriteNode {\\n  idHash\\n  id\\n  name\\n  isPublicFavorite\\n  viewCount\\n  creator\\n  isWatched\\n  questions {\\n    questionId\\n    title\\n    titleSlug\\n    __typename\\n  }\\n  __typename\\n}\\n\\nfragment questionFields on QuestionNode {\\n  status\\n  questionId\\n  questionFrontendId\\n  title\\n  titleSlug\\n  translatedTitle\\n  stats\\n  difficulty\\n  isPaidOnly\\n  topicTags {\\n    name\\n    translatedName\\n    slug\\n    __typename\\n  }\\n  frequencyTimePeriod\\n  __typename\\n}\\n\"}".replace("*****", company);
             LinkedHashMap dataMap = (LinkedHashMap) ((LinkedHashMap) requestLeetCode(requestHeaders, query).getBody().get("data")).get("companyTag");
