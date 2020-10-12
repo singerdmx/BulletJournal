@@ -4,13 +4,24 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.messaging.firebase.FcmClient;
 import com.bulletjournal.messaging.firebase.FcmMessageParams;
 import com.bulletjournal.messaging.mailjet.MailjetEmailClient;
+import com.bulletjournal.messaging.mailjet.MailjetEmailClient.Template;
 import com.bulletjournal.messaging.mailjet.MailjetEmailParams;
 import com.bulletjournal.repository.DeviceTokenDaoJpa;
 import com.bulletjournal.repository.UserAliasDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.DeviceToken;
+import com.bulletjournal.repository.models.Notification;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.User;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -21,44 +32,34 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 /**
  * Handle mobile device notification and email service
  */
 @Service
 public class MessagingService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MessagingService.class);
-
     public static final String NONE_STRING = "None";
-
     public static final String ALIAS_PROPERTY = "alias";
-
     public static final String AVATAR_PROPERTY = "avatar";
-
     public static final String ASSIGNEES_PROPERTY = "assignees";
-
     public static final String TASK_NAME_PROPERTY = "taskName";
-
     public static final String TIMESTAMP_PROPERTY = "timestamp";
-
     public static final String TASK_URL_PROPERTY = "taskUrl";
-
     public static final String BASE_TASK_URL = "https://bulletjournal.us/#/task/";
-
     public static final String TASK_OWNER_PROPERTY = "owner_name";
-
     public static final String TASK_OWNER_AVATAR_PROPERTY = "owner_avatar";
-
     public static final String CLICK_ACTION_KEY = "click_action";
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessagingService.class);
     private static final String CLICK_ACTION_VALUE = "FLUTTER_NOTIFICATION_CLICK";
 
-    private static final String GROUP_INVITATION_ACCEPT_URL = "groupInvitationAcceptURL";
-
-    private static final String GROUP_INVITATION_DECLINE_URL = "groupInvitationDeclineURL";
+    // JOIN GROUP PROPERTIES
+    private static final String GROUP_INVITATION_BASE_URL =
+        "http://bulletjournal.us/public/notifications/";
+    private static final String GROUP_INVITATION_ACCEPT_APPEND = "?action=accept";
+    private static final String GROUP_INVITATION_DECLINE_APPEND = "?action=decline";
+    private static final String GROUP_INVITATION_ACCEPT_URL_PROPERTY = "groupInvitationAcceptURL";
+    private static final String GROUP_INVITATION_DECLINE_URL_PROPERTY = "groupInvitationDeclineURL";
+    private static final String GROUP_INVITATION_CONTENT_PROPERTY = "groupInvitationContent";
 
 
     private FcmClient fcmClient;
@@ -98,6 +99,34 @@ public class MessagingService {
             .collect(Collectors.toList());
         fcmClient.sendAllMessagesAsync(params);
     }
+
+    public void sendJoinGroupNotificationEmailsToUser(
+        List<Pair<String, Notification>> notificationWithUIDs) {
+        LOGGER.info("Sending join group notifications ...");
+        try {
+            Set<String> distinctUsers = notificationWithUIDs.stream().flatMap(item ->
+                Stream.of(item.getValue().getTargetUser()))
+                .collect(Collectors.toSet());
+            List<User> users = userDaoJpa.getUsersByNames(distinctUsers);
+            Map<String, String> nameEmailMap = new HashMap<>();
+            for (User user : users) {
+                if (user.getEmail() != null && !user.getEmail().endsWith("@anon.1o24bbs.com")) {
+                    nameEmailMap.put(user.getName(), user.getEmail());
+                }
+            }
+            List<MailjetEmailParams> emailParamsList = new ArrayList<>();
+            System.out.println(notificationWithUIDs);
+            for (Pair<String, Notification> notificationWithUID : notificationWithUIDs) {
+                emailParamsList.add(
+                    createEmailParamsForGroupInvitation(notificationWithUID, nameEmailMap)
+                );
+            }
+            mailjetClient.sendAllEmailAsync(emailParamsList);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void sendTaskDueNotificationAndEmailToUsers(List<Task> taskList) {
         LOGGER.info("Sending task due notification for tasks: {}", taskList);
@@ -180,6 +209,27 @@ public class MessagingService {
         ret.append(" (" + task.getTimezone() + ")");
         return ret.toString();
     }
+
+    private MailjetEmailParams createEmailParamsForGroupInvitation(
+        Pair<String, Notification> notificationWithUID, Map<String, String> nameEmailMap
+    ) {
+        Notification notification = notificationWithUID.getValue();
+        String receiver = notification.getTargetUser();
+        String title = notification.getTitle();
+        String uid = notificationWithUID.getKey();
+        return
+            new MailjetEmailParams(
+                Arrays.asList(new ImmutablePair<>(receiver, nameEmailMap.get(receiver))),
+                title,
+                null,
+                Template.JOIN_GROUP_NOTIFICATION,
+                GROUP_INVITATION_ACCEPT_URL_PROPERTY,
+                GROUP_INVITATION_BASE_URL + uid + GROUP_INVITATION_ACCEPT_APPEND,
+                GROUP_INVITATION_DECLINE_URL_PROPERTY,
+                GROUP_INVITATION_BASE_URL + uid + GROUP_INVITATION_DECLINE_APPEND
+            );
+    }
+
 
     private List<MailjetEmailParams> createEmailParamsForDueTask(
         Task task, Map<String, String> nameEmailMap
