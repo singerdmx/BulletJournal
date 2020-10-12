@@ -128,6 +128,7 @@ public class SampleTaskDaoJpa {
         sampleTask.setUid(updateSampleTaskParams.getUid());
         sampleTask.setTimeZone(updateSampleTaskParams.getTimeZone());
         sampleTask.setPending(updateSampleTaskParams.isPending());
+        sampleTask.setRefreshable(updateSampleTaskParams.isRefreshable());
         return sampleTaskRepository.save(sampleTask);
     }
 

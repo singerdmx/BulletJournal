@@ -27,15 +27,9 @@ public class SampleTask {
 
     private Choice choice;
 
-    public boolean isPending() {
-        return pending;
-    }
-
-    public void setPending(boolean pending) {
-        this.pending = pending;
-    }
-
     private boolean pending;
+
+    private boolean refreshable;
 
     public SampleTask() {
     }
@@ -43,7 +37,7 @@ public class SampleTask {
     public SampleTask(
             Long id,
             String name) {
-        this(id, name, null, null, null, null, null, null, null, false);
+        this(id, name, null, null, null, null, null, null, null, false, false);
     }
 
     public SampleTask(
@@ -56,7 +50,7 @@ public class SampleTask {
             String dueTime,
             Timestamp availableBefore,
             String timeZone,
-            boolean pending) {
+            boolean pending, boolean refreshable) {
         this.id = id;
         this.name = name;
         this.content = content;
@@ -67,6 +61,7 @@ public class SampleTask {
         this.availableBefore = availableBefore;
         this.timeZone = timeZone;
         this.pending = pending;
+        this.refreshable = refreshable;
     }
 
 
@@ -148,5 +143,21 @@ public class SampleTask {
 
     public void setChoice(Choice choice) {
         this.choice = choice;
+    }
+
+    public boolean isPending() {
+        return pending;
+    }
+
+    public void setPending(boolean pending) {
+        this.pending = pending;
+    }
+
+    public boolean isRefreshable() {
+        return refreshable;
+    }
+
+    public void setRefreshable(boolean refreshable) {
+        this.refreshable = refreshable;
     }
 }

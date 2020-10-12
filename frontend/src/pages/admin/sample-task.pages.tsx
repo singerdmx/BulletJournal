@@ -17,7 +17,7 @@ type SampleTaskProps = {
     getSampleTask: (sampleTaskId: number) => void;
     approveSampleTask: (sampleTaskId: number, choiceId: number, selections: number[]) => void;
     removeSampleTask: (sampleTaskId: number) => void;
-    updateSampleTask: (sampleTaskId: number, name: string, uid: string, content: string, metadata: string, pending: boolean) => void;
+    updateSampleTask: (sampleTaskId: number, name: string, uid: string, content: string, metadata: string, pending: boolean, refreshable: boolean) => void;
 };
 
 const AdminSampleTaskPage: React.FC<SampleTaskProps> = (
@@ -49,7 +49,7 @@ const AdminSampleTaskPage: React.FC<SampleTaskProps> = (
             message.error('name cannot be empty');
             return;
         }
-        updateSampleTask(sampleTask.id, input, sampleTask.uid, sampleTask.content, sampleTask.metadata, sampleTask.pending);
+        updateSampleTask(sampleTask.id, input, sampleTask.uid, sampleTask.content, sampleTask.metadata, sampleTask.pending, sampleTask.refreshable);
     }
 
     const metadataChange = (input: any) => {
@@ -58,7 +58,7 @@ const AdminSampleTaskPage: React.FC<SampleTaskProps> = (
             message.error('metadata cannot be empty');
             return;
         }
-        updateSampleTask(sampleTask.id, sampleTask.name, sampleTask.uid, sampleTask.content, input, sampleTask.pending);
+        updateSampleTask(sampleTask.id, sampleTask.name, sampleTask.uid, sampleTask.content, input, sampleTask.pending, sampleTask.refreshable);
     }
 
     const uidChange = (input: any) => {
@@ -67,7 +67,7 @@ const AdminSampleTaskPage: React.FC<SampleTaskProps> = (
             message.error('uid cannot be empty');
             return;
         }
-        updateSampleTask(sampleTask.id, sampleTask.name, input, sampleTask.content, sampleTask.metadata, sampleTask.pending);
+        updateSampleTask(sampleTask.id, sampleTask.name, input, sampleTask.content, sampleTask.metadata, sampleTask.pending, sampleTask.refreshable);
     }
 
     const onChoiceChange = (e: any) => {
@@ -87,7 +87,13 @@ const AdminSampleTaskPage: React.FC<SampleTaskProps> = (
     const onChangePending = (value: any) => {
         console.log(value.target.checked);
         if (sampleTask) {
-            updateSampleTask(sampleTask.id, sampleTask.name, sampleTask.uid, sampleTask.content, sampleTask.metadata, value.target.checked);
+            updateSampleTask(sampleTask.id, sampleTask.name, sampleTask.uid, sampleTask.content, sampleTask.metadata, value.target.checked, sampleTask.refreshable);
+        }
+    }
+
+    const onChangeRefreshable = (value: any) => {
+        if (sampleTask) {
+            updateSampleTask(sampleTask.id, sampleTask.name, sampleTask.uid, sampleTask.content, sampleTask.metadata, sampleTask.pending, value.target.checked);
         }
     }
 
@@ -105,6 +111,9 @@ const AdminSampleTaskPage: React.FC<SampleTaskProps> = (
                 &nbsp;&nbsp;&nbsp;
                 <Checkbox checked={sampleTask.pending} onChange={onChangePending}>
                     pending
+                </Checkbox>
+                <Checkbox checked={sampleTask.refreshable} onChange={onChangeRefreshable}>
+                    refreshable
                 </Checkbox>
             </div>
             <Divider/>

@@ -78,13 +78,14 @@ export const deleteSampleTask = (sampleTaskId: number) => {
         });
 }
 
-export const putSampleTask = (sampleTaskId: number, name: string, uid: string, content: string, metadata: string, pending: boolean) => {
+export const putSampleTask = (sampleTaskId: number, name: string, uid: string, content: string, metadata: string, pending: boolean, refreshable: boolean) => {
     const putBody = JSON.stringify({
         name: name,
         uid: uid,
         content: content,
         metadata: metadata,
-        pending: pending
+        pending: pending,
+        refreshable: refreshable,
     });
     return doPut(`/api/sampleTasks/${sampleTaskId}`, putBody)
         .then(res => res.json())

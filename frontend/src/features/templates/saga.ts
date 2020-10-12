@@ -592,8 +592,8 @@ function* removeSampleTask(action: PayloadAction<RemoveSampleTaskAction>) {
 
 function* updateSampleTask(action: PayloadAction<UpdateSampleTaskAction>) {
   try {
-    const {sampleTaskId, name, uid, content, metadata, pending} = action.payload;
-    const data : SampleTask = yield call(putSampleTask, sampleTaskId, name, uid, content, metadata, pending);
+    const {sampleTaskId, name, uid, content, metadata, pending, refreshable} = action.payload;
+    const data : SampleTask = yield call(putSampleTask, sampleTaskId, name, uid, content, metadata, pending, refreshable);
     yield put(templatesActions.sampleTaskReceived({task: data}));
   } catch (error) {
     if (error.message === 'reload') {

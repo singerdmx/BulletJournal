@@ -211,6 +211,7 @@ export type UpdateSampleTaskAction = {
     content: string;
     metadata: string;
     pending: boolean;
+    refreshable: boolean;
 };
 
 export type GetSampleTasksByScrollIdAction = {
