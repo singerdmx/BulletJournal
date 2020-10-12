@@ -58,6 +58,7 @@ services:
       FCM_ACCOUNT_KEY: "${FCM_ACCOUNT_KEY}"
       SENDER_EMAIL: "${SENDER_EMAIL}"
       SENDER_NAME: "${SENDER_NAME}"
+      POLYGON_API_KEY: "${POLYGON_API_KEY}"
     volumes:
       - $HOME/docker/volumes/log:/var/log
       - $HOME/docker/volumes/etc/key:/etc/key
