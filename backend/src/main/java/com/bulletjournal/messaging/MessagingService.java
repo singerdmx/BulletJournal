@@ -127,21 +127,30 @@ public class MessagingService {
         List<Pair<String, Notification>> notificationWithUIDs) {
         LOGGER.info("Sending join group notifications ...");
         try {
-            Set<String> distinctUsers = notificationWithUIDs.stream().flatMap(item ->
+            Set<String> distinctTargetUsers = notificationWithUIDs.stream().flatMap(item ->
                 Stream.of(item.getValue().getTargetUser()))
                 .collect(Collectors.toSet());
-            List<User> users = userDaoJpa.getUsersByNames(distinctUsers);
-            Map<String, String> nameEmailMap = new HashMap<>();
-            for (User user : users) {
+            List<User> targetUsers = userDaoJpa.getUsersByNames(distinctTargetUsers);
+            Map<String, String> targetUserEmailMap = new HashMap<>();
+            for (User user : targetUsers) {
                 if (user.getEmail() != null && !user.getEmail().endsWith("@anon.1o24bbs.com")) {
-                    nameEmailMap.put(user.getName(), user.getEmail());
+                    targetUserEmailMap.put(user.getName(), user.getEmail());
                 }
             }
+
+            Set<String> distinctInviters = notificationWithUIDs.stream().flatMap(item ->
+                Stream.of(item.getValue().getTargetUser()))
+                .collect(Collectors.toSet());
+            Map<String, String> inviterAvatarMap = getAvatarMap(new ArrayList<>(distinctInviters));
+
+
+
             List<MailjetEmailParams> emailParamsList = new ArrayList<>();
             System.out.println(notificationWithUIDs);
             for (Pair<String, Notification> notificationWithUID : notificationWithUIDs) {
                 MailjetEmailParams mailjetEmailParams =
-                    createEmailParamsForGroupInvitation(notificationWithUID, nameEmailMap);
+                    createEmailParamsForGroupInvitation(notificationWithUID,
+                        targetUserEmailMap, inviterAvatarMap);
                 if (mailjetEmailParams != null){
                     emailParamsList.add(mailjetEmailParams);
                 }
@@ -236,7 +245,8 @@ public class MessagingService {
     }
 
     private MailjetEmailParams createEmailParamsForGroupInvitation(
-        Pair<String, Notification> notificationWithUID, Map<String, String> nameEmailMap
+        Pair<String, Notification> notificationWithUID, Map<String, String> targetUserEmailMap,
+        Map<String, String> inviterAvatarMap
     ) {
         Notification notification = notificationWithUID.getValue();
         String receiver = notification.getTargetUser();
@@ -245,7 +255,7 @@ public class MessagingService {
         String uid = notificationWithUID.getKey();
         Matcher titleMatcher = Pattern.compile("(?s)(?<=##).*?(?=##)").matcher(title);
         List<String> matchResults = new ArrayList<>();
-        String groupInviterAvatar = getAvatar(inviter);
+        String groupInviterAvatar = inviterAvatarMap.get(inviter);
         while (titleMatcher.find()) {
             matchResults.add(titleMatcher.group());
         }
@@ -256,7 +266,7 @@ public class MessagingService {
 
         return
             new MailjetEmailParams(
-                Arrays.asList(new ImmutablePair<>(receiver, nameEmailMap.get(receiver))),
+                Arrays.asList(new ImmutablePair<>(receiver, targetUserEmailMap.get(receiver))),
                 title.replace("#", ""),
                 null,
                 Template.JOIN_GROUP_NOTIFICATION,
