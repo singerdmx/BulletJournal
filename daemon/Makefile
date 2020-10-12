@@ -20,3 +20,15 @@ docker:
 	mkdir protobuf
 	cp -r ../protobuf/daemon/* protobuf/.
 	docker build --rm -t bulletjournal-daemon:latest .
+
+BASE_GEN_DIR ?= ./proto_gen
+PROTODIR ?= ../protobuf
+PROTO_GO_PACKAGE_PREFIX ?= github.com/singerdmx/BulletJournal
+GEN_DIR ?= ${BASE_GEN_DIR}/${PROTO_GO_PACKAGE_PREFIX}
+
+.PHONY: gen_proto
+gen_proto:
+	rm -rf ${GEN_DIR}
+	mkdir -p ${GEN_DIR}
+	cp -rf ${PROTODIR} ${GEN_DIR}
+	$(MAKE) -C ${GEN_DIR}/protobuf
