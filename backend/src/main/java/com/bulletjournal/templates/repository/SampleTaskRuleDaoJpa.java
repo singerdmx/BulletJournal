@@ -64,29 +64,25 @@ public class SampleTaskRuleDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void updateSampleTaskRule(SampleTask sampleTask, String keyword, List<Long> selections) {
-        Step step = null;
         for (String k : keyword.split(",")) {
             k = k.trim();
             Optional<StepMetadataKeyword> stepMetadataKeyword = this.stepMetadataKeywordRepository.findById(k);
-            if (stepMetadataKeyword.isPresent()) {
-                step = stepMetadataKeyword.get().getStep();
+            if (!stepMetadataKeyword.isPresent()) {
+               continue;
             }
-        }
-        if (step == null) {
-            LOGGER.info(keyword + " not found");
-            return;
-        }
-        for (Long selection : selections) {
-            String selectionCombo = Long.toString(selection);
-            SampleTaskRuleId ruleId = new SampleTaskRuleId(step, selectionCombo);
-            Optional<SampleTaskRule> rule = this.sampleTaskRuleRepository.findById(ruleId);
-            List<Long> l = new ArrayList<>();
-            if (rule.isPresent()) {
-                l = rule.get().getSampleTaskIds();
+            Step step = stepMetadataKeyword.get().getStep();
+            for (Long selection : selections) {
+                String selectionCombo = Long.toString(selection);
+                SampleTaskRuleId ruleId = new SampleTaskRuleId(step, selectionCombo);
+                Optional<SampleTaskRule> rule = this.sampleTaskRuleRepository.findById(ruleId);
+                List<Long> l = new ArrayList<>();
+                if (rule.isPresent()) {
+                    l = rule.get().getSampleTaskIds();
+                }
+                l.add(sampleTask.getId());
+                this.upsert(step.getId(), selectionCombo,
+                        l.stream().distinct().sorted().map(s -> Long.toString(s)).collect(Collectors.joining(",")));
             }
-            l.add(sampleTask.getId());
-            this.upsert(step.getId(), selectionCombo,
-                    l.stream().distinct().sorted().map(s -> Long.toString(s)).collect(Collectors.joining(",")));
         }
     }
 }
