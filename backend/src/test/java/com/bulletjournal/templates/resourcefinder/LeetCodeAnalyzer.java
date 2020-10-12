@@ -281,7 +281,6 @@ public class LeetCodeAnalyzer {
 
     @Test
     @Ignore
-    @Deprecated
     public void findDataFromLeetCode() throws IOException, InterruptedException {
         BufferedWriter bufferedWriterSampleTask = getBufferedWriter("./src/main/resources/db/migration/V131__seed_sample_tasks.sql");
         List<String> companies = readCompaniesFromLeetCode("./src/test/resources/leetcode-companies.html");
@@ -325,7 +324,7 @@ public class LeetCodeAnalyzer {
             String mDeltaCompanies = coms.stream().map(c -> "{\"insert\":\"\\n" + c + "\"},{\"attributes\":{\"block\":\"ul\"},\"insert\":\"\\n\"},").collect(Collectors.joining(""));
             String content = contentTemplate.replace("PROBLEM_LINK", sampleTask.getContent()).replace("DIFFICULTY", difficulty).replace("HTML_COMPANIES", htmlCompanies).replace("DELTA_COMPANIES", deltaCompanies).replace("M_COMPANIES", mDeltaCompanies);
             sampleTask.setContent(content);
-            bufferedWriterSampleTask.write("INSERT INTO \"template\".sample_tasks (id,created_at,updated_at,metadata,content,name,uid) VALUES (S_T_ID,'2020-08-29 10:21:46.593','2020-08-29 10:21:46.593','S_T_METADATA','S_T_CONTENT','S_T_NAME','S_T_UID');"
+            bufferedWriterSampleTask.write("INSERT INTO \"template\".sample_tasks (id,created_at,updated_at,metadata,content,name,uid,pending) VALUES (S_T_ID,'2020-08-29 10:21:46.593','2020-08-29 10:21:46.593','S_T_METADATA','S_T_CONTENT','S_T_NAME','S_T_UID',true);"
                     .replace("S_T_METADATA", sampleTask.getMetadata())
                     .replace("S_T_NAME", sampleTask.getName())
                     .replace("S_T_ID", sampleTask.getUid())
