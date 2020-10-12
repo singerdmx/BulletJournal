@@ -91,12 +91,11 @@ public class MessagingService {
 
     private static final String GROUP_INVITATION_DECLINE_URL_PROPERTY = "groupInvitationDeclineURL";
 
-//    private static final String GROUP_INVITATION_CONTENT_PROPERTY = "groupInvitationContent";
     private static final String GROUP_INVITER_PROPERTY = "groupInviter";
 
     private static final String GROUP_INVITER_AVATAR_PROPERTY = "groupInviterAvatar";
 
-    private static final String INVITATION_GROUP_NAME_PROPERTY = "invitationGroupName";
+    private static final String GROUP_NAME_PROPERTY = "groupName";
 
     @Autowired
     public MessagingService(
@@ -241,10 +240,12 @@ public class MessagingService {
     ) {
         Notification notification = notificationWithUID.getValue();
         String receiver = notification.getTargetUser();
+        String inviter = notification.getOriginator();
         String title = notification.getTitle();
         String uid = notificationWithUID.getKey();
         Matcher titleMatcher = Pattern.compile("(?s)(?<=##).*?(?=##)").matcher(title);
         List<String> matchResults = new ArrayList<>();
+        String groupInviterAvatar = getAvatar(inviter);
         while (titleMatcher.find()) {
             matchResults.add(titleMatcher.group());
         }
@@ -264,9 +265,11 @@ public class MessagingService {
                 GROUP_INVITATION_DECLINE_URL_PROPERTY,
                 GROUP_INVITATION_BASE_URL + uid + GROUP_INVITATION_DECLINE_APPEND,
                 GROUP_INVITER_PROPERTY,
-                notification.getOriginator(),
-                INVITATION_GROUP_NAME_PROPERTY,
-                matchResults.get(2)
+                inviter,
+                GROUP_NAME_PROPERTY,
+                matchResults.get(2),
+                GROUP_INVITER_AVATAR_PROPERTY,
+                groupInviterAvatar
             );
     }
 
