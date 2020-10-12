@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
@@ -79,6 +81,7 @@ public class MessagingService {
     // JOIN GROUP PROPERTIES
     private static final String GROUP_INVITATION_BASE_URL =
         "http://bulletjournal.us/public/notifications/";
+//        "http://localhost/public/notifications/";
 
     private static final String GROUP_INVITATION_ACCEPT_APPEND = "?action=accept";
 
@@ -88,7 +91,12 @@ public class MessagingService {
 
     private static final String GROUP_INVITATION_DECLINE_URL_PROPERTY = "groupInvitationDeclineURL";
 
-    private static final String GROUP_INVITATION_CONTENT_PROPERTY = "groupInvitationContent";
+//    private static final String GROUP_INVITATION_CONTENT_PROPERTY = "groupInvitationContent";
+    private static final String GROUP_INVITER_PROPERTY = "groupInviter";
+
+    private static final String GROUP_INVITER_AVATAR_PROPERTY = "groupInviterAvatar";
+
+    private static final String INVITATION_GROUP_NAME_PROPERTY = "invitationGroupName";
 
     @Autowired
     public MessagingService(
@@ -133,9 +141,11 @@ public class MessagingService {
             List<MailjetEmailParams> emailParamsList = new ArrayList<>();
             System.out.println(notificationWithUIDs);
             for (Pair<String, Notification> notificationWithUID : notificationWithUIDs) {
-                emailParamsList.add(
-                    createEmailParamsForGroupInvitation(notificationWithUID, nameEmailMap)
-                );
+                MailjetEmailParams mailjetEmailParams =
+                    createEmailParamsForGroupInvitation(notificationWithUID, nameEmailMap);
+                if (mailjetEmailParams != null){
+                    emailParamsList.add(mailjetEmailParams);
+                }
             }
             mailjetClient.sendAllEmailAsync(emailParamsList);
         } catch (Exception e) {
@@ -233,16 +243,30 @@ public class MessagingService {
         String receiver = notification.getTargetUser();
         String title = notification.getTitle();
         String uid = notificationWithUID.getKey();
+        Matcher titleMatcher = Pattern.compile("(?s)(?<=##).*?(?=##)").matcher(title);
+        List<String> matchResults = new ArrayList<>();
+        while (titleMatcher.find()) {
+            matchResults.add(titleMatcher.group());
+        }
+
+        if (matchResults.size() != 3) {
+            return null;
+        }
+
         return
             new MailjetEmailParams(
                 Arrays.asList(new ImmutablePair<>(receiver, nameEmailMap.get(receiver))),
-                title,
+                title.replace("#", ""),
                 null,
                 Template.JOIN_GROUP_NOTIFICATION,
                 GROUP_INVITATION_ACCEPT_URL_PROPERTY,
                 GROUP_INVITATION_BASE_URL + uid + GROUP_INVITATION_ACCEPT_APPEND,
                 GROUP_INVITATION_DECLINE_URL_PROPERTY,
-                GROUP_INVITATION_BASE_URL + uid + GROUP_INVITATION_DECLINE_APPEND
+                GROUP_INVITATION_BASE_URL + uid + GROUP_INVITATION_DECLINE_APPEND,
+                GROUP_INVITER_PROPERTY,
+                notification.getOriginator(),
+                INVITATION_GROUP_NAME_PROPERTY,
+                matchResults.get(2)
             );
     }
 
