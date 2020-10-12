@@ -38,29 +38,31 @@ import org.springframework.stereotype.Service;
 @Service
 public class MessagingService {
 
-    public static final String NONE_STRING = "None";
-    public static final String ALIAS_PROPERTY = "alias";
-    public static final String AVATAR_PROPERTY = "avatar";
-    public static final String ASSIGNEES_PROPERTY = "assignees";
-    public static final String TASK_NAME_PROPERTY = "taskName";
-    public static final String TIMESTAMP_PROPERTY = "timestamp";
-    public static final String TASK_URL_PROPERTY = "taskUrl";
-    public static final String BASE_TASK_URL = "https://bulletjournal.us/#/task/";
-    public static final String TASK_OWNER_PROPERTY = "owner_name";
-    public static final String TASK_OWNER_AVATAR_PROPERTY = "owner_avatar";
-    public static final String CLICK_ACTION_KEY = "click_action";
     private static final Logger LOGGER = LoggerFactory.getLogger(MessagingService.class);
+
+    public static final String NONE_STRING = "None";
+
+    public static final String ALIAS_PROPERTY = "alias";
+
+    public static final String AVATAR_PROPERTY = "avatar";
+
+    public static final String ASSIGNEES_PROPERTY = "assignees";
+
+    public static final String TASK_NAME_PROPERTY = "taskName";
+
+    public static final String TIMESTAMP_PROPERTY = "timestamp";
+
+    public static final String TASK_URL_PROPERTY = "taskUrl";
+
+    public static final String BASE_TASK_URL = "https://bulletjournal.us/#/task/";
+
+    public static final String TASK_OWNER_PROPERTY = "owner_name";
+
+    public static final String TASK_OWNER_AVATAR_PROPERTY = "owner_avatar";
+
+    public static final String CLICK_ACTION_KEY = "click_action";
+
     private static final String CLICK_ACTION_VALUE = "FLUTTER_NOTIFICATION_CLICK";
-
-    // JOIN GROUP PROPERTIES
-    private static final String GROUP_INVITATION_BASE_URL =
-        "http://bulletjournal.us/public/notifications/";
-    private static final String GROUP_INVITATION_ACCEPT_APPEND = "?action=accept";
-    private static final String GROUP_INVITATION_DECLINE_APPEND = "?action=decline";
-    private static final String GROUP_INVITATION_ACCEPT_URL_PROPERTY = "groupInvitationAcceptURL";
-    private static final String GROUP_INVITATION_DECLINE_URL_PROPERTY = "groupInvitationDeclineURL";
-    private static final String GROUP_INVITATION_CONTENT_PROPERTY = "groupInvitationContent";
-
 
     private FcmClient fcmClient;
 
@@ -73,6 +75,20 @@ public class MessagingService {
     private UserAliasDaoJpa userAliasDaoJpa;
 
     private UserClient userClient;
+
+    // JOIN GROUP PROPERTIES
+    private static final String GROUP_INVITATION_BASE_URL =
+        "http://bulletjournal.us/public/notifications/";
+
+    private static final String GROUP_INVITATION_ACCEPT_APPEND = "?action=accept";
+
+    private static final String GROUP_INVITATION_DECLINE_APPEND = "?action=decline";
+
+    private static final String GROUP_INVITATION_ACCEPT_URL_PROPERTY = "groupInvitationAcceptURL";
+
+    private static final String GROUP_INVITATION_DECLINE_URL_PROPERTY = "groupInvitationDeclineURL";
+
+    private static final String GROUP_INVITATION_CONTENT_PROPERTY = "groupInvitationContent";
 
     @Autowired
     public MessagingService(
