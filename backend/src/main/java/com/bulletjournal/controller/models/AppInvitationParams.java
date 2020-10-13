@@ -1,10 +1,11 @@
 package com.bulletjournal.controller.models;
 
 import java.util.List;
+import javax.validation.constraints.NotNull;
 
 public class AppInvitationParams {
 
-  private List<String> emails;
+  private List<@NotNull String> emails;
 
   public AppInvitationParams() {
   }

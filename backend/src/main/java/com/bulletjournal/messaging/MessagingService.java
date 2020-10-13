@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -239,7 +240,7 @@ public class MessagingService {
         LOGGER.info("Sending app invitation emails...");
         try {
             List<MailjetEmailParams> emailParamsList = new ArrayList<>();
-            for (String email : emails) {
+            for (String email : new HashSet<>(emails)) {
                 MailjetEmailParams mailjetEmailParams =
                     createEmailPramsForAppInvitation(inviter, this.getAvatar(inviter), email);
                 if (mailjetEmailParams != null) {
@@ -266,10 +267,9 @@ public class MessagingService {
         }
 
         String title = inviter + " invited your to join BulletJournal";
-        String receiver = "invitee";
 
         return new MailjetEmailParams(
-            Arrays.asList(new ImmutablePair<>(receiver, email)),
+            Arrays.asList(new ImmutablePair(null, email)),
             title,
             null,
             Template.APP_INVITATION,
@@ -286,7 +286,7 @@ public class MessagingService {
         String emailPattern = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\\\.[A-Z]{2,6}$";
         Matcher emailMatcher =  Pattern.compile(emailPattern, Pattern.CASE_INSENSITIVE)
                                     .matcher(email);
-        return emailMatcher.find();
+        return !emailMatcher.find();
     }
 
     private String getTitle(Task task) {
