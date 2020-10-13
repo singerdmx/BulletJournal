@@ -100,7 +100,6 @@ public class NotificationDaoJpa implements Etaggable {
             });
             this.redisNotificationRepository.saveAll(joinGroupNotifications);
 
-            // TODO: sendEmail(joinGroupEventNotifications)
             messagingService.sendJoinGroupNotificationEmailsToUser(joinGroupNotificationsWithUIDs);
         }
     }
