@@ -2,6 +2,7 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.messaging.MessagingService;
 import com.bulletjournal.redis.FirstTimeUserRepository;
 import com.bulletjournal.redis.models.FirstTimeUser;
 import com.bulletjournal.repository.UserAliasDaoJpa;
@@ -28,6 +29,7 @@ public class UserController {
     protected static final String CHANGE_ALIAS_ROUTE = "/api/users/{username}/changeAlias";
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private static final String TRUE = "true";
+    public static final String APP_INVITATIONS_ROUTE = "/api/appInvitations";
 
     @Autowired
     private UserClient userClient;
@@ -40,6 +42,9 @@ public class UserController {
 
     @Autowired
     private FirstTimeUserRepository firstTimeUserRepository;
+
+    @Autowired
+    private MessagingService messagingService;
 
     @GetMapping(GET_USER_ROUTE)
     public User getUser(@NotNull @PathVariable String username) {
@@ -106,5 +111,11 @@ public class UserController {
     public ResponseEntity<List<UserPointActivity>> getUserPointActivities() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return ResponseEntity.ok().body(this.userDaoJpa.getPointActivitiesByUsername(username));
+    }
+
+    @PostMapping(APP_INVITATIONS_ROUTE)
+    public void sendAppInvitations(@Valid @RequestBody AppInvitationParams appInvitationParams) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        messagingService.sendAppInvitationEmailsToUser(username, appInvitationParams.getEmails());
     }
 }
