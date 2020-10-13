@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.LinkedHashMap;
 import java.util.Optional;
 
@@ -18,6 +19,8 @@ public class StockTickerDetailsDaoJpa {
 
     private static final Gson GSON = new Gson();
     public static final Logger LOGGER = LoggerFactory.getLogger(StockTickerDetailsDaoJpa.class);
+
+    private static final long MILLS_IN_YEAR = 1000L * 60 * 60 * 24 * 365;
 
     @Autowired
     private StockTickerDetailsRepository stockTickerDetailsRepository;
@@ -31,16 +34,13 @@ public class StockTickerDetailsDaoJpa {
     public StockTickerDetails get(String symbol) {
         Optional<com.bulletjournal.templates.repository.model.StockTickerDetails> stockTickerDetailsOptional =
                 this.stockTickerDetailsRepository.findById(symbol);
-        if (stockTickerDetailsOptional.isPresent()) {
+        if (stockTickerDetailsOptional.isPresent() && stockTickerDetailsOptional.get().
+                getExpirationTime().after(new Timestamp(System.currentTimeMillis()))) {
             return stockTickerDetailsOptional.get().toPresentationModel();
         }
 
         LinkedHashMap resp = this.stockApiClient.getCompany(symbol);
-        com.bulletjournal.templates.repository.model.StockTickerDetails stockTickerDetails =
-                new com.bulletjournal.templates.repository.model.StockTickerDetails();
         LOGGER.info(resp.toString());
-        stockTickerDetails.setTicker(symbol);
-        stockTickerDetails.setDetails(GSON.toJson(resp));
         String sector = (String) resp.get("sector");
         Long selectionId;
         switch (sector.toLowerCase()) {
@@ -77,10 +77,16 @@ public class StockTickerDetailsDaoJpa {
             default:
                 throw new BadRequestException("Sector " + sector + " not found");
         }
-
         Selection selection = this.selectionDaoJpa.getById(selectionId);
+
+        com.bulletjournal.templates.repository.model.StockTickerDetails stockTickerDetails =
+                stockTickerDetailsOptional.isPresent() ? stockTickerDetailsOptional.get() :
+                        new com.bulletjournal.templates.repository.model.StockTickerDetails();
         stockTickerDetails.setSelection(selection);
+        stockTickerDetails.setExpirationTime(new Timestamp(System.currentTimeMillis() + MILLS_IN_YEAR));
+        stockTickerDetails.setDetails(GSON.toJson(resp));
+        stockTickerDetails.setTicker(symbol);
         stockTickerDetailsRepository.save(stockTickerDetails);
-        return stockTickerDetails.toPresentationModel();
+        return stockTickerDetailsOptional.get().toPresentationModel();
     }
 }
