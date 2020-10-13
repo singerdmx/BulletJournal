@@ -5,7 +5,8 @@ import javax.validation.constraints.NotNull;
 
 public class AppInvitationParams {
 
-  private List<@NotNull String> emails;
+  @NotNull
+  private List<String> emails;
 
   public AppInvitationParams() {
   }
