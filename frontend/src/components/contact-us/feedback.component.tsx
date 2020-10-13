@@ -6,7 +6,7 @@ import {ContactType} from "../../features/system/constants";
 type FeedbackProps = {};
 
 const handleFeedback = (title: String, content: String) => {
-    contactSupport(ContactType.FEEDBACK, title, content).then((res) => {
+    contactSupport(109, title, content).then((res) => {
         window.location.href = res.headers.get('Location')!;
     });
 };

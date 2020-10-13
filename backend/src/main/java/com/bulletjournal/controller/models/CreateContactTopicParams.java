@@ -5,7 +5,7 @@ import javax.validation.constraints.NotNull;
 
 public class CreateContactTopicParams {
     @NotNull
-    private ContactType contactType;
+    private Integer forumId;
     @NotBlank
     private String title;
     @NotBlank
@@ -14,18 +14,12 @@ public class CreateContactTopicParams {
     public CreateContactTopicParams() {
     }
 
-    public CreateContactTopicParams(ContactType contactType, String title, String content) {
-        this.contactType = contactType;
-        this.title = title;
-        this.content = content;
+    public Integer getForumId() {
+        return forumId;
     }
 
-    public ContactType getContactType() {
-        return contactType;
-    }
-
-    public void setContactType(ContactType contactType) {
-        this.contactType = contactType;
+    public void setForumId(Integer forumId) {
+        this.forumId = forumId;
     }
 
     public String getTitle() {

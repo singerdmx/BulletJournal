@@ -1,12 +1,11 @@
 import React from "react";
 import {Button, Form, Input} from "antd";
 import {contactSupport} from "../../apis/systemApis";
-import {ContactType} from "../../features/system/constants";
 
 type FeedbackProps = {};
 
 const handleIssue = (title: String, content: String) => {
-    contactSupport(ContactType.ISSUE, title, content).then((res) => {
+    contactSupport(110, title, content).then((res) => {
         window.location.href = res.headers.get('Location')!;
     });
 };

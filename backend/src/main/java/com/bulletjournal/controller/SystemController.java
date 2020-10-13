@@ -281,7 +281,7 @@ public class SystemController {
             @NotNull @Valid @RequestBody CreateContactTopicParams createContactTopicParams)
             throws URISyntaxException {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        String topicUrl = this.userClient.createTopic(username, createContactTopicParams.getContactType(),
+        String topicUrl = this.userClient.createTopic(username, createContactTopicParams.getForumId(),
                 createContactTopicParams.getTitle(), createContactTopicParams.getContent());
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setLocation(new URI(topicUrl));
