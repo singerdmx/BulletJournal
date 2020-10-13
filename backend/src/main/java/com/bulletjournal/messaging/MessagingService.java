@@ -82,9 +82,9 @@ public class MessagingService {
     private static final String GROUP_INVITATION_BASE_URL =
         "http://bulletjournal.us/public/notifications/";
 
-    private static final String GROUP_INVITATION_ACCEPT_APPEND = "?action=accept";
+    private static final String GROUP_INVITATION_ACCEPT_SUFFIX = "?action=accept";
 
-    private static final String GROUP_INVITATION_DECLINE_APPEND = "?action=decline";
+    private static final String GROUP_INVITATION_DECLINE_SUFFIX= "?action=decline";
 
     private static final String GROUP_INVITATION_ACCEPT_URL_PROPERTY = "groupInvitationAcceptURL";
 
@@ -265,9 +265,9 @@ public class MessagingService {
                 null,
                 Template.JOIN_GROUP_NOTIFICATION,
                 GROUP_INVITATION_ACCEPT_URL_PROPERTY,
-                GROUP_INVITATION_BASE_URL + uid + GROUP_INVITATION_ACCEPT_APPEND,
+                GROUP_INVITATION_BASE_URL + uid + GROUP_INVITATION_ACCEPT_SUFFIX,
                 GROUP_INVITATION_DECLINE_URL_PROPERTY,
-                GROUP_INVITATION_BASE_URL + uid + GROUP_INVITATION_DECLINE_APPEND,
+                GROUP_INVITATION_BASE_URL + uid + GROUP_INVITATION_DECLINE_SUFFIX,
                 GROUP_INVITER_PROPERTY,
                 inviter,
                 GROUP_NAME_PROPERTY,
