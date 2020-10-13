@@ -283,10 +283,10 @@ public class MessagingService {
     }
 
     private boolean isValidEmailAddr(String email) {
-        String emailPattern = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\\\.[A-Z]{2,6}$";
+        String emailPattern = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$";
         Matcher emailMatcher =  Pattern.compile(emailPattern, Pattern.CASE_INSENSITIVE)
                                     .matcher(email);
-        return !emailMatcher.find();
+        return emailMatcher.find();
     }
 
     private String getTitle(Task task) {
