@@ -81,7 +81,6 @@ public class MessagingService {
     // JOIN GROUP PROPERTIES
     private static final String GROUP_INVITATION_BASE_URL =
         "http://bulletjournal.us/public/notifications/";
-//        "http://localhost/public/notifications/";
 
     private static final String GROUP_INVITATION_ACCEPT_APPEND = "?action=accept";
 
@@ -139,14 +138,11 @@ public class MessagingService {
             }
 
             Set<String> distinctInviters = notificationWithUIDs.stream().flatMap(item ->
-                Stream.of(item.getValue().getTargetUser()))
+                Stream.of(item.getValue().getOriginator()))
                 .collect(Collectors.toSet());
             Map<String, String> inviterAvatarMap = getAvatarMap(new ArrayList<>(distinctInviters));
 
-
-
             List<MailjetEmailParams> emailParamsList = new ArrayList<>();
-            System.out.println(notificationWithUIDs);
             for (Pair<String, Notification> notificationWithUID : notificationWithUIDs) {
                 MailjetEmailParams mailjetEmailParams =
                     createEmailParamsForGroupInvitation(notificationWithUID,
@@ -260,12 +256,10 @@ public class MessagingService {
             matchResults.add(titleMatcher.group());
         }
 
-        if (matchResults.size() != 3) {
-            return null;
-        }
+        // invalid msg format. no GROUP NAME found.
+        if (matchResults.size() != 3) { return null; }
 
-        return
-            new MailjetEmailParams(
+        return new MailjetEmailParams(
                 Arrays.asList(new ImmutablePair<>(receiver, targetUserEmailMap.get(receiver))),
                 title.replace("#", ""),
                 null,
