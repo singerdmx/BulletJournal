@@ -86,7 +86,7 @@ public class StockTickerDetailsDaoJpa {
         stockTickerDetails.setExpirationTime(new Timestamp(System.currentTimeMillis() + MILLS_IN_YEAR));
         stockTickerDetails.setDetails(GSON.toJson(resp));
         stockTickerDetails.setTicker(symbol);
-        stockTickerDetailsRepository.save(stockTickerDetails);
-        return stockTickerDetailsOptional.get().toPresentationModel();
+        stockTickerDetails = stockTickerDetailsRepository.save(stockTickerDetails);
+        return stockTickerDetails.toPresentationModel();
     }
 }
