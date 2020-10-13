@@ -153,7 +153,7 @@ public class MessagingService {
             }
             mailjetClient.sendAllEmailAsync(emailParamsList);
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error("sendJoinGroupNotificationEmailsToUser failed", e);
         }
     }
 
@@ -258,7 +258,7 @@ public class MessagingService {
 
         // invalid msg format. no GROUP NAME found.
         if (matchResults.size() != 3) {
-            LOGGER.error("Invalid group invitation message format. No group name found.");
+            LOGGER.error("Invalid group invitation message format {}. No group name found.", title);
             return null;
         }
 
