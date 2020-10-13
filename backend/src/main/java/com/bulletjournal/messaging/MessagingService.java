@@ -84,7 +84,7 @@ public class MessagingService {
 
     private static final String GROUP_INVITATION_ACCEPT_SUFFIX = "?action=accept";
 
-    private static final String GROUP_INVITATION_DECLINE_SUFFIX= "?action=decline";
+    private static final String GROUP_INVITATION_DECLINE_SUFFIX = "?action=decline";
 
     private static final String GROUP_INVITATION_ACCEPT_URL_PROPERTY = "groupInvitationAcceptURL";
 
@@ -147,7 +147,7 @@ public class MessagingService {
                 MailjetEmailParams mailjetEmailParams =
                     createEmailParamsForGroupInvitation(notificationWithUID,
                         targetUserEmailMap, inviterAvatarMap);
-                if (mailjetEmailParams != null){
+                if (mailjetEmailParams != null) {
                     emailParamsList.add(mailjetEmailParams);
                 }
             }
