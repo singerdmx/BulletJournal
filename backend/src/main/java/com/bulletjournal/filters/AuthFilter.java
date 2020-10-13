@@ -101,7 +101,7 @@ public class AuthFilter implements Filter {
         chain.doFilter(req, res);
     }
 
-    private boolean shouldBypass(String requestURI) {
+    public static boolean shouldBypass(String requestURI) {
         for (String route : BYPASS_WHITE_LIST_ROUTES) {
             if (requestURI.toLowerCase().startsWith(route)) {
                 return true;

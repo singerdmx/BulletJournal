@@ -7,8 +7,6 @@ import com.bulletjournal.controller.models.Notification;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
-import com.bulletjournal.filters.rate.limiting.TokenBucket;
-import com.bulletjournal.filters.rate.limiting.TokenBucketType;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
 import com.bulletjournal.redis.RedisNotificationRepository;
@@ -25,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,9 +39,6 @@ public class NotificationController {
     protected static final String ANSWER_NOTIFICATION_ROUTE = "/api/notifications/{notificationId}/answer";
     protected static final String ANSWER_PUBLIC_NOTIFICATION_ROUTE = "/api/public/notifications/{uid}/answer";
     private static final Logger LOGGER = LoggerFactory.getLogger(NotificationController.class);
-
-    @Autowired
-    private TokenBucket tokenBucket;
 
     @Autowired
     private NotificationDaoJpa notificationDaoJpa;
@@ -168,10 +162,6 @@ public class NotificationController {
             @NotNull @PathVariable String uid, @NotNull @RequestParam String action) {
         // /api/public/notifications/${id}/answer?action=${action}
         // action is "accept" or "decline"
-        if (this.tokenBucket.isLimitExceeded(TokenBucketType.PUBLIC_ITEM)) {
-            LOGGER.error("answerPublicNotification limit exceeded");
-            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(null);
-        }
 
         // read notificationId from redis
         JoinGroupNotification joinGroupNotification = redisNotificationRepository

@@ -28,10 +28,18 @@ public class RateFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) res;
         HttpServletRequest request = (HttpServletRequest) req;
 
-        if (this.tokenBucket.isLimitExceeded(TokenBucketType.USER)) {
-            LOGGER.error("User requests limit exceeded");
-            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value()); // 429
-            return;
+        if (AuthFilter.shouldBypass(request.getRequestURI())) {
+            if (this.tokenBucket.isLimitExceeded(TokenBucketType.PUBLIC_ITEM)) {
+                LOGGER.error(request.getRequestURI() + " api limit exceeded");
+                response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value()); // 429
+                return;
+            }
+        } else {
+            if (this.tokenBucket.isLimitExceeded(TokenBucketType.USER)) {
+                LOGGER.error("User requests limit exceeded");
+                response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value()); // 429
+                return;
+            }
         }
 
         chain.doFilter(req, res);

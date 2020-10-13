@@ -8,8 +8,6 @@ import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
-import com.bulletjournal.filters.rate.limiting.TokenBucket;
-import com.bulletjournal.filters.rate.limiting.TokenBucketType;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
 import com.bulletjournal.redis.models.Etag;
 import com.bulletjournal.redis.models.EtagType;
@@ -24,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -74,9 +71,6 @@ public class SystemController {
 
     @Autowired
     private TaskController taskController;
-
-    @Autowired
-    private TokenBucket tokenBucket;
 
     @Autowired
     private UserClient userClient;
@@ -193,10 +187,6 @@ public class SystemController {
     @GetMapping(PUBLIC_ITEM_ROUTE)
     public ResponseEntity<?> getPublicProjectItem(
             @NotNull @PathVariable String itemId) {
-        if (this.tokenBucket.isLimitExceeded(TokenBucketType.PUBLIC_ITEM)) {
-            LOGGER.error("Get PublicProjectItem limit exceeded");
-            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(null);
-        }
         String originalUser = MDC.get(UserClient.USER_NAME_KEY);
         String username = AuthorizationService.SUPER_USER;
         MDC.put(UserClient.USER_NAME_KEY, username);
