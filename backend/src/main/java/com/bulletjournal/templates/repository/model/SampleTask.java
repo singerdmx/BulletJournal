@@ -140,8 +140,8 @@ public class SampleTask extends NamedModel {
                 dueTime,
                 availableBefore,
                 timeZone,
-                pending
-            );
+                pending,
+                refreshable);
     }
 
     public com.bulletjournal.templates.controller.model.SampleTask toSimplePresentationModel() {
@@ -155,7 +155,7 @@ public class SampleTask extends NamedModel {
                 dueTime,
                 availableBefore,
                 timeZone,
-                pending
-        );
+                pending,
+                refreshable);
     }
 }

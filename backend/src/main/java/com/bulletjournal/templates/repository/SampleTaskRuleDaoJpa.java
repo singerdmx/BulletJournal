@@ -1,12 +1,11 @@
 package com.bulletjournal.templates.repository;
 
 import com.bulletjournal.exceptions.ResourceNotFoundException;
-import com.bulletjournal.templates.repository.model.SampleTask;
-import com.bulletjournal.templates.repository.model.SampleTaskRule;
-import com.bulletjournal.templates.repository.model.SampleTaskRuleId;
-import com.bulletjournal.templates.repository.model.Step;
+import com.bulletjournal.templates.repository.model.*;
 import com.bulletjournal.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -19,6 +18,7 @@ import java.util.stream.Collectors;
 
 @Repository
 public class SampleTaskRuleDaoJpa {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SampleTaskRuleDaoJpa.class);
     private SampleTaskRuleRepository sampleTaskRuleRepository;
     private StepRepository stepRepository;
     private StepMetadataKeywordRepository stepMetadataKeywordRepository;
@@ -36,6 +36,7 @@ public class SampleTaskRuleDaoJpa {
     public void saveAll(Iterable<SampleTaskRule> sampleTaskRules) {
         this.sampleTaskRuleRepository.saveAll(sampleTaskRules);
     }
+
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SampleTaskRule upsert(Long stepId, String selectionCombo, String taskIds) {
         selectionCombo = StringUtils.join(StringUtil.convertNumArray(selectionCombo), ",");
@@ -63,19 +64,25 @@ public class SampleTaskRuleDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void updateSampleTaskRule(SampleTask sampleTask, String keyword, List<Long> selections) {
-        Step step = this.stepMetadataKeywordRepository.findById(keyword).orElseThrow(
-                () -> new ResourceNotFoundException(keyword + " not found")).getStep();
-        for (Long selection : selections) {
-            String selectionCombo = Long.toString(selection);
-            SampleTaskRuleId ruleId = new SampleTaskRuleId(step, selectionCombo);
-            Optional<SampleTaskRule> rule = this.sampleTaskRuleRepository.findById(ruleId);
-            List<Long> l = new ArrayList<>();
-            if (rule.isPresent()) {
-                l = rule.get().getSampleTaskIds();
+        for (String k : keyword.split(",")) {
+            k = k.trim();
+            Optional<StepMetadataKeyword> stepMetadataKeyword = this.stepMetadataKeywordRepository.findById(k);
+            if (!stepMetadataKeyword.isPresent()) {
+               continue;
             }
-            l.add(sampleTask.getId());
-            this.upsert(step.getId(), selectionCombo,
-                    l.stream().sorted().map(s -> Long.toString(s)).collect(Collectors.joining(",")));
+            Step step = stepMetadataKeyword.get().getStep();
+            for (Long selection : selections) {
+                String selectionCombo = Long.toString(selection);
+                SampleTaskRuleId ruleId = new SampleTaskRuleId(step, selectionCombo);
+                Optional<SampleTaskRule> rule = this.sampleTaskRuleRepository.findById(ruleId);
+                List<Long> l = new ArrayList<>();
+                if (rule.isPresent()) {
+                    l = rule.get().getSampleTaskIds();
+                }
+                l.add(sampleTask.getId());
+                this.upsert(step.getId(), selectionCombo,
+                        l.stream().distinct().sorted().map(s -> Long.toString(s)).collect(Collectors.joining(",")));
+            }
         }
     }
 }

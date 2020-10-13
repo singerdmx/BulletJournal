@@ -39,7 +39,7 @@ public class WorkflowController {
     public static final String SAMPLE_TASKS_IMPORT_ROUTE = "/api/sampleTasks/import";
     public static final String SAMPLE_TASKS_ROUTE = "/api/sampleTasks";
     public static final String ADMIN_SAMPLE_TASK_ROUTE = "/api/admin/sampleTasks/{sampleTaskId}";
-    public static final String SAMPLE_TASK_ROUTE = "/api/public/sampleTasks/{sampleTaskId}";
+    public static final String PUBLIC_SAMPLE_TASK_ROUTE = "/api/public/sampleTasks/{sampleTaskId}";
     public static final String SAMPLE_TASK_CONTENT_ROUTE = "/api/sampleTasks/{sampleTaskId}/contents";
     public static final String SAMPLE_TASK_BY_METADATA = "/api/sampleTasks";
     public static final String SAMPLE_TASK_RULE_ROUTE = "/api/sampleTaskRule";
@@ -50,6 +50,7 @@ public class WorkflowController {
     public static final String USER_SAMPLE_TASKS_ROUTE = "/api/userSampleTasks";
     public static final String REMOVE_USER_SAMPLE_TASKS_ROUTE = "/api/userSampleTasks/remove";
     public static final String REMOVE_USER_SAMPLE_TASK_ROUTE = "/api/userSampleTasks/{sampleTaskId}";
+    public static final String SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}";
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
@@ -298,7 +299,7 @@ public class WorkflowController {
         return result;
     }
 
-    @GetMapping(SAMPLE_TASK_ROUTE)
+    @GetMapping(PUBLIC_SAMPLE_TASK_ROUTE)
     public SampleTaskView getSampleTask(@NotNull @PathVariable Long sampleTaskId) {
         // ContentType SAMPLE_TASK
         SampleTask sampleTask = getAdminSampleTask(sampleTaskId);

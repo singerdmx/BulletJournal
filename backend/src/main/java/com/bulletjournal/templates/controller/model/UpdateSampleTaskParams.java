@@ -14,6 +14,8 @@ public class UpdateSampleTaskParams {
 
     private boolean pending;
 
+    private boolean refreshable;
+
     public boolean isPending() {
         return pending;
     }
@@ -63,5 +65,13 @@ public class UpdateSampleTaskParams {
 
     public void setUid(String uid) {
         this.uid = uid;
+    }
+
+    public boolean isRefreshable() {
+        return refreshable;
+    }
+
+    public void setRefreshable(boolean refreshable) {
+        this.refreshable = refreshable;
     }
 }

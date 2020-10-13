@@ -118,8 +118,8 @@ export const getSampleTask = (sampleTaskId: number) => actions.getSampleTask({sa
 export const removeSampleTask = (sampleTaskId: number) =>
     actions.removeSampleTask({taskId: sampleTaskId});
 
-export const updateSampleTask = (sampleTaskId: number, name: string, uid: string, content: string, metadata: string, pending: boolean) =>
-    actions.updateSampleTask({sampleTaskId: sampleTaskId, name: name, uid: uid, content: content, metadata: metadata, pending: pending});
+export const updateSampleTask = (sampleTaskId: number, name: string, uid: string, content: string, metadata: string, pending: boolean, refreshable: boolean) =>
+    actions.updateSampleTask({sampleTaskId: sampleTaskId, name: name, uid: uid, content: content, metadata: metadata, pending: pending, refreshable: refreshable});
 
 export const cloneStep = (stepId: number) => actions.copyStep({stepId: stepId});
 

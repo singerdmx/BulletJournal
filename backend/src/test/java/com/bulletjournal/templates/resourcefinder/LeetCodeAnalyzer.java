@@ -2,9 +2,13 @@ package com.bulletjournal.templates.resourcefinder;
 
 import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.templates.controller.WorkflowController;
+import com.bulletjournal.templates.repository.SampleTaskRuleRepository;
 import com.bulletjournal.templates.repository.SelectionRepository;
+import com.bulletjournal.templates.repository.StepRepository;
 import com.bulletjournal.templates.repository.model.SampleTask;
+import com.bulletjournal.templates.repository.model.SampleTaskRuleId;
 import com.bulletjournal.templates.repository.model.Selection;
+import com.bulletjournal.templates.repository.model.Step;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
@@ -51,6 +55,12 @@ public class LeetCodeAnalyzer {
     @Autowired
     private SelectionRepository selectionRepository;
 
+    @Autowired
+    private SampleTaskRuleRepository sampleTaskRuleRepository;
+
+    @Autowired
+    private StepRepository stepRepository;
+
     private static final Map<Integer, String> FREQUENCIES = ImmutableMap.of(
             261, "####",
             262, "###",
@@ -76,6 +86,7 @@ public class LeetCodeAnalyzer {
     @Test
     @Ignore
     public void linkTasksToSelection() {
+        Step step = this.stepRepository.getById(11L);
         List<com.bulletjournal.templates.controller.model.SampleTask> l = getAlgorithmSampleTasks();
         // Difficulty
         Set<Long> set = new TreeSet<>();
@@ -85,10 +96,10 @@ public class LeetCodeAnalyzer {
             set = new TreeSet<>(l.stream().filter(task -> task.getMetadata().split(",")[1].equals(difficulty))
                     .map(task -> task.getId())
                     .collect(Collectors.toSet()));
-            String s = String.format("UPDATE template.sample_task_rules " + "SET task_ids = '%s' " +
+            String s1 = String.format("UPDATE template.sample_task_rules " + "SET task_ids = '%s' " +
                     "WHERE step_id = 11" +
                     " AND selection_combo = '%d';", set.toString().substring(1, set.toString().length() - 1), 11 + i * 2);
-            System.out.println(s);
+            System.out.println(s1);
         }
 
         // Topic
@@ -107,15 +118,16 @@ public class LeetCodeAnalyzer {
                 }
             }
             String s = set.toString();
-            String ss = String.format("UPDATE template.sample_task_rules " + "SET task_ids = '%s' " +
+            s = s.substring(1, s.length() - 1);
+            String s2 = String.format("UPDATE template.sample_task_rules " + "SET task_ids = '%s' " +
                     "WHERE step_id = 11" +
-                    " AND selection_combo = '%d';", s.substring(1, s.length() - 1), selection.getId());
-            System.out.println(ss);
+                    " AND selection_combo = '%d';", s, selection.getId());
+            System.out.println(s2);
         }
 
         // Company
         // frequencytimeperiod#
-        for (long i = 300L; i < 537L; i++) {
+        for (long i = 300L; i <= 537L; i++) {
             final long id = i;
             Optional<Selection> selectionOptional = selections.stream().filter(s -> s.getId().equals(id)).findFirst();
             if (!selectionOptional.isPresent()) {
@@ -130,13 +142,18 @@ public class LeetCodeAnalyzer {
                         set.add(task.getId());
                     }
                 }
-                if (!set.isEmpty()) {
-                    String s = set.toString();
-                    String s3 = String.format("UPDATE template.sample_task_rules " + "SET task_ids = '%s' " +
-                            "WHERE step_id = 11" +
-                            " AND selection_combo = '%s';", s.substring(1, s.length() - 1), j + "," + selection.getId());
-                    System.out.println(s3);
+                String s = set.toString();
+                s = s.substring(1, s.length() - 1);
+                String selectionCombo = j + "," + selection.getId();
+                String s3 = String.format("UPDATE template.sample_task_rules " + "SET task_ids = '%s' " +
+                        "WHERE step_id = 11" +
+                        " AND selection_combo = '%s';", s, selectionCombo);
+                SampleTaskRuleId sampleTaskRuleId = new SampleTaskRuleId(step, selectionCombo);
+                if (!this.sampleTaskRuleRepository.existsById(sampleTaskRuleId)) {
+                    s3 = String.format("INSERT INTO template.sample_task_rules (task_ids, step_id, selection_combo) " +
+                            "VALUES ('%s', 11, '%s');", s, selectionCombo);
                 }
+                System.out.println(s3);
             }
         }
     }
@@ -264,7 +281,6 @@ public class LeetCodeAnalyzer {
 
     @Test
     @Ignore
-    @Deprecated
     public void findDataFromLeetCode() throws IOException, InterruptedException {
         BufferedWriter bufferedWriterSampleTask = getBufferedWriter("./src/main/resources/db/migration/V131__seed_sample_tasks.sql");
         List<String> companies = readCompaniesFromLeetCode("./src/test/resources/leetcode-companies.html");
@@ -308,7 +324,7 @@ public class LeetCodeAnalyzer {
             String mDeltaCompanies = coms.stream().map(c -> "{\"insert\":\"\\n" + c + "\"},{\"attributes\":{\"block\":\"ul\"},\"insert\":\"\\n\"},").collect(Collectors.joining(""));
             String content = contentTemplate.replace("PROBLEM_LINK", sampleTask.getContent()).replace("DIFFICULTY", difficulty).replace("HTML_COMPANIES", htmlCompanies).replace("DELTA_COMPANIES", deltaCompanies).replace("M_COMPANIES", mDeltaCompanies);
             sampleTask.setContent(content);
-            bufferedWriterSampleTask.write("INSERT INTO \"template\".sample_tasks (id,created_at,updated_at,metadata,content,name,uid) VALUES (S_T_ID,'2020-08-29 10:21:46.593','2020-08-29 10:21:46.593','S_T_METADATA','S_T_CONTENT','S_T_NAME','S_T_UID');"
+            bufferedWriterSampleTask.write("INSERT INTO \"template\".sample_tasks (id,created_at,updated_at,metadata,content,name,uid,pending) VALUES (S_T_ID,'2020-08-29 10:21:46.593','2020-08-29 10:21:46.593','S_T_METADATA','S_T_CONTENT','S_T_NAME','S_T_UID',true);"
                     .replace("S_T_METADATA", sampleTask.getMetadata())
                     .replace("S_T_NAME", sampleTask.getName())
                     .replace("S_T_ID", sampleTask.getUid())

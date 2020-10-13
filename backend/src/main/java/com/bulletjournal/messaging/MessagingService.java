@@ -4,13 +4,26 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.messaging.firebase.FcmClient;
 import com.bulletjournal.messaging.firebase.FcmMessageParams;
 import com.bulletjournal.messaging.mailjet.MailjetEmailClient;
+import com.bulletjournal.messaging.mailjet.MailjetEmailClient.Template;
 import com.bulletjournal.messaging.mailjet.MailjetEmailParams;
 import com.bulletjournal.repository.DeviceTokenDaoJpa;
 import com.bulletjournal.repository.UserAliasDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.DeviceToken;
+import com.bulletjournal.repository.models.Notification;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.User;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -20,9 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Handle mobile device notification and email service
@@ -68,6 +78,24 @@ public class MessagingService {
 
     private UserClient userClient;
 
+    // JOIN GROUP PROPERTIES
+    private static final String GROUP_INVITATION_BASE_URL =
+        "http://bulletjournal.us/public/notifications/";
+
+    private static final String GROUP_INVITATION_ACCEPT_SUFFIX = "?action=accept";
+
+    private static final String GROUP_INVITATION_DECLINE_SUFFIX = "?action=decline";
+
+    private static final String GROUP_INVITATION_ACCEPT_URL_PROPERTY = "groupInvitationAcceptURL";
+
+    private static final String GROUP_INVITATION_DECLINE_URL_PROPERTY = "groupInvitationDeclineURL";
+
+    private static final String GROUP_INVITER_PROPERTY = "groupInviter";
+
+    private static final String GROUP_INVITER_AVATAR_PROPERTY = "groupInviterAvatar";
+
+    private static final String GROUP_NAME_PROPERTY = "groupName";
+
     @Autowired
     public MessagingService(
         FcmClient fcmClient,
@@ -93,6 +121,42 @@ public class MessagingService {
             .collect(Collectors.toList());
         fcmClient.sendAllMessagesAsync(params);
     }
+
+    public void sendJoinGroupNotificationEmailsToUser(
+        List<Pair<String, Notification>> notificationWithUIDs) {
+        LOGGER.info("Sending join group notifications ...");
+        try {
+            Set<String> distinctTargetUsers = notificationWithUIDs.stream().flatMap(item ->
+                Stream.of(item.getValue().getTargetUser()))
+                .collect(Collectors.toSet());
+            List<User> targetUsers = userDaoJpa.getUsersByNames(distinctTargetUsers);
+            Map<String, String> targetUserEmailMap = new HashMap<>();
+            for (User user : targetUsers) {
+                if (user.getEmail() != null && !user.getEmail().endsWith("@anon.1o24bbs.com")) {
+                    targetUserEmailMap.put(user.getName(), user.getEmail());
+                }
+            }
+
+            Set<String> distinctInviters = notificationWithUIDs.stream().flatMap(item ->
+                Stream.of(item.getValue().getOriginator()))
+                .collect(Collectors.toSet());
+            Map<String, String> inviterAvatarMap = getAvatarMap(new ArrayList<>(distinctInviters));
+
+            List<MailjetEmailParams> emailParamsList = new ArrayList<>();
+            for (Pair<String, Notification> notificationWithUID : notificationWithUIDs) {
+                MailjetEmailParams mailjetEmailParams =
+                    createEmailParamsForGroupInvitation(notificationWithUID,
+                        targetUserEmailMap, inviterAvatarMap);
+                if (mailjetEmailParams != null) {
+                    emailParamsList.add(mailjetEmailParams);
+                }
+            }
+            mailjetClient.sendAllEmailAsync(emailParamsList);
+        } catch (Exception e) {
+            LOGGER.error("sendJoinGroupNotificationEmailsToUser failed", e);
+        }
+    }
+
 
     public void sendTaskDueNotificationAndEmailToUsers(List<Task> taskList) {
         LOGGER.info("Sending task due notification for tasks: {}", taskList);
@@ -175,6 +239,47 @@ public class MessagingService {
         ret.append(" (" + task.getTimezone() + ")");
         return ret.toString();
     }
+
+    private MailjetEmailParams createEmailParamsForGroupInvitation(
+        Pair<String, Notification> notificationWithUID, Map<String, String> targetUserEmailMap,
+        Map<String, String> inviterAvatarMap
+    ) {
+        Notification notification = notificationWithUID.getValue();
+        String receiver = notification.getTargetUser();
+        String inviter = notification.getOriginator();
+        String title = notification.getTitle();
+        String uid = notificationWithUID.getKey();
+        Matcher titleMatcher = Pattern.compile("(?s)(?<=##).*?(?=##)").matcher(title);
+        List<String> matchResults = new ArrayList<>();
+        String groupInviterAvatar = inviterAvatarMap.get(inviter);
+        while (titleMatcher.find()) {
+            matchResults.add(titleMatcher.group());
+        }
+
+        // invalid msg format. no GROUP NAME found.
+        if (matchResults.size() != 3) {
+            LOGGER.error("Invalid group invitation message format {}. No group name found.", title);
+            return null;
+        }
+
+        return new MailjetEmailParams(
+                Arrays.asList(new ImmutablePair<>(receiver, targetUserEmailMap.get(receiver))),
+                title.replace("#", ""),
+                null,
+                Template.JOIN_GROUP_NOTIFICATION,
+                GROUP_INVITATION_ACCEPT_URL_PROPERTY,
+                GROUP_INVITATION_BASE_URL + uid + GROUP_INVITATION_ACCEPT_SUFFIX,
+                GROUP_INVITATION_DECLINE_URL_PROPERTY,
+                GROUP_INVITATION_BASE_URL + uid + GROUP_INVITATION_DECLINE_SUFFIX,
+                GROUP_INVITER_PROPERTY,
+                inviter,
+                GROUP_NAME_PROPERTY,
+                matchResults.get(2),
+                GROUP_INVITER_AVATAR_PROPERTY,
+                groupInviterAvatar
+            );
+    }
+
 
     private List<MailjetEmailParams> createEmailParamsForDueTask(
         Task task, Map<String, String> nameEmailMap
