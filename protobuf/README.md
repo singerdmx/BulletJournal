@@ -1,5 +1,7 @@
 # Protobuf definition
 
+Usually you don't need to manually run this make, go to `daemon/` and run `make gen_proto` instead.
+
 Run the following to install protobuf and protoc-gen-go
 ```
 brew install protobuf
