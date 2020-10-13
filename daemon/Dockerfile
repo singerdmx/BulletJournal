@@ -15,12 +15,14 @@ COPY logging logging
 COPY api api
 COPY go.mod .
 COPY Makefile .
+COPY proto_gen proto_gen
 
 # Build the grpc command inside the container.
 RUN apk update && \
     apk add git protobuf make && \
-    go get -u github.com/golang/protobuf/protoc-gen-go && \
-    go mod vendor && \
+    go get -u github.com/golang/protobuf/protoc-gen-go
+
+RUN go mod vendor && \
     GOOS=linux TARGET=/go/bin make build
 
 
