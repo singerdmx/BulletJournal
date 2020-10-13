@@ -153,7 +153,7 @@ public class MessagingService {
             }
             mailjetClient.sendAllEmailAsync(emailParamsList);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
     }
 
@@ -257,7 +257,10 @@ public class MessagingService {
         }
 
         // invalid msg format. no GROUP NAME found.
-        if (matchResults.size() != 3) { return null; }
+        if (matchResults.size() != 3) {
+            LOGGER.error("Invalid group invitation message format. No group name found.");
+            return null;
+        }
 
         return new MailjetEmailParams(
                 Arrays.asList(new ImmutablePair<>(receiver, targetUserEmailMap.get(receiver))),
