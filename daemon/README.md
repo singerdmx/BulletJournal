@@ -1,12 +1,14 @@
 # GRPC Go daemon
 
+Read `../protobuf/README.md` to install all needed tools for protobuf code generation.
+
 Run the following to initialize the project
 ```
 brew install go
-
 git clone https://github.com/singerdmx/BulletJournal.git
 cd <PATH to BulletJournal>/daemon
 go mod init github.com/BulletJournal/daemon
+make gen_proto
 go mod vendor
 ```
 
