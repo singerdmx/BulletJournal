@@ -37,14 +37,14 @@ func (s *SampleTaskDao) Upsert(t *SampleTask) {
 			fmt.Println(err, t.ID)
 		}
 	} else {
-		//Find the existing SampleTask Entity based on ID
-		var existSt SampleTask
-		s.Db.First(&existSt, t.ID)
-		//Update the SampleTask only if content change
-		if existSt.Content != t.Content {
-			t.Content = existSt.Content
-			s.Db.Save(&t)
-		}
+		//Update the SampleTask for only Content, DueDate, availableBefore, DueTime
+		s.Db.Model(&t).Select("content", "due_date", "due_time", "available_before").
+			Updates(map[string]interface{}{
+				"content": t.Content,
+				"due_date": t.DueDate,
+				"due_time": t.DueTime,
+				"available_before": t.AvailableBefore,
+			})
 	}
 }
 

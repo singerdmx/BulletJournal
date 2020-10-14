@@ -37,10 +37,9 @@ func (suite *ClientTestSuite) TestUpsert() {
 	var st persistence.SampleTask
 	//Find the last entry and make a new entry to upsert a new entry.
 	sampleTaskDao.Db.Last(&st)
-	fmt.Printf("In TestUpsert, old SampleTask is %v\n", st)
 	st.ID += 1
+	st.Uid = fmt.Sprint(st.ID)
 	st.Name = st.Name + "_test_suffix"
-	fmt.Printf("In TestUpsert, new SampleTask is %v\n", st)
 	sampleTaskDao.Upsert(&st)
 	var newSt persistence.SampleTask
 	sampleTaskDao.Db.First(&newSt, st.ID)
@@ -58,7 +57,7 @@ func (suite *ClientTestSuite) TestUpsert() {
 	sampleTaskDao.Upsert(&st2)
 	var updatedSt persistence.SampleTask
 	sampleTaskDao.Db.First(&updatedSt, st2.ID)
-	assert.Equal(suite.T(), updatedSt.Content, oldContent)
+	assert.NotEqual(suite.T(), updatedSt.Content, oldContent)
 
 	//Revert back the content
 	st2.Content = oldContent
