@@ -40,9 +40,10 @@ func (s *SampleTaskDao) Upsert(t *SampleTask) (uint64, bool) {
 		return t.ID, true
 	}
 
-	if t.Raw == prevReport.Raw {
-		return 0, false
-	}
+	// in case controller didn't receive the call
+	//if t.Raw == prevReport.Raw {
+	//	return 0, false
+	//}
 
 	// Update the SampleTask for only Content, DueDate, availableBefore, DueTime
 	s.Db.Model(&t).Where("uid = ?", t.Uid).Select("raw", "due_date", "due_time", "available_before").

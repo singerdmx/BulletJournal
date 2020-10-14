@@ -63,6 +63,9 @@ public class SampleTaskDaoJpa {
     @Autowired
     private NotificationRepository notificationRepository;
 
+    @Autowired
+    private StockTickerDetailsDaoJpa stockTickerDetailsDaoJpa;
+
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SampleTask createSampleTask(CreateSampleTaskParams createSampleTaskParams) {
         SampleTask sampleTask = new SampleTask();
@@ -232,5 +235,14 @@ public class SampleTaskDaoJpa {
         this.notificationService.inform(new NewSampleTaskEvent(events, "BulletJournal"));
 
         return sampleTask;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void handleSampleTaskChange(long id) {
+        SampleTask sampleTask = findSampleTaskById(id);
+        switch (sampleTask.getMetadata()) {
+            case "INVESTMENT_IPO_RECORD":
+                break;
+        }
     }
 }

@@ -105,9 +105,13 @@ func (c *IPOClient) SendData() (*[]uint64, *[]uint64, error) {
 		target := c.data.IPO[i]
 		availBefore := target.Date
 		t, _ := time.Parse(layoutISO, availBefore)
-		dueDate := target.PricingDate
+		dueDate := target.Date
 		if len(dueDate) > 10 {
-			dueDate = dueDate[0:11] // yyyy-MM-dd
+			dueDate = dueDate[0:10] // yyyy-MM-dd
+		}
+		dueTime := target.Time
+		if len(dueTime) > 5 {
+			dueTime = dueTime[0:5]
 		}
 		raw, _ := json.Marshal(target)
 		item := persistence.SampleTask{
@@ -119,7 +123,7 @@ func (c *IPOClient) SendData() (*[]uint64, *[]uint64, error) {
 			Uid:             "INVESTMENT_IPO_RECORD_" + target.Ticker,
 			AvailableBefore: t,
 			DueDate:         dueDate,
-			DueTime:         "",
+			DueTime:         dueTime,
 			Pending:         true,
 			Refreshable:     true,
 			TimeZone:        "America/New_York",

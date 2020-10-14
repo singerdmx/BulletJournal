@@ -8,6 +8,7 @@ import com.bulletjournal.repository.AuditableDaoJpa;
 import com.bulletjournal.repository.NotificationDaoJpa;
 import com.bulletjournal.repository.ProjectDaoJpa;
 import com.bulletjournal.repository.TaskDaoJpa;
+import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
 import com.bulletjournal.util.CustomThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,10 @@ public class NotificationService {
 
     @Autowired
     private ProjectDaoJpa projectDaoJpa;
+
+    @Lazy
+    @Autowired
+    private SampleTaskDaoJpa sampleTaskDaoJpa;
 
     @Autowired
     public NotificationService(NotificationDaoJpa notificationDaoJpa, AuditableDaoJpa auditableDaoJpa,
@@ -142,6 +147,7 @@ public class NotificationService {
             List<Remindable> remindables = new ArrayList<>();
             List<ContentBatch> contentBatches = new ArrayList<>();
             List<SampleProjectsCreation> sampleProjectsCreations = new ArrayList<>();
+            List<SampleTaskChange> sampleTaskChanges = new ArrayList<>();
             events.forEach((e) -> {
                 if (e instanceof Informed) {
                     informeds.add((Informed) e);
@@ -157,6 +163,8 @@ public class NotificationService {
                     contentBatches.add((ContentBatch) e);
                 } else if (e instanceof SampleProjectsCreation) {
                     sampleProjectsCreations.add((SampleProjectsCreation) e);
+                } else if (e instanceof SampleTaskChange) {
+                    sampleTaskChanges.add((SampleTaskChange) e);
                 }
             });
             try {
@@ -211,6 +219,14 @@ public class NotificationService {
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error on Reminder", ex);
+            }
+
+            for (SampleTaskChange sampleTaskChange : sampleTaskChanges) {
+                try {
+                    this.sampleTaskDaoJpa.handleSampleTaskChange(sampleTaskChange.getId());
+                } catch (Exception ex) {
+                    LOGGER.error("Error on SampleTaskChange", ex);
+                }
             }
             events = new ArrayList<>();
         }
