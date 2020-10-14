@@ -98,7 +98,7 @@ public class MessagingService {
     private static final String GROUP_NAME_PROPERTY = "groupName";
 
     // APP INVITATION PROPERTIES
-    private static final String APP_BASIC_URL = "http://bulletjournal.us";
+    private static final String APP_BASIC_URL = "https://bulletjournal.us/home/index.html";
 
     private static final String APP_URL_PROPERTY = "appUrl";
 
