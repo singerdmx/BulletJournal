@@ -50,6 +50,7 @@ public class MailjetEmailClient {
 
     public enum Template {
         TASK_DUE_NOTIFICATION(1625167),
+        APP_INVITATION(1784938),
         JOIN_GROUP_NOTIFICATION(1768232);
 
         private final int value;
