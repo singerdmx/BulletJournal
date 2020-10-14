@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -96,6 +97,16 @@ public class MessagingService {
 
     private static final String GROUP_NAME_PROPERTY = "groupName";
 
+    // APP INVITATION PROPERTIES
+    private static final String APP_BASIC_URL = "https://bulletjournal.us/home/index.html";
+
+    private static final String APP_URL_PROPERTY = "appUrl";
+
+    private static final String APP_INVITER_PROPERTY = "appInviter";
+
+    private static final String APP_INVITER_AVATAR_PROPERTY = "appInviterAvatar";
+
+
     @Autowired
     public MessagingService(
         FcmClient fcmClient,
@@ -156,7 +167,6 @@ public class MessagingService {
             LOGGER.error("sendJoinGroupNotificationEmailsToUser failed", e);
         }
     }
-
 
     public void sendTaskDueNotificationAndEmailToUsers(List<Task> taskList) {
         LOGGER.info("Sending task due notification for tasks: {}", taskList);
@@ -224,6 +234,59 @@ public class MessagingService {
             ));
         }
         return paramsList;
+    }
+
+    public void sendAppInvitationEmailsToUser(String inviter, List<String> emails) {
+        LOGGER.info("Sending app invitation emails...");
+        try {
+            List<MailjetEmailParams> emailParamsList = new ArrayList<>();
+            for (String email : new HashSet<>(emails)) {
+                MailjetEmailParams mailjetEmailParams =
+                    createEmailPramsForAppInvitation(inviter, this.getAvatar(inviter), email);
+                if (mailjetEmailParams != null) {
+                    emailParamsList.add(mailjetEmailParams);
+                }
+            }
+            mailjetClient.sendAllEmailAsync(emailParamsList);
+        } catch (Exception e) {
+            LOGGER.error("sendAppInvitationEmailsToUser failed", e);
+        }
+    }
+
+    public MailjetEmailParams createEmailPramsForAppInvitation(String inviter,
+                                                               String inviterAvatar,
+                                                               String email) {
+        if (!this.isValidEmailAddr(email)) {
+          LOGGER.error("Invalid app invitation email address: {}", email);
+          return null;
+        }
+
+        if (inviter == null || inviterAvatar == null) {
+          LOGGER.error("APP Invitation: Invalid inviter infor");
+          return null;
+        }
+
+        String title = inviter + " invited your to join BulletJournal";
+
+        return new MailjetEmailParams(
+            Arrays.asList(new ImmutablePair(null, email)),
+            title,
+            null,
+            Template.APP_INVITATION,
+            APP_URL_PROPERTY,
+            APP_BASIC_URL,
+            APP_INVITER_PROPERTY,
+            inviter,
+            APP_INVITER_AVATAR_PROPERTY,
+            inviterAvatar
+        );
+    }
+
+    private boolean isValidEmailAddr(String email) {
+        String emailPattern = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$";
+        Matcher emailMatcher =  Pattern.compile(emailPattern, Pattern.CASE_INSENSITIVE)
+                                    .matcher(email);
+        return emailMatcher.find();
     }
 
     private String getTitle(Task task) {

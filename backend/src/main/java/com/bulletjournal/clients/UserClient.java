@@ -1,7 +1,6 @@
 package com.bulletjournal.clients;
 
 import com.bulletjournal.config.SSOConfig;
-import com.bulletjournal.controller.models.ContactType;
 import com.bulletjournal.controller.models.UpdateMyselfParams;
 import com.bulletjournal.controller.models.User;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
@@ -201,7 +200,7 @@ public class UserClient {
         return headers;
     }
 
-    public String createTopic(String username, ContactType contactType, String title, String content) {
+    public String createTopic(String username, Integer forumId, String title, String content) {
         if (this.ssoAPIKey == null) {
             throw new IllegalArgumentException("ssoAPIKey missing");
         }
@@ -211,7 +210,7 @@ public class UserClient {
                 url,
                 HttpMethod.POST,
                 new HttpEntity<>(
-                        new CreateTopicParams(title, content, ContactType.getForumCategoryID(contactType)), headers),
+                        new CreateTopicParams(title, content, forumId), headers),
                 LinkedHashMap.class);
         LOGGER.info("Posts response {}", response);
         return this.ssoEndPoint.resolve(

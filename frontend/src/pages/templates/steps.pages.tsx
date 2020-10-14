@@ -13,12 +13,19 @@ import {
 import {Category, Choice, NextStep, SampleTask, SampleTasks, Step} from "../../features/templates/interface";
 import {Button, Card, Empty, notification, Select, Tooltip} from "antd";
 import {isSubsequence} from "../../utils/Util";
-import {CloseOutlined, CloseSquareTwoTone, ExclamationCircleFilled, UpCircleTwoTone} from "@ant-design/icons";
+import {
+    CloseOutlined,
+    CloseSquareTwoTone,
+    ExclamationCircleFilled,
+    QuestionCircleTwoTone,
+    UpCircleTwoTone
+} from "@ant-design/icons";
 import ReactLoading from "react-loading";
 import {getCookie} from "../../index";
 import StepsImportTasksPage from "./steps.import.tasks.pages";
 import {updateProjects} from "../../features/project/actions";
 import {updateExpandedMyself} from "../../features/myself/actions";
+import Feedback from "./feedback.page";
 
 const {Meta} = Card;
 const {Option} = Select;
@@ -117,6 +124,7 @@ const StepsPage: React.FC<StepsProps> = (
     const [showConfirmButton, setShowConfirmButton] = useState(false);
     const [showImportTasksCard, setShowImportTasksCard] = useState(false);
     const [showApplyButton, setShowApplyButton] = useState(true);
+    const [showFeedbackCard, setShowFeedbackCard] = useState(false);
 
     if (!category) {
         return <Empty/>
@@ -398,11 +406,19 @@ const StepsPage: React.FC<StepsProps> = (
                     }
                 >
                     <Meta
-                        title={category.name}
+                        title={<span>
+                            {category.name}&nbsp;
+                            {category.forumId && <Tooltip title='Contact us with suggestion or feedback. Your valuable input will be awarded with points.'>
+                                <QuestionCircleTwoTone style={{cursor: "pointer"}} onClick={() => setShowFeedbackCard(true)}/>
+                            </Tooltip>}
+                        </span>}
                         description={category.description}
                     />
                 </Card>
             </div>
+            {showFeedbackCard && category.forumId && <div className='feedback-card'>
+               <Feedback forumId={category.forumId} hideShowFeedbackCard={() => setShowFeedbackCard(false)}/>
+            </div>}
             {getStepsDiv()}
             {getComingSoonDiv()}
         </div>

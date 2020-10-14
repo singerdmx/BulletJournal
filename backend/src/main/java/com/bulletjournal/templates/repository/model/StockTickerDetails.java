@@ -6,6 +6,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "stock_ticker_details", schema = "template")
@@ -16,7 +17,10 @@ public class StockTickerDetails {
     @Id
     private String ticker;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "expiration_time", nullable = false)
+    private Timestamp expirationTime;
+
+    @Column(name = "details", nullable = false)
     private String details;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -27,10 +31,19 @@ public class StockTickerDetails {
     public StockTickerDetails() {
     }
 
-    public StockTickerDetails(String ticker, String details, Selection selection) {
+    public StockTickerDetails(String ticker, String details, Selection selection, Timestamp expirationTime) {
         this.ticker = ticker;
         this.details = details;
         this.selection = selection;
+        expirationTime = expirationTime;
+    }
+
+    public Timestamp getExpirationTime() {
+        return expirationTime;
+    }
+
+    public void setExpirationTime(Timestamp expirationTime) {
+        this.expirationTime = expirationTime;
     }
 
     public String getTicker() {
@@ -61,23 +74,23 @@ public class StockTickerDetails {
         JsonObject json = GSON.fromJson(
                 details, JsonObject.class);
         return new com.bulletjournal.templates.controller.model.StockTickerDetails(ticker, details, selection.toPresentationModel(),
-                json.get("logo").toString(),
-                json.get("country").toString(),
-                json.get("industry").toString(),
+                json.get("logo").getAsString(),
+                json.get("country").getAsString(),
+                json.get("industry").getAsString(),
                 json.get("marketcap").getAsLong(),
                 json.get("employees").getAsLong(),
-                json.get("phone").toString(),
-                json.get("ceo").toString(),
-                json.get("url").toString(),
-                json.get("description").toString(),
-                json.get("exchange").toString(),
-                json.get("name").toString(),
-                json.get("exchangeSymbol").toString(),
-                json.get("hq_address").toString(),
-                json.get("hq_state").toString(),
-                json.get("hq_country").toString(),
-                GSON.fromJson(json.get("tags").toString(), String[].class),
-                GSON.fromJson(json.get("similar").toString(), String[].class)
+                json.get("phone").getAsString(),
+                json.get("ceo").getAsString(),
+                json.get("url").getAsString(),
+                json.get("description").getAsString(),
+                json.get("exchange").getAsString(),
+                json.get("name").getAsString(),
+                json.get("exchangeSymbol").getAsString(),
+                json.get("hq_address").getAsString(),
+                json.get("hq_state").getAsString(),
+                json.get("hq_country").getAsString(),
+                GSON.fromJson(json.get("tags").getAsJsonArray(), String[].class),
+                GSON.fromJson(json.get("similar").getAsJsonArray(), String[].class)
         );
     }
 }

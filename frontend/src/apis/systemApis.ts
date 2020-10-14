@@ -25,9 +25,9 @@ export const getPublicProjectItem = (itemId: string) => {
         });
 };
 
-export const contactSupport = (contactType: ContactType, title: String, content: String) => {
+export const contactSupport = (forumId: number, title: String, content: String) => {
     const postBody = JSON.stringify({
-        contactType: contactType,
+        forumId: forumId,
         title: title,
         content: content
     });
