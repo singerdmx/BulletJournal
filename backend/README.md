@@ -14,6 +14,10 @@ Make sure port 8080 is available and then start backend by running the following
 ./gradlew bootRun
 ```
 
+## How to clean and seed database
+
+Run `backend/seed/seed_db.sh`
+
 ## How to build and push the backend image
 ```
 DOCKER_BUILDKIT=1 docker build -t {dockerhub_name}/{image_name} .
