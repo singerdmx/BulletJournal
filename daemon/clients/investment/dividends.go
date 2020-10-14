@@ -98,16 +98,21 @@ func (c *DividendsClient) SendData() (*[]uint64, *[]uint64, error) {
 		target := c.data.Dividends[i]
 		availBefore := target.Date
 		t, _ := time.Parse(layoutISO, availBefore)
+		dueDate := target.Date
+		if len(dueDate) > 10 {
+			dueDate = dueDate[0:10] // yyyy-MM-dd
+		}
+		raw, _ := json.Marshal(target)
 		item := persistence.SampleTask{
 			CreatedAt:       time.Now(),
 			UpdatedAt:       time.Now(),
 			Metadata:        "INVESTMENT_DIVIDENDS_RECORD",
-			Content:         "",
-			Name:            target.Name,
+			Raw:             string(raw),
+			Name:            fmt.Sprintf("%v (%v) reports dividends on %v", target.Name, target.Ticker, dueDate),
 			Uid:             "INVESTMENT_DIVIDENDS_RECORD_" + target.Ticker,
 			AvailableBefore: t,
-			DueDate:         "",
-			DueTime:         "",
+			DueDate:         dueDate,
+			DueTime:         "00:00",
 			Pending:         true,
 			Refreshable:     true,
 			TimeZone:        "America/New_York",
