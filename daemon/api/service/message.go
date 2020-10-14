@@ -2,8 +2,6 @@ package service
 
 import (
 	"context"
-	"time"
-
 	"github.com/mailjet/mailjet-apiv3-go"
 	"github.com/singerdmx/BulletJournal/daemon/config"
 	"github.com/singerdmx/BulletJournal/daemon/persistence"
@@ -13,7 +11,6 @@ import (
 const (
 	Accept  = "accept"
 	Decline = "decline"
-	UIDTTL  = 86400000 * time.Millisecond
 )
 
 var ctx = context.Background()

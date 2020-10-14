@@ -30,7 +30,6 @@ type DaoTestSuite struct {
 	RestAuditables                *uint64
 	RestPublicProjectItems        *uint64
 	RestNotifications             *uint64
-	VariableThatShouldStartAtFive int
 }
 
 func getDbConnection(settings postgresql.ConnectionURL) sqlbuilder.Database {
@@ -266,8 +265,6 @@ func cleanUpTables(sess sqlbuilder.Database) {
 	}
 }
 
-// Make sure that VariableThatShouldStartAtFive is set to five
-// before each test
 func (suite *DaoTestSuite) SetupTest() {
 	logging.InitLogging(config.GetEnv())
 	serviceConfig := config.GetConfig()
