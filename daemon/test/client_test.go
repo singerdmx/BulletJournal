@@ -26,7 +26,7 @@ func (suite *ClientTestSuite) SetupTest() {
 func (suite *ClientTestSuite) TestUpsert() {
 	fmt.Println("In TestUpsert")
 	//config.InitConfig()
-	//serviceConfig := config.GetConfig()
+	//logging.InitLogging(config.GetEnv())
 	dbConfig := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s",
 		"localhost", "postgres", "postgres", "docker")
 	db := persistence.GetDB(dbConfig)
@@ -51,21 +51,20 @@ func (suite *ClientTestSuite) TestUpsert() {
 	var allSts []*persistence.SampleTask
 	sampleTaskDao.Db.Find(&allSts)
 	count := len(allSts)
-	fmt.Println("count ", count)
 	var st2 persistence.SampleTask
 	sampleTaskDao.Db.Take(&st2)
-	oldName := st2.Name
-	st2.Name = oldName + "_test_suffix"
+	oldContent := st2.Content
+	st2.Content = oldContent + "_test_suffix"
 	sampleTaskDao.Upsert(&st2)
 	var updatedSt persistence.SampleTask
 	sampleTaskDao.Db.First(&updatedSt, st2.ID)
-	assert.Equal(suite.T(), updatedSt.Name, st2.Name)
-	//Revert back the name
-	st2.Name = oldName
+	assert.Equal(suite.T(), updatedSt.Content, oldContent)
+
+	//Revert back the content
+	st2.Content = oldContent
 	sampleTaskDao.Upsert(&st2)
 	sampleTaskDao.Db.Find(&allSts)
 	newCount := len(allSts)
-	fmt.Println("newCount ", newCount)
 	assert.Equal(suite.T(), count, newCount)
 }
 

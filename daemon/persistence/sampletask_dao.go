@@ -37,7 +37,14 @@ func (s *SampleTaskDao) Upsert(t *SampleTask) {
 			fmt.Println(err, t.ID)
 		}
 	} else {
-		s.Db.Save(&t)
+		//Find the existing SampleTask Entity based on ID
+		var existSt SampleTask
+		s.Db.First(&existSt, t.ID)
+		//Update the SampleTask only if content change
+		if existSt.Content != t.Content {
+			t.Content = existSt.Content
+			s.Db.Save(&t)
+		}
 	}
 }
 
