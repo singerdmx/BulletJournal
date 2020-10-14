@@ -1,7 +1,6 @@
 import React from "react";
 import {Button, Form, Input} from "antd";
 import {contactSupport} from "../../apis/systemApis";
-import {ContactType} from "../../features/system/constants";
 
 type FeedbackProps = {};
 
