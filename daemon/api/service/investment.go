@@ -18,12 +18,13 @@ func (i *Investment) pull(params ...interface{}) {
 	earningClient, _ := investment.NewTemplateClient(investment.EarningsTemplate)
 	dividendsClient, _ := investment.NewTemplateClient(investment.DividendsTemplate)
 
-	retrieveData(ipoClient, logger, i.Service)
-	retrieveData(earningClient, logger, i.Service)
-	retrieveData(dividendsClient, logger, i.Service)
+	retrieveData(ipoClient, i.Service)
+	retrieveData(earningClient, i.Service)
+	retrieveData(dividendsClient, i.Service)
 }
 
-func retrieveData(templateClient *investment.TemplateClient, logger logging.Logger, streaming Streaming) {
+func retrieveData(templateClient *investment.TemplateClient, streaming Streaming) {
+	logger := *logging.GetLogger()
 	error := templateClient.FetchData()
 	if error != nil {
 		logger.Error(error.Error())

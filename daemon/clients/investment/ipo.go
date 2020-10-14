@@ -107,14 +107,14 @@ func (c *IPOClient) SendData() (*[]uint64, *[]uint64, error) {
 		t, _ := time.Parse(layoutISO, availBefore)
 		dueDate := target.PricingDate
 		if len(dueDate) > 10 {
-			dueDate = dueDate[0:11]  // yyyy-MM-dd
+			dueDate = dueDate[0:11] // yyyy-MM-dd
 		}
-		content, _ := json.Marshal(target)
+		raw, _ := json.Marshal(target)
 		item := persistence.SampleTask{
 			CreatedAt:       time.Now(),
 			UpdatedAt:       time.Now(),
 			Metadata:        "INVESTMENT_IPO_RECORD",
-			Content:         string(content),
+			Raw:             string(raw),
 			Name:            fmt.Sprintf("%v (%v) goes public on %v", target.Name, target.Ticker, dueDate),
 			Uid:             "INVESTMENT_IPO_RECORD_" + target.Ticker,
 			AvailableBefore: t,
@@ -124,9 +124,9 @@ func (c *IPOClient) SendData() (*[]uint64, *[]uint64, error) {
 			Refreshable:     true,
 			TimeZone:        "America/New_York",
 		}
-		if entityId, newRecord := c.sampleDao.Upsert(&item); newRecord {
+		if entityId, newRecord := c.sampleDao.Upsert(&item); newRecord && entityId > 0 {
 			created = append(created, entityId)
-		} else {
+		} else if !newRecord && entityId > 0 {
 			modified = append(modified, entityId)
 		}
 	}

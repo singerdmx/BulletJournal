@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/singerdmx/BulletJournal/daemon/clients/investment"
+	"github.com/singerdmx/BulletJournal/daemon/config"
+	"github.com/singerdmx/BulletJournal/daemon/logging"
 
 	//"github.com/singerdmx/BulletJournal/daemon/config"
 
@@ -18,6 +20,7 @@ type ClientTestSuite struct {
 }
 
 func (suite *ClientTestSuite) SetupTest() {
+	logging.InitLogging(config.GetEnv())
 	earningClient,_ := investment.NewTemplateClient(investment.IPOTemplate)
 	earningClient.FetchData()
 	earningClient.SendData()
@@ -26,7 +29,6 @@ func (suite *ClientTestSuite) SetupTest() {
 func (suite *ClientTestSuite) TestUpsert() {
 	fmt.Println("In TestUpsert")
 	//config.InitConfig()
-	//logging.InitLogging(config.GetEnv())
 	dbConfig := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s",
 		"localhost", "postgres", "postgres", "docker")
 	db := persistence.GetDB(dbConfig)
@@ -52,15 +54,15 @@ func (suite *ClientTestSuite) TestUpsert() {
 	count := len(allSts)
 	var st2 persistence.SampleTask
 	sampleTaskDao.Db.Take(&st2)
-	oldContent := st2.Content
-	st2.Content = oldContent + "_test_suffix"
+	oldContent := st2.Raw
+	st2.Raw = oldContent + "_test_suffix"
 	sampleTaskDao.Upsert(&st2)
 	var updatedSt persistence.SampleTask
 	sampleTaskDao.Db.First(&updatedSt, st2.ID)
-	assert.NotEqual(suite.T(), updatedSt.Content, oldContent)
+	assert.NotEqual(suite.T(), updatedSt.Raw, oldContent)
 
 	//Revert back the content
-	st2.Content = oldContent
+	st2.Raw = oldContent
 	sampleTaskDao.Upsert(&st2)
 	sampleTaskDao.Db.Find(&allSts)
 	newCount := len(allSts)

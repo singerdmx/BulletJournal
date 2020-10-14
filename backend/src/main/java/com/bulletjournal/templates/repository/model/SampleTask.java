@@ -43,6 +43,8 @@ public class SampleTask extends NamedModel {
     @Column(name = "time_zone")
     private String timeZone;
 
+    @Column
+    private String raw;
 
     @Override
     public Long getId() {
@@ -127,6 +129,14 @@ public class SampleTask extends NamedModel {
 
     public void setRefreshable(boolean refreshable) {
         this.refreshable = refreshable;
+    }
+
+    public String getRaw() {
+        return raw;
+    }
+
+    public void setRaw(String raw) {
+        this.raw = raw;
     }
 
     public com.bulletjournal.templates.controller.model.SampleTask toPresentationModel() {

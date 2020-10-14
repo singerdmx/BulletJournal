@@ -112,9 +112,9 @@ func (c *DividendsClient) SendData() (*[]uint64, *[]uint64, error) {
 			Refreshable:     true,
 			TimeZone:        "America/New_York",
 		}
-		if entityId, newRecord := c.sampleDao.Upsert(&item); newRecord {
+		if entityId, newRecord := c.sampleDao.Upsert(&item); newRecord && entityId > 0 {
 			created = append(created, entityId)
-		} else {
+		} else if !newRecord && entityId > 0 {
 			modified = append(modified, entityId)
 		}
 	}
