@@ -50,40 +50,8 @@ func (c *DividendsClient) FetchData() error {
 	yearFrom, monthFrom, dayFrom := time.Now().Date()
 	yearTo, monthTo, dayTo := time.Now().AddDate(0, 1, 0).Date()
 
-	var dateFrom string
-	var dateTo string
-
-	if int(monthFrom) < 10 {
-		dateFrom = strconv.Itoa(yearFrom) + "-0" + strconv.Itoa(int(monthFrom))
-		if int(dayFrom) < 10 {
-			dateFrom = dateFrom + "-0" + strconv.Itoa(dayFrom)
-		} else {
-			dateFrom = dateFrom + strconv.Itoa(dayFrom)
-		}
-	} else {
-		dateFrom = strconv.Itoa(yearFrom) + "-" + strconv.Itoa(int(monthFrom))
-		if int(dayFrom) < 10 {
-			dateFrom = dateFrom + "-0" + strconv.Itoa(dayFrom)
-		} else {
-			dateFrom = dateFrom + "-" + strconv.Itoa(dayFrom)
-		}
-	}
-
-	if int(monthTo) < 10 {
-		dateTo = strconv.Itoa(yearTo) + "-0" + strconv.Itoa(int(monthTo))
-		if int(dayTo) < 10 {
-			dateTo = dateTo + "-0" + strconv.Itoa(dayTo)
-		} else {
-			dateTo = dateTo + strconv.Itoa(dayTo)
-		}
-	} else {
-		dateTo = strconv.Itoa(yearTo) + "-" + strconv.Itoa(int(monthTo))
-		if int(dayTo) < 10 {
-			dateTo = dateTo + "-0" + strconv.Itoa(dayTo)
-		} else {
-			dateTo = dateTo + "-" + strconv.Itoa(dayTo)
-		}
-	}
+	dateFrom := dateFormatter(yearFrom, monthFrom, dayFrom)
+	dateTo := dateFormatter(yearTo, monthTo, dayTo)}
 
 	url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/dividends?tpagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", dateFrom, dateTo)
 	resp, err := c.restClient.R().
