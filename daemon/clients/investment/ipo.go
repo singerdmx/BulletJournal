@@ -107,11 +107,12 @@ func (c *IPOClient) SendData() error {
 		if len(dueDate) > 10 {
 			dueDate = dueDate[0:11]  // yyyy-MM-dd
 		}
+		content, _ := json.Marshal(target)
 		item := persistence.SampleTask{
 			CreatedAt:       time.Now(),
 			UpdatedAt:       time.Now(),
 			Metadata:        "INVESTMENT_IPO_RECORD",
-			Content:         "",
+			Content:         string(content),
 			Name:            fmt.Sprintf("%v (%v) goes public on %v", target.Name, target.Ticker, dueDate),
 			Uid:             "INVESTMENT_IPO_RECORD_" + target.Ticker,
 			AvailableBefore: t,
@@ -121,7 +122,6 @@ func (c *IPOClient) SendData() error {
 			Refreshable:     true,
 			TimeZone:        "America/New_York",
 		}
-		fmt.Println(item.AvailableBefore)
 		c.sampleDao.Upsert(&item)
 	}
 
