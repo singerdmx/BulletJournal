@@ -5,6 +5,3 @@
 protobuf/.idea
 discourse-auth-proxy/.idea
 auth-proxy/.idea
-*.pb.go
-*.pb.gw.go
-*.swagger.json

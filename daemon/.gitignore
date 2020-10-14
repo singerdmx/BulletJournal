@@ -3,4 +3,3 @@ vendor/
 target/
 protobuf/
 tmp/
-proto_gen
