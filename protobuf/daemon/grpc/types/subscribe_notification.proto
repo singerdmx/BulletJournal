@@ -8,7 +8,7 @@ option java_package = "com.bulletjournal.protobuf.daemon.grpc.types";
 option java_outer_classname = "SubscribeNotificationProto";
 
 message SubscribeNotification {
-  string service_name = 1;
+  string id = 1;
 }
 
 message StreamMessage {
