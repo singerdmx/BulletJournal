@@ -76,10 +76,12 @@ func (c *EarningClient) FetchData() error {
 	return nil
 }
 
-func (c *EarningClient) SendData() error {
+func (c *EarningClient) SendData() (*[]uint64, *[]uint64, error) {
 	if c.data == nil {
-		return errors.New("Empty Earnings data, please fetch data first.")
+		return nil, nil, errors.New("Empty Earnings data, please fetch data first.")
 	}
+	created := make([]uint64, 0)
+	modified := make([]uint64, 0)
 	for i := range c.data.EarningData {
 		target := c.data.EarningData[i]
 		availBefore := target.Date + "T" + target.Time + "Z00:00"
@@ -98,7 +100,11 @@ func (c *EarningClient) SendData() error {
 			Refreshable:     true,
 			TimeZone:        "America/New_York",
 		}
-		c.sampleDao.Upsert(&item)
+		if entityId, newRecord := c.sampleDao.Upsert(&item); newRecord {
+			created = append(created, entityId)
+		} else {
+			modified = append(modified, entityId)
+		}
 	}
-	return nil
+	return &created, &modified, nil
 }

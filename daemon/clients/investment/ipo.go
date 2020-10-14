@@ -95,10 +95,12 @@ func (c *IPOClient) FetchData() error {
 	return nil
 }
 
-func (c *IPOClient) SendData() error {
+func (c *IPOClient) SendData() (*[]uint64, *[]uint64, error) {
 	if c.data == nil {
-		return errors.New("Empty IPO data, please fetch data first.")
+		return nil, nil, errors.New("Empty IPO data, please fetch data first.")
 	}
+	created := make([]uint64, 0)
+	modified := make([]uint64, 0)
 	for i := range c.data.IPO {
 		target := c.data.IPO[i]
 		availBefore := target.Date
@@ -122,8 +124,12 @@ func (c *IPOClient) SendData() error {
 			Refreshable:     true,
 			TimeZone:        "America/New_York",
 		}
-		c.sampleDao.Upsert(&item)
+		if entityId, newRecord := c.sampleDao.Upsert(&item); newRecord {
+			created = append(created, entityId)
+		} else {
+			modified = append(modified, entityId)
+		}
 	}
 
-	return nil
+	return &created, &modified, nil
 }

@@ -88,10 +88,12 @@ func (c *DividendsClient) FetchData() error {
 	c.data = &data
 	return nil
 }
-func (c *DividendsClient) SendData() error {
+func (c *DividendsClient) SendData() (*[]uint64, *[]uint64, error) {
 	if c.data == nil {
-		return errors.New("Empty Dividends data, please fetch data first.")
+		return nil, nil, errors.New("Empty Dividends data, please fetch data first.")
 	}
+	created := make([]uint64, 0)
+	modified := make([]uint64, 0)
 	for i := range c.data.Dividends {
 		target := c.data.Dividends[i]
 		availBefore := target.Date
@@ -110,7 +112,11 @@ func (c *DividendsClient) SendData() error {
 			Refreshable:     true,
 			TimeZone:        "America/New_York",
 		}
-		c.sampleDao.Upsert(&item)
+		if entityId, newRecord := c.sampleDao.Upsert(&item); newRecord {
+			created = append(created, entityId)
+		} else {
+			modified = append(modified, entityId)
+		}
 	}
-	return nil
+	return &created, &modified, nil
 }
