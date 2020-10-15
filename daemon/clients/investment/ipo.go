@@ -33,9 +33,11 @@ type IPO struct {
 	PriceMin                       string `json:"price_min"`
 	PriceMax                       string `json:"price_max"`
 	DealStatus                     string `json:"deal_status"`
+	InsiderLockupDays              string `json:"insider_lockup_days"`
 	InsiderLockupDate              string `json:"insider_lockup_date"`
 	OfferingValue                  int    `json:"offering_value"`
 	OfferingShares                 int    `json:"offering_shares"`
+	LeadUnderwriters			   string[] `json:"lead_underwriters"`
 	SharesOutstanding              int    `json:"shares_outstanding"`
 	UnderwriterQuietExpirationDate string `json:"underwriter_quiet_expiration_date"`
 	Notes                          string `json:"notes"`
