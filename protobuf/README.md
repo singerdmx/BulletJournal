@@ -5,6 +5,7 @@ Before you go, remember to set your `GOPATH, GOROOT, GOBIN` correctly, and add t
 Run the following to install protobuf and protoc-gen-go
 ```
 brew install protobuf
+cd //BulletJournal/protobuf/daemon
 go get -u github.com/golang/protobuf/protoc-gen-go
 go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
 go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
