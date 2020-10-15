@@ -3,9 +3,10 @@ package investment
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/pkg/errors"
 	"github.com/singerdmx/BulletJournal/daemon/persistence"
-	"time"
 )
 
 type EarningClient struct {
