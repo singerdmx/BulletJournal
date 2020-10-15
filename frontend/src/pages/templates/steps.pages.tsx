@@ -11,7 +11,7 @@ import {
     sampleTasksReceived
 } from "../../features/templates/actions";
 import {Category, Choice, NextStep, SampleTask, SampleTasks, Step} from "../../features/templates/interface";
-import {Button, Card, Empty, notification, Select, Tooltip} from "antd";
+import {Button, Card, Empty, message, notification, Select, Tooltip} from "antd";
 import {isSubsequence} from "../../utils/Util";
 import {
     CloseOutlined,
@@ -409,7 +409,15 @@ const StepsPage: React.FC<StepsProps> = (
                         title={<span>
                             {category.name}&nbsp;
                             {category.forumId && <Tooltip title='Contact us with suggestion or feedback. Your valuable input will be awarded with points.'>
-                                <QuestionCircleTwoTone style={{cursor: "pointer"}} onClick={() => setShowFeedbackCard(true)}/>
+                                <QuestionCircleTwoTone style={{cursor: "pointer"}} onClick={() => {
+                                    const loginCookie = getCookie('__discourse_proxy');
+                                    if (!loginCookie) {
+                                        message.warn("You need to login in order to submit feedback");
+                                        setShowFeedbackCard(false);
+                                        return;
+                                    }
+                                    setShowFeedbackCard(true);
+                                }}/>
                             </Tooltip>}
                         </span>}
                         description={category.description}

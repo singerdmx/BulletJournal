@@ -36,7 +36,7 @@ const Feedback: React.FC<FeedbackProps> = (
 
         const loginCookie = getCookie('__discourse_proxy');
         if (!loginCookie) {
-            message.warn("You need to login in order to submit feeback");
+            message.warn("You need to login in order to submit feedback");
             hideShowFeedbackCard();
             return;
         }
