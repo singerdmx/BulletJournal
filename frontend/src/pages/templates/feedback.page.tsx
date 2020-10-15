@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {Button, Input, message} from "antd";
 import './feedback.styles.less'
 import {contactSupport} from "../../apis/systemApis";
+import {getCookie} from "../../index";
 
 type FeedbackProps = {
     forumId: number;
@@ -30,6 +31,13 @@ const Feedback: React.FC<FeedbackProps> = (
         }
         if (!content) {
             message.error("Missing Content");
+            return;
+        }
+
+        const loginCookie = getCookie('__discourse_proxy');
+        if (!loginCookie) {
+            message.warn("You need to login in order to submit feeback");
+            hideShowFeedbackCard();
             return;
         }
 
