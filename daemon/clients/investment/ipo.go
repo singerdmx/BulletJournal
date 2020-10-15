@@ -21,25 +21,27 @@ type IPOData struct {
 
 // Serializer for IPO response
 type IPO struct {
-	ID                             string `json:"id"`
-	Date                           string `json:"date"`
-	Time                           string `json:"time"`
-	Ticker                         string `json:"ticker"`
-	Exchange                       string `json:"exchange"`
-	Name                           string `json:"name"`
-	OpenDateVerified               bool   `json:"open_date_verified"`
-	PricingDate                    string `json:"pricing_date"`
-	Currency                       string `json:"currency"`
-	PriceMin                       string `json:"price_min"`
-	PriceMax                       string `json:"price_max"`
-	DealStatus                     string `json:"deal_status"`
-	InsiderLockupDate              string `json:"insider_lockup_date"`
-	OfferingValue                  int    `json:"offering_value"`
-	OfferingShares                 int    `json:"offering_shares"`
-	SharesOutstanding              int    `json:"shares_outstanding"`
-	UnderwriterQuietExpirationDate string `json:"underwriter_quiet_expiration_date"`
-	Notes                          string `json:"notes"`
-	Updated                        int    `json:"updated"`
+	ID                             string 	`json:"id"`
+	Date                           string 	`json:"date"`
+	Time                           string 	`json:"time"`
+	Ticker                         string 	`json:"ticker"`
+	Exchange                       string 	`json:"exchange"`
+	Name                           string 	`json:"name"`
+	OpenDateVerified               bool   	`json:"open_date_verified"`
+	PricingDate                    string 	`json:"pricing_date"`
+	Currency                       string 	`json:"currency"`
+	PriceMin                       string 	`json:"price_min"`
+	PriceMax                       string 	`json:"price_max"`
+	DealStatus                     string 	`json:"deal_status"`
+	InsiderLockupDays              string 	`json:"insider_lockup_days"`
+	InsiderLockupDate              string 	`json:"insider_lockup_date"`
+	OfferingValue                  int    	`json:"offering_value"`
+	OfferingShares                 int    	`json:"offering_shares"`
+	LeadUnderwriters			   string[] `json:"lead_underwriters"`
+	SharesOutstanding              int    	`json:"shares_outstanding"`
+	UnderwriterQuietExpirationDate string 	`json:"underwriter_quiet_expiration_date"`
+	Notes                          string 	`json:"notes"`
+	Updated                        int    	`json:"updated"`
 }
 
 const layoutISO = "2006-01-02"

@@ -166,19 +166,27 @@ func main() {
 
 	PST, _ := time.LoadLocation("America/Los_Angeles")
 	log.Infof("PST [%T] [%v]", PST, PST)
-	start := time.Now()
+
+	year, month, day := time.Now().AddDate(0, 0, daemonRpc.serviceConfig.IntervalInDays).In(PST).Date() 
+	start := time.Date(year, month, day, 0, 0, 0, 0, PST)
 
 	daemonBackgroundJob := daemon.Job{Cleaner: cleaner, Reminder: daemon.Reminder{}, Investment: daemon.Investment{}}
 	log.Infof("The next daemon job will start at %v", start.Format(time.RFC3339))
 	log.Infof("And Now it's %v", time.Now().Format(time.RFC3339))
+	
+	var interval time.Duration
+	interval = time.Hour * 24 * time.Duration(daemonRpc.serviceConfig.IntervalInDays)
+
+	daemonBackgroundJob.Run(PST, daemonRpc.serviceConfig.MaxRetentionTimeInDays)
 
 	jobScheduler.AddRecurrentJob(
 		daemonBackgroundJob.Run,
 		start,
-		time.Hour*24*time.Duration(daemonRpc.serviceConfig.IntervalInDays),
+		interval,
 		PST,
 		daemonRpc.serviceConfig.MaxRetentionTimeInDays,
 	)
+)
 
 	<-shutdown
 	log.Infof("Shutdown signal received")
