@@ -186,7 +186,6 @@ func main() {
 		PST,
 		daemonRpc.serviceConfig.MaxRetentionTimeInDays,
 	)
-)
 
 	<-shutdown
 	log.Infof("Shutdown signal received")
