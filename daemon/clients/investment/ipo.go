@@ -61,7 +61,7 @@ func (c *IPOClient) FetchData() error {
 	dateTo := dateFormatter(yearTo, monthTo, dayTo)
 
 	// Request for IPO info of incoming 30 days
-	url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/ipos?tpagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", datefrom, dateto)
+	url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/ipos?tpagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", dateFrom, dateTo)
 	resp, err := c.restClient.R().
 		Get(url)
 
