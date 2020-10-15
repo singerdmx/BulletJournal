@@ -1,8 +1,9 @@
 package investment
 
-import
+import (
+	"strconv"
+	"time"
 
-(
 	"github.com/go-resty/resty/v2"
 	"github.com/singerdmx/BulletJournal/daemon/persistence"
 )
@@ -19,7 +20,25 @@ func NewBaseTemplateClient() BaseTemplateClient {
 		return BaseTemplateClient{}
 	}
 	return BaseTemplateClient{
-		sampleDao: dao,
+		sampleDao:  dao,
 		restClient: resty.New(),
 	}
+}
+
+func dateFormatter(year int, month time.Month, day int) (date string) {
+	var dateRes string
+
+	if int(month) < 10 {
+		dateRes = strconv.Itoa(year) + "-0" + strconv.Itoa(int(month))
+	} else {
+		dateRes = strconv.Itoa(year) + "-" + strconv.Itoa(int(month))
+	}
+
+	if int(day) < 10 {
+		dateRes = dateRes + "-0" + strconv.Itoa(day)
+	} else {
+		dateRes = dateRes + "-" + strconv.Itoa(day)
+	}
+
+	return dateRes
 }
