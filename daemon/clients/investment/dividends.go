@@ -47,11 +47,30 @@ func NewDividendsClient() (*TemplateClient, error) {
 }
 
 func (c *DividendsClient) FetchData() error {
-	yearFrom, monthFrom, dayFrom := time.Now().Date()
-	yearTo, monthTo, dayTo := time.Now().AddDate(0, 1, 0).Date()
+	year, month, _ := time.Now().Date()
 
-	dateFrom := dateFormatter(yearFrom, monthFrom, dayFrom)
-	dateTo := dateFormatter(yearTo, monthTo, dayTo)}
+	var dateFrom string
+	var dateTo string
+	var dateBase string
+
+	if int(month) < 10 {
+		dateBase = strconv.Itoa(year) + "-0" + strconv.Itoa(int(month))
+	} else {
+		dateBase = strconv.Itoa(year) + "-" + strconv.Itoa(int(month))
+	}
+
+	dateFrom = dateBase + "-01"
+
+	// Request for Dividends info of current month
+	judge := int(month)
+	switch judge {
+	case 2:
+		dateTo = dateBase + "-28"
+	case 4, 6, 9, 11:
+		dateTo = dateBase + "-30"
+	default:
+		dateTo = dateBase + "-31"
+	}
 
 	url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/dividends?tpagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", dateFrom, dateTo)
 	resp, err := c.restClient.R().
