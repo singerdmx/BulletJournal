@@ -85,18 +85,27 @@ func (c *EarningClient) SendData() (*[]uint64, *[]uint64, error) {
 	modified := make([]uint64, 0)
 	for i := range c.data.EarningData {
 		target := c.data.EarningData[i]
-		availBefore := target.Date + "T" + target.Time + "Z00:00"
-		t, _ := time.Parse(RFC3339, availBefore)
+		availBefore :=  target.Date
+		t, _ := time.Parse(layoutISO, availBefore)
+		dueDate := target.Date
+		if len(dueDate) > 10 {
+			dueDate = dueDate[0:10] // yyyy-MM-dd
+		}
+		dueTime := target.Time
+		if len(dueTime) > 5 {
+			dueTime = dueTime[0:5]
+		}
+		raw, _ := json.Marshal(target)
 		item := persistence.SampleTask{
 			CreatedAt:       time.Now(),
 			UpdatedAt:       time.Now(),
 			Metadata:        "INVESTMENT_EARNINGS_RECORD",
-			Content:         "",
-			Name:            target.Name,
+			Raw:             string(raw),
+			Name:            fmt.Sprintf("%v (%v) report earnings on %v", target.Name, target.Ticker, dueDate),
 			Uid:             "INVESTMENT_EARNINGS_RECORD_" + target.Ticker,
 			AvailableBefore: t,
-			DueDate:         target.Date,
-			DueTime:         target.Time,
+			DueDate:         dueDate,
+			DueTime:         dueTime,
 			Pending:         true,
 			Refreshable:     true,
 			TimeZone:        "America/New_York",
