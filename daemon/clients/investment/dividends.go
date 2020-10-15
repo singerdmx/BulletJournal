@@ -3,7 +3,6 @@ package investment
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/pkg/errors"
@@ -51,7 +50,7 @@ func (c *DividendsClient) FetchData() error {
 	yearTo, monthTo, dayTo := time.Now().AddDate(0, 1, 0).Date()
 
 	dateFrom := dateFormatter(yearFrom, monthFrom, dayFrom)
-	dateTo := dateFormatter(yearTo, monthTo, dayTo)}
+	dateTo := dateFormatter(yearTo, monthTo, dayTo)
 
 	url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/dividends?tpagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", dateFrom, dateTo)
 	resp, err := c.restClient.R().
