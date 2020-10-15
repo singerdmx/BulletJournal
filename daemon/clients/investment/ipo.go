@@ -3,9 +3,9 @@ package investment
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/pkg/errors"
-	"strconv"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/singerdmx/BulletJournal/daemon/persistence"
 )
@@ -53,32 +53,15 @@ func NewIPOClient() (*TemplateClient, error) {
 
 func (c *IPOClient) FetchData() error {
 	fmt.Println("fetching IPO")
-	year, month, _ := time.Now().Date()
 
-	var datefrom string
-	var dateto string
-	var datebase string
+	yearFrom, monthFrom, dayFrom := time.Now().Date()
+	yearTo, monthTo, dayTo := time.Now().AddDate(0, 1, 0).Date()
 
-	if int(month) < 10 {
-		datebase = strconv.Itoa(year) + "-0" + strconv.Itoa(int(month))
-	} else {
-		datebase = strconv.Itoa(year) + "-" + strconv.Itoa(int(month))
-	}
+	dateFrom := dateFormatter(yearFrom, monthFrom, dayFrom)
+	dateTo := dateFormatter(yearTo, monthTo, dayTo)
 
-	datefrom = datebase + "-01"
-
-	// Request for IPO info of current month
-	judge := int(month)
-	switch judge {
-	case 2:
-		dateto = datebase + "-28"
-	case 4, 6, 9, 11:
-		dateto = datebase + "-30"
-	default:
-		dateto = datebase + "-31"
-	}
-
-	url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/ipos?tpagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", datefrom, dateto)
+	// Request for IPO info of incoming 30 days
+	url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/ipos?tpagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", dateFrom, dateTo)
 	resp, err := c.restClient.R().
 		Get(url)
 
