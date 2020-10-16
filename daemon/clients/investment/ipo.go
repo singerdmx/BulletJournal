@@ -54,7 +54,7 @@ func NewIPOClient() (*TemplateClient, error) {
 }
 
 func (c *IPOClient) FetchData() error {
-	yearFrom, monthFrom, dayFrom := time.Now().Date()
+	yearFrom, monthFrom, dayFrom := time.Now().AddDate(0, -1, 0).Date()
 	yearTo, monthTo, dayTo := time.Now().AddDate(0, 1, 0).Date()
 
 	dateFrom := dateFormatter(yearFrom, monthFrom, dayFrom)
@@ -88,6 +88,7 @@ func (c *IPOClient) SendData() (*[]uint64, *[]uint64, error) {
 		target := c.data.IPO[i]
 		availBefore := target.Date
 		t, _ := time.Parse(layoutISO, availBefore)
+		t = t.AddDate(0, 6, 0)
 		dueDate := target.Date
 		if len(dueDate) > 10 {
 			dueDate = dueDate[0:10] // yyyy-MM-dd
