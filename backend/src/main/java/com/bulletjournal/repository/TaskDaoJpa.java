@@ -462,7 +462,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         this.notificationService.addContentBatch(new ContentBatch(
                 sampleTasks.stream().map(sampleTask -> new TaskContent(sampleTask.getContent())).collect(Collectors.toList()),
                 tasks,
-                tasks.stream().map(OwnedModel::getOwner).collect(Collectors.toList())));
+                tasks.stream().map(ProjectItemModel::getOwner).collect(Collectors.toList())));
 
         return tasks;
     }
