@@ -60,7 +60,7 @@ func NewEarningsClient() (*TemplateClient, error) {
 }
 
 func (c *EarningClient) FetchData() error {
-	yearFrom, monthFrom, dayFrom := time.Now().Date()
+	yearFrom, monthFrom, dayFrom := time.Now().AddDate(0, -1, 0).Date()
 	yearTo, monthTo, dayTo := time.Now().AddDate(0, 1, 0).Date()
 
 	dateFrom := dateFormatter(yearFrom, monthFrom, dayFrom)
@@ -89,6 +89,7 @@ func (c *EarningClient) SendData() (*[]uint64, *[]uint64, error) {
 		target := c.data.EarningData[i]
 		availBefore :=  target.Date
 		t, _ := time.Parse(layoutISO, availBefore)
+		t = t.AddDate(0, 6, 0)
 		dueDate := target.Date
 		if len(dueDate) > 10 {
 			dueDate = dueDate[0:10] // yyyy-MM-dd
