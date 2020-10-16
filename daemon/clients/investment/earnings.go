@@ -60,18 +60,20 @@ func NewEarningsClient() (*TemplateClient, error) {
 }
 
 func (c *EarningClient) FetchData() error {
-	t := time.Now().Local()
-	date := t.Format("2006-01-02")
-	baseURL := "https://www.benzinga.com/services/webapps/calendar/earnings"
+	yearFrom, monthFrom, dayFrom := time.Now().Date()
+	yearTo, monthTo, dayTo := time.Now().AddDate(0, 1, 0).Date()
 
-	url := fmt.Sprintf("%s?pagesize=%+v&parameters[date]=%s&parameters[importance]=%d", baseURL, earningsDefaultPageSize, date, earningsDefaultImportance)
+	dateFrom := dateFormatter(yearFrom, monthFrom, dayFrom)
+	dateTo := dateFormatter(yearTo, monthTo, dayTo)
+
+	url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/earnings?pagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", dateFrom, dateTo)
 	resp, err := c.restClient.R().Get(url)
 	if err != nil {
 		return errors.Wrap(err, "sending request failed")
 	}
 	data := Earnings{}
 	if err := json.Unmarshal(resp.Body(), &data); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("Unmarshal earnings response failed: %s", string(resp.Body())))
+		return errors.Wrap(err, fmt.Sprintf("%s Unmarshal earnings response failed: %s", url, string(resp.Body())))
 	}
 	c.data = &data
 	return nil
@@ -101,7 +103,7 @@ func (c *EarningClient) SendData() (*[]uint64, *[]uint64, error) {
 			UpdatedAt:       time.Now(),
 			Metadata:        "INVESTMENT_EARNINGS_RECORD",
 			Raw:             string(raw),
-			Name:            fmt.Sprintf("%v (%v) report earnings on %v", target.Name, target.Ticker, dueDate),
+			Name:            fmt.Sprintf("%v (%v) reports earnings on %v", target.Name, target.Ticker, dueDate),
 			Uid:             "INVESTMENT_EARNINGS_RECORD_" + target.Ticker,
 			AvailableBefore: t,
 			DueDate:         dueDate,

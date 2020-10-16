@@ -131,7 +131,7 @@ public class WorkflowControllerTest {
     public void testUserSampleTasks() throws Exception {
         List<SampleTask> sampleTasks = getUserSampleTasksWorkflow();
         SampleTask sampleTask = sampleTasks.get(0);
-        assertEquals("IG Acquisition Corp (IGACU) goes public on 2020-10-01", sampleTask.getName());
+        assertEquals("Spartacus Acquisition Corporation (TMTSU) goes public on 2020-10-15", sampleTask.getName());
         assertEquals("America/New_York", sampleTask.getTimeZone());
         assertEquals("2020-09-28", sampleTask.getDueDate());
         assertEquals("21:43", sampleTask.getDueTime());

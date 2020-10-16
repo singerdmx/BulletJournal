@@ -22,6 +22,7 @@ const Feedback: React.FC<FeedbackProps> = (
     const reset = () => {
         setTitle("");
         setContent("");
+        hideShowFeedbackCard();
     }
 
     const handleFeedback = (title: String, content: String) => {

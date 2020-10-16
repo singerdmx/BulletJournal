@@ -2,6 +2,7 @@ package com.bulletjournal.templates.repository;
 
 import com.bulletjournal.clients.StockApiClient;
 import com.bulletjournal.exceptions.BadRequestException;
+import com.bulletjournal.templates.controller.model.Choice;
 import com.bulletjournal.templates.controller.model.StockTickerDetails;
 import com.bulletjournal.templates.repository.model.Selection;
 import com.google.gson.Gson;
@@ -39,7 +40,15 @@ public class StockTickerDetailsDaoJpa {
             return stockTickerDetailsOptional.get().toPresentationModel();
         }
 
-        LinkedHashMap resp = this.stockApiClient.getCompany(symbol);
+        LinkedHashMap resp;
+        try {
+            resp = this.stockApiClient.getCompany(symbol);
+        } catch (Exception ex) {
+            LOGGER.info("Unable to find StockTickerDetails for {}", symbol);
+            LOGGER.error("stockApiClient#getCompany failed", ex);
+            return null;
+        }
+
         LOGGER.info(resp.toString());
         String sector = (String) resp.get("sector");
         Long selectionId;
@@ -87,6 +96,8 @@ public class StockTickerDetailsDaoJpa {
         stockTickerDetails.setDetails(GSON.toJson(resp));
         stockTickerDetails.setTicker(symbol);
         stockTickerDetails = stockTickerDetailsRepository.save(stockTickerDetails);
-        return stockTickerDetails.toPresentationModel();
+        com.bulletjournal.templates.controller.model.StockTickerDetails res = stockTickerDetails.toPresentationModel();
+        res.getSelection().setChoice(new Choice(selection.getChoice().getId()));
+        return res;
     }
 }

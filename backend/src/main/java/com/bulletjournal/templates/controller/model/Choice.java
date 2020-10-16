@@ -20,7 +20,10 @@ public class Choice {
     private List<Step> steps = new ArrayList<>();
 
     public Choice() {
+    }
 
+    public Choice(Long id) {
+        this.id = id;
     }
 
     public Choice(Long id, String name, boolean multiple) {
