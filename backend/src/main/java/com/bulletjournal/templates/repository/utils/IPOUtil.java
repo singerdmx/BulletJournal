@@ -1,4 +1,4 @@
-package com.bulletjournal.templates.repository.Utils;
+package com.bulletjournal.templates.repository.utils;
 
 import com.bulletjournal.templates.controller.model.StockTickerDetails;
 import org.apache.commons.lang3.StringUtils;
