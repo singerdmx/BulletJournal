@@ -46,24 +46,20 @@ func NewDividendsClient() (*TemplateClient, error) {
 }
 
 func (c *DividendsClient) FetchData() error {
-	yearFrom, monthFrom, dayFrom := time.Now().Date()
+	yearFrom, monthFrom, dayFrom := time.Now().AddDate(0, -3, 0).Date()
 	yearTo, monthTo, dayTo := time.Now().AddDate(0, 1, 0).Date()
 
 	dateFrom := dateFormatter(yearFrom, monthFrom, dayFrom)
 	dateTo := dateFormatter(yearTo, monthTo, dayTo)
 
-	url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/dividends?tpagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", dateFrom, dateTo)
-	resp, err := c.restClient.R().
-		Get(url)
-
+	url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/dividends?pagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", dateFrom, dateTo)
+	resp, err := c.restClient.R().Get(url)
 	if err != nil {
-		return errors.Wrap(err, "Dividends client sending request failed!")
+		return errors.Wrap(err, "sending request failed")
 	}
-
-	var data DividendsData
-
+	data := DividendsData{}
 	if err := json.Unmarshal(resp.Body(), &data); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("Unmarshal earnings response failed: %s", string(resp.Body())))
+		return errors.Wrap(err, fmt.Sprintf("%s Unmarshal dividends response failed: %s", url, string(resp.Body())))
 	}
 	c.data = &data
 	return nil
@@ -88,7 +84,7 @@ func (c *DividendsClient) SendData() (*[]uint64, *[]uint64, error) {
 			UpdatedAt:       time.Now(),
 			Metadata:        "INVESTMENT_DIVIDENDS_RECORD",
 			Raw:             string(raw),
-			Name:            fmt.Sprintf("%v (%v) reports dividends on %v", target.Name, target.Ticker, dueDate),
+			Name:            fmt.Sprintf("%v (%v) pays dividends on %v", target.Name, target.Ticker, dueDate),
 			Uid:             "INVESTMENT_DIVIDENDS_RECORD_" + target.Ticker,
 			AvailableBefore: t,
 			DueDate:         dueDate,

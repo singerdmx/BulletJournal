@@ -21,7 +21,7 @@ type ClientTestSuite struct {
 
 func (suite *ClientTestSuite) SetupTest() {
 	logging.InitLogging(config.GetEnv())
-	earningClient,_ := investment.NewTemplateClient(investment.IPOTemplate)
+	earningClient,_ := investment.NewTemplateClient(investment.EarningsTemplate)
 	earningClient.FetchData()
 	earningClient.SendData()
 }
