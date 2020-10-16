@@ -124,6 +124,14 @@ public class NotificationService {
         this.eventQueue.offer(sampleProjectsCreation);
     }
 
+    public void addSampleTaskChange(SampleTaskChange sampleTaskChange) {
+        LOGGER.info("Received sampleTaskChange: " + sampleTaskChange);
+        if (sampleTaskChange == null) {
+            return;
+        }
+        this.eventQueue.offer(sampleTaskChange);
+    }
+
     public void handleNotifications() {
         Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
         List<Object> events = new ArrayList<>();
