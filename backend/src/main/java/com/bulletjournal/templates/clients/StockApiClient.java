@@ -1,6 +1,6 @@
-package com.bulletjournal.clients;
+package com.bulletjournal.templates.clients;
 
-import com.bulletjournal.config.StockApiConfig;
+import com.bulletjournal.templates.config.StockApiConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;

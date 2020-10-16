@@ -4,16 +4,9 @@ import com.bulletjournal.contents.ContentType;
 
 import java.util.List;
 
-public class NewSampleTaskEvent extends Informed {
+public class NewAdminSampleTaskEvent extends Informed {
 
-    private String link;
-
-    public NewSampleTaskEvent(Event event, String originator, String link) {
-        super(event, originator);
-        this.link = link;
-    }
-
-    public NewSampleTaskEvent(List<Event> events, String originator) {
+    public NewAdminSampleTaskEvent(List<Event> events, String originator) {
         super(events, originator);
     }
 
@@ -29,6 +22,6 @@ public class NewSampleTaskEvent extends Informed {
 
     @Override
     public String getLink(Long contentId) {
-        return "/punchCard";
+        return ContentType.getContentLink(ContentType.SAMPLE_TASK, contentId);
     }
 }

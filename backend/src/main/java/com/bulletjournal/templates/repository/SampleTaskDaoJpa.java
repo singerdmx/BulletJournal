@@ -1,9 +1,11 @@
 package com.bulletjournal.templates.repository;
 
+import com.bulletjournal.authz.Role;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.NewAdminSampleTaskEvent;
 import com.bulletjournal.notifications.NewSampleTaskEvent;
 import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.repository.NotificationRepository;
@@ -183,6 +185,7 @@ public class SampleTaskDaoJpa {
             List<Long> notificationIds = StringUtil.convertNumArray(sampleTaskNotification.get().getNotifications());
             List<Notification> notifications = this.notificationRepository.findAllById(notificationIds);
             this.notificationRepository.deleteInBatch(notifications);
+            this.sampleTaskNotificationsRepository.delete(sampleTaskNotification.get());
         }
 
         this.sampleTaskRuleDaoJpa.updateSampleTaskRule(
@@ -278,7 +281,12 @@ public class SampleTaskDaoJpa {
             return;
         }
         // 1. get all admin usernames (role in users table)
+        List<User> users = this.userDaoJpa.getUsersByRole(Role.ADMIN);
         // 2. generate notifications
-        // 3. get notification ids and insert into sample_task_notifications table
+        this.notificationService.inform(
+                new NewAdminSampleTaskEvent(
+                        users.stream().map(u -> new Event(u.getName(), sampleTask.getId(), sampleTask.getName()))
+                                .collect(Collectors.toList()),
+                        "BulletJournal"));
     }
 }
