@@ -32,8 +32,8 @@ import java.util.*;
 public abstract class ProjectItemModel<T extends ProjectItem> extends AuditModel {
 
     @NotBlank
-    @Size(min = 1, max = 100)
-    @Column(length = 100, nullable = false)
+    @Size(min = 1, max = 500)
+    @Column(length = 500, nullable = false)
     private String name;
 
     @NotBlank
