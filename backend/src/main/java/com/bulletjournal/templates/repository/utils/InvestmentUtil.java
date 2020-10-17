@@ -23,6 +23,8 @@ public abstract class InvestmentUtil {
         switch (metadata) {
             case "INVESTMENT_IPO_RECORD":
                 return new IPOUtil(raw);
+            case "INVESTMENT_EARNINGS_RECORD":
+                return new EarningUtil(raw);
             default:
                 throw new IllegalArgumentException("Invalid metadata " + metadata);
         }
