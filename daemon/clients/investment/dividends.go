@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/singerdmx/BulletJournal/daemon/logging"
+
 	"github.com/pkg/errors"
 
 	"github.com/singerdmx/BulletJournal/daemon/persistence"
@@ -46,7 +48,7 @@ func NewDividendsClient() (*TemplateClient, error) {
 }
 
 func (c *DividendsClient) FetchData() error {
-
+	logger := *logging.GetLogger()
 	yearFrom, monthFrom, dayFrom := time.Now().AddDate(0, -3, 0).Date()
 	yearTo, monthTo, dayTo := time.Now().AddDate(0, 1, 0).Date()
 
@@ -68,11 +70,13 @@ func (c *DividendsClient) FetchData() error {
 		url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/dividends?pagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", dateFrom, dateTo)
 		resp, err := c.restClient.R().Get(url)
 		if err != nil {
-			return errors.Wrap(err, "sending request failed")
+			logger.Error("sending request failed")
+			continue
 		}
 		data := DividendsData{}
 		if err := json.Unmarshal(resp.Body(), &data); err != nil {
-			return errors.Wrap(err, fmt.Sprintf("%s Unmarshal dividends response failed: %s", url, string(resp.Body())))
+			logger.Error(fmt.Sprintf("%s Unmarshal dividends response failed: %s", url, string(resp.Body())))
+			continue
 		}
 
 		fetchedData = append(fetchedData, data.Dividends...)
@@ -100,7 +104,7 @@ func (c *DividendsClient) SendData() (*[]uint64, *[]uint64, error) {
 		availBefore := target.Date
 		t, _ := time.Parse(layoutISO, availBefore)
 		t = t.AddDate(0, 6, 0)
-		dueDate := target.Date
+		dueDate := target.ExDividendDate
 		if len(dueDate) > 10 {
 			dueDate = dueDate[0:10] // yyyy-MM-dd
 		}

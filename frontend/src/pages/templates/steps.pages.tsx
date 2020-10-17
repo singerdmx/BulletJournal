@@ -250,7 +250,7 @@ const StepsPage: React.FC<StepsProps> = (
             notification.open({
                 placement: 'bottomRight',
                 message: 'Make Selection',
-                description: 'Make sure there is no missing place',
+                description: 'Please make sure there is no missing place',
                 icon: <ExclamationCircleFilled style={{ color: 'red' }} />,
             });
             return;
@@ -268,6 +268,9 @@ const StepsPage: React.FC<StepsProps> = (
             }
         });
         getNextStep(curStep.id, selected, prevSelections, getSteps().length === 1);
+        setTimeout(() => {
+            window.scrollTo(0, document.body.scrollHeight);
+        }, 300);
     }
 
     const onScrollNext = () => {

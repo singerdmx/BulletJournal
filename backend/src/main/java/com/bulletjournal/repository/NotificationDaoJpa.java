@@ -113,8 +113,13 @@ public class NotificationDaoJpa implements Etaggable {
         }
 
         m.forEach((k, v) -> {
+            Optional<SampleTaskNotification> existing = this.sampleTaskNotificationsRepository.findById(k);
             SampleTaskNotification sampleTaskNotification = new SampleTaskNotification(
                     k, v.stream().distinct().sorted().map(value -> Long.toString(value)).collect(Collectors.joining(",")));
+            if (existing.isPresent()) {
+                sampleTaskNotification.setNotifications(sampleTaskNotification.getNotifications() + "," +
+                        existing.get().getNotifications());
+            }
             this.sampleTaskNotificationsRepository.save(sampleTaskNotification);
         });
     }

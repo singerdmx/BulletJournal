@@ -17,7 +17,7 @@ import com.bulletjournal.repository.models.User;
 import com.bulletjournal.templates.controller.model.AuditSampleTaskParams;
 import com.bulletjournal.templates.controller.model.CreateSampleTaskParams;
 import com.bulletjournal.templates.controller.model.UpdateSampleTaskParams;
-import com.bulletjournal.templates.repository.Utils.InvestmentUtil;
+import com.bulletjournal.templates.repository.utils.InvestmentUtil;
 import com.bulletjournal.templates.repository.model.*;
 import com.bulletjournal.util.StringUtil;
 import com.google.common.collect.ImmutableList;
