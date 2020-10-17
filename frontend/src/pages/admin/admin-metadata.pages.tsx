@@ -280,7 +280,7 @@ const AdminMetadataPage: React.FC<AdminMetadataProps> = (
                 </Radio.Group>
                 <Input
                     allowClear={true}
-                    style={{ width: '120px', marginLeft: '12px', marginRight: '12px'}}
+                    style={{ width: '300px', marginLeft: '12px', marginRight: '12px'}}
                     placeholder='Keyword'
                     value={keyword}
                     onChange={(value) => {
@@ -289,7 +289,7 @@ const AdminMetadataPage: React.FC<AdminMetadataProps> = (
                         setKeyword(s);
                     }}/>
                 <InputNumber
-                    style={{ width: '70px', marginLeft: '12px', marginRight: '12px'}}
+                    style={{ width: '80px', marginLeft: '12px', marginRight: '12px'}}
                     placeholder='ID'
                     onChange={(value) => {
                         if (!value || isNaN(value)) setId(0);

@@ -58,8 +58,7 @@ public class Reminder {
     public void postConstruct() {
         LOGGER.info(reminderConfig.toString());
 
-        this.initLoad();
-
+        executorService.schedule(() -> this.initLoad(), 1, TimeUnit.MILLISECONDS);
         executorService.scheduleWithFixedDelay(this::cronJob,
                 SECONDS_OF_DAY - ZonedDateTimeHelper.getPassedSecondsOfDay(reminderConfig.getTimeZone()),
                 this.reminderConfig.getCronJobSeconds(),
@@ -67,6 +66,7 @@ public class Reminder {
     }
 
     private void initLoad() {
+        LOGGER.info("initLoad");
         ZonedDateTime start = ZonedDateTime.now().minus(reminderConfig.getLoadPrevSeconds(), ChronoUnit.SECONDS);
         ZonedDateTime end = ZonedDateTime.now().plus(reminderConfig.getLoadNextSeconds(), ChronoUnit.SECONDS);
         this.scheduleReminderRecords(Pair.of(start, end));

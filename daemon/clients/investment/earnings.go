@@ -3,9 +3,10 @@ package investment
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/pkg/errors"
 	"github.com/singerdmx/BulletJournal/daemon/persistence"
-	"time"
 )
 
 type EarningClient struct {
@@ -59,46 +60,64 @@ func NewEarningsClient() (*TemplateClient, error) {
 }
 
 func (c *EarningClient) FetchData() error {
-	t := time.Now().Local()
-	date := t.Format("2006-01-02")
-	baseURL := "https://www.benzinga.com/services/webapps/calendar/earnings"
+	yearFrom, monthFrom, dayFrom := time.Now().AddDate(0, -1, 0).Date()
+	yearTo, monthTo, dayTo := time.Now().AddDate(0, 1, 0).Date()
 
-	url := fmt.Sprintf("%s?pagesize=%+v&parameters[date]=%s&parameters[importance]=%d", baseURL, earningsDefaultPageSize, date, earningsDefaultImportance)
+	dateFrom := dateFormatter(yearFrom, monthFrom, dayFrom)
+	dateTo := dateFormatter(yearTo, monthTo, dayTo)
+
+	url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/earnings?pagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", dateFrom, dateTo)
 	resp, err := c.restClient.R().Get(url)
 	if err != nil {
 		return errors.Wrap(err, "sending request failed")
 	}
 	data := Earnings{}
 	if err := json.Unmarshal(resp.Body(), &data); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("Unmarshal earnings response failed: %s", string(resp.Body())))
+		return errors.Wrap(err, fmt.Sprintf("%s Unmarshal earnings response failed: %s", url, string(resp.Body())))
 	}
 	c.data = &data
 	return nil
 }
 
-func (c *EarningClient) SendData() error {
+func (c *EarningClient) SendData() (*[]uint64, *[]uint64, error) {
 	if c.data == nil {
-		return errors.New("Empty Earnings data, please fetch data first.")
+		return nil, nil, errors.New("Empty Earnings data, please fetch data first.")
 	}
+	created := make([]uint64, 0)
+	modified := make([]uint64, 0)
 	for i := range c.data.EarningData {
 		target := c.data.EarningData[i]
-		availBefore := target.Date + "T" + target.Time + "Z00:00"
-		t, _ := time.Parse(RFC3339, availBefore)
+		availBefore :=  target.Date
+		t, _ := time.Parse(layoutISO, availBefore)
+		t = t.AddDate(0, 6, 0)
+		dueDate := target.Date
+		if len(dueDate) > 10 {
+			dueDate = dueDate[0:10] // yyyy-MM-dd
+		}
+		dueTime := target.Time
+		if len(dueTime) > 5 {
+			dueTime = dueTime[0:5]
+		}
+		raw, _ := json.Marshal(target)
 		item := persistence.SampleTask{
 			CreatedAt:       time.Now(),
 			UpdatedAt:       time.Now(),
 			Metadata:        "INVESTMENT_EARNINGS_RECORD",
-			Content:         "",
-			Name:            target.Name,
+			Raw:             string(raw),
+			Name:            fmt.Sprintf("%v (%v) reports earnings on %v", target.Name, target.Ticker, dueDate),
 			Uid:             "INVESTMENT_EARNINGS_RECORD_" + target.Ticker,
 			AvailableBefore: t,
-			DueDate:         target.Date,
-			DueTime:         target.Time,
+			DueDate:         dueDate,
+			DueTime:         dueTime,
 			Pending:         true,
 			Refreshable:     true,
 			TimeZone:        "America/New_York",
 		}
-		c.sampleDao.Upsert(&item)
+		if entityId, newRecord := c.sampleDao.Upsert(&item); newRecord && entityId > 0 {
+			created = append(created, entityId)
+		} else if !newRecord && entityId > 0 {
+			modified = append(modified, entityId)
+		}
 	}
-	return nil
+	return &created, &modified, nil
 }

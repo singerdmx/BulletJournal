@@ -1,4 +1,4 @@
-package com.bulletjournal.config;
+package com.bulletjournal.templates.config;
 
 import org.springframework.context.annotation.Configuration;
 

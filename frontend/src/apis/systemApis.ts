@@ -1,5 +1,4 @@
 import {doFetch, doPost, doPut} from './api-helper';
-import {ContactType} from "../features/system/constants";
 
 export const fetchSystemUpdates = (targets = '', projectId = undefined, remindingTaskEtag = undefined) => {
     let endpoint = '/api/system/updates';

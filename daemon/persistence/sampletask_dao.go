@@ -3,8 +3,8 @@ package persistence
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/singerdmx/BulletJournal/daemon/config"
+	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"gorm.io/gorm"
 )
 
@@ -16,7 +16,7 @@ type SampleTaskDao struct {
 func InitializeSampleTaskDao(config *config.Config, ctx context.Context) *SampleTaskDao {
 	return &SampleTaskDao{
 		Ctx: ctx,
-		Db: NewDB(config),
+		Db:  NewDB(config),
 	}
 }
 
@@ -28,13 +28,14 @@ func NewSampleTaskDao() (*SampleTaskDao, error) {
 	return &sampleTaskDao, nil
 }
 
-func (s *SampleTaskDao) Upsert(t *SampleTask) {
+func (s *SampleTaskDao) Upsert(t *SampleTask) (uint64, bool) {
+	logger := *logging.GetLogger()
 	prevReport := SampleTask{}
 	err := s.Db.Where("uid = ?", t.Uid).Last(&prevReport).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		err :=s.Db.Create(&t).Error
-		if err != nil {
-			fmt.Println(err, t.ID)
+		if err := s.Db.Create(&t).Error; err != nil {
+			logger.Errorf("Create Sample Task Error: %v", err)
+			return 0, false
 		}
 	} else {
 		//Update the SampleTask for only Content, DueDate, availableBefore, DueTime
@@ -45,25 +46,21 @@ func (s *SampleTaskDao) Upsert(t *SampleTask) {
 				"due_time": t.DueTime,
 				"available_before": t.AvailableBefore,
 			})
+		return t.ID, true
 	}
-}
 
-//func (s *SampleTaskDao) Upsert(t *SampleTask) {
-//	query := fmt.Sprintf(`INSERT INTO "template".sample_tasks  (
-//		id,created_at,updated_at,metadata,content,name,uid) VALUES (nextval('template.sample_task_sequence'),
-//		"%v","%v","%v","%v","%v","%v"
-//	) ON CONFLICT (uid) DO UPDATE
-//		SET updated_at = "%v",
-//		available_before = "%v"
-//	`,
-//		t.CreatedAt,
-//		t.UpdatedAt,
-//		t.Metadata,
-//		t.Content,
-//		t.Name,
-//		t.Uid,
-//		t.UpdatedAt,
-//		t.AvailableBefore,
-//	)
-//	s.db.Exec(query)
-//}
+	// in case controller didn't receive the call
+	//if t.Raw == prevReport.Raw {
+	//	return 0, false
+	//}
+
+	// Update the SampleTask for only Content, DueDate, availableBefore, DueTime
+	s.Db.Model(&t).Where("uid = ?", t.Uid).Select("raw", "due_date", "due_time", "available_before").
+		Updates(map[string]interface{}{
+			"raw":              t.Raw,
+			"due_date":         t.DueDate,
+			"due_time":         t.DueTime,
+			"available_before": t.AvailableBefore,
+		})
+	return prevReport.ID, false
+}

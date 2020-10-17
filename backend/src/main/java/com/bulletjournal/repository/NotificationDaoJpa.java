@@ -6,20 +6,19 @@ import com.bulletjournal.messaging.MessagingService;
 import com.bulletjournal.notifications.Action;
 import com.bulletjournal.notifications.Informed;
 import com.bulletjournal.notifications.JoinGroupEvent;
+import com.bulletjournal.notifications.NewAdminSampleTaskEvent;
 import com.bulletjournal.redis.RedisNotificationRepository;
 import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.redis.models.JoinGroupNotification;
 import com.bulletjournal.repository.factory.Etaggable;
 import com.bulletjournal.repository.models.Notification;
+import com.bulletjournal.templates.repository.SampleTaskNotificationsRepository;
+import com.bulletjournal.templates.repository.model.SampleTaskNotification;
 import com.bulletjournal.util.StringUtil;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -41,7 +40,8 @@ public class NotificationDaoJpa implements Etaggable {
     private UserAliasDaoJpa userAliasDaoJpa;
     @Autowired
     private RedisNotificationRepository redisNotificationRepository;
-
+    @Autowired
+    private SampleTaskNotificationsRepository sampleTaskNotificationsRepository;
     @Autowired
     private MessagingService messagingService;
 
@@ -76,11 +76,14 @@ public class NotificationDaoJpa implements Etaggable {
     public void create(List<Informed> events) {
         List<Notification> notifications = new ArrayList<>();
         List<Notification> joinGroupEventNotifications = new ArrayList<>();
+        List<Notification> adminSampleTasksNotifications = new ArrayList<>();
 
         events.forEach(event -> {
             List<Notification> list = event.toNotifications(userAliasDaoJpa);
             if (event instanceof JoinGroupEvent) {
                 joinGroupEventNotifications.addAll(list);
+            } else if (event instanceof NewAdminSampleTaskEvent) {
+                adminSampleTasksNotifications.addAll(list);
             }
             notifications.addAll(list);
         });
@@ -95,13 +98,25 @@ public class NotificationDaoJpa implements Etaggable {
 
             joinGroupEventNotifications.forEach(n -> {
                 String uid = RandomStringUtils.randomAlphanumeric(StringUtil.UUID_LENGTH);
-                joinGroupNotificationsWithUIDs.add(new ImmutablePair<String, Notification>(uid, n));
+                joinGroupNotificationsWithUIDs.add(new ImmutablePair<>(uid, n));
                 joinGroupNotifications.add(new JoinGroupNotification(uid, n.getId()));
             });
             this.redisNotificationRepository.saveAll(joinGroupNotifications);
 
             messagingService.sendJoinGroupNotificationEmailsToUser(joinGroupNotificationsWithUIDs);
         }
+
+        Map<Long, List<Long>> m = new HashMap<>();
+        for (Notification adminSampleTasksNotification : adminSampleTasksNotifications) {
+            m.computeIfAbsent(adminSampleTasksNotification.getContentId(), k -> new ArrayList<>())
+                    .add(adminSampleTasksNotification.getId());
+        }
+
+        m.forEach((k, v) -> {
+            SampleTaskNotification sampleTaskNotification = new SampleTaskNotification(
+                    k, v.stream().distinct().sorted().map(value -> Long.toString(value)).collect(Collectors.joining(",")));
+            this.sampleTaskNotificationsRepository.save(sampleTaskNotification);
+        });
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

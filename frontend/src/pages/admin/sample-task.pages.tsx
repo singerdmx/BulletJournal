@@ -143,6 +143,11 @@ const AdminSampleTaskPage: React.FC<SampleTaskProps> = (
                     View Content
                 </Button>
             </div>
+            {sampleTask.raw && <div>
+            <Divider/>
+            <div>
+                {sampleTask.raw}
+            </div></div>}
         </div>
     );
 };

@@ -1,9 +1,11 @@
 package com.bulletjournal.templates.repository;
 
+import com.bulletjournal.authz.Role;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.NewAdminSampleTaskEvent;
 import com.bulletjournal.notifications.NewSampleTaskEvent;
 import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.repository.NotificationRepository;
@@ -15,10 +17,13 @@ import com.bulletjournal.repository.models.User;
 import com.bulletjournal.templates.controller.model.AuditSampleTaskParams;
 import com.bulletjournal.templates.controller.model.CreateSampleTaskParams;
 import com.bulletjournal.templates.controller.model.UpdateSampleTaskParams;
+import com.bulletjournal.templates.repository.utils.InvestmentUtil;
 import com.bulletjournal.templates.repository.model.*;
 import com.bulletjournal.util.StringUtil;
 import com.google.common.collect.ImmutableList;
 import org.apache.http.util.TextUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -29,6 +34,8 @@ import java.util.stream.Collectors;
 
 @Repository
 public class SampleTaskDaoJpa {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SampleTaskDaoJpa.class);
 
     @Autowired
     private SampleTaskRepository sampleTaskRepository;
@@ -62,6 +69,9 @@ public class SampleTaskDaoJpa {
 
     @Autowired
     private NotificationRepository notificationRepository;
+
+    @Autowired
+    private StockTickerDetailsDaoJpa stockTickerDetailsDaoJpa;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SampleTask createSampleTask(CreateSampleTaskParams createSampleTaskParams) {
@@ -175,6 +185,7 @@ public class SampleTaskDaoJpa {
             List<Long> notificationIds = StringUtil.convertNumArray(sampleTaskNotification.get().getNotifications());
             List<Notification> notifications = this.notificationRepository.findAllById(notificationIds);
             this.notificationRepository.deleteInBatch(notifications);
+            this.sampleTaskNotificationsRepository.delete(sampleTaskNotification.get());
         }
 
         this.sampleTaskRuleDaoJpa.updateSampleTaskRule(
@@ -232,5 +243,50 @@ public class SampleTaskDaoJpa {
         this.notificationService.inform(new NewSampleTaskEvent(events, "BulletJournal"));
 
         return sampleTask;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void handleSampleTaskChange(long id) {
+        SampleTask sampleTask = findSampleTaskById(id);
+        handleSampleTaskRecord(sampleTask, InvestmentUtil.getInstance(sampleTask.getMetadata(), sampleTask.getRaw()));
+    }
+
+    private void handleSampleTaskRecord(SampleTask sampleTask, InvestmentUtil investmentUtil) {
+        com.bulletjournal.templates.controller.model.StockTickerDetails stockTickerDetails =
+                this.stockTickerDetailsDaoJpa.get(investmentUtil.getTicker());
+
+        try {
+            String content = investmentUtil.getContent(stockTickerDetails);
+            sampleTask.setContent(content);
+            this.sampleTaskRepository.save(sampleTask);
+            if (stockTickerDetails == null) {
+                notifyAdmins(sampleTask);
+                return;
+            }
+            // stockTickerDetails exists
+            if (sampleTask.isPending()) {
+                this.auditSampleTask(sampleTask.getId(), new AuditSampleTaskParams(
+                        stockTickerDetails.getSelection().getChoice().getId(),
+                        ImmutableList.of(stockTickerDetails.getSelection().getId())));
+            }
+        } catch (Exception ex) {
+            LOGGER.error("investmentUtil#getContent failed", ex);
+            notifyAdmins(sampleTask);
+        }
+    }
+
+    private void notifyAdmins(SampleTask sampleTask) {
+        if (!sampleTask.isPending()) {
+            LOGGER.info("Sample Task {} is not pending. Skip notifyAdmins", sampleTask.getId());
+            return;
+        }
+        // 1. get all admin usernames (role in users table)
+        List<User> users = this.userDaoJpa.getUsersByRole(Role.ADMIN);
+        // 2. generate notifications
+        this.notificationService.inform(
+                new NewAdminSampleTaskEvent(
+                        users.stream().map(u -> new Event(u.getName(), sampleTask.getId(), sampleTask.getName()))
+                                .collect(Collectors.toList()),
+                        "BulletJournal"));
     }
 }

@@ -11,7 +11,7 @@ var log logging.Logger
 type (
 	AbstractTemplateClientInterface interface {
 		FetchData() error
-		SendData() error
+		SendData() (*[]uint64, *[]uint64, error)
 	}
 
 	TemplateClient struct {

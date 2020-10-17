@@ -1,6 +1,6 @@
 # GRPC Go daemon
 
-Read `../protobuf/README.md` to install all needed tools for protobuf code generation.
+**Before compile daemon, read** [Protobuf Readme](../protobuf/README.md) to install all needed tools for protobuf code generation.
 
 Run the following to initialize the project
 ```
@@ -50,7 +50,7 @@ make clean build GOOS=linux TARGET=bin
 ## Docker usage
 Run the following commands to build Docker image after code changes are committed:
 ```
-docker build --rm -t bulletjournal-daemon:latest .
+make docker
 ```
 Bring up the image by running:
 ```
@@ -61,3 +61,16 @@ Then push Docker image to Docker hub:
 docker tag bulletjournal-daemon:latest zywangzy/bulletjournal-daemon:latest
 docker push zywangzy/bulletjournal-daemon
 ```
+
+## Generate Protobuf Go code
+Run the following command to generate protobuf go code.
+
+```
+  make gen_proto
+```
+> This command will create `./proto_gen/` folder, and copy `../protobuf/` into it, and build. 
+
+```
+  go mod vendor
+```
+> This command will copy compiled protobuf go package from `./proto_gen/` to `./vendor/`

@@ -3,7 +3,6 @@ package investment
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/pkg/errors"
@@ -47,70 +46,59 @@ func NewDividendsClient() (*TemplateClient, error) {
 }
 
 func (c *DividendsClient) FetchData() error {
-	year, month, _ := time.Now().Date()
+	yearFrom, monthFrom, dayFrom := time.Now().AddDate(0, -3, 0).Date()
+	yearTo, monthTo, dayTo := time.Now().AddDate(0, 1, 0).Date()
 
-	var dateFrom string
-	var dateTo string
-	var dateBase string
+	dateFrom := dateFormatter(yearFrom, monthFrom, dayFrom)
+	dateTo := dateFormatter(yearTo, monthTo, dayTo)
 
-	if int(month) < 10 {
-		dateBase = strconv.Itoa(year) + "-0" + strconv.Itoa(int(month))
-	} else {
-		dateBase = strconv.Itoa(year) + "-" + strconv.Itoa(int(month))
-	}
-
-	dateFrom = dateBase + "-01"
-
-	// Request for Dividends info of current month
-	judge := int(month)
-	switch judge {
-	case 2:
-		dateTo = dateBase + "-28"
-	case 4, 6, 9, 11:
-		dateTo = dateBase + "-30"
-	default:
-		dateTo = dateBase + "-31"
-	}
-
-	url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/dividends?tpagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", dateFrom, dateTo)
-	resp, err := c.restClient.R().
-		Get(url)
-
+	url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/dividends?pagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", dateFrom, dateTo)
+	resp, err := c.restClient.R().Get(url)
 	if err != nil {
-		return errors.Wrap(err, "Dividends client sending request failed!")
+		return errors.Wrap(err, "sending request failed")
 	}
-
-	var data DividendsData
-
+	data := DividendsData{}
 	if err := json.Unmarshal(resp.Body(), &data); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("Unmarshal earnings response failed: %s", string(resp.Body())))
+		return errors.Wrap(err, fmt.Sprintf("%s Unmarshal dividends response failed: %s", url, string(resp.Body())))
 	}
 	c.data = &data
 	return nil
 }
-func (c *DividendsClient) SendData() error {
+func (c *DividendsClient) SendData() (*[]uint64, *[]uint64, error) {
 	if c.data == nil {
-		return errors.New("Empty Dividends data, please fetch data first.")
+		return nil, nil, errors.New("Empty Dividends data, please fetch data first.")
 	}
+	created := make([]uint64, 0)
+	modified := make([]uint64, 0)
 	for i := range c.data.Dividends {
 		target := c.data.Dividends[i]
 		availBefore := target.Date
 		t, _ := time.Parse(layoutISO, availBefore)
+		t = t.AddDate(0, 6, 0)
+		dueDate := target.Date
+		if len(dueDate) > 10 {
+			dueDate = dueDate[0:10] // yyyy-MM-dd
+		}
+		raw, _ := json.Marshal(target)
 		item := persistence.SampleTask{
 			CreatedAt:       time.Now(),
 			UpdatedAt:       time.Now(),
 			Metadata:        "INVESTMENT_DIVIDENDS_RECORD",
-			Content:         "",
-			Name:            target.Name,
+			Raw:             string(raw),
+			Name:            fmt.Sprintf("%v (%v) pays dividends on %v", target.Name, target.Ticker, dueDate),
 			Uid:             "INVESTMENT_DIVIDENDS_RECORD_" + target.Ticker,
 			AvailableBefore: t,
-			DueDate:         "",
-			DueTime:         "",
+			DueDate:         dueDate,
+			DueTime:         "00:00",
 			Pending:         true,
 			Refreshable:     true,
 			TimeZone:        "America/New_York",
 		}
-		c.sampleDao.Upsert(&item)
+		if entityId, newRecord := c.sampleDao.Upsert(&item); newRecord && entityId > 0 {
+			created = append(created, entityId)
+		} else if !newRecord && entityId > 0 {
+			modified = append(modified, entityId)
+		}
 	}
-	return nil
+	return &created, &modified, nil
 }

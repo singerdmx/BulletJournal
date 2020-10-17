@@ -69,6 +69,7 @@ export interface SampleTask {
     choice?: Choice;
     pending: boolean;
     refreshable: boolean;
+    raw: string;
 }
 
 export interface SampleTasks {

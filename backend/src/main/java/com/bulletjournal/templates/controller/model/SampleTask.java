@@ -31,13 +31,15 @@ public class SampleTask {
 
     private boolean refreshable;
 
+    private String raw;
+
     public SampleTask() {
     }
 
     public SampleTask(
             Long id,
             String name) {
-        this(id, name, null, null, null, null, null, null, null, false, false);
+        this(id, name, null, null, null, null, null, null, null, false, false, null);
     }
 
     public SampleTask(
@@ -50,7 +52,7 @@ public class SampleTask {
             String dueTime,
             Timestamp availableBefore,
             String timeZone,
-            boolean pending, boolean refreshable) {
+            boolean pending, boolean refreshable, String raw) {
         this.id = id;
         this.name = name;
         this.content = content;
@@ -62,6 +64,7 @@ public class SampleTask {
         this.timeZone = timeZone;
         this.pending = pending;
         this.refreshable = refreshable;
+        this.raw = raw;
     }
 
 
@@ -159,5 +162,13 @@ public class SampleTask {
 
     public void setRefreshable(boolean refreshable) {
         this.refreshable = refreshable;
+    }
+
+    public String getRaw() {
+        return raw;
+    }
+
+    public void setRaw(String raw) {
+        this.raw = raw;
     }
 }
