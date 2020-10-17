@@ -7,6 +7,8 @@ import com.bulletjournal.repository.utils.StringArrayType;
 import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.*;
 
 /**
@@ -27,7 +29,17 @@ import java.util.*;
         ),
 })
 @MappedSuperclass
-public abstract class ProjectItemModel<T extends ProjectItem> extends OwnedModel {
+public abstract class ProjectItemModel<T extends ProjectItem> extends AuditModel {
+
+    @NotBlank
+    @Size(min = 1, max = 500)
+    @Column(length = 500, nullable = false)
+    private String name;
+
+    @NotBlank
+    @Size(min = 2, max = 100)
+    @Column(length = 100, nullable = false, updatable = false)
+    private String owner;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "project_id", nullable = false)
@@ -46,6 +58,24 @@ public abstract class ProjectItemModel<T extends ProjectItem> extends OwnedModel
 
     @Transient
     private boolean shared = false;
+
+    public abstract Long getId();
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
 
     public List<Long> getLabels() {
         if (this.labels == null) {

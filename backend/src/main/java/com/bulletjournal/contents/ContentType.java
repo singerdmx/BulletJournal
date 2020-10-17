@@ -13,6 +13,8 @@ public enum ContentType {
             case NOTE:
             case TRANSACTION:
                 return String.format("/" + type.name().toLowerCase() + "/%d", contentId);
+            case SAMPLE_TASK:
+                return String.format("/admin/sampleTasks/%d", contentId);
         }
 
         return null;

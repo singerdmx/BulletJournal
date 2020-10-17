@@ -6,6 +6,14 @@ public class AuditSampleTaskParams {
     private Long choiceId;
     private List<Long> selections;
 
+    public AuditSampleTaskParams() {
+    }
+
+    public AuditSampleTaskParams(Long choiceId, List<Long> selections) {
+        this.choiceId = choiceId;
+        this.selections = selections;
+    }
+
     public Long getChoiceId() {
         return choiceId;
     }
