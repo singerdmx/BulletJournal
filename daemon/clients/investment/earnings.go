@@ -3,6 +3,7 @@ package investment
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"time"
 
 	"github.com/pkg/errors"
@@ -60,6 +61,7 @@ func NewEarningsClient() (*TemplateClient, error) {
 }
 
 func (c *EarningClient) FetchData() error {
+	logger := *logging.GetLogger()
 	yearFrom, monthFrom, dayFrom := time.Now().AddDate(0, -1, 0).Date()
 	yearTo, monthTo, dayTo := time.Now().AddDate(0, 1, 0).Date()
 
@@ -80,11 +82,13 @@ func (c *EarningClient) FetchData() error {
 		url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/earnings?pagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", dateFrom, dateTo)
 		resp, err := c.restClient.R().Get(url)
 		if err != nil {
-			return errors.Wrap(err, "sending request failed")
+			logger.Error("sending request failed")
+			continue
 		}
 		data := Earnings{}
 		if err := json.Unmarshal(resp.Body(), &data); err != nil {
-			return errors.Wrap(err, fmt.Sprintf("%s Unmarshal earnings response failed: %s", url, string(resp.Body())))
+			logger.Error(fmt.Sprintf("%s Unmarshal dividends response failed: %s", url, string(resp.Body())))
+			continue
 		}
 
 		fetchedData = append(fetchedData, data.EarningData...)
