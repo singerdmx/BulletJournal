@@ -81,8 +81,7 @@ func (c *IPOClient) FetchData() error {
 		fetchedData = append(fetchedData, data.IPO...)
 	}
 
-	temp := IPOData{}
-	temp.IPO = fetchedData
+	temp := IPOData{IPO: fetchedData}
 
 	c.data = &temp
 	return nil

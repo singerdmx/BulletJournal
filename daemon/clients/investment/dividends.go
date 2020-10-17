@@ -82,8 +82,7 @@ func (c *DividendsClient) FetchData() error {
 		dayFrom = slotendDay
 	}
 
-	temp := DividendsData{}
-	temp.Dividends = fetchedData
+	temp := DividendsData{Dividends: fetchedData}
 
 	c.data = &temp
 

@@ -93,8 +93,7 @@ func (c *EarningClient) FetchData() error {
 		dayFrom = slotendDay
 	}
 
-	temp := Earnings{}
-	temp.EarningData = fetchedData
+	temp := Earnings{EarningData: fetchedData}
 
 	c.data = &temp
 	return nil
