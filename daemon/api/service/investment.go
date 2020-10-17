@@ -1,13 +1,14 @@
 package service
 
 import (
+	"time"
+
 	"github.com/singerdmx/BulletJournal/daemon/clients/investment"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
-	"time"
 )
 
 type Investment struct {
-	Service  Streaming
+	Service Streaming
 }
 
 func (i *Investment) pull(params ...interface{}) {
