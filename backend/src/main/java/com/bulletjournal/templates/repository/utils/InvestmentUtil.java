@@ -3,6 +3,7 @@ package com.bulletjournal.templates.repository.utils;
 import com.bulletjournal.templates.controller.model.StockTickerDetails;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 public abstract class InvestmentUtil {
@@ -33,6 +34,9 @@ public abstract class InvestmentUtil {
     }
 
     protected Pair<String, String> getStockTickerDetailContent(StockTickerDetails stockTickerDetails) {
+        if (StringUtils.isBlank(stockTickerDetails.getDetails())) {
+            return Pair.of("", "");
+        }
         String tickerDetailsDelta = "";
         String tickerDetailsHtml = "";
         if (stockTickerDetails != null) {

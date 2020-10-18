@@ -1,5 +1,6 @@
 package com.bulletjournal.templates.repository.model;
 
+import com.bulletjournal.templates.controller.model.Choice;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.commons.lang3.StringUtils;
@@ -74,7 +75,7 @@ public class StockTickerDetails {
     public com.bulletjournal.templates.controller.model.StockTickerDetails toPresentationModel() {
         if (StringUtils.isBlank(details)) {
             return new com.bulletjournal.templates.controller.model.StockTickerDetails(
-                    ticker);
+                    ticker, details, selection.toPresentationModel());
         }
         JsonObject json = GSON.fromJson(
                 details, JsonObject.class);
@@ -97,6 +98,14 @@ public class StockTickerDetails {
                 GSON.fromJson(json.get("tags").getAsJsonArray(), String[].class),
                 GSON.fromJson(json.get("similar").getAsJsonArray(), String[].class)
         );
+    }
+
+    public com.bulletjournal.templates.controller.model.StockTickerDetails toPresentationModelWithChoice() {
+        com.bulletjournal.templates.controller.model.StockTickerDetails stockTickerDetails = toPresentationModel();
+        if (selection != null) {
+            stockTickerDetails.getSelection().setChoice(new Choice(selection.getChoice().getId()));
+        }
+        return stockTickerDetails;
     }
 
     @Override

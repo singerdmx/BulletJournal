@@ -2,7 +2,6 @@ package com.bulletjournal.templates.repository;
 
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.templates.clients.StockApiClient;
-import com.bulletjournal.templates.controller.model.Choice;
 import com.bulletjournal.templates.controller.model.StockTickerDetails;
 import com.bulletjournal.templates.repository.model.Selection;
 import com.google.gson.Gson;
@@ -39,7 +38,7 @@ public class StockTickerDetailsDaoJpa {
                 this.stockTickerDetailsRepository.findById(symbol);
         if (stockTickerDetailsOptional.isPresent() && stockTickerDetailsOptional.get().
                 getExpirationTime().after(new Timestamp(System.currentTimeMillis()))) {
-            return stockTickerDetailsOptional.get().toPresentationModel();
+            return stockTickerDetailsOptional.get().toPresentationModelWithChoice();
         }
 
         LinkedHashMap resp;
@@ -98,8 +97,7 @@ public class StockTickerDetailsDaoJpa {
         stockTickerDetails.setDetails(GSON.toJson(resp));
         stockTickerDetails.setTicker(symbol);
         stockTickerDetails = stockTickerDetailsRepository.save(stockTickerDetails);
-        com.bulletjournal.templates.controller.model.StockTickerDetails res = stockTickerDetails.toPresentationModel();
-        res.getSelection().setChoice(new Choice(selection.getChoice().getId()));
-        return res;
+        return stockTickerDetails.toPresentationModelWithChoice();
     }
+
 }
