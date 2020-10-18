@@ -16,7 +16,6 @@ daemon-server:
 .PHONY: clean
 clean:
 	rm -rf ${TARGET}
-	rm -rf ${GEN_DIR}
 
 .PHONY: build
 build: daemon-server

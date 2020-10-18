@@ -32,8 +32,8 @@ func NewSampleTaskDao() (*SampleTaskDao, error) {
 func (s *SampleTaskDao) Upsert(t *SampleTask) (uint64, bool) {
 	logger := *logging.GetLogger()
 	prevReport := SampleTask{}
-	err := s.Db.Where("uid = ?", t.Uid).Last(&prevReport).Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
+	r := s.Db.Where("uid = ?", t.Uid).Last(&prevReport)
+	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
 		if err := s.Db.Create(&t).Error; err != nil {
 			logger.Errorf("Create Sample Task Error: %v", err)
 			return 0, false
