@@ -23,10 +23,11 @@ import (
 )
 
 const (
-	bulletJournalId     string = "bulletJournal"
-	fanInServiceName    string = "fanIn"
-	cleanerServiceName  string = "cleaner"
-	reminderServiceName string = "reminder"
+	bulletJournalId       string = "Controller"
+	fanInServiceName      string = "fanIn"
+	cleanerServiceName    string = "cleaner"
+	reminderServiceName   string = "reminder"
+	investmentServiceName string = "investment"
 )
 
 var log logging.Logger
@@ -65,27 +66,41 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 				}(service)
 			}
 		}
-		for service := range fanInChannel {
-			if service == nil {
-				log.Printf("Service: %s for subscription: %s is closed", service.ServiceName, subscribe.String())
+		for serviceMsg := range fanInChannel {
+			if serviceMsg == nil {
+				log.Printf("ServiceStreaming: %s for subscription: %s is closed", serviceMsg.ServiceName, subscribe.String())
 				log.Printf("Closing streaming to subscription: %s", subscribe.String())
 				break
-			} else if service.ServiceName == cleanerServiceName {
-				projectId := strconv.Itoa(int(service.Message))
+			} else if serviceMsg.ServiceName == cleanerServiceName {
+				projectId := strconv.Itoa(int(serviceMsg.Message))
 				if err := stream.Send(
 					&types.StreamMessage{
 						Body: &types.StreamMessage_RenewGoogleCalendarWatchMsg{
-							RenewGoogleCalendarWatchMsg: &types.SubscribeRenewGoogleCalendarWatchMsg{GoogleCalendarProjectId: projectId}}}); err != nil {
+							RenewGoogleCalendarWatchMsg: &types.SubscribeRenewGoogleCalendarWatchMsg{GoogleCalendarProjectId: projectId}}},
+				); err != nil {
 					log.Printf("Unexpected error happened to subscription: %s, error: %v", subscribe.String(), err)
-					// Allow future requests with the same subscribe.Id from new subscriptions
+					// Allow future requests with the same subscribe.ServiceName from new subscriptions
 					s.subscriptions[subscribe.ServiceName] = daemonServices
 					log.Printf("Transition streaming to idle for subscription: %s", subscribe.String())
 					break
 				} else {
 					log.Printf("Streaming projectId: %s to subscription: %s", projectId, subscribe.String())
 				}
+			} else if serviceMsg.ServiceName == investmentServiceName {
+				sampleTaskId := strconv.Itoa(int(serviceMsg.Message))
+				if err := stream.Send(
+					&types.StreamMessage{
+						Body: &types.StreamMessage_SampleTaskMsg{
+							SampleTaskMsg: &types.SubscribeSampleTaskMsg{SampleTaskId: sampleTaskId}}},
+				); err != nil {
+					log.Printf("Unexpected error happened to subscription: %s, error: %v", subscribe.String(), err)
+					// Allow future requests with the same subscribe.ServiceName from new subscriptions
+					s.subscriptions[subscribe.ServiceName] = daemonServices
+					log.Printf("Transition streaming to idle for subscription: %s", subscribe.String())
+					break
+				}
 			} else {
-				log.Printf("Service: %s for subscription: %s is not implemented as for now", service.ServiceName, subscribe.String())
+				log.Printf("ServiceStreaming: %s for subscription: %s is not implemented as for now", serviceMsg.ServiceName, subscribe.String())
 			}
 		}
 	} else {
@@ -107,12 +122,13 @@ func main() {
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, syscall.SIGTERM, syscall.SIGINT)
 
-	fanInService := daemon.Streaming{ServiceName: fanInServiceName, ServiceChannel: make(chan *daemon.StreamingMessage, 100)}
-	cleanerService := daemon.Streaming{ServiceName: cleanerServiceName, ServiceChannel: make(chan *daemon.StreamingMessage, 100)}
-	reminderService := daemon.Streaming{ServiceName: reminderServiceName, ServiceChannel: make(chan *daemon.StreamingMessage, 100)}
+	fanInServiceStreaming := daemon.Streaming{ServiceName: fanInServiceName, ServiceChannel: make(chan *daemon.StreamingMessage, 100)}
+	cleanerServiceStreaming := daemon.Streaming{ServiceName: cleanerServiceName, ServiceChannel: make(chan *daemon.StreamingMessage, 100)}
+	reminderServiceStreaming := daemon.Streaming{ServiceName: reminderServiceName, ServiceChannel: make(chan *daemon.StreamingMessage, 100)}
+	investmentServiceStreaming := daemon.Streaming{ServiceName: investmentServiceName, ServiceChannel: make(chan *daemon.StreamingMessage, 100)};
 	daemonRpc := &server{
 		serviceConfig: config.GetConfig(),
-		subscriptions: map[string][]daemon.Streaming{bulletJournalId: {fanInService, cleanerService, reminderService}},
+		subscriptions: map[string][]daemon.Streaming{bulletJournalId: {fanInServiceStreaming, cleanerServiceStreaming, reminderServiceStreaming, investmentServiceStreaming}},
 	}
 
 	rpcPort := ":" + daemonRpc.serviceConfig.RPCPort
@@ -158,7 +174,7 @@ func main() {
 	jobScheduler := scheduler.NewJobScheduler()
 	jobScheduler.Start()
 	cleaner := daemon.Cleaner{
-		Service: cleanerService,
+		ServiceStreaming: cleanerServiceStreaming,
 		Settings: postgresql.ConnectionURL{
 			Host:     daemonRpc.serviceConfig.Host + ":" + daemonRpc.serviceConfig.DBPort,
 			Database: daemonRpc.serviceConfig.Database,
@@ -173,7 +189,7 @@ func main() {
 	year, month, day := time.Now().AddDate(0, 0, daemonRpc.serviceConfig.IntervalInDays).In(PST).Date()
 	start := time.Date(year, month, day, 0, 0, 0, 0, PST)
 
-	daemonBackgroundJob := daemon.Job{Cleaner: cleaner, Reminder: daemon.Reminder{}, Investment: daemon.Investment{}}
+	daemonBackgroundJob := daemon.Job{Cleaner: cleaner, Reminder: daemon.Reminder{}, Investment: daemon.Investment{ServiceStreaming: investmentServiceStreaming}}
 	log.Infof("The next daemon job will start at %v", start.Format(time.RFC3339))
 	log.Infof("And Now it's %v", time.Now().Format(time.RFC3339))
 
@@ -193,8 +209,8 @@ func main() {
 	<-shutdown
 	log.Infof("Shutdown signal received")
 	cleaner.Close()
-	close(reminderService.ServiceChannel)
-	close(fanInService.ServiceChannel)
+	close(reminderServiceStreaming.ServiceChannel)
+	close(fanInServiceStreaming.ServiceChannel)
 	jobScheduler.Stop()
 	log.Infof("JobScheduler stopped")
 	rpcServer.GracefulStop()

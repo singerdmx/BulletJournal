@@ -14,9 +14,14 @@ message SubscribeNotification {
 message StreamMessage {
   oneof body {
     SubscribeRenewGoogleCalendarWatchMsg renewGoogleCalendarWatchMsg = 1;
+    SubscribeSampleTaskMsg sampleTaskMsg = 2;
   }
 }
 
 message SubscribeRenewGoogleCalendarWatchMsg {
   string googleCalendarProjectId = 1;
+}
+
+message SubscribeSampleTaskMsg {
+  string sampleTaskId = 1;
 }

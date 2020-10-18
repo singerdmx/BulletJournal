@@ -8,7 +8,7 @@ import (
 )
 
 type Investment struct {
-	Service Streaming
+	ServiceStreaming Streaming
 }
 
 func (i *Investment) pull(params ...interface{}) {
@@ -19,9 +19,9 @@ func (i *Investment) pull(params ...interface{}) {
 	earningClient, _ := investment.NewTemplateClient(investment.EarningsTemplate)
 	dividendsClient, _ := investment.NewTemplateClient(investment.DividendsTemplate)
 
-	retrieveData(ipoClient, i.Service)
-	retrieveData(earningClient, i.Service)
-	retrieveData(dividendsClient, i.Service)
+	retrieveData(ipoClient, i.ServiceStreaming)
+	retrieveData(earningClient, i.ServiceStreaming)
+	retrieveData(dividendsClient, i.ServiceStreaming)
 }
 
 func retrieveData(templateClient *investment.TemplateClient, streaming Streaming) {
@@ -39,10 +39,10 @@ func retrieveData(templateClient *investment.TemplateClient, streaming Streaming
 
 	for _, sampleTaskId := range *created {
 		logger.Printf("Created Sample Task %d", sampleTaskId)
-		// streaming <- &StreamingMessage{Message: sampleTaskId}
+		streaming.ServiceChannel <- &StreamingMessage{Message: uint(sampleTaskId)}
 	}
 	for _, sampleTaskId := range *modified {
 		logger.Printf("Modified Sample Task %d", sampleTaskId)
-		// streaming <- &StreamingMessage{Message: sampleTaskId}
+		streaming.ServiceChannel <- &StreamingMessage{Message: uint(sampleTaskId)}
 	}
 }
