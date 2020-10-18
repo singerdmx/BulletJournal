@@ -2,6 +2,7 @@ package com.bulletjournal.templates.repository.model;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -71,6 +72,10 @@ public class StockTickerDetails {
     }
 
     public com.bulletjournal.templates.controller.model.StockTickerDetails toPresentationModel() {
+        if (StringUtils.isBlank(details)) {
+            return new com.bulletjournal.templates.controller.model.StockTickerDetails(
+                    ticker);
+        }
         JsonObject json = GSON.fromJson(
                 details, JsonObject.class);
         return new com.bulletjournal.templates.controller.model.StockTickerDetails(ticker, details, selection.toPresentationModel(),
@@ -92,5 +97,15 @@ public class StockTickerDetails {
                 GSON.fromJson(json.get("tags").getAsJsonArray(), String[].class),
                 GSON.fromJson(json.get("similar").getAsJsonArray(), String[].class)
         );
+    }
+
+    @Override
+    public String toString() {
+        return "StockTickerDetails{" +
+                "ticker='" + ticker + '\'' +
+                ", expirationTime=" + expirationTime +
+                ", details='" + details + '\'' +
+                ", selection=" + selection +
+                '}';
     }
 }

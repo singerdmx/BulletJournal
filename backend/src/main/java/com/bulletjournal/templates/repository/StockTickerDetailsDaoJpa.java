@@ -1,7 +1,7 @@
 package com.bulletjournal.templates.repository;
 
-import com.bulletjournal.templates.clients.StockApiClient;
 import com.bulletjournal.exceptions.BadRequestException;
+import com.bulletjournal.templates.clients.StockApiClient;
 import com.bulletjournal.templates.controller.model.Choice;
 import com.bulletjournal.templates.controller.model.StockTickerDetails;
 import com.bulletjournal.templates.repository.model.Selection;
@@ -22,6 +22,8 @@ public class StockTickerDetailsDaoJpa {
     public static final Logger LOGGER = LoggerFactory.getLogger(StockTickerDetailsDaoJpa.class);
 
     private static final long MILLS_IN_YEAR = 1000L * 60 * 60 * 24 * 365;
+
+    public static final long MILLS_IN_SEASON = 1000L * 60 * 60 * 24 * 90;
 
     @Autowired
     private StockTickerDetailsRepository stockTickerDetailsRepository;

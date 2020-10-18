@@ -17,8 +17,8 @@ import com.bulletjournal.repository.models.User;
 import com.bulletjournal.templates.controller.model.AuditSampleTaskParams;
 import com.bulletjournal.templates.controller.model.CreateSampleTaskParams;
 import com.bulletjournal.templates.controller.model.UpdateSampleTaskParams;
-import com.bulletjournal.templates.repository.utils.InvestmentUtil;
 import com.bulletjournal.templates.repository.model.*;
+import com.bulletjournal.templates.repository.utils.InvestmentUtil;
 import com.bulletjournal.util.StringUtil;
 import com.google.common.collect.ImmutableList;
 import org.apache.http.util.TextUtils;
@@ -29,6 +29,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -72,6 +73,12 @@ public class SampleTaskDaoJpa {
 
     @Autowired
     private StockTickerDetailsDaoJpa stockTickerDetailsDaoJpa;
+
+    @Autowired
+    private StockTickerDetailsRepository stockTickerDetailsRepository;
+
+    @Autowired
+    private SelectionRepository selectionRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SampleTask createSampleTask(CreateSampleTaskParams createSampleTaskParams) {
@@ -170,6 +177,7 @@ public class SampleTaskDaoJpa {
         if (auditSampleTaskParams.getSelections().isEmpty()) {
             throw new BadRequestException("Empty Selections");
         }
+        auditSelection(sampleTask, auditSampleTaskParams.getSelections());
         List<SelectionMetadataKeyword> keywords =
                 this.selectionMetadataKeywordDaoJpa.getKeywordsBySelectionsWithoutFrequency(auditSampleTaskParams.getSelections());
         for (SelectionMetadataKeyword keyword : keywords) {
@@ -243,6 +251,23 @@ public class SampleTaskDaoJpa {
         this.notificationService.inform(new NewSampleTaskEvent(events, "BulletJournal"));
 
         return sampleTask;
+    }
+
+    private void auditSelection(SampleTask sampleTask, List<Long> selections) {
+        // selection
+        Optional<Long> match = selections.stream().filter(s -> s != null && s >= 250 && s <= 260).findFirst();
+        if (match.isPresent()) {
+            InvestmentUtil investmentUtil = InvestmentUtil.getInstance(sampleTask.getMetadata(), sampleTask.getRaw());
+            Selection selection = selectionRepository.findById(match.get()).orElseThrow(
+                    () -> new ResourceNotFoundException("Selection" + match.get() + "not found"));
+            StockTickerDetails stockTickerDetails = new StockTickerDetails();
+            stockTickerDetails.setSelection(selection);
+            stockTickerDetails.setExpirationTime(new Timestamp(System.currentTimeMillis() + StockTickerDetailsDaoJpa.MILLS_IN_SEASON));
+            stockTickerDetails.setDetails("");
+            stockTickerDetails.setTicker(investmentUtil.getTicker());
+            stockTickerDetails = stockTickerDetailsRepository.save(stockTickerDetails);
+            LOGGER.info("Created stock detail {}", stockTickerDetails);
+        }
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

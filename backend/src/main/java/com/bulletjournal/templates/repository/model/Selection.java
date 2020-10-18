@@ -89,4 +89,15 @@ public class Selection extends AuditModel {
     public com.bulletjournal.templates.controller.model.Selection toPresentationModel() {
         return new com.bulletjournal.templates.controller.model.Selection(id, icon, text);
     }
+
+    @Override
+    public String toString() {
+        return "Selection{" +
+                "id=" + id +
+                ", choice=" + choice +
+                ", icon='" + icon + '\'' +
+                ", text='" + text + '\'' +
+                ", page='" + page + '\'' +
+                '}';
+    }
 }
