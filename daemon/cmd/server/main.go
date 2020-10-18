@@ -45,11 +45,11 @@ func (s *server) HealthCheck(ctx context.Context, request *types.HealthCheckRequ
 
 func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, stream services.Daemon_SubscribeNotificationServer) error {
 	log.Printf("Received rpc request for subscription: %s", subscribe.String())
-	if _, ok := s.subscriptions[subscribe.Id]; ok {
+	if _, ok := s.subscriptions[subscribe.ServiceName]; ok {
 		log.Printf("Subscription: %s's streaming has been idle, start streaming!", subscribe.String())
-		daemonServices := s.subscriptions[subscribe.Id]
+		daemonServices := s.subscriptions[subscribe.ServiceName]
 		// Prevent requests with the same subscribe.Id from new subscriptions
-		delete(s.subscriptions, subscribe.Id)
+		delete(s.subscriptions, subscribe.ServiceName)
 		// Keep the subscription session alive
 		var fanInChannel chan *daemon.StreamingMessage
 		for _, service := range daemonServices {
@@ -72,10 +72,13 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 				break
 			} else if service.ServiceName == cleanerServiceName {
 				projectId := strconv.Itoa(int(service.Message))
-				if err := stream.Send(&types.StreamMessage{Id: cleanerServiceName, Message: projectId}); err != nil {
+				if err := stream.Send(
+					&types.StreamMessage{
+						Body: &types.StreamMessage_RenewGoogleCalendarWatchMsg{
+							RenewGoogleCalendarWatchMsg: &types.SubscribeRenewGoogleCalendarWatchMsg{GoogleCalendarProjectId: projectId}}}); err != nil {
 					log.Printf("Unexpected error happened to subscription: %s, error: %v", subscribe.String(), err)
 					// Allow future requests with the same subscribe.Id from new subscriptions
-					s.subscriptions[subscribe.Id] = daemonServices
+					s.subscriptions[subscribe.ServiceName] = daemonServices
 					log.Printf("Transition streaming to idle for subscription: %s", subscribe.String())
 					break
 				} else {
@@ -167,13 +170,13 @@ func main() {
 	PST, _ := time.LoadLocation("America/Los_Angeles")
 	log.Infof("PST [%T] [%v]", PST, PST)
 
-	year, month, day := time.Now().AddDate(0, 0, daemonRpc.serviceConfig.IntervalInDays).In(PST).Date() 
+	year, month, day := time.Now().AddDate(0, 0, daemonRpc.serviceConfig.IntervalInDays).In(PST).Date()
 	start := time.Date(year, month, day, 0, 0, 0, 0, PST)
 
 	daemonBackgroundJob := daemon.Job{Cleaner: cleaner, Reminder: daemon.Reminder{}, Investment: daemon.Investment{}}
 	log.Infof("The next daemon job will start at %v", start.Format(time.RFC3339))
 	log.Infof("And Now it's %v", time.Now().Format(time.RFC3339))
-	
+
 	var interval time.Duration
 	interval = time.Hour * 24 * time.Duration(daemonRpc.serviceConfig.IntervalInDays)
 

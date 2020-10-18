@@ -32,7 +32,7 @@ import {
 } from '../../apis/adminApis';
 import {CategorySteps, ChoiceMetadata, SelectionMetadata, StepMetadata, UserInfo} from './interface';
 import {auditSampleTask, fetchCategorySteps} from "../../apis/templates/workflowApis";
-import {Choice, SampleTask} from "../templates/interface";
+import {SampleTask} from "../templates/interface";
 import {sampleTaskReceived} from "../templates/actions";
 import {
   createChoiceMetadata, createSelectionMetadata, createStepMetadata,

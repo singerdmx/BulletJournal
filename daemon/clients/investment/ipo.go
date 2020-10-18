@@ -3,6 +3,7 @@ package investment
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"time"
 
 	"github.com/pkg/errors"
@@ -54,27 +55,39 @@ func NewIPOClient() (*TemplateClient, error) {
 }
 
 func (c *IPOClient) FetchData() error {
+	logger := *logging.GetLogger()
 	yearFrom, monthFrom, dayFrom := time.Now().AddDate(0, -1, 0).Date()
 	yearTo, monthTo, dayTo := time.Now().AddDate(0, 1, 0).Date()
 
-	dateFrom := dateFormatter(yearFrom, monthFrom, dayFrom)
-	dateTo := dateFormatter(yearTo, monthTo, dayTo)
+	var fetchedData []IPO
 
-	// Request for IPO info of incoming 30 days
-	url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/ipos?pagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", dateFrom, dateTo)
-	resp, err := c.restClient.R().
-		Get(url)
+	startDate := Date(yearFrom, int(monthFrom), dayFrom)
+	endDate := Date(yearTo, int(monthTo), dayTo)
 
-	if err != nil {
-		return errors.Wrap(err, "IPO client sending request failed!")
+	interval := intervalInDays(startDate, endDate)
+
+	for day := dayFrom; day < interval; day += 2 {
+		dateFrom := dateFormatter(yearFrom, monthFrom, day)
+		dateTo := dateFormatter(yearTo, monthTo, day+2)
+		url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/ipos?pagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", dateFrom, dateTo)
+		resp, err := c.restClient.R().Get(url)
+		if err != nil {
+			logger.Error("sending request failed")
+			continue
+		}
+
+		data := IPOData{}
+
+		if err := json.Unmarshal(resp.Body(), &data); err != nil {
+			logger.Error(fmt.Sprintf("%s Unmarshal dividends response failed: %s", url, string(resp.Body())))
+			continue
+		}
+		fetchedData = append(fetchedData, data.IPO...)
 	}
 
-	var data IPOData
+	temp := IPOData{IPO: fetchedData}
 
-	if err := json.Unmarshal(resp.Body(), &data); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("%s Unmarshal ipo response failed: %s", url, string(resp.Body())))
-	}
-	c.data = &data
+	c.data = &temp
 	return nil
 }
 

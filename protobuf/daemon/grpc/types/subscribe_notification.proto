@@ -8,10 +8,15 @@ option java_package = "com.bulletjournal.protobuf.daemon.grpc.types";
 option java_outer_classname = "SubscribeNotificationProto";
 
 message SubscribeNotification {
-  string id = 1;
+  string serviceName = 1;
 }
 
 message StreamMessage {
-  string id = 1;
-  string message = 2;
+  oneof body {
+    SubscribeRenewGoogleCalendarWatchMsg renewGoogleCalendarWatchMsg = 1;
+  }
+}
+
+message SubscribeRenewGoogleCalendarWatchMsg {
+  string googleCalendarProjectId = 1;
 }

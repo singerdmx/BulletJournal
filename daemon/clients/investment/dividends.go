@@ -3,6 +3,7 @@ package investment
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"time"
 
 	"github.com/pkg/errors"
@@ -46,24 +47,51 @@ func NewDividendsClient() (*TemplateClient, error) {
 }
 
 func (c *DividendsClient) FetchData() error {
+	logger := *logging.GetLogger()
 	yearFrom, monthFrom, dayFrom := time.Now().AddDate(0, -3, 0).Date()
 	yearTo, monthTo, dayTo := time.Now().AddDate(0, 1, 0).Date()
 
-	dateFrom := dateFormatter(yearFrom, monthFrom, dayFrom)
-	dateTo := dateFormatter(yearTo, monthTo, dayTo)
+	var fetchedData []Dividends
 
-	url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/dividends?pagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", dateFrom, dateTo)
-	resp, err := c.restClient.R().Get(url)
-	if err != nil {
-		return errors.Wrap(err, "sending request failed")
+	startDate := Date(yearFrom, int(monthFrom), dayFrom)
+	endDate := Date(yearTo, int(monthTo), dayTo)
+
+	interval := intervalInDays(startDate, endDate)
+
+	for day := dayFrom; day < interval; day += 2 {
+		//start a new date base each loop since month can change
+		slotStart := Date(yearFrom, int(monthFrom), dayFrom)
+		slotendYear, slotendMonth, slotendDay := slotStart.AddDate(0, 0, 2).Date()
+
+		dateFrom := dateFormatter(yearFrom, monthFrom, dayFrom)
+		dateTo := dateFormatter(slotendYear, slotendMonth, slotendDay)
+
+		url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/dividends?pagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", dateFrom, dateTo)
+		resp, err := c.restClient.R().Get(url)
+		if err != nil {
+			logger.Error("sending request failed")
+			continue
+		}
+		data := DividendsData{}
+		if err := json.Unmarshal(resp.Body(), &data); err != nil {
+			logger.Error(fmt.Sprintf("%s Unmarshal dividends response failed: %s", url, string(resp.Body())))
+			continue
+		}
+
+		fetchedData = append(fetchedData, data.Dividends...)
+
+		yearFrom = slotendYear
+		monthFrom = slotendMonth
+		dayFrom = slotendDay
 	}
-	data := DividendsData{}
-	if err := json.Unmarshal(resp.Body(), &data); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("%s Unmarshal dividends response failed: %s", url, string(resp.Body())))
-	}
-	c.data = &data
+
+	temp := DividendsData{Dividends: fetchedData}
+
+	c.data = &temp
+
 	return nil
 }
+
 func (c *DividendsClient) SendData() (*[]uint64, *[]uint64, error) {
 	if c.data == nil {
 		return nil, nil, errors.New("Empty Dividends data, please fetch data first.")
@@ -75,7 +103,7 @@ func (c *DividendsClient) SendData() (*[]uint64, *[]uint64, error) {
 		availBefore := target.Date
 		t, _ := time.Parse(layoutISO, availBefore)
 		t = t.AddDate(0, 6, 0)
-		dueDate := target.Date
+		dueDate := target.ExDividendDate
 		if len(dueDate) > 10 {
 			dueDate = dueDate[0:10] // yyyy-MM-dd
 		}

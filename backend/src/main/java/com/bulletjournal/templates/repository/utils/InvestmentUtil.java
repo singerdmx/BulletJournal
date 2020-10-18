@@ -23,6 +23,10 @@ public abstract class InvestmentUtil {
         switch (metadata) {
             case "INVESTMENT_IPO_RECORD":
                 return new IPOUtil(raw);
+            case "INVESTMENT_EARNINGS_RECORD":
+                return new EarningUtil(raw);
+            case "INVESTMENT_DIVIDENDS_RECORD":
+                return new DividendsUtil(raw);
             default:
                 throw new IllegalArgumentException("Invalid metadata " + metadata);
         }
@@ -61,7 +65,7 @@ public abstract class InvestmentUtil {
                     "<p><strong>Description</strong>: " + stockTickerDetails.getDescription() + "</p>" +
                     "<p><strong>Exchange</strong>: " + stockTickerDetails.getExchange() + "</p>" +
                     "<p><strong>Name</strong>: " + stockTickerDetails.getName() + "</p>" +
-                    "<p><strong>ExchangeSymbol</strong>: " + stockTickerDetails.getExchangeSymbol() + "</p>" +
+                    "<p><strong>Exchange Symbol</strong>: " + stockTickerDetails.getExchangeSymbol() + "</p>" +
                     "<p><strong>HQ Address</strong>: " + stockTickerDetails.getHqAddress() + "</p>" +
                     "<p><strong>HQ State</strong>: " + stockTickerDetails.getHqState() + "</p>" +
                     "<p><strong>HQ Country</strong>: " + stockTickerDetails.getHqCountry() + "</p>" +
