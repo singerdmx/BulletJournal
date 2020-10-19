@@ -39,10 +39,10 @@ func retrieveData(templateClient *investment.TemplateClient, streaming Streaming
 
 	for _, sampleTaskId := range *created {
 		logger.Printf("Created Sample Task %d", sampleTaskId)
-		streaming.ServiceChannel <- &StreamingMessage{Message: uint(sampleTaskId)}
+		streaming.ServiceChannel <- &StreamingMessage{Message: sampleTaskId}
 	}
 	for _, sampleTaskId := range *modified {
 		logger.Printf("Modified Sample Task %d", sampleTaskId)
-		streaming.ServiceChannel <- &StreamingMessage{Message: uint(sampleTaskId)}
+		streaming.ServiceChannel <- &StreamingMessage{Message: sampleTaskId}
 	}
 }

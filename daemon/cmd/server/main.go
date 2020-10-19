@@ -87,7 +87,7 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 					log.Printf("Streaming projectId: %s to subscription: %s", projectId, subscribe.String())
 				}
 			} else if serviceMsg.ServiceName == investmentServiceName {
-				sampleTaskId := strconv.Itoa(int(serviceMsg.Message))
+				sampleTaskId := serviceMsg.Message
 				if err := stream.Send(
 					&types.StreamMessage{
 						Body: &types.StreamMessage_SampleTaskMsg{

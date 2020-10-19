@@ -80,7 +80,7 @@ func (c *Cleaner) renewExpiringGoogleCalendarWatch() {
 	googleCalendarProjects := c.getExpiringGoogleCalendarProjects("google_calendar_projects")
 	for _, googleCalendarProject := range googleCalendarProjects {
 		log.Printf("%q (ID: %d)\n", googleCalendarProject.Owner, googleCalendarProject.ID)
-		c.ServiceStreaming.ServiceChannel <- &StreamingMessage{Message: googleCalendarProject.ProjectID}
+		c.ServiceStreaming.ServiceChannel <- &StreamingMessage{Message: uint64(googleCalendarProject.ProjectID)}
 	}
 }
 

@@ -23,5 +23,5 @@ message SubscribeRenewGoogleCalendarWatchMsg {
 }
 
 message SubscribeSampleTaskMsg {
-  string sampleTaskId = 1;
+  uint64 sampleTaskId = 1;
 }
