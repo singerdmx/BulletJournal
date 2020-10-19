@@ -277,14 +277,8 @@ public class SampleTaskDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void handleSampleTaskChange(long id) {
         SampleTask sampleTask = findSampleTaskById(id);
-        switch (sampleTask.getMetadata()) {
-            case "INVESTMENT_IPO_RECORD":
-            case "INVESTMENT_EARNINGS_RECORD":
-            case "INVESTMENT_DIVIDENDS_RECORD":
-                handleSampleTaskRecord(sampleTask, InvestmentUtil.getInstance(sampleTask.getMetadata(), sampleTask.getRaw()));
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid metadata " + sampleTask.getMetadata());
+        if (InvestmentUtil.INVESTMENT_METADATA.stream().anyMatch(m -> sampleTask.getMetadata().contains(m))) {
+            handleSampleTaskRecord(sampleTask, InvestmentUtil.getInstance(sampleTask.getMetadata(), sampleTask.getRaw()));
         }
     }
 
