@@ -40,7 +40,7 @@ public abstract class InvestmentUtil {
     }
 
     protected Pair<String, String> getStockTickerDetailContent(StockTickerDetails stockTickerDetails) {
-        if (StringUtils.isBlank(stockTickerDetails.getDetails())) {
+        if (stockTickerDetails != null && StringUtils.isBlank(stockTickerDetails.getDetails())) {
             return Pair.of("", "");
         }
         String tickerDetailsDelta = "";
