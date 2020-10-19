@@ -7,6 +7,13 @@ import com.bulletjournal.redis.FirstTimeUserRepository;
 import com.bulletjournal.redis.models.FirstTimeUser;
 import com.bulletjournal.repository.UserAliasDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -30,6 +37,22 @@ public class UserController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private static final String TRUE = "true";
     public static final String APP_INVITATIONS_ROUTE = "/api/appInvitations";
+    private static final Gson GSON = new Gson();
+
+
+    public enum UserTimestamp {
+        LastInvitation("lastInvitation");
+
+        private final String timestampName;
+
+        UserTimestamp(String timestampName) {
+            this.timestampName = timestampName;
+        }
+
+        public String getTimestampName() {
+            return timestampName;
+        }
+    }
 
     @Autowired
     private UserClient userClient;
@@ -59,6 +82,7 @@ public class UserController {
         String currency = null;
         String theme = null;
         Integer points = 0;
+        boolean sendUserInvitation = false;
         User self = userClient.getUser(username);
 
         if (Objects.equals(expand, TRUE)) {
@@ -69,9 +93,10 @@ public class UserController {
             theme = user.getTheme() == null ? Theme.LIGHT.name() : user.getTheme();
             points = user.getPoints();
             this.userClient.updateEmail(user); //TODO: remove this line
+            sendUserInvitation = this.needToSendUserInvitation(user);
         }
         return new Myself(self, timezone, before, currency, theme, points,
-                this.firstTimeUserRepository.existsById(username));
+                this.firstTimeUserRepository.existsById(username), sendUserInvitation);
     }
 
     @PatchMapping(MYSELF_ROUTE)
@@ -117,5 +142,52 @@ public class UserController {
     public void sendAppInvitations(@Valid @RequestBody AppInvitationParams appInvitationParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         messagingService.sendAppInvitationEmailsToUser(username, appInvitationParams.getEmails());
+    }
+
+    /**
+     * Calculate days from given time to current time
+     * @param time start time
+     * @return days between given time to current time
+     */
+    private Long calculateDays(String time) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+
+        ZonedDateTime start = ZonedDateTime.parse(time);
+        return ChronoUnit.DAYS.between(start,
+            ZonedDateTime.now().withZoneSameInstant(ZoneId.of("UTC")));
+    }
+
+    /**
+     * Check if need to pop up user invitation dialog in front end
+     *
+     * @param user user info
+     * @return if need to send user invitation
+     */
+    private boolean needToSendUserInvitation(com.bulletjournal.repository.models.User user) {
+        // send user invitation should be trigger every userInvitationFrequency days
+        final int userInvitationFrequency = 90;
+
+        JsonObject userTimestamps = GSON.fromJson(user.getUserTimestamps(),
+            JsonObject.class);
+        JsonElement userLastInvitation =
+            userTimestamps.get(UserTimestamp.LastInvitation.getTimestampName());
+
+        // no last invitation info found
+        if (userLastInvitation == null) {
+            userTimestamps.addProperty(UserTimestamp.LastInvitation.getTimestampName(),
+                ZonedDateTime.now().toString());
+            this.userDaoJpa.updateTimestamps(user.getName(), userTimestamps.toString());
+            return true;
+        } else {
+            // if last invitation is userInvitationFrequency days before current day,
+            // set as send invitation
+            if (calculateDays(userLastInvitation.getAsString()) > userInvitationFrequency) {
+                userTimestamps.addProperty(UserTimestamp.LastInvitation.getTimestampName(),
+                    ZonedDateTime.now().toString());
+                this.userDaoJpa.updateTimestamps(user.getName(), userTimestamps.toString());
+                return true;
+            }
+            return false;
+        }
     }
 }

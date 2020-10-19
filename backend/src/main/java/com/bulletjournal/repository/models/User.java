@@ -21,6 +21,9 @@ public class User extends NamedModel {
     @Column(nullable = false)
     private Integer points = 0;
 
+    @Column(nullable = false, name = "user_timestamps")
+    private String userTimestamps;
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<UserGroup> groups = new HashSet<>();
 
@@ -60,6 +63,14 @@ public class User extends NamedModel {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "shared_transactions_project", referencedColumnName = "id")
     private Project sharedTransactionsProject;
+
+    public String getUserTimestamps() {
+        return userTimestamps;
+    }
+
+    public void setUserTimestamps(String userTimestamps) {
+        this.userTimestamps = userTimestamps;
+    }
 
     public Long getId() {
         return id;

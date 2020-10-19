@@ -17,16 +17,18 @@ public class Myself extends User {
 
     private boolean firstTime = false;
 
+    private boolean sendUserInvitation = false;
+
     public Myself() {
     }
 
     public Myself(User user, String timezone, Before reminderBeforeTask, String currency, String theme,
                   Integer points) {
-        this(user, timezone, reminderBeforeTask, currency, theme, points, false);
+        this(user, timezone, reminderBeforeTask, currency, theme, points, false, false);
     }
 
     public Myself(User user, String timezone, Before reminderBeforeTask, String currency, String theme,
-                  Integer points, boolean firstTime) {
+                  Integer points, boolean firstTime, boolean sendUserInvitation) {
         super(user.getId(), user.getName(), user.getThumbnail(), user.getAvatar());
         this.timezone = timezone;
         if (reminderBeforeTask != null) {
@@ -36,6 +38,7 @@ public class Myself extends User {
         this.theme = theme;
         this.points = points;
         this.firstTime = firstTime;
+        this.sendUserInvitation = sendUserInvitation;
     }
 
     public String getTimezone() {
@@ -92,5 +95,13 @@ public class Myself extends User {
 
     public void setFirstTime(boolean firstTime) {
         this.firstTime = firstTime;
+    }
+
+    public boolean isSendUserInvitation() {
+        return sendUserInvitation;
+    }
+
+    public void setSendUserInvitation(boolean sendUserInvitation) {
+        this.sendUserInvitation = sendUserInvitation;
     }
 }
