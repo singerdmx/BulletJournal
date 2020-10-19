@@ -26,6 +26,8 @@ public class DaemonServiceClient {
 
     private static final String SERVICE_NAME = "Controller";
 
+    private static long RETRY_WAIT = 10000L;
+
     @Autowired
     private DaemonClientConfig daemonClientConfig;
 
@@ -86,20 +88,26 @@ public class DaemonServiceClient {
             public void onError(Throwable t) {
                 Status status = Status.fromThrowable(t);
                 LOGGER.error("subscribeNotification server side error: {}", status);
-                long wait = 10000L;
-                LOGGER.info("Will retry subscribing to daemon server again in {}s", wait / 1000);
+                LOGGER.info("Will retry subscribing to daemon server again in {}s", RETRY_WAIT / 1000);
                 try {
-                    Thread.sleep(wait);
+                    Thread.sleep(RETRY_WAIT);
                     subscribeNotification(SubscribeNotification.newBuilder().setServiceName(SERVICE_NAME).build(), newResponseObserver());
                 } catch (InterruptedException interruptedException) {
-                    LOGGER.error("Internal error happened before attempting to retry subscribing to daemon server: {}", interruptedException.getMessage());
+                    LOGGER.error("Internal error happened before attempting to retry subscribing to daemon server", interruptedException);
                     LOGGER.error("Stop subscribing to daemon server due to the previous server side error");
                 }
             }
 
             @Override
             public void onCompleted() {
-                LOGGER.info("Stopped receiving subscribeNotification");
+                LOGGER.info("Stopped receiving subscribeNotification, will retry subscribing to daemon server again in {}s",
+                        RETRY_WAIT / 1000);
+                try {
+                    Thread.sleep(RETRY_WAIT);
+                    subscribeNotification(SubscribeNotification.newBuilder().setServiceName(SERVICE_NAME).build(), newResponseObserver());
+                } catch (InterruptedException interruptedException) {
+                    LOGGER.error("Internal error happened before attempting to retry subscribing to daemon server", interruptedException);
+                }
             }
         };
     }
