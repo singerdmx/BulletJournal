@@ -110,7 +110,7 @@ public class UserController {
                 }
             }
 
-            if (sendUserInvitation){
+            if (sendUserInvitation) {
                 this.userDaoJpa.updateTimestamps(username, userTimestamps.toString());
             }
 
