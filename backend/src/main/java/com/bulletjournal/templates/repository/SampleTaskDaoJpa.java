@@ -17,8 +17,8 @@ import com.bulletjournal.repository.models.User;
 import com.bulletjournal.templates.controller.model.AuditSampleTaskParams;
 import com.bulletjournal.templates.controller.model.CreateSampleTaskParams;
 import com.bulletjournal.templates.controller.model.UpdateSampleTaskParams;
-import com.bulletjournal.templates.repository.utils.InvestmentUtil;
 import com.bulletjournal.templates.repository.model.*;
+import com.bulletjournal.templates.repository.utils.InvestmentUtil;
 import com.bulletjournal.util.StringUtil;
 import com.google.common.collect.ImmutableList;
 import org.apache.http.util.TextUtils;
@@ -29,6 +29,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -72,6 +73,12 @@ public class SampleTaskDaoJpa {
 
     @Autowired
     private StockTickerDetailsDaoJpa stockTickerDetailsDaoJpa;
+
+    @Autowired
+    private StockTickerDetailsRepository stockTickerDetailsRepository;
+
+    @Autowired
+    private SelectionRepository selectionRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SampleTask createSampleTask(CreateSampleTaskParams createSampleTaskParams) {
@@ -170,6 +177,7 @@ public class SampleTaskDaoJpa {
         if (auditSampleTaskParams.getSelections().isEmpty()) {
             throw new BadRequestException("Empty Selections");
         }
+        auditSelection(sampleTask, auditSampleTaskParams.getSelections());
         List<SelectionMetadataKeyword> keywords =
                 this.selectionMetadataKeywordDaoJpa.getKeywordsBySelectionsWithoutFrequency(auditSampleTaskParams.getSelections());
         for (SelectionMetadataKeyword keyword : keywords) {
@@ -211,23 +219,27 @@ public class SampleTaskDaoJpa {
                 if (sampleTask.isRefreshable()) {
                     sampleTaskModel.setContent(null);
                 }
-                List<Task> createdTasks = this.taskDaoJpa.createTaskFromSampleTask(
-                        user.getProject().getId(),
-                        username,
-                        ImmutableList.of(sampleTaskModel),
-                        userMap.get(username).getReminderBeforeTask().getValue(),
-                        ImmutableList.of(username),
-                        Collections.emptyList());
-                if (sampleTask.isRefreshable()) {
-                    createdTasks.forEach(t -> t.setSampleTask(sampleTask));
-                }
-                this.taskDaoJpa.saveAll(createdTasks);
+                try {
+                    List<Task> createdTasks = this.taskDaoJpa.createTaskFromSampleTask(
+                            user.getProject().getId(),
+                            username,
+                            ImmutableList.of(sampleTaskModel),
+                            userMap.get(username).getReminderBeforeTask().getValue(),
+                            ImmutableList.of(username),
+                            Collections.emptyList());
+                    if (sampleTask.isRefreshable()) {
+                        createdTasks.forEach(t -> t.setSampleTask(sampleTask));
+                    }
+                    this.taskDaoJpa.saveAll(createdTasks);
 
-                this.notificationService.inform(
-                        new NewSampleTaskEvent(
-                                new Event(username, sampleTaskId, sampleTask.getName()),
-                                "BulletJournal",
-                                ContentType.getContentLink(ContentType.TASK, createdTasks.get(0).getId())));
+                    this.notificationService.inform(
+                            new NewSampleTaskEvent(
+                                    new Event(username, sampleTaskId, sampleTask.getName()),
+                                    "BulletJournal",
+                                    ContentType.getContentLink(ContentType.TASK, createdTasks.get(0).getId())));
+                } catch (Exception ex) {
+                    LOGGER.error("Failure to create task for subscribed user " + username, ex);
+                }
             }
             return sampleTask;
         }
@@ -245,15 +257,57 @@ public class SampleTaskDaoJpa {
         return sampleTask;
     }
 
+    private void auditSelection(SampleTask sampleTask, List<Long> selections) {
+        // selection
+        Optional<Long> match = selections.stream().filter(s -> s != null && s >= 250 && s <= 260).findFirst();
+        if (match.isPresent()) {
+            InvestmentUtil investmentUtil = InvestmentUtil.getInstance(sampleTask.getMetadata(), sampleTask.getRaw());
+            Selection selection = selectionRepository.findById(match.get()).orElseThrow(
+                    () -> new ResourceNotFoundException("Selection" + match.get() + "not found"));
+            StockTickerDetails stockTickerDetails = new StockTickerDetails();
+            stockTickerDetails.setSelection(selection);
+            stockTickerDetails.setExpirationTime(new Timestamp(System.currentTimeMillis() + StockTickerDetailsDaoJpa.MILLS_IN_YEAR));
+            stockTickerDetails.setDetails("");
+            stockTickerDetails.setTicker(investmentUtil.getTicker());
+            stockTickerDetails = stockTickerDetailsRepository.save(stockTickerDetails);
+            LOGGER.info("Created stock detail {}", stockTickerDetails);
+        }
+    }
+
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void handleSampleTaskChange(long id) {
         SampleTask sampleTask = findSampleTaskById(id);
-        handleSampleTaskRecord(sampleTask, InvestmentUtil.getInstance(sampleTask.getMetadata(), sampleTask.getRaw()));
+        if (InvestmentUtil.INVESTMENT_METADATA.stream().anyMatch(m -> sampleTask.getMetadata().contains(m))) {
+            handleSampleTaskRecord(sampleTask, InvestmentUtil.getInstance(sampleTask.getMetadata(), sampleTask.getRaw()));
+        }
     }
 
     private void handleSampleTaskRecord(SampleTask sampleTask, InvestmentUtil investmentUtil) {
         com.bulletjournal.templates.controller.model.StockTickerDetails stockTickerDetails =
                 this.stockTickerDetailsDaoJpa.get(investmentUtil.getTicker());
+
+        if (stockTickerDetails == null) {
+            String sampleTaskName = sampleTask.getName().toLowerCase();
+            Long selectionId = null;
+            for (Map.Entry<Long, List<String>> entry : StockTickerDetailsDaoJpa.SECTOR_KEYWORD.entrySet()) {
+                if (entry.getValue().stream().anyMatch(v -> sampleTaskName.contains(v))) {
+                    selectionId = entry.getKey();
+                    break;
+                }
+            }
+            if (selectionId != null) {
+                final long targetSelectionId = selectionId;
+                Selection selection = selectionRepository.findById(targetSelectionId).orElseThrow(
+                        () -> new ResourceNotFoundException("Selection" + targetSelectionId + "not found"));
+                StockTickerDetails sd = new StockTickerDetails();
+                sd.setSelection(selection);
+                sd.setExpirationTime(new Timestamp(System.currentTimeMillis() + StockTickerDetailsDaoJpa.MILLS_IN_YEAR));
+                sd.setDetails("");
+                sd.setTicker(investmentUtil.getTicker());
+                sd = stockTickerDetailsRepository.save(sd);
+                stockTickerDetails = sd.toPresentationModelWithChoice();
+            }
+        }
 
         try {
             String content = investmentUtil.getContent(stockTickerDetails);

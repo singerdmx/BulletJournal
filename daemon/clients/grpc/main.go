@@ -50,7 +50,7 @@ func main() {
 			if err != nil {
 				log.Fatalf("Server side error happened: %v", err)
 			}
-			log.Println(message.Message)
+			log.Println(message.Body)
 		}
 		log.Printf("Received all JoinGroupEvents responses")
 	}()

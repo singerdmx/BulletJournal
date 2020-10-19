@@ -13,8 +13,8 @@ var log logging.Logger
 
 //Cleaner ...
 type Cleaner struct {
-	Settings postgresql.ConnectionURL
-	Service  Streaming
+	Settings         postgresql.ConnectionURL
+	ServiceStreaming Streaming
 }
 
 func (c *Cleaner) getExpiringGoogleCalendarProjects(tableName string) []persistence.GoogleCalendarProject {
@@ -80,7 +80,7 @@ func (c *Cleaner) renewExpiringGoogleCalendarWatch() {
 	googleCalendarProjects := c.getExpiringGoogleCalendarProjects("google_calendar_projects")
 	for _, googleCalendarProject := range googleCalendarProjects {
 		log.Printf("%q (ID: %d)\n", googleCalendarProject.Owner, googleCalendarProject.ID)
-		c.Service.ServiceChannel <- &StreamingMessage{Message: googleCalendarProject.ProjectID}
+		c.ServiceStreaming.ServiceChannel <- &StreamingMessage{Message: uint64(googleCalendarProject.ProjectID)}
 	}
 }
 
@@ -119,5 +119,5 @@ func (c *Cleaner) Clean(maxRetentionTimeInDays int) {
 
 //Close ...Close channel
 func (c *Cleaner) Close() {
-	close(c.Service.ServiceChannel)
+	close(c.ServiceStreaming.ServiceChannel)
 }

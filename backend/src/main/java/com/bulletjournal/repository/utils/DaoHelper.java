@@ -43,7 +43,9 @@ public class DaoHelper {
     public static Map<ReminderRecord, Task> getReminderRecordMap(Task task, ZonedDateTime startTime, ZonedDateTime endTime) {
         Map<ReminderRecord, Task> map = new HashMap<>();
         if (Objects.isNull(task.getRecurrenceRule())) {
-            map.put(new ReminderRecord(task.getId(), task.getReminderDateTime().getTime()), task);
+            if (task.getReminderDateTime() != null) {
+                map.put(new ReminderRecord(task.getId(), task.getReminderDateTime().getTime()), task);
+            }
         } else {
             List<Task> recurringTasks = getRecurringTask(task, startTime, endTime);
             recurringTasks.forEach(t -> {

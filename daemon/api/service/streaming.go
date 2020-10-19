@@ -7,6 +7,6 @@ type Streaming struct {
 
 type StreamingMessage struct {
 	ServiceName string
-	Message uint
+	Message uint64
 	Err error
 }

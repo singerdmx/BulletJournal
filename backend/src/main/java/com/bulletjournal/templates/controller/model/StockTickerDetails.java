@@ -53,6 +53,12 @@ public class StockTickerDetails {
         this.similar = similar;
     }
 
+    public StockTickerDetails(String ticker, String details, Selection selection) {
+        this.ticker = ticker;
+        this.details = details;
+        this.selection = selection;
+    }
+
     public String getTicker() {
         return ticker;
     }

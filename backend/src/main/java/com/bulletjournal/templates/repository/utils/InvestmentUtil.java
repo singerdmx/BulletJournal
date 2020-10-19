@@ -1,13 +1,20 @@
 package com.bulletjournal.templates.repository.utils;
 
 import com.bulletjournal.templates.controller.model.StockTickerDetails;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.List;
 
 public abstract class InvestmentUtil {
     protected static final Gson GSON = new Gson();
     protected final JsonObject json;
+
+    public static List<String> INVESTMENT_METADATA = ImmutableList.of(
+            "INVESTMENT_IPO_RECORD", "INVESTMENT_EARNINGS_RECORD", "INVESTMENT_DIVIDENDS_RECORD");
 
     public InvestmentUtil(String raw) {
         this.json = GSON.fromJson(raw, JsonObject.class);
@@ -33,6 +40,9 @@ public abstract class InvestmentUtil {
     }
 
     protected Pair<String, String> getStockTickerDetailContent(StockTickerDetails stockTickerDetails) {
+        if (stockTickerDetails != null && StringUtils.isBlank(stockTickerDetails.getDetails())) {
+            return Pair.of("", "");
+        }
         String tickerDetailsDelta = "";
         String tickerDetailsHtml = "";
         if (stockTickerDetails != null) {
