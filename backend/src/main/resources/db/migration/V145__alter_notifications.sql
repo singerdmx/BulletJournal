@@ -1,0 +1,1 @@
+alter table template.sample_task_notifications alter column notifications type varchar(8000) using notifications::varchar(8000);

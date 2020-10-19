@@ -27,16 +27,16 @@ public abstract class InvestmentUtil {
     }
 
     public static InvestmentUtil getInstance(String metadata, String raw) {
-        switch (metadata) {
-            case "INVESTMENT_IPO_RECORD":
-                return new IPOUtil(raw);
-            case "INVESTMENT_EARNINGS_RECORD":
-                return new EarningUtil(raw);
-            case "INVESTMENT_DIVIDENDS_RECORD":
-                return new DividendsUtil(raw);
-            default:
-                throw new IllegalArgumentException("Invalid metadata " + metadata);
+        if (metadata.contains("INVESTMENT_IPO_RECORD")) {
+            return new IPOUtil(raw);
         }
+        if (metadata.contains("INVESTMENT_EARNINGS_RECORD")) {
+            return new EarningUtil(raw);
+        }
+        if (metadata.contains("INVESTMENT_DIVIDENDS_RECORD")) {
+            return new DividendsUtil(raw);
+        }
+        throw new IllegalArgumentException("Invalid metadata " + metadata);
     }
 
     protected Pair<String, String> getStockTickerDetailContent(StockTickerDetails stockTickerDetails) {
