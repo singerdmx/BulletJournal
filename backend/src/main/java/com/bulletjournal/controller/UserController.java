@@ -37,6 +37,8 @@ public class UserController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private static final String TRUE = "true";
     public static final String APP_INVITATIONS_ROUTE = "/api/appInvitations";
+    private static final Gson GSON = new Gson();
+
 
     public enum UserTimestamp {
         LastInvitation("lastInvitation");
@@ -165,7 +167,7 @@ public class UserController {
         // send user invitation should be trigger every userInvitationFrequency days
         final int userInvitationFrequency = 90;
 
-        JsonObject userTimestamps = new Gson().fromJson(user.getUserTimestamps(),
+        JsonObject userTimestamps = GSON.fromJson(user.getUserTimestamps(),
             JsonObject.class);
         JsonElement userLastInvitation =
             userTimestamps.get(UserTimestamp.LastInvitation.getTimestampName());
