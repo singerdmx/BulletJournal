@@ -266,7 +266,7 @@ public class SampleTaskDaoJpa {
                     () -> new ResourceNotFoundException("Selection" + match.get() + "not found"));
             StockTickerDetails stockTickerDetails = new StockTickerDetails();
             stockTickerDetails.setSelection(selection);
-            stockTickerDetails.setExpirationTime(new Timestamp(System.currentTimeMillis() + StockTickerDetailsDaoJpa.MILLS_IN_SEASON));
+            stockTickerDetails.setExpirationTime(new Timestamp(System.currentTimeMillis() + StockTickerDetailsDaoJpa.MILLS_IN_YEAR));
             stockTickerDetails.setDetails("");
             stockTickerDetails.setTicker(investmentUtil.getTicker());
             stockTickerDetails = stockTickerDetailsRepository.save(stockTickerDetails);
@@ -285,6 +285,29 @@ public class SampleTaskDaoJpa {
     private void handleSampleTaskRecord(SampleTask sampleTask, InvestmentUtil investmentUtil) {
         com.bulletjournal.templates.controller.model.StockTickerDetails stockTickerDetails =
                 this.stockTickerDetailsDaoJpa.get(investmentUtil.getTicker());
+
+        if (stockTickerDetails == null) {
+            String sampleTaskName = sampleTask.getName().toLowerCase();
+            Long selectionId = null;
+            for (Map.Entry<Long, List<String>> entry : StockTickerDetailsDaoJpa.SECTOR_KEYWORD.entrySet()) {
+                if (entry.getValue().stream().anyMatch(v -> sampleTaskName.contains(v))) {
+                    selectionId = entry.getKey();
+                    break;
+                }
+            }
+            if (selectionId != null) {
+                final long targetSelectionId = selectionId;
+                Selection selection = selectionRepository.findById(targetSelectionId).orElseThrow(
+                        () -> new ResourceNotFoundException("Selection" + targetSelectionId + "not found"));
+                StockTickerDetails sd = new StockTickerDetails();
+                sd.setSelection(selection);
+                sd.setExpirationTime(new Timestamp(System.currentTimeMillis() + StockTickerDetailsDaoJpa.MILLS_IN_YEAR));
+                sd.setDetails("");
+                sd.setTicker(investmentUtil.getTicker());
+                sd = stockTickerDetailsRepository.save(sd);
+                stockTickerDetails = sd.toPresentationModelWithChoice();
+            }
+        }
 
         try {
             String content = investmentUtil.getContent(stockTickerDetails);

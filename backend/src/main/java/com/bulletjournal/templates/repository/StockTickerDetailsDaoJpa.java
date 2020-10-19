@@ -4,6 +4,8 @@ import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.templates.clients.StockApiClient;
 import com.bulletjournal.templates.controller.model.StockTickerDetails;
 import com.bulletjournal.templates.repository.model.Selection;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -20,9 +24,12 @@ public class StockTickerDetailsDaoJpa {
     private static final Gson GSON = new Gson();
     public static final Logger LOGGER = LoggerFactory.getLogger(StockTickerDetailsDaoJpa.class);
 
-    private static final long MILLS_IN_YEAR = 1000L * 60 * 60 * 24 * 365;
+    public static Map<Long, List<String>> SECTOR_KEYWORD = ImmutableMap.of(
+            254L, ImmutableList.of("acquisition"),
+            255L, ImmutableList.of("pharmaceutical", "medicine", "bio", "health", "therapeutic", "lifescience"),
+            252L, ImmutableList.of("education"));
 
-    public static final long MILLS_IN_SEASON = 1000L * 60 * 60 * 24 * 90;
+    public static final long MILLS_IN_YEAR = 1000L * 60 * 60 * 24 * 365;
 
     @Autowired
     private StockTickerDetailsRepository stockTickerDetailsRepository;
