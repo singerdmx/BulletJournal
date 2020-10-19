@@ -1,6 +1,8 @@
 package com.bulletjournal.clients;
 
 import com.bulletjournal.config.DaemonClientConfig;
+import com.bulletjournal.notifications.NotificationService;
+import com.bulletjournal.notifications.SampleTaskChange;
 import com.bulletjournal.protobuf.daemon.grpc.services.DaemonGrpc;
 import com.bulletjournal.protobuf.daemon.grpc.types.StreamMessage;
 import com.bulletjournal.protobuf.daemon.grpc.types.SubscribeNotification;
@@ -35,6 +37,9 @@ public class DaemonServiceClient {
     @Autowired
     private GoogleCalendarProjectDaoJpa googleCalendarProjectDaoJpa;
 
+    @Autowired
+    private NotificationService notificationService;
+
     @PostConstruct
     public void postConstruct() {
         if (this.daemonClientConfig.isEnabled()) {
@@ -63,13 +68,14 @@ public class DaemonServiceClient {
                         case SAMPLETASKMSG:
                             SubscribeSampleTaskMsg msg = stream.getSampleTaskMsg();
                             LOGGER.info("Received SubscribeInvestmentSampleTaskMsg with sampleTaskId: {}", msg.getSampleTaskId());
+                            DaemonServiceClient.this.notificationService.addSampleTaskChange(new SampleTaskChange(msg.getSampleTaskId()));
                             break;
                         default:
                             LOGGER.warn("No need to handle unsupported service message: {}", stream);
                             break;
                     }
                 } catch (Exception e) {
-                    LOGGER.error("RenewGoogleCalendarWatch client side error: {}", e.toString());
+                    LOGGER.error("Subscription client side error: {}", e.toString());
                 }
                 LOGGER.info("Processed a daemon streaming message");
             }

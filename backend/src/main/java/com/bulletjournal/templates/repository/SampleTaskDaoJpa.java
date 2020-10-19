@@ -273,6 +273,7 @@ public class SampleTaskDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void handleSampleTaskChange(long id) {
         SampleTask sampleTask = findSampleTaskById(id);
+        // TODO
         handleSampleTaskRecord(sampleTask, InvestmentUtil.getInstance(sampleTask.getMetadata(), sampleTask.getRaw()));
     }
 
