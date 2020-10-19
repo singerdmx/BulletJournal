@@ -219,23 +219,27 @@ public class SampleTaskDaoJpa {
                 if (sampleTask.isRefreshable()) {
                     sampleTaskModel.setContent(null);
                 }
-                List<Task> createdTasks = this.taskDaoJpa.createTaskFromSampleTask(
-                        user.getProject().getId(),
-                        username,
-                        ImmutableList.of(sampleTaskModel),
-                        userMap.get(username).getReminderBeforeTask().getValue(),
-                        ImmutableList.of(username),
-                        Collections.emptyList());
-                if (sampleTask.isRefreshable()) {
-                    createdTasks.forEach(t -> t.setSampleTask(sampleTask));
-                }
-                this.taskDaoJpa.saveAll(createdTasks);
+                try {
+                    List<Task> createdTasks = this.taskDaoJpa.createTaskFromSampleTask(
+                            user.getProject().getId(),
+                            username,
+                            ImmutableList.of(sampleTaskModel),
+                            userMap.get(username).getReminderBeforeTask().getValue(),
+                            ImmutableList.of(username),
+                            Collections.emptyList());
+                    if (sampleTask.isRefreshable()) {
+                        createdTasks.forEach(t -> t.setSampleTask(sampleTask));
+                    }
+                    this.taskDaoJpa.saveAll(createdTasks);
 
-                this.notificationService.inform(
-                        new NewSampleTaskEvent(
-                                new Event(username, sampleTaskId, sampleTask.getName()),
-                                "BulletJournal",
-                                ContentType.getContentLink(ContentType.TASK, createdTasks.get(0).getId())));
+                    this.notificationService.inform(
+                            new NewSampleTaskEvent(
+                                    new Event(username, sampleTaskId, sampleTask.getName()),
+                                    "BulletJournal",
+                                    ContentType.getContentLink(ContentType.TASK, createdTasks.get(0).getId())));
+                } catch (Exception ex) {
+                    LOGGER.error("Failure to create task for subscribed user " + username, ex);
+                }
             }
             return sampleTask;
         }
