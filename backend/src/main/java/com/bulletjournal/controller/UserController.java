@@ -7,6 +7,13 @@ import com.bulletjournal.redis.FirstTimeUserRepository;
 import com.bulletjournal.redis.models.FirstTimeUser;
 import com.bulletjournal.repository.UserAliasDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -30,6 +37,20 @@ public class UserController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private static final String TRUE = "true";
     public static final String APP_INVITATIONS_ROUTE = "/api/appInvitations";
+
+    public enum UserTimestamp {
+        LastInvitation("lastInvitation");
+
+        private final String timestampName;
+
+        UserTimestamp(String timestampName) {
+            this.timestampName = timestampName;
+        }
+
+        public String getTimestampName() {
+            return timestampName;
+        }
+    }
 
     @Autowired
     private UserClient userClient;
@@ -59,6 +80,7 @@ public class UserController {
         String currency = null;
         String theme = null;
         Integer points = 0;
+        boolean sendUserInvitation = false;
         User self = userClient.getUser(username);
 
         if (Objects.equals(expand, TRUE)) {
@@ -69,9 +91,32 @@ public class UserController {
             theme = user.getTheme() == null ? Theme.LIGHT.name() : user.getTheme();
             points = user.getPoints();
             this.userClient.updateEmail(user); //TODO: remove this line
+
+            JsonObject userTimestamps = new Gson().fromJson(user.getUserTimestamps(),
+                JsonObject.class);
+            JsonElement userLastInvitation =
+                userTimestamps.get(UserTimestamp.LastInvitation.getTimestampName());
+
+            if (userLastInvitation == null) {
+                userTimestamps.addProperty(UserTimestamp.LastInvitation.getTimestampName(),
+                    ZonedDateTime.now().toString());
+                sendUserInvitation = true;
+            } else {
+                // if last invitation is 90 days before current day, set as send invitation
+                if (calculateDays(userLastInvitation.getAsString()) > 90) {
+                    userTimestamps.addProperty(UserTimestamp.LastInvitation.getTimestampName(),
+                        ZonedDateTime.now().toString());
+                    sendUserInvitation = true;
+                }
+            }
+
+            if (sendUserInvitation){
+                this.userDaoJpa.updateTimestamps(username, userTimestamps.toString());
+            }
+
         }
         return new Myself(self, timezone, before, currency, theme, points,
-                this.firstTimeUserRepository.existsById(username));
+                this.firstTimeUserRepository.existsById(username), sendUserInvitation);
     }
 
     @PatchMapping(MYSELF_ROUTE)
@@ -117,5 +162,13 @@ public class UserController {
     public void sendAppInvitations(@Valid @RequestBody AppInvitationParams appInvitationParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         messagingService.sendAppInvitationEmailsToUser(username, appInvitationParams.getEmails());
+    }
+
+    private Long calculateDays(String time) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+
+        ZonedDateTime start = ZonedDateTime.parse(time);
+        return ChronoUnit.DAYS.between(start,
+            ZonedDateTime.now().withZoneSameInstant(ZoneId.of("UTC")));
     }
 }
