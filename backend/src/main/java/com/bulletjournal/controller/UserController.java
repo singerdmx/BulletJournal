@@ -91,29 +91,7 @@ public class UserController {
             theme = user.getTheme() == null ? Theme.LIGHT.name() : user.getTheme();
             points = user.getPoints();
             this.userClient.updateEmail(user); //TODO: remove this line
-
-            JsonObject userTimestamps = new Gson().fromJson(user.getUserTimestamps(),
-                JsonObject.class);
-            JsonElement userLastInvitation =
-                userTimestamps.get(UserTimestamp.LastInvitation.getTimestampName());
-
-            if (userLastInvitation == null) {
-                userTimestamps.addProperty(UserTimestamp.LastInvitation.getTimestampName(),
-                    ZonedDateTime.now().toString());
-                sendUserInvitation = true;
-            } else {
-                // if last invitation is 90 days before current day, set as send invitation
-                if (calculateDays(userLastInvitation.getAsString()) > 90) {
-                    userTimestamps.addProperty(UserTimestamp.LastInvitation.getTimestampName(),
-                        ZonedDateTime.now().toString());
-                    sendUserInvitation = true;
-                }
-            }
-
-            if (sendUserInvitation) {
-                this.userDaoJpa.updateTimestamps(username, userTimestamps.toString());
-            }
-
+            sendUserInvitation = this.needToSendUserInvitation(user);
         }
         return new Myself(self, timezone, before, currency, theme, points,
                 this.firstTimeUserRepository.existsById(username), sendUserInvitation);
@@ -164,11 +142,50 @@ public class UserController {
         messagingService.sendAppInvitationEmailsToUser(username, appInvitationParams.getEmails());
     }
 
+    /**
+     * Calculate days from given time to current time
+     * @param time start time
+     * @return days between given time to current time
+     */
     private Long calculateDays(String time) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM-dd-yyyy");
 
         ZonedDateTime start = ZonedDateTime.parse(time);
         return ChronoUnit.DAYS.between(start,
             ZonedDateTime.now().withZoneSameInstant(ZoneId.of("UTC")));
+    }
+
+    /**
+     * Check if need to pop up user invitation dialog in front end
+     *
+     * @param user user info
+     * @return if need to send user invitation
+     */
+    private boolean needToSendUserInvitation(com.bulletjournal.repository.models.User user) {
+        // send user invitation should be trigger every userInvitationFrequency days
+        final int userInvitationFrequency = 90;
+
+        JsonObject userTimestamps = new Gson().fromJson(user.getUserTimestamps(),
+            JsonObject.class);
+        JsonElement userLastInvitation =
+            userTimestamps.get(UserTimestamp.LastInvitation.getTimestampName());
+
+        // no last invitation info found
+        if (userLastInvitation == null) {
+            userTimestamps.addProperty(UserTimestamp.LastInvitation.getTimestampName(),
+                ZonedDateTime.now().toString());
+            this.userDaoJpa.updateTimestamps(user.getName(), userTimestamps.toString());
+            return true;
+        } else {
+            // if last invitation is userInvitationFrequency days before current day,
+            // set as send invitation
+            if (calculateDays(userLastInvitation.getAsString()) > userInvitationFrequency) {
+                userTimestamps.addProperty(UserTimestamp.LastInvitation.getTimestampName(),
+                    ZonedDateTime.now().toString());
+                this.userDaoJpa.updateTimestamps(user.getName(), userTimestamps.toString());
+                return true;
+            }
+            return false;
+        }
     }
 }
