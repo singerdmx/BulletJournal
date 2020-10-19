@@ -14,6 +14,7 @@ import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -37,6 +38,7 @@ public class DaemonServiceClient {
     @Autowired
     private GoogleCalendarProjectDaoJpa googleCalendarProjectDaoJpa;
 
+    @Lazy
     @Autowired
     private NotificationService notificationService;
 
