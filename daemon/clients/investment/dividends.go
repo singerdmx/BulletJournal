@@ -102,7 +102,7 @@ func (c *DividendsClient) SendData() (*[]uint64, *[]uint64, error) {
 		target := c.data.Dividends[i]
 		availBefore := target.Date
 		t, _ := time.Parse(layoutISO, availBefore)
-		t = t.AddDate(0, 6, 0)
+		t = t.AddDate(0, 1, 0)
 		dueDate := target.ExDividendDate
 		if len(dueDate) > 10 {
 			dueDate = dueDate[0:10] // yyyy-MM-dd
