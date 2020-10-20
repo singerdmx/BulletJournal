@@ -25,7 +25,7 @@ public class StockTickerDetailsDaoJpa {
     public static final Logger LOGGER = LoggerFactory.getLogger(StockTickerDetailsDaoJpa.class);
 
     public static Map<Long, List<String>> SECTOR_KEYWORD = ImmutableMap.of(
-            254L, ImmutableList.of("acquisition"),
+            254L, ImmutableList.of("bank", "acquisition"),
             255L, ImmutableList.of("pharmaceutical", "medicine", "bio", "health", "therapeutic", "lifescience"),
             259L, ImmutableList.of("real estate"),
             252L, ImmutableList.of("education"));
