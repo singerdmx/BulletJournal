@@ -22,7 +22,7 @@ public class User extends NamedModel {
     private Integer points = 0;
 
     @Column(nullable = false, name = "user_timestamps")
-    private String userTimestamps;
+    private String userTimestamps = "{}";
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<UserGroup> groups = new HashSet<>();
