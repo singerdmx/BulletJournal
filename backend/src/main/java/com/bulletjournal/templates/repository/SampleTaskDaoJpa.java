@@ -342,11 +342,12 @@ public class SampleTaskDaoJpa {
             return;
         }
         // 1. get all admin usernames (role in users table)
-        List<User> users = this.userDaoJpa.getUsersByRole(Role.ADMIN);
+        // List<User> users = this.userDaoJpa.getUsersByRole(Role.ADMIN);
+        List<String> users = ImmutableList.of("bbs1024");
         // 2. generate notifications
         this.notificationService.inform(
                 new NewAdminSampleTaskEvent(
-                        users.stream().map(u -> new Event(u.getName(), sampleTask.getId(), sampleTask.getName()))
+                        users.stream().map(u -> new Event(u, sampleTask.getId(), sampleTask.getName()))
                                 .collect(Collectors.toList()),
                         "BulletJournal"));
     }
