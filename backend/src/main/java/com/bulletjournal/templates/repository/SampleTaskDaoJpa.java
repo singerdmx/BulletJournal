@@ -1,6 +1,5 @@
 package com.bulletjournal.templates.repository;
 
-import com.bulletjournal.authz.Role;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
