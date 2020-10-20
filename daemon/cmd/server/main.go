@@ -196,7 +196,10 @@ func main() {
 	var interval time.Duration
 	interval = time.Hour * 24 * time.Duration(daemonRpc.serviceConfig.IntervalInDays)
 
-	daemonBackgroundJob.Run(PST, daemonRpc.serviceConfig.MaxRetentionTimeInDays)
+	// use a separate go routine to avoid blocking main thread
+	go func() {
+		daemonBackgroundJob.Run(PST, daemonRpc.serviceConfig.MaxRetentionTimeInDays)
+	}()
 
 	jobScheduler.AddRecurrentJob(
 		daemonBackgroundJob.Run,
