@@ -1,4 +1,4 @@
-INSERT INTO template.categories(id, name, description, created_at, updated_at, icon, color, forum_id, image) VALUES (17, 'NBA', null, '2020-10-19 20:00:00.000000', '2020-10-19 20:00:00.000000', null, '#b3b3ff', null, null);
+INSERT INTO template.categories(id, name, description, created_at, updated_at, icon, color, forum_id, image) VALUES (18, 'NBA Teams', null, '2020-10-19 20:00:00.000000', '2020-10-19 20:00:00.000000', null, '#b3b3ff', null, null);
 
 INSERT INTO template.choices(id, created_at, updated_at, multiple, name, instruction_included) VALUES (20, '2020-10-19 20:00:00.000000', '2020-10-19 20:00:00.000000', TRUE, 'Team', null);
 

@@ -37,7 +37,7 @@ func (s *SampleTaskDao) Upsert(t *SampleTask) (uint64, bool) {
 
 	// If current time is more recent than duedate, skip this instance
 	if r.DueDate.Before(time.Now()) {
-		return t.ID, false
+		return -1, false
 	}
 
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
