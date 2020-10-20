@@ -1,6 +1,7 @@
 package com.bulletjournal.templates.repository.utils;
 
 import com.bulletjournal.templates.controller.model.StockTickerDetails;
+import com.bulletjournal.templates.repository.model.SampleTask;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -13,7 +14,7 @@ public abstract class InvestmentUtil {
     protected static final Gson GSON = new Gson();
     protected final JsonObject json;
 
-    public static List<String> INVESTMENT_METADATA = ImmutableList.of(
+    private static List<String> INVESTMENT_METADATA = ImmutableList.of(
             "INVESTMENT_IPO_RECORD", "INVESTMENT_EARNINGS_RECORD", "INVESTMENT_DIVIDENDS_RECORD");
 
     public InvestmentUtil(String raw) {
@@ -24,6 +25,23 @@ public abstract class InvestmentUtil {
 
     public String getTicker() {
         return json.get("ticker").getAsString();
+    }
+
+    public static boolean isInvestmentSampleTask(SampleTask sampleTask) {
+        return INVESTMENT_METADATA.stream().anyMatch(m -> sampleTask.getMetadata().contains(m));
+    }
+
+    public static String getCategoryNameKeyword(String metadata) {
+        if (metadata.contains("INVESTMENT_IPO_RECORD")) {
+            return "ipo";
+        }
+        if (metadata.contains("INVESTMENT_EARNINGS_RECORD")) {
+            return "earning";
+        }
+        if (metadata.contains("INVESTMENT_DIVIDENDS_RECORD")) {
+            return "dividend";
+        }
+        throw new IllegalArgumentException("Invalid metadata " + metadata);
     }
 
     public static InvestmentUtil getInstance(String metadata, String raw) {

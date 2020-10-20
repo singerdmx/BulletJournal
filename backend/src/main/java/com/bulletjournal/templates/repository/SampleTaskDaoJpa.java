@@ -202,6 +202,13 @@ public class SampleTaskDaoJpa {
         // send notification to subscribed users
         List<UserCategory> users = this.userCategoryDaoJpa.getSubscribedUsersByMetadataKeyword(
                 keywords.stream().map(SelectionMetadataKeyword::getKeyword).collect(Collectors.toList()));
+        if (InvestmentUtil.isInvestmentSampleTask(sampleTask)) {
+            String categoryNameKeyword = InvestmentUtil.getCategoryNameKeyword(sampleTask.getMetadata());
+            LOGGER.info("Filter users on categoryNameKeyword {}", categoryNameKeyword);
+            users = users.stream()
+                    .filter(u -> u.getCategory().getName().toLowerCase().contains(categoryNameKeyword))
+                    .collect(Collectors.toList());
+        }
 
         if (users.isEmpty()) {
             return sampleTask;
@@ -277,7 +284,7 @@ public class SampleTaskDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void handleSampleTaskChange(long id) {
         SampleTask sampleTask = findSampleTaskById(id);
-        if (InvestmentUtil.INVESTMENT_METADATA.stream().anyMatch(m -> sampleTask.getMetadata().contains(m))) {
+        if (InvestmentUtil.isInvestmentSampleTask(sampleTask)) {
             handleSampleTaskRecord(sampleTask, InvestmentUtil.getInstance(sampleTask.getMetadata(), sampleTask.getRaw()));
         }
     }
