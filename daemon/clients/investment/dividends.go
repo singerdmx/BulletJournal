@@ -48,7 +48,7 @@ func NewDividendsClient() (*TemplateClient, error) {
 
 func (c *DividendsClient) FetchData() error {
 	logger := *logging.GetLogger()
-	yearFrom, monthFrom, dayFrom := time.Now().AddDate(0, -3, 0).Date()
+	yearFrom, monthFrom, dayFrom := time.Now().AddDate(0, 0, -16).Date()
 	yearTo, monthTo, dayTo := time.Now().AddDate(0, 1, 0).Date()
 
 	var fetchedData []Dividends

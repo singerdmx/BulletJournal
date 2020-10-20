@@ -56,7 +56,7 @@ func NewIPOClient() (*TemplateClient, error) {
 
 func (c *IPOClient) FetchData() error {
 	logger := *logging.GetLogger()
-	yearFrom, monthFrom, dayFrom := time.Now().AddDate(0, -1, 0).Date()
+	yearFrom, monthFrom, dayFrom := time.Now().AddDate(0, 0, -6).Date()
 	yearTo, monthTo, dayTo := time.Now().AddDate(0, 1, 0).Date()
 
 	var fetchedData []IPO
