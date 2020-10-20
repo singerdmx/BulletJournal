@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/singerdmx/BulletJournal/daemon/config"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
@@ -33,6 +34,12 @@ func (s *SampleTaskDao) Upsert(t *SampleTask) (uint64, bool) {
 	logger := *logging.GetLogger()
 	prevReport := SampleTask{}
 	r := s.Db.Where("uid = ?", t.Uid).Last(&prevReport)
+
+	// If current time is more recent than duedate, skip this instance
+	if r.DueDate.Before(time.Now()) {
+		return t.ID, false
+	}
+
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
 		if err := s.Db.Create(&t).Error; err != nil {
 			logger.Errorf("Create Sample Task Error: %v", err)
