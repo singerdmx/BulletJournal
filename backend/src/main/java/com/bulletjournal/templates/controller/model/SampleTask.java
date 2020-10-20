@@ -2,7 +2,6 @@ package com.bulletjournal.templates.controller.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import java.sql.Timestamp;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SampleTask {
@@ -23,8 +22,6 @@ public class SampleTask {
 
     private String dueTime;
 
-    private Timestamp availableBefore;
-
     private Choice choice;
 
     private boolean pending;
@@ -39,7 +36,7 @@ public class SampleTask {
     public SampleTask(
             Long id,
             String name) {
-        this(id, name, null, null, null, null, null, null, null, false, false, null);
+        this(id, name, null, null, null, null, null, null, false, false, null);
     }
 
     public SampleTask(
@@ -50,7 +47,6 @@ public class SampleTask {
             String uid,
             String dueDate,
             String dueTime,
-            Timestamp availableBefore,
             String timeZone,
             boolean pending, boolean refreshable, String raw) {
         this.id = id;
@@ -60,7 +56,6 @@ public class SampleTask {
         this.uid = uid;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
-        this.availableBefore = availableBefore;
         this.timeZone = timeZone;
         this.pending = pending;
         this.refreshable = refreshable;
@@ -130,14 +125,6 @@ public class SampleTask {
 
     public void setDueTime(String dueTime) {
         this.dueTime = dueTime;
-    }
-
-    public Timestamp getAvailableBefore() {
-        return availableBefore;
-    }
-
-    public void setAvailableBefore(Timestamp availableBefore) {
-        this.availableBefore = availableBefore;
     }
 
     public Choice getChoice() {
