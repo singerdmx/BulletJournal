@@ -5,7 +5,6 @@ import com.bulletjournal.templates.clients.StockApiClient;
 import com.bulletjournal.templates.controller.model.StockTickerDetails;
 import com.bulletjournal.templates.repository.model.Selection;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public class StockTickerDetailsDaoJpa {
@@ -24,11 +20,17 @@ public class StockTickerDetailsDaoJpa {
     private static final Gson GSON = new Gson();
     public static final Logger LOGGER = LoggerFactory.getLogger(StockTickerDetailsDaoJpa.class);
 
-    public static Map<Long, List<String>> SECTOR_KEYWORD = ImmutableMap.of(
-            254L, ImmutableList.of("bank", "acquisition"),
-            255L, ImmutableList.of("pharmaceutical", "medicine", "bio", "health", "therapeutic", "lifescience"),
-            259L, ImmutableList.of("real estate"),
-            252L, ImmutableList.of("education"));
+    public static Map<Long, List<String>> SECTOR_KEYWORD = new HashMap<>();
+
+    static {
+        SECTOR_KEYWORD.put(254L, ImmutableList.of("bank", "acquisition", "capita"));
+        SECTOR_KEYWORD.put(255L, ImmutableList.of("pharmaceutical", "medicine",
+                "bio", "health", "therapeutic", "lifescience"));
+        SECTOR_KEYWORD.put(259L, ImmutableList.of("real estate"));
+        SECTOR_KEYWORD.put(252L, ImmutableList.of("education"));
+        SECTOR_KEYWORD.put(260L, ImmutableList.of("utility", "utilities"));
+        SECTOR_KEYWORD.put(253L, ImmutableList.of("petroleum", "energy"));
+    }
 
     public static final long MILLS_IN_YEAR = 1000L * 60 * 60 * 24 * 365;
 
