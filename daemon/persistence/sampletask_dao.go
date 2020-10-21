@@ -31,16 +31,17 @@ func NewSampleTaskDao() (*SampleTaskDao, error) {
 }
 
 func (s *SampleTaskDao) Upsert(t *SampleTask) (uint64, bool) {
+	logger := *logging.GetLogger()
 	// If current time is more recent than duedate, skip this instance
 	dueDate, err := time.Parse(LAYOUT, t.DueDate)
 	if err != nil {
+		logger.Errorf("due date parse to format yyyy-mm-dd failed, duedate: %s, error: %v", t.DueDate, err)
 		return 0, false
 	}
 	if dueDate.Before(time.Now()) {
-		return -1, false
+		return 0, false
 	}
 
-	logger := *logging.GetLogger()
 	prevReport := SampleTask{}
 	r := s.Db.Where("uid = ?", t.Uid).Last(&prevReport)
 
