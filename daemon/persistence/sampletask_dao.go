@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 	"time"
 )
+
 const LAYOUT = "2006-01-02"
 
 type SampleTaskDao struct {
@@ -66,6 +67,7 @@ func (s *SampleTaskDao) Upsert(t *SampleTask) (uint64, bool) {
 			"due_date":         t.DueDate,
 			"due_time":         t.DueTime,
 			"available_before": t.AvailableBefore,
+			"name":             t.Name,
 		})
 	return prevReport.ID, false
 }
