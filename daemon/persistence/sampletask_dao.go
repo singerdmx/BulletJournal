@@ -6,7 +6,9 @@ import (
 	"github.com/singerdmx/BulletJournal/daemon/config"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"gorm.io/gorm"
+	"time"
 )
+const LAYOUT = "2006-01-02"
 
 type SampleTaskDao struct {
 	Ctx context.Context
@@ -30,9 +32,13 @@ func NewSampleTaskDao() (*SampleTaskDao, error) {
 
 func (s *SampleTaskDao) Upsert(t *SampleTask) (uint64, bool) {
 	// If current time is more recent than duedate, skip this instance
-	//if t.DueDate.Before(time.Now()) {
-	//	return -1, false
-	//}
+	dueDate, err := time.Parse(LAYOUT, t.DueDate)
+	if err != nil {
+		return 0, false
+	}
+	if dueDate.Before(time.Now()) {
+		return -1, false
+	}
 
 	logger := *logging.GetLogger()
 	prevReport := SampleTask{}
