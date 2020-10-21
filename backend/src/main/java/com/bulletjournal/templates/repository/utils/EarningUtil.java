@@ -49,13 +49,14 @@ public class EarningUtil extends InvestmentUtil {
         String revenueSurprisePercentHtml = "";
         String revenueTypeDelta = "";
         String revenueTypeHtml = "";
+        String priorRevenueDelta = "";
+        String priorRevenueHtml = "";
+
         if (this.json.has("eps_prior") && !StringUtils.isBlank(this.json.get("eps_prior").getAsString())) {
             priorEpsDelta = ",{\"attributes\":{\"bold\":true},\"insert\":\"Prior EPS: \"}," +
                     "{\"insert\": \"" + this.json.get("eps_prior").getAsString() + "\\n\"}";
             priorEpsHtml = "<p><strong>Prior EPS</strong>: " + this.json.get("eps_prior").getAsString() + "</p>";
         }
-        String priorRevenueDelta = "";
-        String priorRevenueHtml = "";
         if (this.json.has("revenue_prior") && !StringUtils.isBlank(this.json.get("revenue_prior").getAsString())) {
             priorRevenueDelta = ",{\"attributes\":{\"bold\":true},\"insert\":\"Prior Revenue: \"}," +
                     "{\"insert\": \"" + this.json.get("revenue_prior").getAsString() + "\\n\"}";
