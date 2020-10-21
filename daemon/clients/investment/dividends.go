@@ -3,8 +3,9 @@ package investment
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"time"
+
+	"github.com/singerdmx/BulletJournal/daemon/logging"
 
 	"github.com/pkg/errors"
 
