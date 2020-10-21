@@ -316,7 +316,15 @@ const slice = createSlice({
         removeRule: (state, action: PayloadAction<RemoveRuleAction>) => state,
         sampleTasksReceived: (state, action: PayloadAction<SampleTasksAction>) => {
             const {tasks, scrollId} = action.payload;
-            state.sampleTasks = tasks;
+            const res = [] as SampleTask[];
+            const set = new Set();
+            tasks.forEach(task => {
+                if (!set.has(task.id)) {
+                    res.push(task);
+                    set.add(task.id);
+                }
+            });
+            state.sampleTasks = res;
             state.scrollId = scrollId;
         },
         getSampleTasks: (state, action: PayloadAction<GetSampleTasksAction>) => state,
