@@ -79,11 +79,16 @@ public class StockTickerDetails {
         }
         JsonObject json = GSON.fromJson(
                 details, JsonObject.class);
+        Long marketCap = null;
+        if (json.has("marketcap")) {
+            marketCap = json.get("marketcap").getAsLong();
+        }
+
         return new com.bulletjournal.templates.controller.model.StockTickerDetails(ticker, details, selection.toPresentationModel(),
                 json.get("logo").getAsString(),
                 json.get("country").getAsString(),
                 json.get("industry").getAsString(),
-                json.get("marketcap").getAsLong(),
+                marketCap,
                 json.get("employees").getAsLong(),
                 json.get("phone").getAsString(),
                 json.get("ceo").getAsString(),

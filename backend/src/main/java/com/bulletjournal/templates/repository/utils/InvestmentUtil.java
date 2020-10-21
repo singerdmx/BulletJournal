@@ -62,13 +62,19 @@ public abstract class InvestmentUtil {
             return Pair.of("", "");
         }
         String tickerDetailsDelta = "";
+        String marketCapDelta = "";
+        String marketCapHtml = "";
         String tickerDetailsHtml = "";
+        if (stockTickerDetails.getMarketCap() != null) {
+            marketCapDelta = ",{\"attributes\":{\"bold\":true},\"insert\":\"MarketCap\"},{\"insert\":\": " + stockTickerDetails.getMarketCap() + "\\n\"}";
+            marketCapHtml = "<p><strong>MarketCap</strong>: " + stockTickerDetails.getMarketCap() + "</p>";
+        }
         if (stockTickerDetails != null) {
             tickerDetailsDelta =
                     ",{\"attributes\":{\"width\":\"72\"},\"insert\":{\"image\":\"" + stockTickerDetails.getLogo() + "\"}},{\"insert\":\"\\n\"}" +
                             ",{\"attributes\":{\"bold\":true},\"insert\":\"Country\"},{\"insert\":\": " + stockTickerDetails.getCountry() + "\\n\"}" +
                             ",{\"attributes\":{\"bold\":true},\"insert\":\"Industry\"},{\"insert\":\": " + stockTickerDetails.getIndustry() + "\\n\"}" +
-                            ",{\"attributes\":{\"bold\":true},\"insert\":\"MarketCap\"},{\"insert\":\": " + stockTickerDetails.getMarketCap() + "\\n\"}" +
+                            "MARKET_CAP_DELTA" +
                             ",{\"attributes\":{\"bold\":true},\"insert\":\"Employees\"},{\"insert\":\": " + stockTickerDetails.getEmployees() + "\\n\"}" +
                             ",{\"attributes\":{\"bold\":true},\"insert\":\"Phone\"},{\"insert\":\": " + stockTickerDetails.getPhone() + "\\n\"}" +
                             ",{\"attributes\":{\"bold\":true},\"insert\":\"CEO\"},{\"insert\":\": " + stockTickerDetails.getCeo() + "\\n\"}" +
@@ -85,7 +91,7 @@ public abstract class InvestmentUtil {
             tickerDetailsHtml = "<p><img src=\\\"" + stockTickerDetails.getLogo() + "\\\" width=\\\"72\\\"></p>" +
                     "<p><strong>Country</strong>: " + stockTickerDetails.getCountry() + "</p>" +
                     "<p><strong>Industry</strong>: " + stockTickerDetails.getIndustry() + "</p>" +
-                    "<p><strong>MarketCap</strong>: " + stockTickerDetails.getMarketCap() + "</p>" +
+                    "MARKET_CAP_HTML" +
                     "<p><strong>Employees</strong>: " + stockTickerDetails.getEmployees() + "</p>" +
                     "<p><strong>Phone</strong>: " + stockTickerDetails.getPhone() + "</p>" +
                     "<p><strong>CEO</strong>: " + stockTickerDetails.getCeo() + "</p>" +
@@ -100,6 +106,6 @@ public abstract class InvestmentUtil {
                     "<p><strong>Tags</strong>: " + String.join(", ", stockTickerDetails.getTags()) + "</p>" +
                     "<p><strong>Similar</strong>: " + String.join(", ", stockTickerDetails.getSimilar()) + "</p>";
         }
-        return Pair.of(tickerDetailsDelta, tickerDetailsHtml);
+        return Pair.of(tickerDetailsDelta.replace("MARKET_CAP_DELTA", marketCapDelta), tickerDetailsHtml.replace("MARKET_CAP_HTML", marketCapHtml));
     }
 }

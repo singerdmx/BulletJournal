@@ -48,39 +48,39 @@ public class EarningUtil extends InvestmentUtil {
         String revenueSurprisePercentHtml = "";
         String revenueTypeDelta = "";
         String revenueTypeHtml = "";
-        if (this.json.get("eps_prior") != null) {
+        if (this.json.has("eps_prior") && !this.json.get("eps_prior").getAsString().isEmpty()) {
             priorEpsDelta = ",{\"attributes\":{\"bold\":true},\"insert\":\"Prior EPS: \"}," +
                     "{\"insert\": \"" + this.json.get("eps_prior").getAsString() + "\\n\"}";
             priorEpsHtml = "<p><strong>Prior EPS</strong>: " + this.json.get("eps_prior").getAsString() + "</p>";
         }
         String priorRevenueDelta = "";
         String priorRevenueHtml = "";
-        if (this.json.get("revenue_prior") != null) {
+        if (this.json.has("revenue_prior") && !this.json.get("revenue_prior").getAsString().isEmpty()) {
             priorRevenueDelta = ",{\"attributes\":{\"bold\":true},\"insert\":\"Prior Revenue: \"}," +
                     "{\"insert\": \"" + this.json.get("revenue_prior").getAsString() + "\\n\"}";
             priorRevenueHtml = "<p><strong>Prior Revenue</strong>: " + this.json.get("revenue_prior").getAsString() + "</p>";
         }
-        if (this.json.get("revenue") != null) {
+        if (this.json.has("revenue") && !this.json.get("revenue").getAsString().isEmpty()) {
             revenueDelta = ",{\"attributes\":{\"bold\":true},\"insert\":\"Revenue: \"}," +
                     "{\"insert\": \"" + this.json.get("revenue").getAsString() + "\\n\"}";
             revenueHtml = "<p><strong>Revenue</strong>: " + this.json.get("revenue").getAsString() + "</p>";
         }
-        if (this.json.get("revenue_est") != null) {
+        if (this.json.has("revenue_est") && !this.json.get("revenue_est").getAsString().isEmpty()) {
             revenueEstDelta = ",{\"attributes\":{\"bold\":true},\"insert\":\"Revenue Est: \"}," +
                     "{\"insert\": \"" + this.json.get("revenue_est").getAsString() + "\\n\"}";
             revenueEstHtml = "<p><strong>Revenue Est</strong>: " + this.json.get("revenue_est").getAsString() + "</p>";
         }
-        if (this.json.get("revenue_surprise") != null) {
+        if (this.json.has("revenue_surprise") && !this.json.get("revenue_surprise").getAsString().isEmpty()) {
             revenueSurpriseDelta = ",{\"attributes\":{\"bold\":true},\"insert\":\"Revenue Surprise: \"}," +
                     "{\"insert\": \"" + this.json.get("revenue_surprise").getAsString() + "\\n\"}";
             revenueSurpriseHtml = "<p><strong>Revenue Surprise</strong>: " + this.json.get("revenue_surprise").getAsString() + "</p>";
         }
-        if (this.json.get("revenue_surprise_percent") != null) {
+        if (this.json.has("revenue_surprise_percent") && !this.json.get("revenue_surprise_percent").getAsString().isEmpty()) {
             revenueSurprisePercentDelta = ",{\"attributes\":{\"bold\":true},\"insert\":\"Revenue Surprise Percent \"}," +
                     "{\"insert\": \"" + this.json.get("revenue_surprise_percent").getAsString() + "\\n\"}";
             revenueSurprisePercentHtml = "<p><strong>Revenue Surprise Percent</strong>: " + this.json.get("revenue_surprise_percent").getAsString() + "</p>";
         }
-        if (this.json.get("revenue_type") != null) {
+        if (this.json.has("revenue_type") && !this.json.get("revenue_type").getAsString().isEmpty()) {
             revenueTypeDelta = ",{\"attributes\":{\"bold\":true},\"insert\":\"Revenue Type: \"}," +
                     "{\"insert\": \"" + this.json.get("revenue_type").getAsString() + "\\n\"}";
             revenueTypeHtml = "<p><strong>Revenue Type</strong>: " + this.json.get("revenue_type").getAsString() + "</p>";
