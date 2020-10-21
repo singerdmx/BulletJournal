@@ -32,20 +32,21 @@ func NewSampleTaskDao() (*SampleTaskDao, error) {
 
 func (s *SampleTaskDao) Upsert(t *SampleTask) (uint64, bool) {
 	logger := *logging.GetLogger()
-	// If current time is more recent than duedate, skip this instance
-	dueDate, err := time.Parse(LAYOUT, t.DueDate)
-	if err != nil {
-		logger.Errorf("due date parse to format yyyy-mm-dd failed, duedate: %s, error: %v", t.DueDate, err)
-		return 0, false
-	}
-	if dueDate.Before(time.Now()) {
-		return 0, false
-	}
 
 	prevReport := SampleTask{}
 	r := s.Db.Where("uid = ?", t.Uid).Last(&prevReport)
 
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
+		// If current time is more recent than duedate, skip this instance
+		dueDate, err := time.Parse(LAYOUT, t.DueDate)
+		if err != nil {
+			logger.Errorf("due date parse to format yyyy-mm-dd failed, duedate: %s, error: %v", t.DueDate, err)
+			return 0, false
+		}
+		if dueDate.Before(time.Now()) {
+			return 0, false
+		}
+
 		if err := s.Db.Create(&t).Error; err != nil {
 			logger.Errorf("Create Sample Task Error: %v", err)
 			return 0, false
