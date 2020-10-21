@@ -23,7 +23,7 @@ public class StockTickerDetailsDaoJpa {
     public static Map<Long, List<String>> SECTOR_KEYWORD = new HashMap<>();
 
     static {
-        SECTOR_KEYWORD.put(254L, ImmutableList.of("bank", "acquisition", "capita"));
+        SECTOR_KEYWORD.put(254L, ImmutableList.of("bank", "acquisition", "capita", "financial"));
         SECTOR_KEYWORD.put(255L, ImmutableList.of("pharmaceutical", "medicine",
                 "bio", "health", "therapeutic", "lifescience"));
         SECTOR_KEYWORD.put(259L, ImmutableList.of("real estate"));
