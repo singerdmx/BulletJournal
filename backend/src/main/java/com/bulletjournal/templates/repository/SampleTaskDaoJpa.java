@@ -289,6 +289,10 @@ public class SampleTaskDaoJpa {
     }
 
     private void handleSampleTaskRecord(SampleTask sampleTask, InvestmentUtil investmentUtil) {
+        if ("OTC".equals(investmentUtil.getExchange())) {
+            LOGGER.info("Skip OTC exchange {}", sampleTask.getRaw());
+            return;
+        }
         com.bulletjournal.templates.controller.model.StockTickerDetails stockTickerDetails =
                 this.stockTickerDetailsDaoJpa.get(investmentUtil.getTicker());
 

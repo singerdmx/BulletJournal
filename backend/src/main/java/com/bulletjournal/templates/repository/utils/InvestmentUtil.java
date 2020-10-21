@@ -44,6 +44,14 @@ public abstract class InvestmentUtil {
         throw new IllegalArgumentException("Invalid metadata " + metadata);
     }
 
+    public String getExchange() {
+        if (!json.has("exchange")) {
+            return null;
+        }
+        String exchange = json.get("exchange").getAsString();
+        return exchange;
+    }
+
     public static InvestmentUtil getInstance(String metadata, String raw) {
         if (metadata.contains("INVESTMENT_IPO_RECORD")) {
             return new IPOUtil(raw);
