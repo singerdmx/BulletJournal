@@ -68,6 +68,7 @@ public class StockTickerDetailsDaoJpa {
                 selectionId = 257L;
                 break;
             case "communication service": // CMCSA
+            case "communication services":
                 selectionId = 250L;
                 break;
             case "healthcare": // CBLI
