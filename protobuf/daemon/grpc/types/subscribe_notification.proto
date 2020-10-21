@@ -7,11 +7,12 @@ option java_multiple_files = true;
 option java_package = "com.bulletjournal.protobuf.daemon.grpc.types";
 option java_outer_classname = "SubscribeNotificationProto";
 
-message SubscribeNotification {
+message SubscribeNotificationMsg {
   string serviceName = 1;
+  string clientId = 2;
 }
 
-message StreamMessage {
+message NotificationStreamMsg {
   oneof body {
     SubscribeRenewGoogleCalendarWatchMsg renewGoogleCalendarWatchMsg = 1;
     SubscribeSampleTaskMsg sampleTaskMsg = 2;

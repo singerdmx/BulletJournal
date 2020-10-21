@@ -15,7 +15,7 @@ option java_outer_classname = "DaemonProto";
 service Daemon {
 
   // Serve rpc call to subscribe server side streaming
-  rpc SubscribeNotification (types.SubscribeNotification) returns (stream types.StreamMessage) {}
+  rpc SubscribeNotification (types.SubscribeNotificationMsg) returns (stream types.NotificationStreamMsg) {}
 
   // Serve rpc / rest call to health check
   rpc HealthCheck (types.HealthCheckRequest) returns (types.HealthCheckResponse) {

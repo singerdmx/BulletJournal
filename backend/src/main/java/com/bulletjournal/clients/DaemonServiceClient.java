@@ -4,8 +4,8 @@ import com.bulletjournal.config.DaemonClientConfig;
 import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.SampleTaskChange;
 import com.bulletjournal.protobuf.daemon.grpc.services.DaemonGrpc;
-import com.bulletjournal.protobuf.daemon.grpc.types.StreamMessage;
-import com.bulletjournal.protobuf.daemon.grpc.types.SubscribeNotification;
+import com.bulletjournal.protobuf.daemon.grpc.types.NotificationStreamMsg;
+import com.bulletjournal.protobuf.daemon.grpc.types.SubscribeNotificationMsg;
 import com.bulletjournal.protobuf.daemon.grpc.types.SubscribeSampleTaskMsg;
 import com.bulletjournal.repository.GoogleCalendarProjectDaoJpa;
 import io.grpc.Status;
@@ -48,21 +48,21 @@ public class DaemonServiceClient {
     public void postConstruct() {
         if (this.daemonClientConfig.isEnabled()) {
             LOGGER.info("We're enabling daemon streaming...");
-            subscribeNotification(SubscribeNotification.newBuilder().setServiceName(SERVICE_NAME).build(), newResponseObserver());
+            subscribeNotification(SubscribeNotificationMsg.newBuilder().setServiceName(SERVICE_NAME).build(), newResponseObserver());
         } else {
             LOGGER.info("We don't enable daemon streaming as for now...");
         }
     }
 
-    private void subscribeNotification(SubscribeNotification subscribeNotification, StreamObserver<StreamMessage> responseObserver) {
+    private void subscribeNotification(SubscribeNotificationMsg subscribeNotificationMsg, StreamObserver<NotificationStreamMsg> responseObserver) {
         LOGGER.info("Start subscribing to daemon server");
-        this.daemonAsyncStub.subscribeNotification(subscribeNotification, responseObserver);
+        this.daemonAsyncStub.subscribeNotification(subscribeNotificationMsg, responseObserver);
     }
 
-    private StreamObserver<StreamMessage> newResponseObserver() {
-        return new StreamObserver<StreamMessage>() {
+    private StreamObserver<NotificationStreamMsg> newResponseObserver() {
+        return new StreamObserver<NotificationStreamMsg>() {
             @Override
-            public void onNext(StreamMessage stream) {
+            public void onNext(NotificationStreamMsg stream) {
                 LOGGER.info("Got a daemon streaming message");
                 try {
                     switch (stream.getBodyCase()) {
@@ -91,7 +91,7 @@ public class DaemonServiceClient {
                 LOGGER.info("Will retry subscribing to daemon server again in {}s", RETRY_WAIT / 1000);
                 try {
                     Thread.sleep(RETRY_WAIT);
-                    subscribeNotification(SubscribeNotification.newBuilder().setServiceName(SERVICE_NAME).build(), newResponseObserver());
+                    subscribeNotification(SubscribeNotificationMsg.newBuilder().setServiceName(SERVICE_NAME).build(), newResponseObserver());
                 } catch (InterruptedException interruptedException) {
                     LOGGER.error("Internal error happened before attempting to retry subscribing to daemon server", interruptedException);
                     LOGGER.error("Stop subscribing to daemon server due to the previous server side error");
@@ -104,7 +104,7 @@ public class DaemonServiceClient {
                         RETRY_WAIT / 1000);
                 try {
                     Thread.sleep(RETRY_WAIT);
-                    subscribeNotification(SubscribeNotification.newBuilder().setServiceName(SERVICE_NAME).build(), newResponseObserver());
+                    subscribeNotification(SubscribeNotificationMsg.newBuilder().setServiceName(SERVICE_NAME).build(), newResponseObserver());
                 } catch (InterruptedException interruptedException) {
                     LOGGER.error("Internal error happened before attempting to retry subscribing to daemon server", interruptedException);
                 }

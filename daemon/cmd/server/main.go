@@ -44,7 +44,7 @@ func (s *server) HealthCheck(ctx context.Context, request *types.HealthCheckRequ
 	return &types.HealthCheckResponse{}, nil
 }
 
-func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, stream services.Daemon_SubscribeNotificationServer) error {
+func (s *server) SubscribeNotification(subscribe *types.SubscribeNotificationMsg, stream services.Daemon_SubscribeNotificationServer) error {
 	log.Printf("Received rpc request for subscription: %s", subscribe.String())
 	if _, ok := s.subscriptions[subscribe.ServiceName]; ok {
 		log.Printf("Subscription: %s's streaming has been idle, start streaming!", subscribe.String())
@@ -74,8 +74,8 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 			} else if serviceMsg.ServiceName == cleanerServiceName {
 				projectId := strconv.Itoa(int(serviceMsg.Message))
 				if err := stream.Send(
-					&types.StreamMessage{
-						Body: &types.StreamMessage_RenewGoogleCalendarWatchMsg{
+					&types.NotificationStreamMsg{
+						Body: &types.NotificationStreamMsg_RenewGoogleCalendarWatchMsg{
 							RenewGoogleCalendarWatchMsg: &types.SubscribeRenewGoogleCalendarWatchMsg{GoogleCalendarProjectId: projectId}}},
 				); err != nil {
 					log.Printf("Unexpected error happened to subscription: %s, error: %v", subscribe.String(), err)
@@ -89,8 +89,8 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotification, s
 			} else if serviceMsg.ServiceName == investmentServiceName {
 				sampleTaskId := serviceMsg.Message
 				if err := stream.Send(
-					&types.StreamMessage{
-						Body: &types.StreamMessage_SampleTaskMsg{
+					&types.NotificationStreamMsg{
+						Body: &types.NotificationStreamMsg_SampleTaskMsg{
 							SampleTaskMsg: &types.SubscribeSampleTaskMsg{SampleTaskId: sampleTaskId}}},
 				); err != nil {
 					log.Printf("Unexpected error happened to subscription: %s, error: %v", subscribe.String(), err)
