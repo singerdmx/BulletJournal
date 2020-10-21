@@ -3,8 +3,6 @@ package persistence
 import (
 	"context"
 	"errors"
-	"time"
-
 	"github.com/singerdmx/BulletJournal/daemon/config"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"gorm.io/gorm"
@@ -31,14 +29,14 @@ func NewSampleTaskDao() (*SampleTaskDao, error) {
 }
 
 func (s *SampleTaskDao) Upsert(t *SampleTask) (uint64, bool) {
+	// If current time is more recent than duedate, skip this instance
+	//if t.DueDate.Before(time.Now()) {
+	//	return -1, false
+	//}
+
 	logger := *logging.GetLogger()
 	prevReport := SampleTask{}
 	r := s.Db.Where("uid = ?", t.Uid).Last(&prevReport)
-
-	// If current time is more recent than duedate, skip this instance
-	if r.DueDate.Before(time.Now()) {
-		return -1, false
-	}
 
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
 		if err := s.Db.Create(&t).Error; err != nil {
