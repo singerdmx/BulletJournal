@@ -18,6 +18,7 @@ import com.bulletjournal.templates.controller.model.CreateSampleTaskParams;
 import com.bulletjournal.templates.controller.model.UpdateSampleTaskParams;
 import com.bulletjournal.templates.repository.model.*;
 import com.bulletjournal.templates.repository.utils.InvestmentUtil;
+import com.bulletjournal.util.DeltaConverter;
 import com.bulletjournal.util.StringUtil;
 import com.google.common.collect.ImmutableList;
 import org.apache.http.util.TextUtils;
@@ -87,7 +88,7 @@ public class SampleTaskDaoJpa {
         sampleTask.setName(createSampleTaskParams.getName());
         sampleTask.setUid(createSampleTaskParams.getUid());
         sampleTask.setTimeZone(createSampleTaskParams.getTimeZone());
-        return sampleTaskRepository.save(sampleTask);
+        return this.save(sampleTask);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -145,14 +146,14 @@ public class SampleTaskDaoJpa {
         sampleTask.setTimeZone(updateSampleTaskParams.getTimeZone());
         sampleTask.setPending(updateSampleTaskParams.isPending());
         sampleTask.setRefreshable(updateSampleTaskParams.isRefreshable());
-        return sampleTaskRepository.save(sampleTask);
+        return this.save(sampleTask);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SampleTask updateSampleTaskContent(Long sampleTaskId, String content) {
         SampleTask sampleTask = findSampleTaskById(sampleTaskId);
         sampleTask.setContent(content);
-        return sampleTaskRepository.save(sampleTask);
+        return this.save(sampleTask);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -165,6 +166,10 @@ public class SampleTaskDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SampleTask save(SampleTask sampleTask) {
+        if (sampleTask.hasContent()) {
+            sampleTask.setContent(
+                    DeltaConverter.supplementContentText(sampleTask.getContent(), false));
+        }
         return this.sampleTaskRepository.save(sampleTask);
     }
 
@@ -322,7 +327,7 @@ public class SampleTaskDaoJpa {
         try {
             String content = investmentUtil.getContent(stockTickerDetails);
             sampleTask.setContent(content);
-            this.sampleTaskRepository.save(sampleTask);
+            this.save(sampleTask);
             if (stockTickerDetails == null) {
                 notifyAdmins(sampleTask);
                 return;

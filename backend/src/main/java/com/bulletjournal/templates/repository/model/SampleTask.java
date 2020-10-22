@@ -1,6 +1,7 @@
 package com.bulletjournal.templates.repository.model;
 
 import com.bulletjournal.repository.models.AuditModel;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -79,6 +80,10 @@ public class SampleTask extends AuditModel {
 
     public String getContent() {
         return content;
+    }
+
+    public boolean hasContent() {
+        return StringUtils.isNotBlank(this.content);
     }
 
     public String getTimeZone() {
