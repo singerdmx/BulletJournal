@@ -39,12 +39,14 @@ type server struct {
 }
 
 // HealthCheck implements the rest endpoint healthcheck -> rpc
-func (s *server) HealthCheck(ctx context.Context, request *types.HealthCheckRequest) (*types.HealthCheckResponse, error) {
+func (s *server) HealthCheck(
+	ctx context.Context, request *types.HealthCheckRequest) (*types.HealthCheckResponse, error) {
 	// log.Printf("Received health check request: %v", request.String())
 	return &types.HealthCheckResponse{}, nil
 }
 
-func (s *server) SubscribeNotification(subscribe *types.SubscribeNotificationMsg, stream services.Daemon_SubscribeNotificationServer) error {
+func (s *server) SubscribeNotification(
+	subscribe *types.SubscribeNotificationMsg, stream services.Daemon_SubscribeNotificationServer) error {
 	log.Printf("Received rpc request for subscription: %s", subscribe.String())
 	if _, ok := s.subscriptions[subscribe.ServiceName]; ok {
 		log.Printf("Subscription: %s's streaming has been idle, start streaming!", subscribe.String())
@@ -68,7 +70,8 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotificationMsg
 		}
 		for serviceMsg := range fanInChannel {
 			if serviceMsg == nil {
-				log.Printf("ServiceStreaming: %s for subscription: %s is closed", serviceMsg.ServiceName, subscribe.String())
+				log.Printf("ServiceStreaming: %s for subscription: %s is closed",
+					serviceMsg.ServiceName, subscribe.String())
 				log.Printf("Closing streaming to subscription: %s", subscribe.String())
 				break
 			} else if serviceMsg.ServiceName == cleanerServiceName {
@@ -76,7 +79,8 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotificationMsg
 				if err := stream.Send(
 					&types.NotificationStreamMsg{
 						Body: &types.NotificationStreamMsg_RenewGoogleCalendarWatchMsg{
-							RenewGoogleCalendarWatchMsg: &types.SubscribeRenewGoogleCalendarWatchMsg{GoogleCalendarProjectId: projectId}}},
+							RenewGoogleCalendarWatchMsg:
+								&types.SubscribeRenewGoogleCalendarWatchMsg{GoogleCalendarProjectId: projectId}}},
 				); err != nil {
 					log.Printf("Unexpected error happened to subscription: %s, error: %v", subscribe.String(), err)
 					// Allow future requests with the same subscribe.ServiceName from new subscriptions
@@ -100,7 +104,8 @@ func (s *server) SubscribeNotification(subscribe *types.SubscribeNotificationMsg
 					break
 				}
 			} else {
-				log.Printf("ServiceStreaming: %s for subscription: %s is not implemented as for now", serviceMsg.ServiceName, subscribe.String())
+				log.Printf("ServiceStreaming: %s for subscription: %s is not implemented as for now",
+					serviceMsg.ServiceName, subscribe.String())
 			}
 		}
 	} else {
@@ -128,7 +133,9 @@ func main() {
 	investmentServiceStreaming := daemon.Streaming{ServiceName: investmentServiceName, ServiceChannel: make(chan *daemon.StreamingMessage, 100)};
 	daemonRpc := &server{
 		serviceConfig: config.GetConfig(),
-		subscriptions: map[string][]daemon.Streaming{bulletJournalId: {fanInServiceStreaming, cleanerServiceStreaming, reminderServiceStreaming, investmentServiceStreaming}},
+		subscriptions: map[string][]daemon.Streaming{
+			bulletJournalId:
+				{fanInServiceStreaming, cleanerServiceStreaming, reminderServiceStreaming, investmentServiceStreaming}},
 	}
 
 	rpcPort := ":" + daemonRpc.serviceConfig.RPCPort
@@ -139,7 +146,9 @@ func main() {
 	rpcServer := grpc.NewServer()
 	services.RegisterDaemonServer(rpcServer, daemonRpc)
 
-	gatewayMux := runtime.NewServeMux(runtime.WithIncomingHeaderMatcher(middleware.IncomingHeaderMatcher), runtime.WithOutgoingHeaderMatcher(middleware.OutgoingHeaderMatcher))
+	gatewayMux := runtime.NewServeMux(
+		runtime.WithIncomingHeaderMatcher(
+			middleware.IncomingHeaderMatcher), runtime.WithOutgoingHeaderMatcher(middleware.OutgoingHeaderMatcher))
 	endpoint := "127.0.0.1" + rpcPort
 	err = services.RegisterDaemonHandlerFromEndpoint(ctx, gatewayMux, endpoint, []grpc.DialOption{grpc.WithInsecure()})
 	if err != nil {
@@ -189,7 +198,10 @@ func main() {
 	year, month, day := time.Now().AddDate(0, 0, daemonRpc.serviceConfig.IntervalInDays).In(PST).Date()
 	start := time.Date(year, month, day, 0, 0, 0, 0, PST)
 
-	daemonBackgroundJob := daemon.Job{Cleaner: cleaner, Reminder: daemon.Reminder{}, Investment: daemon.Investment{ServiceStreaming: investmentServiceStreaming}}
+	daemonBackgroundJob := daemon.Job{
+		Cleaner: cleaner, Reminder: daemon.Reminder{},
+		Investment: daemon.Investment{ServiceStreaming: investmentServiceStreaming},
+	}
 	log.Infof("The next daemon job will start at %v", start.Format(time.RFC3339))
 	log.Infof("And Now it's %v", time.Now().Format(time.RFC3339))
 
