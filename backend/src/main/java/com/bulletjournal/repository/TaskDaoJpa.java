@@ -21,6 +21,7 @@ import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
+import com.bulletjournal.templates.repository.model.SampleTask;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -445,11 +446,13 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             Long projectId,
             String owner,
             List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasks,
+            List<SampleTask> repoSampleTasks,
             Integer reminderBeforeTask,
             List<String> assignees,
             List<Long> labels
     ) {
         Preconditions.checkNotNull(assignees);
+
         List<CreateTaskParams> createTaskParams = new ArrayList<>();
         sampleTasks.forEach(sampleTask -> createTaskParams.add(sampleTaskToCreateTaskParams(
                 sampleTask,
@@ -458,11 +461,30 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 labels)
         ));
         List<Task> tasks = create(projectId, owner, createTaskParams);
+        Preconditions.checkArgument(sampleTasks.size() == tasks.size(),
+                sampleTasks.size() + " does not match " + tasks.size());
+        List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasksForContents = new ArrayList<>();
+        List<Task> tasksForContents = new ArrayList<>();
+        for (int i = 0; i < sampleTasks.size(); i++) {
+            if (sampleTasks.get(i).isRefreshable()) {
+                long sampleTaskId = sampleTasks.get(i).getId();
+                tasks.get(i).setSampleTask(
+                        repoSampleTasks.stream().filter(s -> sampleTaskId == s.getId()).findFirst().get());
+                continue;
+            }
+            sampleTasksForContents.add(sampleTasks.get(i));
+            tasksForContents.add(tasks.get(i));
+        }
 
-        this.notificationService.addContentBatch(new ContentBatch(
-                sampleTasks.stream().map(sampleTask -> new TaskContent(sampleTask.getContent())).collect(Collectors.toList()),
-                tasks,
-                tasks.stream().map(ProjectItemModel::getOwner).collect(Collectors.toList())));
+        this.saveAll(tasks);
+
+        if (!sampleTasksForContents.isEmpty()) {
+            this.notificationService.addContentBatch(new ContentBatch(
+                    sampleTasksForContents.stream()
+                            .map(sampleTask -> new TaskContent(sampleTask.getContent())).collect(Collectors.toList()),
+                    tasksForContents,
+                    tasksForContents.stream().map(ProjectItemModel::getOwner).collect(Collectors.toList())));
+        }
 
         return tasks;
     }

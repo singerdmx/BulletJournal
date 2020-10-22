@@ -227,21 +227,15 @@ public class SampleTaskDaoJpa {
                 String username = user.getUser().getName();
                 com.bulletjournal.templates.controller.model.SampleTask sampleTaskModel =
                         sampleTask.toPresentationModel();
-                if (sampleTask.isRefreshable()) {
-                    sampleTaskModel.setContent(null);
-                }
                 try {
                     List<Task> createdTasks = this.taskDaoJpa.createTaskFromSampleTask(
                             user.getProject().getId(),
                             username,
                             ImmutableList.of(sampleTaskModel),
+                            ImmutableList.of(sampleTask),
                             userMap.get(username).getReminderBeforeTask().getValue(),
                             ImmutableList.of(username),
                             Collections.emptyList());
-                    if (sampleTask.isRefreshable()) {
-                        createdTasks.forEach(t -> t.setSampleTask(sampleTask));
-                    }
-                    this.taskDaoJpa.saveAll(createdTasks);
 
                     this.notificationService.inform(
                             new NewSampleTaskEvent(
