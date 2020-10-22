@@ -460,7 +460,14 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 assignees,
                 labels)
         ));
-        List<Task> tasks = create(projectId, owner, createTaskParams);
+
+        List<Task> tasks;
+        try {
+            tasks = create(projectId, owner, createTaskParams);
+        } catch (Exception ex) {
+            LOGGER.info("createTaskFromSampleTask failed", ex);
+            return Collections.emptyList();
+        }
         Preconditions.checkArgument(sampleTasks.size() == tasks.size(),
                 sampleTasks.size() + " does not match " + tasks.size());
         List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasksForContents = new ArrayList<>();

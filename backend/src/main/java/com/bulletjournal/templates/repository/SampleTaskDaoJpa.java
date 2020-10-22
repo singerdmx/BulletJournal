@@ -237,11 +237,13 @@ public class SampleTaskDaoJpa {
                             ImmutableList.of(username),
                             Collections.emptyList());
 
-                    this.notificationService.inform(
-                            new NewSampleTaskEvent(
-                                    new Event(username, sampleTaskId, sampleTask.getName()),
-                                    "BulletJournal",
-                                    ContentType.getContentLink(ContentType.TASK, createdTasks.get(0).getId())));
+                    if (!createdTasks.isEmpty()) {
+                        this.notificationService.inform(
+                                new NewSampleTaskEvent(
+                                        new Event(username, sampleTaskId, sampleTask.getName()),
+                                        "BulletJournal",
+                                        ContentType.getContentLink(ContentType.TASK, createdTasks.get(0).getId())));
+                    }
                 } catch (Exception ex) {
                     LOGGER.error("Failure to create task for subscribed user " + username, ex);
                 }
