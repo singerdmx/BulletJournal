@@ -84,7 +84,7 @@ sourceSets {
 
 protobuf {
     generatedFilesBaseDir = "./generatedProto"
-
+    delete generatedFilesBaseDir
     protoc {
         artifact = 'com.google.protobuf:protoc:3.0.0'
     }
