@@ -11,6 +11,9 @@ type Investment struct {
 	ServiceStreaming Streaming
 }
 
+type void struct{}
+var member void
+
 func (i *Investment) pull(params ...interface{}) {
 	logger := *logging.GetLogger()
 	logger.Infof("Investment starts at %v", time.Now().In(params[0].(*time.Location)).Format(time.RFC3339))
@@ -37,13 +40,22 @@ func retrieveData(templateClient *investment.TemplateClient, streaming Streaming
 		return
 	}
 
+	set := make(map[uint64]void)
 	for _, sampleTaskId := range *created {
+		if _, exists := set[sampleTaskId]; exists {
+			continue
+		}
 		logger.Printf("Created Sample Task %d", sampleTaskId)
+		set[sampleTaskId] = member
 		time.Sleep(30 * time.Second)
 		streaming.ServiceChannel <- &StreamingMessage{Message: sampleTaskId}
 	}
 	for _, sampleTaskId := range *modified {
+		if _, exists := set[sampleTaskId]; exists {
+			continue
+		}
 		logger.Printf("Modified Sample Task %d", sampleTaskId)
+		set[sampleTaskId] = member
 		time.Sleep(30 * time.Second)
 		streaming.ServiceChannel <- &StreamingMessage{Message: sampleTaskId}
 	}
