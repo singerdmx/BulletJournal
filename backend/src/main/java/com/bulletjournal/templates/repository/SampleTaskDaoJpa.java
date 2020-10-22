@@ -273,15 +273,17 @@ public class SampleTaskDaoJpa {
         Optional<Long> match = selections.stream().filter(s -> s != null && s >= 250 && s <= 260).findFirst();
         if (match.isPresent()) {
             InvestmentUtil investmentUtil = InvestmentUtil.getInstance(sampleTask.getMetadata(), sampleTask.getRaw());
-            Selection selection = selectionRepository.findById(match.get()).orElseThrow(
-                    () -> new ResourceNotFoundException("Selection" + match.get() + "not found"));
-            StockTickerDetails stockTickerDetails = new StockTickerDetails();
-            stockTickerDetails.setSelection(selection);
-            stockTickerDetails.setExpirationTime(new Timestamp(System.currentTimeMillis() + StockTickerDetailsDaoJpa.MILLS_IN_YEAR));
-            stockTickerDetails.setDetails("");
-            stockTickerDetails.setTicker(investmentUtil.getTicker());
-            stockTickerDetails = stockTickerDetailsRepository.save(stockTickerDetails);
-            LOGGER.info("Created stock detail {}", stockTickerDetails);
+            if (!this.stockTickerDetailsRepository.existsById(investmentUtil.getTicker())) {
+                Selection selection = selectionRepository.findById(match.get()).orElseThrow(
+                        () -> new ResourceNotFoundException("Selection" + match.get() + "not found"));
+                StockTickerDetails stockTickerDetails = new StockTickerDetails();
+                stockTickerDetails.setSelection(selection);
+                stockTickerDetails.setExpirationTime(new Timestamp(System.currentTimeMillis() + StockTickerDetailsDaoJpa.MILLS_IN_YEAR));
+                stockTickerDetails.setDetails("");
+                stockTickerDetails.setTicker(investmentUtil.getTicker());
+                stockTickerDetails = stockTickerDetailsRepository.save(stockTickerDetails);
+                LOGGER.info("Created stock detail {}", stockTickerDetails);
+            }
         }
     }
 
