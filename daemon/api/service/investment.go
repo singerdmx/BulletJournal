@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/singerdmx/BulletJournal/daemon/consts"
 	"time"
 
 	"github.com/singerdmx/BulletJournal/daemon/clients/investment"
@@ -8,7 +9,7 @@ import (
 )
 
 type Investment struct {
-	ServiceStreaming Streaming
+	StreamChannel chan<- *StreamingMessage
 }
 
 type void struct{}
@@ -22,12 +23,12 @@ func (i *Investment) pull(params ...interface{}) {
 	earningClient, _ := investment.NewTemplateClient(investment.EarningsTemplate)
 	dividendsClient, _ := investment.NewTemplateClient(investment.DividendsTemplate)
 
-	retrieveData(ipoClient, i.ServiceStreaming)
-	retrieveData(earningClient, i.ServiceStreaming)
-	retrieveData(dividendsClient, i.ServiceStreaming)
+	i.retrieveData(ipoClient)
+	i.retrieveData(earningClient)
+	i.retrieveData(dividendsClient)
 }
 
-func retrieveData(templateClient *investment.TemplateClient, streaming Streaming) {
+func (i *Investment)retrieveData(templateClient *investment.TemplateClient) {
 	logger := *logging.GetLogger()
 	error := templateClient.FetchData()
 	if error != nil {
@@ -48,7 +49,7 @@ func retrieveData(templateClient *investment.TemplateClient, streaming Streaming
 		logger.Printf("Created Sample Task %d", sampleTaskId)
 		set[sampleTaskId] = member
 		time.Sleep(30 * time.Second)
-		streaming.ServiceChannel <- &StreamingMessage{Message: sampleTaskId}
+		i.StreamChannel <- &StreamingMessage{Message: sampleTaskId, ServiceName: consts.INVESTMENT_SERVICE_NAME}
 	}
 	for _, sampleTaskId := range *modified {
 		if _, exists := set[sampleTaskId]; exists {
@@ -57,6 +58,6 @@ func retrieveData(templateClient *investment.TemplateClient, streaming Streaming
 		logger.Printf("Modified Sample Task %d", sampleTaskId)
 		set[sampleTaskId] = member
 		time.Sleep(30 * time.Second)
-		streaming.ServiceChannel <- &StreamingMessage{Message: sampleTaskId}
+		i.StreamChannel <- &StreamingMessage{Message: sampleTaskId, ServiceName: consts.INVESTMENT_SERVICE_NAME}
 	}
 }

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/singerdmx/BulletJournal/daemon/consts"
 	"github.com/singerdmx/BulletJournal/daemon/persistence"
 	"time"
 
@@ -14,7 +15,7 @@ var log logging.Logger
 //Cleaner ...
 type Cleaner struct {
 	Settings         postgresql.ConnectionURL
-	ServiceStreaming Streaming
+	StreamChannel    chan<- *StreamingMessage
 }
 
 func (c *Cleaner) getExpiringGoogleCalendarProjects(tableName string) []persistence.GoogleCalendarProject {
@@ -80,7 +81,9 @@ func (c *Cleaner) renewExpiringGoogleCalendarWatch() {
 	googleCalendarProjects := c.getExpiringGoogleCalendarProjects("google_calendar_projects")
 	for _, googleCalendarProject := range googleCalendarProjects {
 		log.Printf("%q (ID: %d)\n", googleCalendarProject.Owner, googleCalendarProject.ID)
-		c.ServiceStreaming.ServiceChannel <- &StreamingMessage{Message: uint64(googleCalendarProject.ProjectID)}
+		c.StreamChannel <- &StreamingMessage{
+			Message: uint64(googleCalendarProject.ProjectID),
+			ServiceName: consts.CLEANER_SERVICE_NAME}
 	}
 }
 
@@ -115,9 +118,4 @@ func (c *Cleaner) Clean(maxRetentionTimeInDays int) {
 	c.deleteByExpirationTimeBefore("public_project_items")
 	c.deleteByAvailableBefore(`template.sample_tasks`)
 	c.renewExpiringGoogleCalendarWatch()
-}
-
-//Close ...Close channel
-func (c *Cleaner) Close() {
-	close(c.ServiceStreaming.ServiceChannel)
 }
