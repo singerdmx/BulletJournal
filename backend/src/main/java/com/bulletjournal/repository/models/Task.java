@@ -32,7 +32,7 @@ public class Task extends TaskModel {
         this.sampleTask = sampleTask;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sample_task_id", referencedColumnName = "id", nullable = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private SampleTask sampleTask;
