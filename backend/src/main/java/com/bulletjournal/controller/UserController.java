@@ -150,8 +150,6 @@ public class UserController {
      * @return days between given time to current time
      */
     private Long calculateDays(String time) {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM-dd-yyyy");
-
         ZonedDateTime start = ZonedDateTime.parse(time);
         return ChronoUnit.DAYS.between(start,
             ZonedDateTime.now().withZoneSameInstant(ZoneId.of("UTC")));
