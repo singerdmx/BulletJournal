@@ -107,9 +107,11 @@ public class MessagingService {
     private static final String APP_INVITER_AVATAR_PROPERTY = "appInviterAvatar";
 
     // Regex Pattern
-    private static final String EMAIL_REGEX_PATTERN = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$";
+    private static final Pattern EMAIL_PATTERN = Pattern
+        .compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$", Pattern.CASE_INSENSITIVE);
 
-    private static final String GROUP_INVITATION_TITLE_PATTERN = "(?s)(?<=##).*?(?=##)";
+    private static final Pattern GROUP_INVITATION_TITLE_PATTERN =  Pattern
+        .compile("(?s)(?<=##).*?(?=##)");
 
 
     @Autowired
@@ -288,8 +290,7 @@ public class MessagingService {
     }
 
     private boolean isValidEmailAddr(String email) {
-        Matcher emailMatcher =  Pattern.compile(EMAIL_REGEX_PATTERN, Pattern.CASE_INSENSITIVE)
-                                    .matcher(email);
+        Matcher emailMatcher = EMAIL_PATTERN.matcher(email);
         return emailMatcher.find();
     }
 
@@ -316,7 +317,7 @@ public class MessagingService {
         String inviter = notification.getOriginator();
         String title = notification.getTitle();
         String uid = notificationWithUID.getKey();
-        Matcher titleMatcher = Pattern.compile(GROUP_INVITATION_TITLE_PATTERN).matcher(title);
+        Matcher titleMatcher = GROUP_INVITATION_TITLE_PATTERN.matcher(title);
         List<String> matchResults = new ArrayList<>();
         String groupInviterAvatar = inviterAvatarMap.get(inviter);
         while (titleMatcher.find()) {
