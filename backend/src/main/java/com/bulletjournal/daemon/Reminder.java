@@ -138,15 +138,13 @@ public class Reminder {
         LOGGER.info("process record=" + record.toString());
         Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.getInterval(VERIFY_BUFF_SECONDS, reminderConfig.getTimeZone());
         taskRepository.findById(record.getId()).ifPresent(task -> {
-            List<ReminderRecord> records = DaoHelper.getReminderRecords(task, interval.getFirst(), interval.getSecond());
             Map<ReminderRecord, Task> map = DaoHelper.getReminderRecordMap(task, interval.getFirst(), interval.getSecond());
-            LOGGER.info("records = " + records);
             if (map.keySet().contains(record)) {
                 Task clonedTask = map.get(record);
                 LOGGER.info("Push notification record = " + record + "clonedTask = " + clonedTask);
                 messagingService.sendTaskDueNotificationAndEmailToUsers(Arrays.asList(clonedTask));
-                concurrentHashMap.remove(record);
             }
+            concurrentHashMap.remove(record);
         });
     }
 
