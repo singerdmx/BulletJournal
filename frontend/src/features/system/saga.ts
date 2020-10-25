@@ -24,7 +24,7 @@ import {projectLabelsUpdate} from "../label/actions";
 import {reloadReceived} from "../myself/actions";
 
 const fetchReminderFromLocal = () => {
-  const defaultReminders = [] as Task[];
+  const defaultReminders = [] as string[];
   const reminders = localStorage.getItem('reminders') || '';
   if (!reminders) {
     localStorage.setItem('reminders', JSON.stringify(defaultReminders));
@@ -33,9 +33,7 @@ const fetchReminderFromLocal = () => {
   return JSON.parse(reminders);
 };
 
-const taskNameMapper = (item: any) => item.id;
-
-const saveTasksIntoLocal = (tasks: Task[]) => {
+const saveTasksIntoLocal = (tasks: string[]) => {
   localStorage.clear();
   localStorage.setItem('reminders', JSON.stringify(tasks));
 };
@@ -84,26 +82,16 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
 
     let newComingTasks = [] as Task[];
     const now = new Date().getTime();
-    let localReminders = fetchReminderFromLocal();
-    let unExpiredLocalReminders = localReminders.filter((reminder: any) => {
-      return now - reminder.time < 2 * 60 * 60 * 1000;
+    const localReminders = fetchReminderFromLocal();
+    const unExpiredLocalReminders = localReminders.filter((reminder: string) => {
+      return now - parseInt(reminder.substring(reminder.indexOf('@') + 1)) < 2 * 60 * 60 * 1000;
     });
 
     if (remindingTaskEtag !== data.remindingTaskEtag) {
       newComingTasks = data.reminders
-        .map(taskNameMapper)
-        .filter(
-          (task: any) => !localReminders.map(taskNameMapper).includes(task)
-        )
-        .map((item: any) => ({
-          id: item,
-          time: now,
-        }));
+        .filter((task: Task) => !localReminders.includes(task.id + '@' + task.reminderDateTime));
       yield all([
         ...newComingTasks
-          .map((t) => {
-            return data.reminders.find((reminder: any) => reminder.id === t.id);
-          })
           .map((task: Task) => {
             const args: ArgsProps = {
               message: `"${task.name}" due at ${task.dueDate} ${task.dueTime ? task.dueTime : ''} (${task.timezone})`,
@@ -116,7 +104,7 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
             return call(notification.open, args);
           }),
       ]);
-      saveTasksIntoLocal([...newComingTasks, ...unExpiredLocalReminders]);
+      saveTasksIntoLocal([...newComingTasks.map(task => task.id + '@' + task.reminderDateTime), ...unExpiredLocalReminders]);
     }
 
     let tasksEtag = state.system.tasksEtag;

@@ -81,36 +81,27 @@ public class Reminder {
 
     /***
      * called by controller who created or updated task
-     * @param createdTask
+     * @param tasks
      */
-    public void generateTaskReminder(Task createdTask) {
-        Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.getInterval(SECONDS_OF_DAY, reminderConfig.getTimeZone());
-        taskRepository.findById(createdTask.getId()).ifPresent(task -> {
-            DaoHelper.getReminderRecords(task, interval.getFirst(), interval.getSecond()).forEach(e -> {
-                        if (!concurrentHashMap.containsKey(e)) {
-                            this.scheduleReminderRecords(reminderConfig.getLoadNextSeconds());
-                        }
-                    }
-            );
-        });
-
-    }
-
     public void generateTaskReminder(List<Task> tasks) {
         Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.getInterval(SECONDS_OF_DAY, reminderConfig.getTimeZone());
 
         tasks.forEach(t -> {
             LOGGER.info("generateTaskReminder" + t);
             DaoHelper.getReminderRecords(t, interval.getFirst(), interval.getSecond()).forEach(e -> {
-                LOGGER.info("getReminderRecords" + e);
+                        LOGGER.info("getReminderRecords {}", e);
                         if (!concurrentHashMap.containsKey(e)) {
-                            LOGGER.info("getReminderRecords in map" + e);
-                            this.scheduleReminderRecords(reminderConfig.getLoadNextSeconds());
+                            LOGGER.info("getReminderRecords in map: {}", e);
+                            long delay = e.getTimestampSecond() - ZonedDateTime.now().toEpochSecond() - SCHEDULE_BUFF_SECONDS;
+                            if (delay > 0) {
+                                LOGGER.info("Schedule New Job:" + e.toString() + "\t delay=" + delay);
+                                executorService.schedule(() -> this.process(e), delay, TimeUnit.SECONDS);
+                            }
                         }
+                        concurrentHashMap.put(e, t);
                     }
             );
         });
-
     }
 
     private void purge(long expiredSeconds) {

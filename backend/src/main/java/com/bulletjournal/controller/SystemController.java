@@ -30,6 +30,7 @@ import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 
@@ -162,7 +163,7 @@ public class SystemController {
             remindingTasks = this.taskDaoJpa.getRemindingTasks(username, ZonedDateTimeHelper.getNow());
             remindingTaskEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                     EtagGenerator.HashType.TO_HASHCODE,
-                    remindingTasks);
+                    remindingTasks.stream().map(t -> t.getId()).distinct().collect(Collectors.toList()));
             if (remindingTaskRequestEtag.isPresent() && remindingTaskEtag.equals(remindingTaskRequestEtag.get())) {
                 remindingTasks = null;
             }
