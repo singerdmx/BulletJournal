@@ -9,6 +9,7 @@ import com.bulletjournal.repository.TaskRepository;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.bulletjournal.util.CustomThreadFactory;
+import com.bulletjournal.util.MathUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,10 +93,10 @@ public class Reminder {
                         LOGGER.info("getReminderRecords {}", e);
                         if (!concurrentHashMap.containsKey(e)) {
                             LOGGER.info("getReminderRecords in map: {}", e);
-                            long delay = e.getTimestampSecond() - ZonedDateTime.now().toEpochSecond() - SCHEDULE_BUFF_SECONDS;
+                            long delay = getJitterDelay(e);
                             if (delay > 0) {
                                 LOGGER.info("Schedule New Job:" + e.toString() + "\t delay=" + delay);
-                                executorService.schedule(() -> this.process(e), delay, TimeUnit.SECONDS);
+                                executorService.schedule(() -> this.process(e), delay, TimeUnit.MILLISECONDS);
                             }
                         }
                         concurrentHashMap.put(e, t);
@@ -111,13 +112,20 @@ public class Reminder {
 
     private void scheduleReminderRecords(Pair<ZonedDateTime, ZonedDateTime> interval) {
         taskDaoJpa.getRemindingTasks(interval.getFirst(), interval.getSecond()).forEach((k, v) -> {
-            long delay = k.getTimestampSecond() - ZonedDateTime.now().toEpochSecond() - SCHEDULE_BUFF_SECONDS;
+            long delay = getJitterDelay(k);
             if (!concurrentHashMap.containsKey(k) && delay > 0) {
                 LOGGER.info("Schedule New Job:" + k.toString() + "\t delay=" + delay);
-                executorService.schedule(() -> this.process(k), delay, TimeUnit.SECONDS);
+                executorService.schedule(() -> this.process(k), delay, TimeUnit.MILLISECONDS);
                 concurrentHashMap.put(k, v);
             }
         });
+    }
+
+    private long getJitterDelay(ReminderRecord reminderRecord) {
+        long delay = reminderRecord.getTimestampSecond() - ZonedDateTime.now().toEpochSecond();
+        delay *= 1000;
+        delay -= MathUtil.getRandomNumber(200L, SCHEDULE_BUFF_SECONDS * 1000);
+        return delay;
     }
 
     private void scheduleReminderRecords(long seconds) {
@@ -134,8 +142,9 @@ public class Reminder {
                 Task clonedTask = map.get(record);
                 LOGGER.info("Push notification record = " + record + "clonedTask = " + clonedTask);
                 messagingService.sendTaskDueNotificationAndEmailToUsers(Arrays.asList(clonedTask));
+            } else {
+                concurrentHashMap.remove(record);
             }
-            concurrentHashMap.remove(record);
         });
     }
 
