@@ -3,6 +3,9 @@ package com.bulletjournal.util;
 import java.util.Random;
 
 public class MathUtil {
+
+    private static final Random RND = new Random();
+
     public static double round(double value, int places) {
         if (places < 0) {
             throw new IllegalArgumentException();
@@ -15,8 +18,7 @@ public class MathUtil {
     }
 
     public static long getRandomNumber(long min, long max) {
-        Random random = new Random();
-        return random.longs(min, max)
+        return RND.longs(min, max + 1)
                 .findFirst()
                 .getAsLong();
     }

@@ -5,7 +5,8 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
-import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
+import com.bulletjournal.daemon.Reminder;
+import com.bulletjournal.daemon.models.ReminderRecord;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
@@ -29,6 +30,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -81,6 +83,9 @@ public class SystemController {
 
     @Autowired
     private ProjectItemDaos projectItemDaos;
+
+    @Autowired
+    private Reminder reminder;
 
     @GetMapping(UPDATES_ROUTE)
     public SystemUpdates getUpdates(@RequestParam(name = "targets", required = false) String targets,
@@ -160,12 +165,20 @@ public class SystemController {
         }
 
         if (targetEtags == null || targetEtags.contains("taskReminders")) {
-            remindingTasks = this.taskDaoJpa.getRemindingTasks(username, ZonedDateTimeHelper.getNow());
+            final ZonedDateTime startTime = ZonedDateTime.now().minusHours(2);
+            final ZonedDateTime endTime = ZonedDateTime.now().plusMinutes(2);
+            List<ReminderRecord> reminderRecords = this.reminder.getTasksAssignedThatNeedsWebPopupReminder(
+                    username, startTime, endTime);
             remindingTaskEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                     EtagGenerator.HashType.TO_HASHCODE,
-                    remindingTasks.stream().map(t -> t.getId()).distinct().collect(Collectors.toList()));
-            if (remindingTaskRequestEtag.isPresent() && remindingTaskEtag.equals(remindingTaskRequestEtag.get())) {
-                remindingTasks = null;
+                    reminderRecords.stream()
+                            .map(ReminderRecord::getId)
+                            .distinct()
+                            .collect(Collectors.toList()));
+            if (!remindingTaskRequestEtag.isPresent() || !remindingTaskEtag.equals(remindingTaskRequestEtag.get())) {
+                remindingTasks = this.labelDaoJpa.getLabelsForProjectItemList(
+                        this.reminder.getRemindingTasks(reminderRecords, startTime, endTime)
+                                .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList()));
             }
         }
 

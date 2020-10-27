@@ -252,39 +252,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     /**
-     * Get assignee's reminding tasks and recurring reminding tasks from database.
-     * <p>
-     * Reminding tasks qualifications:
-     * 1. Reminding Time is before current time.
-     * 2. Starting time plus 10 minutes buffer is after the current time.
-     * <p>
-     * [Reminding Time] <= Now <= [Starting Time + 10 mins]
-     *
-     * @param assignee the username of task assignee
-     * @param now      the ZonedDateTime object of the current time
-     * @return List<com.bulletjournal.controller.models.Task> - a list of tasks to
-     * be reminded
-     */
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<com.bulletjournal.controller.models.Task> getRemindingTasks(String assignee, ZonedDateTime now) {
-        Timestamp currentTime = Timestamp.from(now.toInstant());
-        // Subtract current time by 10 minutes to compare with task's starting time
-        Timestamp startTime = Timestamp.from(now.minusMinutes(REMINDING_TASK_BUFFER_IN_MINS).toInstant());
-
-        // Fetch regular reminding tasks
-        List<com.bulletjournal.controller.models.Task> regularTasks = this.taskRepository
-                .findRemindingTasks(assignee, currentTime.toString(), startTime.toString()).stream()
-                .map(t -> t.toPresentationModel()).collect(Collectors.toList());
-
-        // Fetch recurring reminding tasks
-        List<com.bulletjournal.controller.models.Task> recurringTask = getRecurringTaskNeedReminding(assignee, now);
-
-        // Append recurring reminding tasks to regular reminding tasks
-        regularTasks.addAll(recurringTask);
-        return this.labelDaoJpa.getLabelsForProjectItemList(regularTasks);
-    }
-
-    /**
      * Get user's tasks between the request start time and request end time.
      *
      * @param assignee  the username of task assignee

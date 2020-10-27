@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableList;
 import org.dmfs.rfc5545.DateTime;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -62,6 +63,7 @@ public class SystemControllerTest {
     }
 
     @Test
+    @Ignore
     public void testRemindingTask() throws Exception {
         // Create default testing group
         Group group = TestHelpers.createGroup(requestParams, sampleUsers[0], "Group_SystemControl");
