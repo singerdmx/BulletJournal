@@ -144,6 +144,7 @@ function* SystemUpdate(action: PayloadAction<UpdateSystem>) {
       })
     );
   } catch (error) {
+    localStorage.removeItem('reminders'); //TODO: remove
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
     } else {
