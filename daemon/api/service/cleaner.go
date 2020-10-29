@@ -34,7 +34,7 @@ func (c *Cleaner) getExpiringGoogleCalendarProjects(tableName string) []persiste
 	var googleCalendarProjects []persistence.GoogleCalendarProject
 	err = sess.Collection(tableName).Find(expirationTimeBeforeCond).All(&googleCalendarProjects)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
 
 	return googleCalendarProjects
