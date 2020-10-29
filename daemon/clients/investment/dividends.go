@@ -1,10 +1,12 @@
 package investment
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"time"
 
+	"github.com/go-resty/resty/v2"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
 
 	"github.com/pkg/errors"
@@ -40,9 +42,9 @@ type Dividends struct {
 	Updated        int    `json:"updated"`
 }
 
-func NewDividendsClient() (*TemplateClient, error) {
+func NewDividendsClient(ctx context.Context, sampleTaskDao *persistence.SampleTaskDao, restClient *resty.Client) (*TemplateClient, error) {
 	c := DividendsClient{
-		BaseTemplateClient: NewBaseTemplateClient(),
+		BaseTemplateClient: NewBaseTemplateClient(ctx, sampleTaskDao, restClient),
 	}
 	return &TemplateClient{&c}, nil
 }

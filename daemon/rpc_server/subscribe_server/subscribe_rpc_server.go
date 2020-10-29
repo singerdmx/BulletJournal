@@ -5,14 +5,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"strconv"
 	"sync"
 	"time"
 
+	"github.com/go-resty/resty/v2"
 	daemon "github.com/singerdmx/BulletJournal/daemon/api/service"
 	"github.com/singerdmx/BulletJournal/daemon/config"
 	"github.com/singerdmx/BulletJournal/daemon/consts"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
+	"github.com/singerdmx/BulletJournal/daemon/persistence"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types"
 	"google.golang.org/grpc/codes"
@@ -149,6 +152,8 @@ func NewServer(ctx context.Context) *SubscribeRpcServer {
 	serviceConfig := config.GetConfig()
 
 	// Get clients
+	db := persistence.NewDB(serviceConfig)
+	restClient := resty.New()
 	// TODO: please uncomment following clients when needed
 	/*
 		redisClient := persistence.GetRedisClient(serviceConfig)
@@ -160,6 +165,10 @@ func NewServer(ctx context.Context) *SubscribeRpcServer {
 
 	// Get DAOs
 	// TODO: please uncomment following DAOs when needed
+	sampleTaskDao, err := persistence.NewSampleTaskDao(ctx, db)
+	if err != nil {
+		log.Fatal("DAO for Template init failed: ", err)
+	}
 	/*
 		etagDao := persistence.NewEtagDao(ctx, redisClient)
 		groupDao := persistence.NewGroupDao(ctx)
@@ -182,7 +191,7 @@ func NewServer(ctx context.Context) *SubscribeRpcServer {
 		},
 	}
 	reminder := daemon.Reminder{}
-	investment := daemon.Investment{StreamChannel: fanInChannel}
+	investment := daemon.NewInvestment(fanInChannel, ctx, sampleTaskDao, restClient)
 	/*
 		messageService := daemon.NewMessageService(groupDao, joinGroupInvitationDao, mailClient)
 	*/
@@ -192,7 +201,7 @@ func NewServer(ctx context.Context) *SubscribeRpcServer {
 		FanInChannel:      fanInChannel,
 		CleanerService:    &cleaner,
 		ReminderService:   &reminder,
-		InvestmentService: &investment,
+		InvestmentService: investment,
 		sessionProvider: &sessionProvider{
 			sessionMap:  map[string]*list.Element{},
 			sessionList: list.List{},

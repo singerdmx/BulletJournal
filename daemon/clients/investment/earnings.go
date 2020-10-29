@@ -1,10 +1,12 @@
 package investment
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"time"
 
+	"github.com/go-resty/resty/v2"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
 
 	"github.com/pkg/errors"
@@ -54,9 +56,9 @@ const (
 	RFC3339                   = "2006-01-02T15:04:05Z07:00"
 )
 
-func NewEarningsClient() (*TemplateClient, error) {
+func NewEarningsClient(ctx context.Context, sampleTaskDao *persistence.SampleTaskDao, restClient *resty.Client) (*TemplateClient, error) {
 	c := EarningClient{
-		BaseTemplateClient: NewBaseTemplateClient(),
+		BaseTemplateClient: NewBaseTemplateClient(ctx, sampleTaskDao, restClient),
 	}
 	return &TemplateClient{&c}, nil
 }

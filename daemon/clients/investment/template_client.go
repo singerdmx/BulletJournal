@@ -1,9 +1,13 @@
 package investment
 
 import (
+	"context"
 	"fmt"
+
+	"github.com/go-resty/resty/v2"
 	"github.com/pkg/errors"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
+	"github.com/singerdmx/BulletJournal/daemon/persistence"
 )
 
 var log logging.Logger
@@ -20,13 +24,13 @@ type (
 )
 
 const (
-	EarningsTemplate = "Earnings"
+	EarningsTemplate  = "Earnings"
 	DividendsTemplate = "Dividends"
-	IPOTemplate = "IPO"
+	IPOTemplate       = "IPO"
 )
 
-func NewTemplateClient(TemplateName string) (*TemplateClient, error) {
-	var f func() (*TemplateClient, error)
+func NewTemplateClient(TemplateName string, ctx context.Context, sampleTaskDao *persistence.SampleTaskDao, restClient *resty.Client) (*TemplateClient, error) {
+	var f func(ctx context.Context, sampleTaskDao *persistence.SampleTaskDao, restClient *resty.Client) (*TemplateClient, error)
 	switch TemplateName {
 	case EarningsTemplate:
 		f = NewEarningsClient
@@ -38,10 +42,9 @@ func NewTemplateClient(TemplateName string) (*TemplateClient, error) {
 		return nil, errors.Wrap(errors.New("Template not implemented"),
 			fmt.Sprintf("Template %s not implement", TemplateName))
 	}
-	TemplateClientInstance, err := f()
+	TemplateClientInstance, err := f(ctx, sampleTaskDao, restClient)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("cannot create template for %s", TemplateName))
 	}
 	return TemplateClientInstance, nil
 }
-
