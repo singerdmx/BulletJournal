@@ -48,7 +48,6 @@ func main() {
 	// even when server is slow or there is no available sessions temporarily
 	fanInChannel := make(chan *daemon.StreamingMessage, RPC_SERVER_BUFFER_SIZE)
 	subscribeRpcServer := subscribe_server.NewServer(fanInChannel)
-	subscribeRpcServer.StartDispatcher()
 
 	rpcPort := ":" + configObj.RPCPort
 	listener, err := net.Listen("tcp", rpcPort)
@@ -75,6 +74,7 @@ func main() {
 			log.Fatalf("rpc server failed to serve: %v", err)
 		}
 	}()
+	subscribeRpcServer.StartDispatcher()
 
 	go func() {
 		logger.Infof("http server running at port [%v]", configObj.HttpPort)

@@ -59,6 +59,7 @@ services:
       SENDER_EMAIL: "${SENDER_EMAIL}"
       SENDER_NAME: "${SENDER_NAME}"
       POLYGON_API_KEY: "${POLYGON_API_KEY}"
+      RPC_CLIENT_ID: "${RPC_CLIENT_ID}"
     volumes:
       - $HOME/docker/volumes/log:/var/log
       - $HOME/docker/volumes/etc/key:/etc/key

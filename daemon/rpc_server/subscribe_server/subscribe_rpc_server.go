@@ -151,7 +151,7 @@ func NewServer(fanInChannel chan *daemon.StreamingMessage) *SubscribeRpcServer {
 // via one of registered RPC sessions, we pick next available session in a round robin manner
 func (s *SubscribeRpcServer) StartDispatcher() {
 	go func() {
-		logger.Infof("Start subscribe RPC dispatcher go routine")
+		logger.Infof("Start subscribing RPC dispatcher go routine")
 		for msg := range s.fanInChannel {
 			session := s.sessionProvider.getNextSession()
 			switch msg.ServiceName {
