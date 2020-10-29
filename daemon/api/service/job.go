@@ -1,14 +1,15 @@
 package service
 
 import (
-	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"time"
+
+	"github.com/singerdmx/BulletJournal/daemon/logging"
 )
 
 type Job struct {
-	Cleaner Cleaner
-	Investment Investment
-	Reminder Reminder
+	Cleaner    *Cleaner
+	Investment *Investment
+	Reminder   *Reminder
 }
 
 func (r *Job) Run(params ...interface{}) {
