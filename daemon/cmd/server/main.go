@@ -2,6 +2,14 @@ package main
 
 import (
 	"context"
+	"log"
+	"net"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/singerdmx/BulletJournal/daemon/api/middleware"
 	daemon "github.com/singerdmx/BulletJournal/daemon/api/service"
@@ -11,18 +19,6 @@ import (
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services"
 	scheduler "github.com/zywangzy/JobScheduler"
 	"google.golang.org/grpc"
-	"log"
-	"net"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
-	"upper.io/db.v3/postgresql"
-)
-
-const (
-	RPC_SERVER_BUFFER_SIZE = 200
 )
 
 var logger logging.Logger
@@ -39,15 +35,12 @@ func main() {
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, syscall.SIGTERM, syscall.SIGINT)
 
-	configObj := config.GetConfig()
-
 	/***********************
 	 *  Start RPC server
 	 ***********************/
-	// use a buffered channel so that services can send messages to RPC server
-	// even when server is slow or there is no available sessions temporarily
-	fanInChannel := make(chan *daemon.StreamingMessage, RPC_SERVER_BUFFER_SIZE)
-	subscribeRpcServer := subscribe_server.NewServer(fanInChannel)
+	subscribeRpcServer := subscribe_server.NewServer(ctx)
+
+	configObj := subscribeRpcServer.ServiceConfig
 
 	rpcPort := ":" + configObj.RPCPort
 	listener, err := net.Listen("tcp", rpcPort)
@@ -84,18 +77,8 @@ func main() {
 		}
 	}()
 
-
 	jobScheduler := scheduler.NewJobScheduler()
 	jobScheduler.Start()
-	cleaner := daemon.Cleaner{
-		StreamChannel: fanInChannel,
-		Settings: postgresql.ConnectionURL{
-			Host:     configObj.Host + ":" + configObj.DBPort,
-			Database: configObj.Database,
-			User:     configObj.Username,
-			Password: configObj.Password,
-		},
-	}
 
 	PST, _ := time.LoadLocation("America/Los_Angeles")
 	logger.Infof("PST [%T] [%v]", PST, PST)
@@ -104,8 +87,9 @@ func main() {
 	start := time.Date(year, month, day, 0, 0, 0, 0, PST)
 
 	daemonBackgroundJob := daemon.Job{
-		Cleaner: cleaner, Reminder: daemon.Reminder{},
-		Investment: daemon.Investment{StreamChannel: fanInChannel},
+		Cleaner:    subscribeRpcServer.CleanerService,
+		Reminder:   subscribeRpcServer.ReminderService,
+		Investment: subscribeRpcServer.InvestmentService,
 	}
 	logger.Infof("The next daemon job will start at %v", start.Format(time.RFC3339))
 	logger.Infof("And Now it's %v", time.Now().Format(time.RFC3339))
@@ -128,7 +112,7 @@ func main() {
 
 	<-shutdown
 	logger.Infof("Shutdown signal received")
-	close(fanInChannel)
+	close(subscribeRpcServer.FanInChannel)
 	//jobScheduler.Stop()
 	logger.Infof("JobScheduler stopped")
 	subscribeRpcServer.Stop()

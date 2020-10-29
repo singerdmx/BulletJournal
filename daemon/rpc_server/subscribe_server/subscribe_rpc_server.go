@@ -5,20 +5,27 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+	"strconv"
+	"sync"
+	"time"
+
+	"github.com/go-resty/resty/v2"
 	daemon "github.com/singerdmx/BulletJournal/daemon/api/service"
+	"github.com/singerdmx/BulletJournal/daemon/config"
 	"github.com/singerdmx/BulletJournal/daemon/consts"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
+	"github.com/singerdmx/BulletJournal/daemon/persistence"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/services"
 	"github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"strconv"
-	"sync"
-	"time"
+	"upper.io/db.v3/postgresql"
 )
 
 const (
 	DEFAULT_RETRY_INTERVAL = 5 * time.Second // in second
+	RPC_SERVER_BUFFER_SIZE = 200
 )
 
 var (
@@ -26,25 +33,33 @@ var (
 )
 
 type SubscribeRpcServer struct {
+	// Configs
+	ServiceConfig *config.Config
+	// Clients
+	// DAOs
+	// Channel
+	FanInChannel chan *daemon.StreamingMessage
+	// Services
+	CleanerService    *daemon.Cleaner
+	ReminderService   *daemon.Reminder
+	InvestmentService *daemon.Investment
+	sessionProvider   *sessionProvider
 	services.UnimplementedDaemonServer
-	fanInChannel chan *daemon.StreamingMessage
-	sessionProvider *sessionProvider
 }
 
 type streamHandle struct {
-	stream *services.Daemon_SubscribeNotificationServer
-	clientId string
+	stream    *services.Daemon_SubscribeNotificationServer
+	clientId  string
 	errorChan chan error
 }
 
 type sessionProvider struct {
 	// store *streamHandle in list actually
-	sessionMap map[string] *list.Element
+	sessionMap  map[string]*list.Element
 	sessionList list.List
 	currSession *list.Element
-	mux sync.Mutex
+	mux         sync.Mutex
 }
-
 
 func (provider *sessionProvider) registerSession(
 	clientId string,
@@ -63,7 +78,6 @@ func (provider *sessionProvider) registerSession(
 		return errorChan, nil
 	}
 }
-
 
 // return next established session (stream) in a round robin manner
 func (provider *sessionProvider) getNextSession() *streamHandle {
@@ -86,7 +100,6 @@ func (provider *sessionProvider) getNextSession() *streamHandle {
 	return provider.currSession.Value.(*streamHandle)
 }
 
-
 // remove session, explicitly close connection from server side by send an error
 // to error channel, this will make the RPC call to return in error state
 func (provider *sessionProvider) terminateSession(clientId string, reason string) error {
@@ -107,13 +120,11 @@ func (provider *sessionProvider) terminateSession(clientId string, reason string
 	return nil
 }
 
-
 func (provider *sessionProvider) terminateAllSessions() {
 	for clientId, _ := range provider.sessionMap {
 		provider.terminateSession(clientId, "Terminate all connected sessions")
 	}
 }
-
 
 func (provider *sessionProvider) getSessionDump() string {
 	ret := "\n\t------- Session Provider dump: --------"
@@ -133,30 +144,81 @@ func (provider *sessionProvider) getSessionDump() string {
 	return ret
 }
 
-
-func NewServer(fanInChannel chan *daemon.StreamingMessage) *SubscribeRpcServer {
+func NewServer(ctx context.Context) *SubscribeRpcServer {
 	logger = *logging.GetLogger()
 	logger.Infof("Create SubscribeRpcServer")
+
+	// Get config
+	serviceConfig := config.GetConfig()
+
+	// Get clients
+	db := persistence.NewDB(serviceConfig)
+	restClient := resty.New()
+	// TODO: please uncomment following clients when needed
+	/*
+		redisClient := persistence.GetRedisClient(serviceConfig)
+		mailClient, err := persistence.GetMailClient()
+		if err != nil {
+			log.Printf("Failed to initialize mail client: %v", err)
+		}
+	*/
+
+	// Get DAOs
+	// TODO: please uncomment following DAOs when needed
+	sampleTaskDao, err := persistence.NewSampleTaskDao(ctx, db)
+	if err != nil {
+		log.Fatal("DAO for Template init failed: ", err)
+	}
+	/*
+		etagDao := persistence.NewEtagDao(ctx, redisClient)
+		groupDao := persistence.NewGroupDao(ctx)
+		joinGroupInvitationDao := persistence.NewJoinGroupInvitationDao(ctx, redisClient)
+	*/
+
+	// use a buffered channel so that services can send messages to RPC server
+	// even when server is slow or there is no available sessions temporarily
+	fanInChannel := make(chan *daemon.StreamingMessage, RPC_SERVER_BUFFER_SIZE)
+
+	// Get services
+	// TODO: please uncomment following services when needed
+	cleaner := daemon.Cleaner{
+		StreamChannel: fanInChannel,
+		Settings: postgresql.ConnectionURL{
+			Host:     serviceConfig.Host + ":" + serviceConfig.DBPort,
+			Database: serviceConfig.Database,
+			User:     serviceConfig.Username,
+			Password: serviceConfig.Password,
+		},
+	}
+	reminder := daemon.Reminder{}
+	investment := daemon.NewInvestment(fanInChannel, ctx, sampleTaskDao, restClient)
+	/*
+		messageService := daemon.NewMessageService(groupDao, joinGroupInvitationDao, mailClient)
+	*/
+
 	return &SubscribeRpcServer{
-		fanInChannel: fanInChannel,
+		ServiceConfig:     serviceConfig,
+		FanInChannel:      fanInChannel,
+		CleanerService:    &cleaner,
+		ReminderService:   &reminder,
+		InvestmentService: investment,
 		sessionProvider: &sessionProvider{
-			sessionMap: map[string]*list.Element{},
+			sessionMap:  map[string]*list.Element{},
 			sessionList: list.List{},
 		},
 	}
 }
-
 
 // Start a go routine to dispatch all incoming messages, each of them is going to be sent
 // via one of registered RPC sessions, we pick next available session in a round robin manner
 func (s *SubscribeRpcServer) StartDispatcher() {
 	go func() {
 		logger.Infof("Start subscribing RPC dispatcher go routine")
-		for msg := range s.fanInChannel {
+		for msg := range s.FanInChannel {
 			session := s.sessionProvider.getNextSession()
 			switch msg.ServiceName {
 			case consts.CLEANER_SERVICE_NAME:
-				if err :=s.sendCleanerServiceNotification(session, msg); err != nil {
+				if err := s.sendCleanerServiceNotification(session, msg); err != nil {
 					s.handleDispatchingError(session, msg)
 				}
 			case consts.INVESTMENT_SERVICE_NAME:
@@ -173,7 +235,6 @@ func (s *SubscribeRpcServer) StartDispatcher() {
 	}()
 }
 
-
 func (s *SubscribeRpcServer) handleDispatchingError(session *streamHandle, msg *daemon.StreamingMessage) {
 	if err := s.sessionProvider.terminateSession(
 		session.clientId, "Failed to send message through this session, close it."); err != nil {
@@ -181,25 +242,22 @@ func (s *SubscribeRpcServer) handleDispatchingError(session *streamHandle, msg *
 	}
 	logger.Infof("Failed to send message: {%v, %v}, put into the queue again",
 		msg.ServiceName, msg.Message)
-	s.fanInChannel <- msg
+	s.FanInChannel <- msg
 }
-
 
 func (s *SubscribeRpcServer) dumpState() {
-	logger.Infof("\n=========== Dump SubscribeRpcServer State ===========\n" +
-	             "\tfanInBuffer size: %v" +
-	             "\n%v" +
-				 "\n======================= Done =========================",
-	             len(s.fanInChannel), s.sessionProvider.getSessionDump())
+	logger.Infof("\n=========== Dump SubscribeRpcServer State ===========\n"+
+		"\tfanInBuffer size: %v"+
+		"\n%v"+
+		"\n======================= Done =========================",
+		len(s.FanInChannel), s.sessionProvider.getSessionDump())
 }
-
 
 func (s *SubscribeRpcServer) Stop() {
 	logger.Infof("Stop SubscribeRpcServer")
 	s.dumpState()
 	s.sessionProvider.terminateAllSessions()
 }
-
 
 func (s *SubscribeRpcServer) sendInvestmentServiceNotification(
 	handle *streamHandle,
@@ -215,7 +273,6 @@ func (s *SubscribeRpcServer) sendInvestmentServiceNotification(
 	)
 }
 
-
 func (s *SubscribeRpcServer) sendCleanerServiceNotification(
 	handle *streamHandle,
 	msg *daemon.StreamingMessage,
@@ -224,20 +281,17 @@ func (s *SubscribeRpcServer) sendCleanerServiceNotification(
 	return (*handle.stream).Send(
 		&types.NotificationStreamMsg{
 			Body: &types.NotificationStreamMsg_RenewGoogleCalendarWatchMsg{
-				RenewGoogleCalendarWatchMsg:
-					&types.SubscribeRenewGoogleCalendarWatchMsg{GoogleCalendarProjectId: projectId},
+				RenewGoogleCalendarWatchMsg: &types.SubscribeRenewGoogleCalendarWatchMsg{GoogleCalendarProjectId: projectId},
 			},
 		},
 	)
 }
-
 
 func (s *SubscribeRpcServer) HealthCheck(
 	ctx context.Context, request *types.HealthCheckRequest,
 ) (*types.HealthCheckResponse, error) {
 	return &types.HealthCheckResponse{}, nil
 }
-
 
 func (s *SubscribeRpcServer) SubscribeNotification(
 	requestMsg *types.SubscribeNotificationMsg,

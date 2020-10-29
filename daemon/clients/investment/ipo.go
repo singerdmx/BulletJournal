@@ -1,10 +1,12 @@
 package investment
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"time"
 
+	"github.com/go-resty/resty/v2"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
 
 	"github.com/pkg/errors"
@@ -48,9 +50,9 @@ type IPO struct {
 
 const layoutISO = "2006-01-02"
 
-func NewIPOClient() (*TemplateClient, error) {
+func NewIPOClient(ctx context.Context, sampleTaskDao *persistence.SampleTaskDao, restClient *resty.Client) (*TemplateClient, error) {
 	c := IPOClient{
-		BaseTemplateClient: NewBaseTemplateClient(),
+		BaseTemplateClient: NewBaseTemplateClient(ctx, sampleTaskDao, restClient),
 	}
 	return &TemplateClient{&c}, nil
 }

@@ -1,6 +1,7 @@
 package investment
 
 import (
+	"context"
 	"strconv"
 	"time"
 
@@ -9,19 +10,16 @@ import (
 )
 
 type BaseTemplateClient struct {
+	ctx        context.Context
 	sampleDao  *persistence.SampleTaskDao
 	restClient *resty.Client
 }
 
-func NewBaseTemplateClient() BaseTemplateClient {
-	dao, err := persistence.NewSampleTaskDao()
-	if err != nil {
-		log.Fatal("DAO for Template init failed: ", err)
-		return BaseTemplateClient{}
-	}
+func NewBaseTemplateClient(ctx context.Context, sampleTaskDao *persistence.SampleTaskDao, restClient *resty.Client) BaseTemplateClient {
 	return BaseTemplateClient{
-		sampleDao:  dao,
-		restClient: resty.New(),
+		ctx:        ctx,
+		sampleDao:  sampleTaskDao,
+		restClient: restClient,
 	}
 }
 
