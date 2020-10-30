@@ -1,11 +1,13 @@
 version: '2.1'
 services:
   auth-proxy:
-    image: xcode1024/auth-proxy:v72
+    image: xcode1024/auth-proxy:v73
     container_name: auth-proxy
     ports:
       - "80:80"
       - "443:443"
+    environment:
+      AUTH_COOKIE_SECRET: "${AUTH_COOKIE_SECRET}"
     volumes:
       - $HOME/docker/auth_proxy/bin:/tmp
       - $HOME/docker/auth_proxy/log:/var/log
