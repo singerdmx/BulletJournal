@@ -162,8 +162,9 @@ public class QueryController {
                 shareItemIds.getSharedNoteIds(), shareItemIds.getSharedTaskIds());
 
         // Batch remove all invalid results from ElasticSearch using notification event queue
-        notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(
-                invalidResults.stream().map(SearchIndex::getId).collect(Collectors.toList())));
+        // TODO: turn it back
+        // notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(
+        //        invalidResults.stream().map(SearchIndex::getId).collect(Collectors.toList())));
 
         SearchResult validSearchResult = new SearchResult();
         validSearchResult.setScrollId(scrollId);
