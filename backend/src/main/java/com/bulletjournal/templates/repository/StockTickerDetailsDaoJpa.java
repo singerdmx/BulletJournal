@@ -56,7 +56,7 @@ public class StockTickerDetailsDaoJpa {
             resp = this.stockApiClient.getCompany(symbol);
         } catch (Exception ex) {
             LOGGER.info("Unable to find StockTickerDetails for {}", symbol);
-            LOGGER.error("stockApiClient#getCompany failed", ex);
+            // LOGGER.error("stockApiClient#getCompany failed", ex);
             return null;
         }
 
