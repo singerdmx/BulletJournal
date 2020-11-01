@@ -95,6 +95,9 @@ public class StockTickerDetailsDaoJpa {
             case "financial services": //JPM
                 selectionId = 254L;
                 break;
+            case "utilities":
+                selectionId = 260L;
+                break;
             default:
                 throw new BadRequestException("Sector " + sector + " not found");
         }
