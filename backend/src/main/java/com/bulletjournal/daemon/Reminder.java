@@ -85,6 +85,7 @@ public class Reminder {
         ZonedDateTime start = ZonedDateTime.now().minus(reminderConfig.getLoadPrevSeconds(), ChronoUnit.SECONDS);
         ZonedDateTime end = ZonedDateTime.now().plus(reminderConfig.getLoadNextSeconds(), ChronoUnit.SECONDS);
         this.scheduleReminderRecords(Pair.of(start, end));
+        LOGGER.info("initLoad completed");
     }
 
     private void cronJob() {
