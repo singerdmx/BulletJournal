@@ -147,7 +147,7 @@ func newZapLogger(config Configuration) (*Logger, error) {
 		level := getZapLevel(config.FileLevel)
 		writer := zapcore.AddSync(&lumberjack.Logger{
 			Filename:   config.FileLocation,
-			MaxSize:    100,
+			MaxSize:    10,
 			MaxBackups: 2,
 			MaxAge:     28,
 			Compress:   true,
