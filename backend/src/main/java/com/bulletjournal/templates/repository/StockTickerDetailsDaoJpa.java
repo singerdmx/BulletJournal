@@ -1,6 +1,5 @@
 package com.bulletjournal.templates.repository;
 
-import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.templates.clients.StockApiClient;
 import com.bulletjournal.templates.controller.model.StockTickerDetails;
 import com.bulletjournal.templates.repository.model.Selection;
