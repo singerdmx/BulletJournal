@@ -83,13 +83,21 @@ public class StockTickerDetails {
         if (json.has("marketcap")) {
             marketCap = json.get("marketcap").getAsLong();
         }
+        Long employees = null;
+        if (json.has("employees")) {
+            employees = json.get("employees").getAsLong();
+        }
+        String hqState = null;
+        if (json.has("hq_state")) {
+            hqState = json.get("hq_state").getAsString();
+        }
 
         return new com.bulletjournal.templates.controller.model.StockTickerDetails(ticker, details, selection.toPresentationModel(),
                 json.get("logo").getAsString(),
                 json.get("country").getAsString(),
                 json.get("industry").getAsString(),
                 marketCap,
-                json.get("employees").getAsLong(),
+                employees,
                 json.get("phone").getAsString(),
                 json.get("ceo").getAsString(),
                 json.get("url").getAsString(),
@@ -98,7 +106,7 @@ public class StockTickerDetails {
                 json.get("name").getAsString(),
                 json.get("exchangeSymbol").getAsString(),
                 json.get("hq_address").getAsString(),
-                json.get("hq_state").getAsString(),
+                hqState,
                 json.get("hq_country").getAsString(),
                 GSON.fromJson(json.get("tags").getAsJsonArray(), String[].class),
                 GSON.fromJson(json.get("similar").getAsJsonArray(), String[].class)

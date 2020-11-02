@@ -74,17 +74,28 @@ public abstract class InvestmentUtil {
         String marketCapDelta = "";
         String marketCapHtml = "";
         String tickerDetailsHtml = "";
+        String employeesDelta = "";
+        String employeesHtml = "";
+        String hqStateDelta = "";
+        String hqStateHtml = "";
 
         if (stockTickerDetails.getMarketCap() != null) {
             marketCapDelta = ",{\"attributes\":{\"bold\":true},\"insert\":\"MarketCap\"},{\"insert\":\": " + stockTickerDetails.getMarketCap() + "\\n\"}";
             marketCapHtml = "<p><strong>MarketCap</strong>: " + stockTickerDetails.getMarketCap() + "</p>";
         }
+        if (stockTickerDetails.getEmployees() != null) {
+            employeesDelta = ",{\"attributes\":{\"bold\":true},\"insert\":\"Employees\"},{\"insert\":\": " + stockTickerDetails.getEmployees() + "\\n\"}";
+            employeesHtml = "<p><strong>Employees</strong>: " + stockTickerDetails.getEmployees() + "</p>";
+        }
+        if (stockTickerDetails.getHqState() != null) {
+            hqStateDelta = ",{\"attributes\":{\"bold\":true},\"insert\":\"HQ State\"},{\"insert\":\": " + stockTickerDetails.getHqState() + "\\n\"}";
+            hqStateHtml = "<p><strong>HQ State</strong>: " + stockTickerDetails.getHqState() + "</p>";
+        }
         tickerDetailsDelta =
                 ",{\"attributes\":{\"width\":\"72\"},\"insert\":{\"image\":\"" + stockTickerDetails.getLogo() + "\"}},{\"insert\":\"\\n\"}" +
                         ",{\"attributes\":{\"bold\":true},\"insert\":\"Country\"},{\"insert\":\": " + stockTickerDetails.getCountry() + "\\n\"}" +
                         ",{\"attributes\":{\"bold\":true},\"insert\":\"Industry\"},{\"insert\":\": " + stockTickerDetails.getIndustry() + "\\n\"}" +
-                        "MARKET_CAP_DELTA" +
-                        ",{\"attributes\":{\"bold\":true},\"insert\":\"Employees\"},{\"insert\":\": " + stockTickerDetails.getEmployees() + "\\n\"}" +
+                        "MARKET_CAP_DELTA" + "EMPLOYEES_DELTA" +
                         ",{\"attributes\":{\"bold\":true},\"insert\":\"Phone\"},{\"insert\":\": " + stockTickerDetails.getPhone() + "\\n\"}" +
                         ",{\"attributes\":{\"bold\":true},\"insert\":\"CEO\"},{\"insert\":\": " + stockTickerDetails.getCeo() + "\\n\"}" +
                         ",{\"attributes\":{\"bold\":true},\"insert\":\"URL\"},{\"insert\":\": \"},{\"attributes\":{\"a\":\"" + stockTickerDetails.getUrl() + "\"},\"insert\":\"" + stockTickerDetails.getUrl() + "\"},{\"insert\":\"\\n\"}" +
@@ -93,14 +104,14 @@ public abstract class InvestmentUtil {
                         ",{\"attributes\":{\"bold\":true},\"insert\":\"Name\"},{\"insert\":\": " + stockTickerDetails.getName() + "\\n\"}" +
                         ",{\"attributes\":{\"bold\":true},\"insert\":\"ExchangeSymbol\"},{\"insert\":\": " + stockTickerDetails.getExchangeSymbol() + "\\n\"}" +
                         ",{\"attributes\":{\"bold\":true},\"insert\":\"HQ Address\"},{\"insert\":\": " + stockTickerDetails.getHqAddress() + "\\n\"}" +
-                        ",{\"attributes\":{\"bold\":true},\"insert\":\"HQ State\"},{\"insert\":\": " + stockTickerDetails.getHqState() + "\\n\"}" +
+                        "HQ_STATE_DELTA" +
                         ",{\"attributes\":{\"bold\":true},\"insert\":\"HQ Country\"},{\"insert\":\": " + stockTickerDetails.getHqCountry() + "\\n\"}" +
                         ",{\"attributes\":{\"bold\":true},\"insert\":\"Tags\"},{\"insert\":\": " + String.join(", ", stockTickerDetails.getTags()) + "\\n\"}" +
                         ",{\"attributes\":{\"bold\":true},\"insert\":\"Similar\"},{\"insert\":\": " + String.join(", ", stockTickerDetails.getSimilar()) + "\\n\"}";
         tickerDetailsHtml = "<p><img src=\\\"" + stockTickerDetails.getLogo() + "\\\" width=\\\"72\\\"></p>" +
                 "<p><strong>Country</strong>: " + stockTickerDetails.getCountry() + "</p>" +
                 "<p><strong>Industry</strong>: " + stockTickerDetails.getIndustry() + "</p>" +
-                "MARKET_CAP_HTML" +
+                "MARKET_CAP_HTML" + "EMPLOYEES_HTML" +
                 "<p><strong>Employees</strong>: " + stockTickerDetails.getEmployees() + "</p>" +
                 "<p><strong>Phone</strong>: " + stockTickerDetails.getPhone() + "</p>" +
                 "<p><strong>CEO</strong>: " + stockTickerDetails.getCeo() + "</p>" +
@@ -110,10 +121,15 @@ public abstract class InvestmentUtil {
                 "<p><strong>Name</strong>: " + stockTickerDetails.getName() + "</p>" +
                 "<p><strong>Exchange Symbol</strong>: " + stockTickerDetails.getExchangeSymbol() + "</p>" +
                 "<p><strong>HQ Address</strong>: " + stockTickerDetails.getHqAddress() + "</p>" +
-                "<p><strong>HQ State</strong>: " + stockTickerDetails.getHqState() + "</p>" +
+                "HQ_STATE_HTML" +
                 "<p><strong>HQ Country</strong>: " + stockTickerDetails.getHqCountry() + "</p>" +
                 "<p><strong>Tags</strong>: " + String.join(", ", stockTickerDetails.getTags()) + "</p>" +
                 "<p><strong>Similar</strong>: " + String.join(", ", stockTickerDetails.getSimilar()) + "</p>";
-        return Pair.of(tickerDetailsDelta.replace("MARKET_CAP_DELTA", marketCapDelta), tickerDetailsHtml.replace("MARKET_CAP_HTML", marketCapHtml));
+        return Pair.of(tickerDetailsDelta.replace("MARKET_CAP_DELTA", marketCapDelta)
+                        .replace("EMPLOYEES_DELTA", employeesDelta)
+                        .replace("HQ_STATE_DELTA", hqStateDelta),
+                tickerDetailsHtml.replace("MARKET_CAP_HTML", marketCapHtml)
+                        .replace("EMPLOYEES_HTML", employeesHtml)
+                        .replace("HQ_STATE_HTML", hqStateHtml));
     }
 }
