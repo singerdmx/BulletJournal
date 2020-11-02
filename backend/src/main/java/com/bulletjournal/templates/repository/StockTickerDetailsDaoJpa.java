@@ -99,7 +99,8 @@ public class StockTickerDetailsDaoJpa {
                 selectionId = 260L;
                 break;
             default:
-                throw new BadRequestException("Sector " + sector + " not found");
+                LOGGER.error("Sector {} not found. Unable to find StockTickerDetails for {}", sector, symbol);
+                return null;
         }
         Selection selection = this.selectionDaoJpa.getById(selectionId);
 
