@@ -37,7 +37,6 @@ public class Reminder {
     private static long VERIFY_BUFF_SECONDS = 7200;
     private static long SCHEDULE_BUFF_SECONDS = 5;
     private static long AWAIT_TERMINATION_SECONDS = 5;
-    private static long TWO_HOURS_IN_SECONDS = 7200;
 
     private final ScheduledExecutorService executorService;
     private final ConcurrentHashMap<ReminderRecord, Task> concurrentHashMap;
@@ -164,7 +163,6 @@ public class Reminder {
         if (map.keySet().contains(record)) {
             return true;
         }
-
         concurrentHashMap.remove(record);
         return false;
     }

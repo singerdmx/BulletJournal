@@ -166,19 +166,17 @@ public class SystemController {
 
         if (targetEtags == null || targetEtags.contains("taskReminders")) {
             final ZonedDateTime startTime = ZonedDateTime.now().minusHours(2);
-            final ZonedDateTime endTime = ZonedDateTime.now().plusMinutes(2);
+            final ZonedDateTime endTime = ZonedDateTime.now().plusHours(2);
             List<ReminderRecord> reminderRecords = this.reminder.getTasksAssignedThatNeedsWebPopupReminder(
                     username, startTime, endTime);
+            remindingTasks = this.labelDaoJpa.getLabelsForProjectItemList(
+                    this.reminder.getRemindingTasks(reminderRecords, startTime, endTime)
+                            .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList()));
             remindingTaskEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                     EtagGenerator.HashType.TO_HASHCODE,
-                    reminderRecords.stream()
-                            .map(ReminderRecord::getId)
-                            .distinct()
-                            .collect(Collectors.toList()));
-            if (!remindingTaskRequestEtag.isPresent() || !remindingTaskEtag.equals(remindingTaskRequestEtag.get())) {
-                remindingTasks = this.labelDaoJpa.getLabelsForProjectItemList(
-                        this.reminder.getRemindingTasks(reminderRecords, startTime, endTime)
-                                .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList()));
+                    remindingTasks);
+            if (remindingTaskRequestEtag.isPresent() && remindingTaskEtag.equals(remindingTaskRequestEtag.get())) {
+                remindingTasks = null;
             }
         }
 
