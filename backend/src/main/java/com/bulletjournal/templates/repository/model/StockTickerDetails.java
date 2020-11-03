@@ -99,10 +99,26 @@ public class StockTickerDetails {
         if (json.has("logo")) {
             logo = json.get("logo").getAsString();
         }
+        String country = null;
+        if (json.has("country")) {
+            country = json.get("country").getAsString();
+        }
+        String exchangeSymbol = null;
+        if (json.has("exchangeSymbol")) {
+            exchangeSymbol = json.get("exchangeSymbol").getAsString();
+        }
+        String hqAddress = null;
+        if (json.has("hq_address")) {
+            hqAddress = json.get("hq_address").getAsString();
+        }
+        String hqCountry = null;
+        if (json.has("hq_country")) {
+            hqCountry = json.get("hq_country").getAsString();
+        }
 
         return new com.bulletjournal.templates.controller.model.StockTickerDetails(ticker, details, selection.toPresentationModel(),
                 logo,
-                json.get("country").getAsString(),
+                country,
                 json.get("industry").getAsString(),
                 marketCap,
                 employees,
@@ -112,10 +128,10 @@ public class StockTickerDetails {
                 json.get("description").getAsString(),
                 json.get("exchange").getAsString(),
                 json.get("name").getAsString(),
-                json.get("exchangeSymbol").getAsString(),
-                json.get("hq_address").getAsString(),
+                exchangeSymbol,
+                hqAddress,
                 hqState,
-                json.get("hq_country").getAsString(),
+                hqCountry,
                 GSON.fromJson(json.get("tags").getAsJsonArray(), String[].class),
                 GSON.fromJson(json.get("similar").getAsJsonArray(), String[].class)
         );
