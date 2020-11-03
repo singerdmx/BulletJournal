@@ -84,6 +84,8 @@ public abstract class InvestmentUtil {
         String hqStateHtml = "";
         String phoneDelta = "";
         String phoneHtml = "";
+        String logoDelta = "";
+        String logoHtml = "";
 
         if (stockTickerDetails.getMarketCap() != null) {
             marketCapDelta = ",{\"attributes\":{\"bold\":true},\"insert\":\"MarketCap\"},{\"insert\":\": " + stockTickerDetails.getMarketCap() + "\\n\"}";
@@ -101,23 +103,26 @@ public abstract class InvestmentUtil {
             hqStateDelta = ",{\"attributes\":{\"bold\":true},\"insert\":\"Phone\"},{\"insert\":\": " + stockTickerDetails.getPhone() + "\\n\"}";
             hqStateHtml = "<p><strong>Phone</strong>: " + stockTickerDetails.getPhone() + "</p>";
         }
-        tickerDetailsDelta =
-                ",{\"attributes\":{\"width\":\"72\"},\"insert\":{\"image\":\"" + stockTickerDetails.getLogo() + "\"}},{\"insert\":\"\\n\"}" +
-                        ",{\"attributes\":{\"bold\":true},\"insert\":\"Country\"},{\"insert\":\": " + stockTickerDetails.getCountry() + "\\n\"}" +
-                        ",{\"attributes\":{\"bold\":true},\"insert\":\"Industry\"},{\"insert\":\": " + stockTickerDetails.getIndustry() + "\\n\"}" +
-                        "MARKET_CAP_DELTA" + "EMPLOYEES_DELTA" + "PHONE_DELTA" +
-                        ",{\"attributes\":{\"bold\":true},\"insert\":\"CEO\"},{\"insert\":\": " + stockTickerDetails.getCeo() + "\\n\"}" +
-                        ",{\"attributes\":{\"bold\":true},\"insert\":\"URL\"},{\"insert\":\": \"},{\"attributes\":{\"a\":\"" + stockTickerDetails.getUrl() + "\"},\"insert\":\"" + stockTickerDetails.getUrl() + "\"},{\"insert\":\"\\n\"}" +
-                        ",{\"attributes\":{\"bold\":true},\"insert\":\"Description\"},{\"insert\":\": " + description + "\\n\"}" +
-                        ",{\"attributes\":{\"bold\":true},\"insert\":\"Exchange\"},{\"insert\":\": " + stockTickerDetails.getExchange() + "\\n\"}" +
-                        ",{\"attributes\":{\"bold\":true},\"insert\":\"Name\"},{\"insert\":\": " + stockTickerDetails.getName() + "\\n\"}" +
-                        ",{\"attributes\":{\"bold\":true},\"insert\":\"ExchangeSymbol\"},{\"insert\":\": " + stockTickerDetails.getExchangeSymbol() + "\\n\"}" +
-                        ",{\"attributes\":{\"bold\":true},\"insert\":\"HQ Address\"},{\"insert\":\": " + stockTickerDetails.getHqAddress() + "\\n\"}" +
-                        "HQ_STATE_DELTA" +
-                        ",{\"attributes\":{\"bold\":true},\"insert\":\"HQ Country\"},{\"insert\":\": " + stockTickerDetails.getHqCountry() + "\\n\"}" +
-                        ",{\"attributes\":{\"bold\":true},\"insert\":\"Tags\"},{\"insert\":\": " + String.join(", ", stockTickerDetails.getTags()) + "\\n\"}" +
-                        ",{\"attributes\":{\"bold\":true},\"insert\":\"Similar\"},{\"insert\":\": " + String.join(", ", stockTickerDetails.getSimilar()) + "\\n\"}";
-        tickerDetailsHtml = "<p><img src=\\\"" + stockTickerDetails.getLogo() + "\\\" width=\\\"72\\\"></p>" +
+        if (stockTickerDetails.getLogo() != null) {
+            logoDelta = ",{\"attributes\":{\"bold\":true},\"insert\":\"Logo\"},{\"insert\":\": " + stockTickerDetails.getLogo() + "\\n\"}";
+            logoHtml = "<p><strong>Logo</strong>: " + stockTickerDetails.getLogo() + "</p>";
+        }
+        tickerDetailsDelta = "LOGO_DELTA" +
+                ",{\"attributes\":{\"bold\":true},\"insert\":\"Country\"},{\"insert\":\": " + stockTickerDetails.getCountry() + "\\n\"}" +
+                ",{\"attributes\":{\"bold\":true},\"insert\":\"Industry\"},{\"insert\":\": " + stockTickerDetails.getIndustry() + "\\n\"}" +
+                "MARKET_CAP_DELTA" + "EMPLOYEES_DELTA" + "PHONE_DELTA" +
+                ",{\"attributes\":{\"bold\":true},\"insert\":\"CEO\"},{\"insert\":\": " + stockTickerDetails.getCeo() + "\\n\"}" +
+                ",{\"attributes\":{\"bold\":true},\"insert\":\"URL\"},{\"insert\":\": \"},{\"attributes\":{\"a\":\"" + stockTickerDetails.getUrl() + "\"},\"insert\":\"" + stockTickerDetails.getUrl() + "\"},{\"insert\":\"\\n\"}" +
+                ",{\"attributes\":{\"bold\":true},\"insert\":\"Description\"},{\"insert\":\": " + description + "\\n\"}" +
+                ",{\"attributes\":{\"bold\":true},\"insert\":\"Exchange\"},{\"insert\":\": " + stockTickerDetails.getExchange() + "\\n\"}" +
+                ",{\"attributes\":{\"bold\":true},\"insert\":\"Name\"},{\"insert\":\": " + stockTickerDetails.getName() + "\\n\"}" +
+                ",{\"attributes\":{\"bold\":true},\"insert\":\"ExchangeSymbol\"},{\"insert\":\": " + stockTickerDetails.getExchangeSymbol() + "\\n\"}" +
+                ",{\"attributes\":{\"bold\":true},\"insert\":\"HQ Address\"},{\"insert\":\": " + stockTickerDetails.getHqAddress() + "\\n\"}" +
+                "HQ_STATE_DELTA" +
+                ",{\"attributes\":{\"bold\":true},\"insert\":\"HQ Country\"},{\"insert\":\": " + stockTickerDetails.getHqCountry() + "\\n\"}" +
+                ",{\"attributes\":{\"bold\":true},\"insert\":\"Tags\"},{\"insert\":\": " + String.join(", ", stockTickerDetails.getTags()) + "\\n\"}" +
+                ",{\"attributes\":{\"bold\":true},\"insert\":\"Similar\"},{\"insert\":\": " + String.join(", ", stockTickerDetails.getSimilar()) + "\\n\"}";
+        tickerDetailsHtml = "LOGO_HTML" +
                 "<p><strong>Country</strong>: " + stockTickerDetails.getCountry() + "</p>" +
                 "<p><strong>Industry</strong>: " + stockTickerDetails.getIndustry() + "</p>" +
                 "MARKET_CAP_HTML" + "EMPLOYEES_HTML" + "PHONE_HTML" +
@@ -135,10 +140,12 @@ public abstract class InvestmentUtil {
         return Pair.of(tickerDetailsDelta.replace("MARKET_CAP_DELTA", marketCapDelta)
                         .replace("EMPLOYEES_DELTA", employeesDelta)
                         .replace("HQ_STATE_DELTA", hqStateDelta)
-                        .replace("PHONE_DELTA", phoneDelta),
+                        .replace("PHONE_DELTA", phoneDelta)
+                        .replace("LOGO_DELTA", logoDelta),
                 tickerDetailsHtml.replace("MARKET_CAP_HTML", marketCapHtml)
                         .replace("EMPLOYEES_HTML", employeesHtml)
                         .replace("HQ_STATE_HTML", hqStateHtml)
-                        .replace("PHONE_HTML", phoneHtml));
+                        .replace("PHONE_HTML", phoneHtml)
+                        .replace("LOGO_HTML", logoHtml));
     }
 }
