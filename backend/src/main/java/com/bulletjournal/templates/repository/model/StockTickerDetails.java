@@ -91,6 +91,10 @@ public class StockTickerDetails {
         if (json.has("hq_state")) {
             hqState = json.get("hq_state").getAsString();
         }
+        String phone = null;
+        if (json.has("phone")) {
+            phone = json.get("phone").getAsString();
+        }
 
         return new com.bulletjournal.templates.controller.model.StockTickerDetails(ticker, details, selection.toPresentationModel(),
                 json.get("logo").getAsString(),
@@ -98,7 +102,7 @@ public class StockTickerDetails {
                 json.get("industry").getAsString(),
                 marketCap,
                 employees,
-                json.get("phone").getAsString(),
+                phone,
                 json.get("ceo").getAsString(),
                 json.get("url").getAsString(),
                 json.get("description").getAsString(),
