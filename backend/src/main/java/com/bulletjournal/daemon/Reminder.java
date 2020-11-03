@@ -179,10 +179,12 @@ public class Reminder {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Task> getRemindingTasks(List<ReminderRecord> reminderRecords, ZonedDateTime startTime, ZonedDateTime endTime) {
+    public List<Task> getRemindingTasks(
+            List<ReminderRecord> reminderRecords, ZonedDateTime startTime) {
         if (reminderRecords.isEmpty()) {
             return Collections.emptyList();
         }
+        ZonedDateTime endTime = ZonedDateTime.now().plusHours(2);
         // batch get tasks using task ids
         Map<Long, Task> taskMap = this.taskRepository.findAllById(
                 reminderRecords.stream().map(ReminderRecord::getId).distinct().collect(Collectors.toList()))
@@ -196,11 +198,11 @@ public class Reminder {
         }).map(record -> {
             Task task = taskMap.get(record.getId());
             if (task.getRecurrenceRule() != null) {
-                List<Task> l = DaoHelper.getRecurringTask(task, startTime, ZonedDateTime.now().plusHours(2));
+                List<Task> l = DaoHelper.getRecurringTask(task, startTime, endTime);
                 if (!l.isEmpty()) {
                     task = l.get(0);
                 } else {
-                    LOGGER.error("No recurring task for {} between {} and {}", task, startTime, ZonedDateTime.now().plusHours(2));
+                    LOGGER.error("No recurring task for {} between {} and {}", task, startTime, endTime);
                 }
             }
             return task;
