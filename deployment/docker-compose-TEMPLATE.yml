@@ -26,7 +26,7 @@ services:
     container_name: daemon_app
     image: mwangxx/bulletjournal-daemon:BULLETJOURNAL_VERSION
     ports:
-      - "50051:50051"
+      - "127.0.0.1:50051:50051"
     depends_on:
       cache:
         condition: service_started
@@ -80,7 +80,7 @@ services:
     container_name: db
     hostname: postgres
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: docker
