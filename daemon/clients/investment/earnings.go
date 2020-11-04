@@ -1,28 +1,25 @@
 package investment
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"time"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/singerdmx/BulletJournal/daemon/logging"
-
 	"github.com/pkg/errors"
 	"github.com/singerdmx/BulletJournal/daemon/persistence"
 )
 
 type EarningClient struct {
-	BaseTemplateClient
-	data *Earnings
+	InvestmentClient
+	data *EarningsData
 }
 
-type Earnings struct {
-	EarningData []EarningData `json:"earnings"`
+type EarningsData struct {
+	Earning []Earning `json:"earnings"`
 }
 
-type EarningData struct {
+type Earning struct {
 	ID                     string `json:"id"`
 	Date                   string `json:"date"`
 	DateConfirmed          int16  `json:"date_confirmed"`
@@ -56,95 +53,71 @@ const (
 	RFC3339                   = "2006-01-02T15:04:05Z07:00"
 )
 
-func NewEarningsClient(ctx context.Context, sampleTaskDao *persistence.SampleTaskDao, restClient *resty.Client) (*TemplateClient, error) {
-	c := EarningClient{
-		BaseTemplateClient: NewBaseTemplateClient(ctx, sampleTaskDao, restClient),
+func NewEarningsClient(sampleTaskDao *persistence.SampleTaskDao, restClient *resty.Client) *EarningClient {
+	return &EarningClient{
+		InvestmentClient: Init("earnings", sampleTaskDao, restClient),
 	}
-	return &TemplateClient{&c}, nil
 }
 
-func (c *EarningClient) FetchData() error {
-	logger := *logging.GetLogger()
-	yearFrom, monthFrom, dayFrom := time.Now().AddDate(0, 0, -6).Date()
-	yearTo, monthTo, dayTo := time.Now().AddDate(0, 1, 0).Date()
+func (c *EarningClient) ProcessData() (*[]uint64, *[]uint64, error) {
+	return c.ProcessAllData(-6, c)
+}
 
-	var fetchedData []EarningData
-
-	startDate := Date(yearFrom, int(monthFrom), dayFrom)
-	endDate := Date(yearTo, int(monthTo), dayTo)
-
-	interval := intervalInDays(startDate, endDate)
-
-	for day := dayFrom; day < interval; day += 2 {
-		slotStart := Date(yearFrom, int(monthFrom), dayFrom)
-		slotendYear, slotendMonth, slotendDay := slotStart.AddDate(0, 0, 2).Date()
-
-		dateFrom := dateFormatter(yearFrom, monthFrom, dayFrom)
-		dateTo := dateFormatter(slotendYear, slotendMonth, slotendDay)
-
-		url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/earnings?pagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", dateFrom, dateTo)
-		resp, err := c.restClient.R().Get(url)
-		if err != nil {
-			logger.Error("sending request failed")
+func (c *EarningClient) toSampleTasks(response [][]byte) ([]persistence.SampleTask, error) {
+	var fetchedData []Earning
+	for _, resp := range response {
+		data := EarningsData{}
+		if err := json.Unmarshal(resp, &data); err != nil {
+			//logger.Error(fmt.Sprintf("%s Unmarshal earnings response failed: %s", url, string(resp.Body())))
+			logger.Error(fmt.Sprintf("Unmarshal earnings response failed: %s", string(resp)))
 			continue
 		}
-		data := Earnings{}
-		if err := json.Unmarshal(resp.Body(), &data); err != nil {
-			logger.Error(fmt.Sprintf("%s Unmarshal dividends response failed: %s", url, string(resp.Body())))
-			continue
-		}
-
-		fetchedData = append(fetchedData, data.EarningData...)
-		yearFrom = slotendYear
-		monthFrom = slotendMonth
-		dayFrom = slotendDay
+		fetchedData = append(fetchedData, data.Earning...)
 	}
-
-	temp := Earnings{EarningData: fetchedData}
-
+	temp := EarningsData{Earning: fetchedData}
 	c.data = &temp
-	return nil
+
+	if c.data == nil {
+		return nil, errors.New("Empty EarningsData data, please fetch data first.")
+	}
+
+	var sampleTasks []persistence.SampleTask
+	for i := range c.data.Earning {
+		item := c.toSampleTask(c.data.Earning[i])
+		sampleTasks = append(sampleTasks, item)
+	}
+	return sampleTasks, nil
 }
 
-func (c *EarningClient) SendData() (*[]uint64, *[]uint64, error) {
-	if c.data == nil {
-		return nil, nil, errors.New("Empty Earnings data, please fetch data first.")
+func (c *EarningClient) toSampleTask(data Earning) persistence.SampleTask { // data EarningsData
+	// for converting one sample task
+
+	availBefore := data.Date
+	t, _ := time.Parse(layoutISO, availBefore)
+	t = t.AddDate(0, 0, 0)
+	dueDate := data.Date
+	if len(dueDate) > 10 {
+		dueDate = dueDate[0:10] // yyyy-MM-dd
 	}
-	created := make([]uint64, 0)
-	modified := make([]uint64, 0)
-	for i := range c.data.EarningData {
-		target := c.data.EarningData[i]
-		availBefore := target.Date
-		t, _ := time.Parse(layoutISO, availBefore)
-		t = t.AddDate(0, 0, 0)
-		dueDate := target.Date
-		if len(dueDate) > 10 {
-			dueDate = dueDate[0:10] // yyyy-MM-dd
-		}
-		dueTime := target.Time
-		if len(dueTime) > 5 {
-			dueTime = dueTime[0:5]
-		}
-		raw, _ := json.Marshal(target)
-		item := persistence.SampleTask{
-			CreatedAt:       time.Now(),
-			UpdatedAt:       time.Now(),
-			Metadata:        "INVESTMENT_EARNINGS_RECORD",
-			Raw:             string(raw),
-			Name:            fmt.Sprintf("%v (%v) reports earnings on %v", target.Name, target.Ticker, dueDate),
-			Uid:             "INVESTMENT_EARNINGS_RECORD_" + target.Ticker,
-			AvailableBefore: t,
-			DueDate:         dueDate,
-			DueTime:         dueTime,
-			Pending:         true,
-			Refreshable:     true,
-			TimeZone:        "America/New_York",
-		}
-		if entityId, newRecord := c.sampleDao.Upsert(&item); newRecord && entityId > 0 {
-			created = append(created, entityId)
-		} else if !newRecord && entityId > 0 {
-			modified = append(modified, entityId)
-		}
+	dueTime := data.Time
+	if len(dueTime) > 5 {
+		dueTime = dueTime[0:5]
 	}
-	return &created, &modified, nil
+	raw, _ := json.Marshal(data)
+	item := persistence.SampleTask{
+		CreatedAt:       time.Now(),
+		UpdatedAt:       time.Now(),
+		Metadata:        "INVESTMENT_EARNINGS_RECORD",
+		Raw:             string(raw),
+		Name:            fmt.Sprintf("%v (%v) reports earnings on %v", data.Name, data.Ticker, dueDate),
+		Uid:             "INVESTMENT_EARNINGS_RECORD_" + data.Ticker,
+		AvailableBefore: t,
+		DueDate:         dueDate,
+		DueTime:         dueTime,
+		Pending:         true,
+		Refreshable:     true,
+		TimeZone:        "America/New_York",
+	}
+	return item
+
 }

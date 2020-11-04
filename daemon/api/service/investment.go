@@ -14,15 +14,18 @@ import (
 
 type Investment struct {
 	StreamChannel   chan<- *StreamingMessage
-	ipoClient       *investment.TemplateClient
-	earningClient   *investment.TemplateClient
-	dividendsClient *investment.TemplateClient
+	ipoClient       *investment.IPOClient
+	earningClient   *investment.EarningClient
+	dividendsClient *investment.DividendsClient
 }
 
 func NewInvestment(streamChannel chan<- *StreamingMessage, ctx context.Context, sampleTaskDao *persistence.SampleTaskDao, restClient *resty.Client) *Investment {
-	ipoClient, _ := investment.NewTemplateClient(investment.IPOTemplate, ctx, sampleTaskDao, restClient)
-	earningClient, _ := investment.NewTemplateClient(investment.EarningsTemplate, ctx, sampleTaskDao, restClient)
-	dividendsClient, _ := investment.NewTemplateClient(investment.DividendsTemplate, ctx, sampleTaskDao, restClient)
+	//ipoClient, _ := investment.NewTemplateClient(investment.IPOTemplate, ctx, sampleTaskDao, restClient)
+	ipoClient := investment.NewIPOClient(sampleTaskDao, restClient)
+	//earningClient, _ := investment.NewTemplateClient(investment.EarningsTemplate, ctx, sampleTaskDao, restClient)
+	earningClient := investment.NewEarningsClient(sampleTaskDao, restClient)
+	//dividendsClient, _ := investment.NewTemplateClient(investment.DividendsTemplate, ctx, sampleTaskDao, restClient)
+	dividendsClient := investment.NewDividendsClient(sampleTaskDao, restClient)
 
 	return &Investment{StreamChannel: streamChannel, ipoClient: ipoClient, earningClient: earningClient, dividendsClient: dividendsClient}
 }
@@ -40,14 +43,20 @@ func (i *Investment) pull(params ...interface{}) {
 	i.retrieveData(i.dividendsClient)
 }
 
-func (i *Investment) retrieveData(templateClient *investment.TemplateClient) {
+func (i *Investment) retrieveData(templateClient investment.Extractor) {
 	logger := *logging.GetLogger()
-	error := templateClient.FetchData()
-	if error != nil {
-		logger.Error(error.Error())
-		return
-	}
-	created, modified, error := templateClient.SendData()
+	//error := templateClient.FetchData()
+	//if error != nil {
+	//	logger.Error(error.Error())
+	//	return
+	//}
+	//created, modified, error := templateClient.SendData()
+	//if error != nil {
+	//	logger.Error(error.Error())
+	//	return
+	//}
+
+	created, modified, error := templateClient.ProcessData()
 	if error != nil {
 		logger.Error(error.Error())
 		return

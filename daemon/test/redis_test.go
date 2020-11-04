@@ -113,7 +113,8 @@ func (suite *RedisTestSuite) SetupTest() {
 	serviceConfig := config.GetConfig()
 	logging.InitLogging(config.GetEnv())
 
-	etagDao := persistence.InitializeEtagDao(ctx, serviceConfig)
+	//etagDao := persistence.InitializeEtagDao(ctx, serviceConfig)
+	etagDao := persistence.NewEtagDao(ctx, persistence.GetRedisClient(serviceConfig))
 	//Check health of redis connection
 	testRedisClient(etagDao, suite)
 	//Test persisting single entity
