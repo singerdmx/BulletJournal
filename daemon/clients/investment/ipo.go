@@ -62,7 +62,7 @@ func (c *IPOClient) toSampleTasks(response [][]byte) ([]persistence.SampleTask, 
 	var fetchedData []IPO
 	for _, resp := range response {
 		data := IPOData{}
-		if len(resp) > 0 {
+		if len(resp) == 0 {
 			continue
 		}
 		if err := json.Unmarshal(resp, &data); err != nil {

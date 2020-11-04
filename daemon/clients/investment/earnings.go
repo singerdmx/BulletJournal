@@ -67,7 +67,7 @@ func (c *EarningClient) toSampleTasks(response [][]byte) ([]persistence.SampleTa
 	var fetchedData []Earning
 	for _, resp := range response {
 		data := EarningsData{}
-		if len(resp) > 0 {
+		if len(resp) == 0 {
 			continue
 		}
 		if err := json.Unmarshal(resp, &data); err != nil {
