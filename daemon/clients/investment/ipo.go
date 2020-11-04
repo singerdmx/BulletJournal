@@ -57,13 +57,14 @@ func (c *IPOClient) ProcessData() (*[]uint64, *[]uint64, error) {
 	return c.ProcessAllData(-6, c)
 }
 
-// check for repeated uid -> after getting all sample tasks
 
-// add to interface
 func (c *IPOClient) toSampleTasks(response [][]byte) ([]persistence.SampleTask, error) {
 	var fetchedData []IPO
 	for _, resp := range response {
 		data := IPOData{}
+		if len(resp) > 0 {
+			continue
+		}
 		if err := json.Unmarshal(resp, &data); err != nil {
 			//logger.Error(fmt.Sprintf("%s Unmarshal ipos response failed: %s", url, string(resp.Body())))
 			logger.Error(fmt.Sprintf("Unmarshal ipos response failed: %s", string(resp)))
@@ -87,11 +88,10 @@ func (c *IPOClient) toSampleTasks(response [][]byte) ([]persistence.SampleTask, 
 }
 
 func (c *IPOClient) toSampleTask(data IPO) persistence.SampleTask { // data IPOData
-	// for converting one sample task
 
 	availBefore := data.Date
 	t, _ := time.Parse(layoutISO, availBefore)
-	t = t.AddDate(0, 0, 0)
+	t = t.AddDate(0, 0, 0) // expire in days -> to constant
 	dueDate := data.Date
 	if len(dueDate) > 10 {
 		dueDate = dueDate[0:10] // yyyy-MM-dd

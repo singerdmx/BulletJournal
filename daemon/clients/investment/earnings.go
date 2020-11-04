@@ -67,6 +67,9 @@ func (c *EarningClient) toSampleTasks(response [][]byte) ([]persistence.SampleTa
 	var fetchedData []Earning
 	for _, resp := range response {
 		data := EarningsData{}
+		if len(resp) > 0 {
+			continue
+		}
 		if err := json.Unmarshal(resp, &data); err != nil {
 			//logger.Error(fmt.Sprintf("%s Unmarshal earnings response failed: %s", url, string(resp.Body())))
 			logger.Error(fmt.Sprintf("Unmarshal earnings response failed: %s", string(resp)))
