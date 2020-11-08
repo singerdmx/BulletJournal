@@ -3,37 +3,43 @@ package persistence
 import (
 	"context"
 	"errors"
+	"time"
 
-	"github.com/singerdmx/BulletJournal/daemon/config"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"gorm.io/gorm"
 )
+
+const LAYOUT = "2006-01-02"
 
 type SampleTaskDao struct {
 	Ctx context.Context
 	Db  *gorm.DB
 }
 
-func InitializeSampleTaskDao(config *config.Config, ctx context.Context) *SampleTaskDao {
+func NewSampleTaskDao(ctx context.Context, db *gorm.DB) (*SampleTaskDao, error) {
 	return &SampleTaskDao{
 		Ctx: ctx,
-		Db:  NewDB(config),
-	}
-}
-
-func NewSampleTaskDao() (*SampleTaskDao, error) {
-
-	sampleTaskDao := SampleTaskDao{
-		Db: DB,
-	}
-	return &sampleTaskDao, nil
+		Db:  db, // NewDB(config),
+	}, nil
 }
 
 func (s *SampleTaskDao) Upsert(t *SampleTask) (uint64, bool) {
 	logger := *logging.GetLogger()
+
 	prevReport := SampleTask{}
 	r := s.Db.Where("uid = ?", t.Uid).Last(&prevReport)
+
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
+		// If current time is more recent than duedate, skip this instance
+		dueDate, err := time.Parse(LAYOUT, t.DueDate)
+		if err != nil {
+			logger.Errorf("due date parse to format yyyy-mm-dd failed, duedate: %s, error: %v", t.DueDate, err)
+			return 0, false
+		}
+		if dueDate.Before(time.Now()) {
+			return 0, false
+		}
+
 		if err := s.Db.Create(&t).Error; err != nil {
 			logger.Errorf("Create Sample Task Error: %v", err)
 			return 0, false
@@ -62,6 +68,7 @@ func (s *SampleTaskDao) Upsert(t *SampleTask) (uint64, bool) {
 			"due_date":         t.DueDate,
 			"due_time":         t.DueTime,
 			"available_before": t.AvailableBefore,
+			"name":             t.Name,
 		})
 	return prevReport.ID, false
 }

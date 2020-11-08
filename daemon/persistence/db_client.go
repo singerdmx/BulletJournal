@@ -18,11 +18,14 @@ func NewDB(config *config.Config) *gorm.DB {
 }
 
 func GetDB(dbConfig string) *gorm.DB {
+
 	db, err := gorm.Open(postgres.Open(dbConfig), &gorm.Config{})
+
 	if err != nil {
 		log.Panic("Database init failed")
 		return nil
 	}
+	db.Logger.LogMode(1)
 	return db
 }
 

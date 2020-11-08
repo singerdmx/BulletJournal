@@ -79,7 +79,7 @@ const TemplateSubscriptions: React.FC<TemplateSubscriptionsProps> = (
                                 </div>
                                 <div>
                                     <Select
-                                        style={{padding: '3px', minWidth: '40%'}}
+                                        style={{padding: '3px', minWidth: '40%', maxWidth: '90%'}}
                                         placeholder="Choose BuJo"
                                         onChange={(id: number) => {
                                             updateCategorySubscription(subscribedCategory.category.id, s.id, id);

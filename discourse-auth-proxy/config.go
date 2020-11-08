@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/namsral/flag"
-	"github.com/pborman/uuid"
 )
 
 type Config struct {
@@ -97,7 +96,7 @@ func ParseConfig() (*Config, error) {
 	}
 	c.LogRequests = *rc.LogRequests
 
-	c.CookieSecret = uuid.New()
+	c.CookieSecret = os.Getenv("AUTH_COOKIE_SECRET")
 
 	return c, nil
 }

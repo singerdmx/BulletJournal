@@ -169,4 +169,12 @@ public class UserDaoJpa {
         user.setPoints(points);
         this.userRepository.save(user);
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void updateTimestamps(String username, String timestamps) {
+        User user = this.getByName(username);
+        user.setUserTimestamps(timestamps);
+        this.userRepository.save(user);
+    }
+
 }

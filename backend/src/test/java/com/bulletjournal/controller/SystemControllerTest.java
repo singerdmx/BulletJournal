@@ -20,11 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.time.Instant;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
@@ -67,49 +63,52 @@ public class SystemControllerTest {
         Group group = TestHelpers.createGroup(requestParams, sampleUsers[0], "Group_SystemControl");
 
         Project p1 = TestHelpers.createProject(requestParams, sampleUsers[0], "p_SystemControl_task", group, ProjectType.TODO);
-        Task t1 = createRemindingTask(p1, "T1", 0,
-                ZonedDateTimeHelper.getNow().plusHours(2).format(ZonedDateTimeHelper.DATE_FORMATTER), null);
-        Task t2 = createRemindingTask(p1, "T2", 1,
-                ZonedDateTimeHelper.getNow().plusHours(2).format(ZonedDateTimeHelper.DATE_FORMATTER), null);
-        Task t3 = createRemindingTask(p1, "T3", 2,
-                ZonedDateTimeHelper.getNow().plusHours(2).format(ZonedDateTimeHelper.DATE_FORMATTER), null);
-        Task t4 = createRemindingTask(p1, "T4", 3,
-                ZonedDateTimeHelper.getNow().plusHours(2).format(ZonedDateTimeHelper.DATE_FORMATTER), null);
-        Task t5 = createRemindingTask(p1, "T5", 6,
-                ZonedDateTimeHelper.getNow().plusHours(2).format(ZonedDateTimeHelper.DATE_FORMATTER), null);
+        ZonedDateTime due = ZonedDateTimeHelper.getNow("America/Los_Angeles").plusMinutes(30);
+        String dueDate = ZonedDateTimeHelper.getDate(due); // today
+        String dueTime = ZonedDateTimeHelper.getTime(due); // 30 min later
+
+        Task t1 = createRemindingTask(p1, "T1", 0, dueDate, dueTime);
+        Task t2 = createRemindingTask(p1, "T2", 1, dueDate, dueTime);
+        Task t3 = createRemindingTask(p1, "T3", 4, dueDate, dueTime);
+        Task t4 = createRemindingTask(p1, "T4", 5, dueDate, dueTime);
+        Task t5 = createRemindingTask(p1, "T5", 6, dueDate, dueTime);
 
         SystemUpdates systemUpdates = getRemindingTasks(p1);
         List<Task> remindingTasks = systemUpdates.getReminders();
 
-        assertEquals(4, remindingTasks.size());
+        assertEquals(2, remindingTasks.size());
 
-        // Check if t1, t2, t3, t4 in the reminding tasks
-        TestHelpers.assertIfContains(remindingTasks, t1, t2, t3, t4);
+        // Check if t3, t4 in the reminding tasks
+        TestHelpers.assertIfContains(remindingTasks, t3, t4);
 
-        // Check if t5 not in the reminding tasks
-        TestHelpers.assertIfNotContains(remindingTasks, t5);
+        // Check if t1, t2, t5 not in the reminding tasks
+        TestHelpers.assertIfNotContains(remindingTasks, t1, t2, t5);
 
-        deleteTask(t1);
+        deleteTask(t3);
 
         systemUpdates = getRemindingTasks(p1);
         remindingTasks = systemUpdates.getReminders();
 
-        assertEquals(3, remindingTasks.size());
+        assertEquals(1, remindingTasks.size());
 
-        // Check if t2, t3, t4 in the reminding tasks
-        TestHelpers.assertIfContains(remindingTasks, t2, t3, t4);
+        // Check if  t4 in the reminding tasks
+        TestHelpers.assertIfContains(remindingTasks, t4);
 
-        // Check if t5 not in the reminding tasks
-        TestHelpers.assertIfNotContains(remindingTasks, t5);
+        // Check if t1, t2, t3, t4, t5 not in the reminding tasks
+        TestHelpers.assertIfNotContains(remindingTasks, t1, t2, t3, t5);
 
         String remindingTaskEtag = systemUpdates.getRemindingTaskEtag();
         systemUpdates = testRemindingTaskEtagMatch(p1, remindingTaskEtag);
         assertNull(systemUpdates.getReminders());
 
-        Task recurringRemindingTask = addRecurringRemindingTasks(p1, 5, null, null);
+        deleteTask(t1);
+        deleteTask(t2);
+        deleteTask(t4);
+        deleteTask(t5);
+        Task recurringRemindingTask = addRecurringRemindingTasks(p1, 1, null, null);
         systemUpdates = getRemindingTasks(p1);
         remindingTasks = systemUpdates.getReminders();
-        assertEquals(4, remindingTasks.size());
+        assertEquals(1, remindingTasks.size());
 
         List<Task> recurringRemindingTaskList = remindingTasks
                 .stream()
@@ -120,11 +119,6 @@ public class SystemControllerTest {
         assertNotEquals(0, recurringRemindingTaskList.size());
 
         deleteTask(recurringRemindingTask);
-        deleteTask(t2);
-        deleteTask(t3);
-        deleteTask(t4);
-        deleteTask(t5);
-
         String oldGroupsEtag = getGroupsEtag();
         String oldNotificationsEtag = getNotificationsEtag();
         TestHelpers.addUserToGroup(requestParams, group, sampleUsers[1], 2, sampleUsers[0]);
@@ -186,7 +180,7 @@ public class SystemControllerTest {
 
     private Task addRecurringRemindingTasks(Project project, Integer before, String date, String time) {
         DateTime now = DateTime.now(TimeZone.getTimeZone(TIMEZONE));
-        String recurrenceRule = "DTSTART:" + now.toString() + " RRULE:FREQ=HOURLY;INTERVAL=1";
+        String recurrenceRule = "DTSTART:" + now.toString() + "\nRRULE:FREQ=DAILY;INTERVAL=1";
         String taskName = "rt1";
         ReminderSetting reminderSetting = new ReminderSetting(date, time, before);
 
@@ -253,23 +247,10 @@ public class SystemControllerTest {
     }
 
     private Task createRemindingTask(Project project, String name, Integer before, String date, String time) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        ZonedDateTime now = ZonedDateTime.now();
-
-        ZonedDateTime dueZonedDateTime = getDueDateTime(now, before, 5, ChronoUnit.MINUTES);
-
-        String dueDateTime = dueZonedDateTime.format(formatter);
-        String dueDate = dueDateTime.split(" ")[0];
-        String dueTime = dueDateTime.split(" ")[1];
-
-        String remindingDateTime = getReminderDateTime(dueZonedDateTime, before).format(formatter);
-        String remindingDate = remindingDateTime.split(" ")[0];
-        String remindingTime = remindingDateTime.split(" ")[1];
-
-        ReminderSetting reminderSetting = new ReminderSetting(remindingDate, remindingTime, before);
+        ReminderSetting reminderSetting = new ReminderSetting(null, null, before);
 
         CreateTaskParams task = new CreateTaskParams(
-                name, dueDate, dueTime, 10, reminderSetting, ImmutableList.of("Michael_Zhou"), "America/Los_Angeles", null);
+                name, date, time, 10, reminderSetting, ImmutableList.of("Michael_Zhou"), "America/Los_Angeles", null);
 
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
@@ -284,71 +265,5 @@ public class SystemControllerTest {
         assertEquals(name, created.getName());
         assertEquals(project.getId(), created.getProjectId());
         return created;
-    }
-
-    private ZonedDateTime getDueDateTime(ZonedDateTime startTime, Integer after, int amount, ChronoUnit unit) {
-        Instant reminderInstant = startTime.toInstant();
-        ZoneId zoneId = ZoneId.of("America/Los_Angeles");
-        if (after != null) {
-            switch (after) {
-                case 0:
-                    return ZonedDateTime.ofInstant(reminderInstant, zoneId);
-                case 1:
-                    reminderInstant = reminderInstant.plus(5, ChronoUnit.MINUTES);
-                    return ZonedDateTime.ofInstant(reminderInstant, zoneId);
-                case 2:
-                    reminderInstant = reminderInstant.plus(10, ChronoUnit.MINUTES);
-                    break;
-                case 3:
-                    reminderInstant = reminderInstant.plus(30, ChronoUnit.MINUTES);
-                    break;
-                case 4:
-                    reminderInstant = reminderInstant.plus(1, ChronoUnit.HOURS);
-                    break;
-                case 5:
-                    reminderInstant = reminderInstant.plus(2, ChronoUnit.HOURS);
-                    break;
-                default:
-            }
-        }
-        reminderInstant = reminderInstant.minus(amount, unit);
-
-        return ZonedDateTime.ofInstant(reminderInstant, zoneId);
-    }
-
-    /*
-     * Get Reminder Date Time
-     *
-     *
-     */
-    private ZonedDateTime getReminderDateTime(ZonedDateTime startTime, Integer before) {
-        Instant reminderInstant;
-        switch (before) {
-            case 0:
-                reminderInstant = startTime.toInstant();
-                break;
-            case 1:
-                reminderInstant = startTime.toInstant().minus(5, ChronoUnit.MINUTES);
-                break;
-            case 2:
-                reminderInstant = startTime.toInstant().minus(10, ChronoUnit.MINUTES);
-                break;
-            case 3:
-                reminderInstant = startTime.toInstant().minus(30, ChronoUnit.MINUTES);
-                break;
-            case 4:
-                reminderInstant = startTime.toInstant().minus(1, ChronoUnit.HOURS);
-                break;
-            case 5:
-                reminderInstant = startTime.toInstant().minus(2, ChronoUnit.HOURS);
-                break;
-            case 6:
-                reminderInstant = Instant.EPOCH.plusMillis(Long.MAX_VALUE);
-                break;
-            default:
-                throw new IllegalArgumentException();
-        }
-        ZoneId zoneId = ZoneId.of("America/Los_Angeles");
-        return ZonedDateTime.ofInstant(reminderInstant, zoneId);
     }
 }

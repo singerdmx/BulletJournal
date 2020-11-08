@@ -17,3 +17,13 @@ export const changeUserAlias = (targetUser: string, alias: string) => {
             throw Error(err);
         });
 };
+
+export const sendInvitation = (emails: string[]) => {
+    const postBody = JSON.stringify({
+        emails: emails
+    });
+    return doPost('/api/appInvitations', postBody)
+        .catch(err => {
+            throw Error(err);
+        });
+}

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/go-resty/resty/v2"
 	"github.com/singerdmx/BulletJournal/daemon/clients/investment"
 	"github.com/singerdmx/BulletJournal/daemon/config"
 	"github.com/singerdmx/BulletJournal/daemon/logging"
@@ -21,9 +22,15 @@ type ClientTestSuite struct {
 
 func (suite *ClientTestSuite) SetupTest() {
 	logging.InitLogging(config.GetEnv())
-	earningClient,_ := investment.NewTemplateClient(investment.EarningsTemplate)
-	earningClient.FetchData()
-	earningClient.SendData()
+	//earningClient,_ := investment.NewTemplateClient(investment.EarningsTemplate)
+	//earningClient.FetchData()
+	//earningClient.SendData()
+	serviceConfig := config.GetConfig()
+	db := persistence.NewDB(serviceConfig)
+	sampleTaskDao, _ := persistence.NewSampleTaskDao(ctx, db)
+	restClient := resty.New()
+	earningClient := investment.NewEarningsClient(sampleTaskDao, restClient)
+	earningClient.ProcessData()
 }
 
 func (suite *ClientTestSuite) TestUpsert() {

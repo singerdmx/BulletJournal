@@ -31,13 +31,15 @@ FROM golang:1.15-alpine as builder
 WORKDIR /go/src/github.com/singerdmx/BulletJournal/daemon
 COPY --from=ubuntu-builder /app-daemon/proto_gen proto_gen
 # Copy 
+COPY api api
 COPY cmd cmd
 COPY clients clients
 COPY config config
-COPY utils utils
-COPY persistence persistence
+COPY consts consts
 COPY logging logging
-COPY api api
+COPY persistence persistence
+COPY rpc_server rpc_server
+COPY utils utils
 COPY go.mod .
 COPY Makefile .
 COPY proto_gen proto_gen

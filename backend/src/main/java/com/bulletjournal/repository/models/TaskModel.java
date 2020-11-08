@@ -289,12 +289,16 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
             reminderSetting.setBefore(this.getReminderBeforeTask());
         }
 
+        Long reminderDateTime = null;
+        if (this.getReminderDateTime() != null) {
+            reminderDateTime = this.getReminderDateTime().getTime();
+        }
         com.bulletjournal.controller.models.Task task = new com.bulletjournal.controller.models.Task(
                 this.getId(), new User(this.getOwner()),
                 this.getAssignees().stream().map(a -> new User(a)).collect(Collectors.toList()), this.getDueDate(),
                 this.getDueTime(), this.getTimezone(), this.getName(), this.getDuration(), this.getProject(), labels,
                 reminderSetting, this.getRecurrenceRule(), this.getCreatedAt().getTime(), this.getUpdatedAt().getTime(),
-                null);
+                null, reminderDateTime);
         task.setShared(this.isShared());
         return task;
     }

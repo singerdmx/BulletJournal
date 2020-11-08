@@ -29,6 +29,9 @@ public class NewSampleTaskEvent extends Informed {
 
     @Override
     public String getLink(Long contentId) {
+        if (this.link != null) {
+            return link;
+        }
         return "/punchCard";
     }
 }

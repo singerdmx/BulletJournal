@@ -40,6 +40,7 @@ dependencies {
     implementation 'net.devh:grpc-client-spring-boot-starter:2.9.0.RELEASE'
     implementation 'io.grpc:grpc-stub'
     implementation 'io.grpc:grpc-protobuf'
+    implementation "com.stripe:stripe-java:20.25.0"
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
@@ -84,7 +85,7 @@ sourceSets {
 
 protobuf {
     generatedFilesBaseDir = "./generatedProto"
-
+    delete generatedFilesBaseDir
     protoc {
         artifact = 'com.google.protobuf:protoc:3.0.0'
     }

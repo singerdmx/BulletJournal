@@ -3,16 +3,16 @@ package investment
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"time"
 
+	"github.com/go-resty/resty/v2"
 	"github.com/pkg/errors"
 
 	"github.com/singerdmx/BulletJournal/daemon/persistence"
 )
 
 type IPOClient struct {
-	BaseTemplateClient
+	InvestmentClient
 	data *IPOData
 }
 
@@ -47,90 +47,74 @@ type IPO struct {
 
 const layoutISO = "2006-01-02"
 
-func NewIPOClient() (*TemplateClient, error) {
-	c := IPOClient{
-		BaseTemplateClient: NewBaseTemplateClient(),
+func NewIPOClient(sampleTaskDao *persistence.SampleTaskDao, restClient *resty.Client) *IPOClient {
+	return &IPOClient{
+		InvestmentClient: Init("ipos", sampleTaskDao, restClient),
 	}
-	return &TemplateClient{&c}, nil
 }
 
-func (c *IPOClient) FetchData() error {
-	logger := *logging.GetLogger()
-	yearFrom, monthFrom, dayFrom := time.Now().AddDate(0, -1, 0).Date()
-	yearTo, monthTo, dayTo := time.Now().AddDate(0, 1, 0).Date()
+func (c *IPOClient) ProcessData() (*[]uint64, *[]uint64, error) {
+	return c.ProcessAllData(-6, c)
+}
 
+
+func (c *IPOClient) toSampleTasks(response [][]byte) ([]persistence.SampleTask, error) {
 	var fetchedData []IPO
-
-	startDate := Date(yearFrom, int(monthFrom), dayFrom)
-	endDate := Date(yearTo, int(monthTo), dayTo)
-
-	interval := intervalInDays(startDate, endDate)
-
-	for day := dayFrom; day < interval; day += 2 {
-		dateFrom := dateFormatter(yearFrom, monthFrom, day)
-		dateTo := dateFormatter(yearTo, monthTo, day+2)
-		url := fmt.Sprintf("https://www.benzinga.com/services/webapps/calendar/ipos?pagesize=500&parameters[date_from]=%+v&parameters[date_to]=%+v&parameters[importance]=0", dateFrom, dateTo)
-		resp, err := c.restClient.R().Get(url)
-		if err != nil {
-			logger.Error("sending request failed")
+	for _, resp := range response {
+		data := IPOData{}
+		if len(resp) == 0 {
 			continue
 		}
-
-		data := IPOData{}
-
-		if err := json.Unmarshal(resp.Body(), &data); err != nil {
-			logger.Error(fmt.Sprintf("%s Unmarshal dividends response failed: %s", url, string(resp.Body())))
+		if err := json.Unmarshal(resp, &data); err != nil {
+			//logger.Error(fmt.Sprintf("%s Unmarshal ipos response failed: %s", url, string(resp.Body())))
+			logger.Error(fmt.Sprintf("Unmarshal ipos response failed: %s", string(resp)))
 			continue
 		}
 		fetchedData = append(fetchedData, data.IPO...)
 	}
-
 	temp := IPOData{IPO: fetchedData}
-
 	c.data = &temp
-	return nil
+
+	if c.data == nil {
+		return nil, errors.New("Empty IPO data, please fetch data first.")
+	}
+
+	var sampleTasks []persistence.SampleTask
+	for i := range c.data.IPO {
+		item := c.toSampleTask(c.data.IPO[i])
+		sampleTasks = append(sampleTasks, item)
+	}
+	return sampleTasks, nil
 }
 
-func (c *IPOClient) SendData() (*[]uint64, *[]uint64, error) {
-	if c.data == nil {
-		return nil, nil, errors.New("Empty IPO data, please fetch data first.")
-	}
-	created := make([]uint64, 0)
-	modified := make([]uint64, 0)
-	for i := range c.data.IPO {
-		target := c.data.IPO[i]
-		availBefore := target.Date
-		t, _ := time.Parse(layoutISO, availBefore)
-		t = t.AddDate(0, 6, 0)
-		dueDate := target.Date
-		if len(dueDate) > 10 {
-			dueDate = dueDate[0:10] // yyyy-MM-dd
-		}
-		dueTime := target.Time
-		if len(dueTime) > 5 {
-			dueTime = dueTime[0:5]
-		}
-		raw, _ := json.Marshal(target)
-		item := persistence.SampleTask{
-			CreatedAt:       time.Now(),
-			UpdatedAt:       time.Now(),
-			Metadata:        "INVESTMENT_IPO_RECORD",
-			Raw:             string(raw),
-			Name:            fmt.Sprintf("%v (%v) goes public on %v", target.Name, target.Ticker, dueDate),
-			Uid:             "INVESTMENT_IPO_RECORD_" + target.Ticker,
-			AvailableBefore: t,
-			DueDate:         dueDate,
-			DueTime:         dueTime,
-			Pending:         true,
-			Refreshable:     true,
-			TimeZone:        "America/New_York",
-		}
-		if entityId, newRecord := c.sampleDao.Upsert(&item); newRecord && entityId > 0 {
-			created = append(created, entityId)
-		} else if !newRecord && entityId > 0 {
-			modified = append(modified, entityId)
-		}
-	}
+func (c *IPOClient) toSampleTask(data IPO) persistence.SampleTask { // data IPOData
 
-	return &created, &modified, nil
+	availBefore := data.Date
+	t, _ := time.Parse(layoutISO, availBefore)
+	t = t.AddDate(0, 0, 0) // expire in days -> to constant
+	dueDate := data.Date
+	if len(dueDate) > 10 {
+		dueDate = dueDate[0:10] // yyyy-MM-dd
+	}
+	dueTime := data.Time
+	if len(dueTime) > 5 {
+		dueTime = dueTime[0:5]
+	}
+	raw, _ := json.Marshal(data)
+	item := persistence.SampleTask{
+		CreatedAt:       time.Now(),
+		UpdatedAt:       time.Now(),
+		Metadata:        "INVESTMENT_IPO_RECORD",
+		Raw:             string(raw),
+		Name:            fmt.Sprintf("%v (%v) goes public on %v", data.Name, data.Ticker, dueDate),
+		Uid:             "INVESTMENT_IPO_RECORD_" + data.Ticker,
+		AvailableBefore: t,
+		DueDate:         dueDate,
+		DueTime:         dueTime,
+		Pending:         true,
+		Refreshable:     true,
+		TimeZone:        "America/New_York",
+	}
+	return item
+
 }

@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
+
 	"github.com/mailjet/mailjet-apiv3-go"
-	"github.com/singerdmx/BulletJournal/daemon/config"
 	"github.com/singerdmx/BulletJournal/daemon/persistence"
 	"github.com/singerdmx/BulletJournal/daemon/utils"
 )
@@ -16,8 +16,16 @@ const (
 var ctx = context.Background()
 
 type MessageService struct {
-	groupDao   *persistence.GroupDao
-	mailClient *persistence.MailjetClient
+	groupDao               *persistence.GroupDao
+	joinGroupInvitationDao *persistence.JoinGroupInvitationDao
+	mailClient             *mailjet.Client
+}
+
+func NewMessageService(
+	groupDao *persistence.GroupDao,
+	joinGroupInvitationDao *persistence.JoinGroupInvitationDao,
+	mailClient *mailjet.Client) *MessageService {
+	return &MessageService{groupDao, joinGroupInvitationDao, mailClient}
 }
 
 func GetUrl(uuid string, action string) string {
@@ -28,12 +36,10 @@ func GetUrl(uuid string, action string) string {
 func (m *MessageService) SendJoinGroupEmail(username, email string, groupId, uid uint64) {
 	notificationId := utils.GenerateUID()
 	// Set in redis with key of uid and value of JoinGroupInvitation json string
-	joinGroupInvitationDao := persistence.InitializeJoinGroupInvitationDao(config.GetConfig())
-	joinGroupInvitationDao.SingleCache(
+	m.joinGroupInvitationDao.SingleCache(
 		&persistence.JoinGroupInvitation{string(uid), username, string(groupId), notificationId})
 
-	groupDao := persistence.NewGroupDao()
-	group := groupDao.FindGroup(groupId)
+	group := m.groupDao.FindGroup(groupId)
 	if group == nil {
 		log.Fatalf("cannot find group with group id %v", groupId)
 		return

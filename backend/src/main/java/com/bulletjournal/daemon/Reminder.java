@@ -9,23 +9,26 @@ import com.bulletjournal.repository.TaskRepository;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.bulletjournal.util.CustomThreadFactory;
+import com.bulletjournal.util.MathUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 public class Reminder {
@@ -65,11 +68,23 @@ public class Reminder {
                 TimeUnit.SECONDS);
     }
 
+    public List<ReminderRecord> getTasksAssignedThatNeedsWebPopupReminder(
+            String requester, ZonedDateTime startTime, ZonedDateTime endTime) {
+        // task assignees match requester
+        List<ReminderRecord> res = concurrentHashMap.entrySet().stream()
+                .filter(e -> e.getValue().getAssignees().contains(requester)
+                        && e.getKey().getTimestampSecond() <= endTime.toEpochSecond() &&
+                        startTime.toEpochSecond() <= e.getKey().getTimestampSecond())
+                .map(e -> e.getKey()).distinct().collect(Collectors.toList());
+        return res;
+    }
+
     private void initLoad() {
         LOGGER.info("initLoad");
         ZonedDateTime start = ZonedDateTime.now().minus(reminderConfig.getLoadPrevSeconds(), ChronoUnit.SECONDS);
         ZonedDateTime end = ZonedDateTime.now().plus(reminderConfig.getLoadNextSeconds(), ChronoUnit.SECONDS);
         this.scheduleReminderRecords(Pair.of(start, end));
+        LOGGER.info("initLoad completed");
     }
 
     private void cronJob() {
@@ -81,36 +96,27 @@ public class Reminder {
 
     /***
      * called by controller who created or updated task
-     * @param createdTask
+     * @param tasks
      */
-    public void generateTaskReminder(Task createdTask) {
-        Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.getInterval(SECONDS_OF_DAY, reminderConfig.getTimeZone());
-        taskRepository.findById(createdTask.getId()).ifPresent(task -> {
-            DaoHelper.getReminderRecords(task, interval.getFirst(), interval.getSecond()).forEach(e -> {
-                        if (!concurrentHashMap.containsKey(e)) {
-                            this.scheduleReminderRecords(reminderConfig.getLoadNextSeconds());
-                        }
-                    }
-            );
-        });
-
-    }
-
     public void generateTaskReminder(List<Task> tasks) {
         Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.getInterval(SECONDS_OF_DAY, reminderConfig.getTimeZone());
 
         tasks.forEach(t -> {
-            LOGGER.info("generateTaskReminder" + t);
+            LOGGER.info("generateTaskReminder {}", t);
             DaoHelper.getReminderRecords(t, interval.getFirst(), interval.getSecond()).forEach(e -> {
-                LOGGER.info("getReminderRecords" + e);
+                        LOGGER.info("getReminderRecords {}", e);
                         if (!concurrentHashMap.containsKey(e)) {
-                            LOGGER.info("getReminderRecords in map" + e);
-                            this.scheduleReminderRecords(reminderConfig.getLoadNextSeconds());
+                            LOGGER.info("getReminderRecords in map: {}", e);
+                            long delay = getJitterDelay(e);
+                            if (delay > 0) {
+                                LOGGER.info("Schedule New Job:" + e.toString() + "\t delay=" + delay);
+                                executorService.schedule(() -> this.process(e), delay, TimeUnit.MILLISECONDS);
+                            }
                         }
+                        concurrentHashMap.put(e, t);
                     }
             );
         });
-
     }
 
     private void purge(long expiredSeconds) {
@@ -120,13 +126,20 @@ public class Reminder {
 
     private void scheduleReminderRecords(Pair<ZonedDateTime, ZonedDateTime> interval) {
         taskDaoJpa.getRemindingTasks(interval.getFirst(), interval.getSecond()).forEach((k, v) -> {
-            long delay = k.getTimestampSecond() - ZonedDateTime.now().toEpochSecond() - SCHEDULE_BUFF_SECONDS;
+            long delay = getJitterDelay(k);
             if (!concurrentHashMap.containsKey(k) && delay > 0) {
                 LOGGER.info("Schedule New Job:" + k.toString() + "\t delay=" + delay);
-                executorService.schedule(() -> this.process(k), delay, TimeUnit.SECONDS);
+                executorService.schedule(() -> this.process(k), delay, TimeUnit.MILLISECONDS);
                 concurrentHashMap.put(k, v);
             }
         });
+    }
+
+    private long getJitterDelay(ReminderRecord reminderRecord) {
+        long delay = reminderRecord.getTimestampSecond() - ZonedDateTime.now().toEpochSecond();
+        delay *= 1000;
+        delay -= MathUtil.getRandomNumber(200L, SCHEDULE_BUFF_SECONDS * 1000);
+        return delay;
     }
 
     private void scheduleReminderRecords(long seconds) {
@@ -134,20 +147,24 @@ public class Reminder {
         this.scheduleReminderRecords(interval);
     }
 
-    private void process(ReminderRecord record) {
+    private void process(final ReminderRecord record) {
         LOGGER.info("process record=" + record.toString());
         Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.getInterval(VERIFY_BUFF_SECONDS, reminderConfig.getTimeZone());
         taskRepository.findById(record.getId()).ifPresent(task -> {
-            List<ReminderRecord> records = DaoHelper.getReminderRecords(task, interval.getFirst(), interval.getSecond());
-            Map<ReminderRecord, Task> map = DaoHelper.getReminderRecordMap(task, interval.getFirst(), interval.getSecond());
-            LOGGER.info("records = " + records);
-            if (map.keySet().contains(record)) {
-                Task clonedTask = map.get(record);
-                LOGGER.info("Push notification record = " + record + "clonedTask = " + clonedTask);
-                messagingService.sendTaskDueNotificationAndEmailToUsers(Arrays.asList(clonedTask));
-                concurrentHashMap.remove(record);
+            if (filterInvalidTask(record, interval.getFirst(), interval.getSecond(), task)) {
+                LOGGER.info("Push notification record {}", record);
+                messagingService.sendTaskDueNotificationAndEmailToUsers(Arrays.asList(task));
             }
         });
+    }
+
+    private boolean filterInvalidTask(ReminderRecord record, ZonedDateTime startTime, ZonedDateTime endTime, Task task) {
+        Map<ReminderRecord, Task> map = DaoHelper.getReminderRecordMap(task, startTime, endTime);
+        if (map.keySet().contains(record)) {
+            return true;
+        }
+        concurrentHashMap.remove(record);
+        return false;
     }
 
     @PreDestroy
@@ -161,4 +178,40 @@ public class Reminder {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Task> getRemindingTasks(
+            List<ReminderRecord> reminderRecords, ZonedDateTime startTime) {
+        if (reminderRecords.isEmpty()) {
+            return Collections.emptyList();
+        }
+        ZonedDateTime endTime = ZonedDateTime.now().plusHours(2);
+        // batch get tasks using task ids
+        Map<Long, Task> taskMap = this.taskRepository.findAllById(
+                reminderRecords.stream().map(ReminderRecord::getId).distinct().collect(Collectors.toList()))
+                .stream().filter(Objects::nonNull).collect(Collectors.toMap(Task::getId, t -> t));
+        List<Task> res = reminderRecords.stream().filter(record -> {
+            Task task = taskMap.get(record.getId());
+            if (task == null) {
+                return false;
+            }
+            return filterInvalidTask(record, startTime, endTime, task);
+        }).map(record -> {
+            Task task = taskMap.get(record.getId());
+            if (task.getRecurrenceRule() != null) {
+                List<Task> l = DaoHelper.getRecurringTask(task, startTime, endTime);
+                if (!l.isEmpty()) {
+                    task = l.get(0);
+                } else {
+                    LOGGER.error("No recurring task for {} between {} and {}", task, startTime, endTime);
+                }
+            }
+            return task;
+        }).collect(Collectors.toList());
+        for (Task t : res) {
+            LOGGER.info("t.getReminderDateTime() {} {}", t.getReminderDateTime(), Timestamp.valueOf(ZonedDateTime.now()
+                    .toLocalDateTime()));
+        }
+        return res.stream().filter(t -> t.getReminderDateTime().before(Timestamp.valueOf(ZonedDateTime.now()
+                .toLocalDateTime()))).collect(Collectors.toList());
+    }
 }

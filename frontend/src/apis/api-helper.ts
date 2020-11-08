@@ -24,6 +24,7 @@ export function doFetch(endpoint: string, etag: any = undefined) {
     const v = res.headers.get('version');
     if (v && v !== version) {
       console.log(`current version is ${version} and server version is ${v}`);
+      localStorage.removeItem('reminders'); //TODO: remove
       throw Error('reload');
     }
     return res;

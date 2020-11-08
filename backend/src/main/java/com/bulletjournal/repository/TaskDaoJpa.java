@@ -21,6 +21,7 @@ import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
+import com.bulletjournal.templates.repository.model.SampleTask;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -251,39 +252,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     /**
-     * Get assignee's reminding tasks and recurring reminding tasks from database.
-     * <p>
-     * Reminding tasks qualifications:
-     * 1. Reminding Time is before current time.
-     * 2. Starting time plus 10 minutes buffer is after the current time.
-     * <p>
-     * [Reminding Time] <= Now <= [Starting Time + 10 mins]
-     *
-     * @param assignee the username of task assignee
-     * @param now      the ZonedDateTime object of the current time
-     * @return List<com.bulletjournal.controller.models.Task> - a list of tasks to
-     * be reminded
-     */
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<com.bulletjournal.controller.models.Task> getRemindingTasks(String assignee, ZonedDateTime now) {
-        Timestamp currentTime = Timestamp.from(now.toInstant());
-        // Subtract current time by 10 minutes to compare with task's starting time
-        Timestamp startTime = Timestamp.from(now.minusMinutes(REMINDING_TASK_BUFFER_IN_MINS).toInstant());
-
-        // Fetch regular reminding tasks
-        List<com.bulletjournal.controller.models.Task> regularTasks = this.taskRepository
-                .findRemindingTasks(assignee, currentTime.toString(), startTime.toString()).stream()
-                .map(t -> t.toPresentationModel()).collect(Collectors.toList());
-
-        // Fetch recurring reminding tasks
-        List<com.bulletjournal.controller.models.Task> recurringTask = getRecurringTaskNeedReminding(assignee, now);
-
-        // Append recurring reminding tasks to regular reminding tasks
-        regularTasks.addAll(recurringTask);
-        return this.labelDaoJpa.getLabelsForProjectItemList(regularTasks);
-    }
-
-    /**
      * Get user's tasks between the request start time and request end time.
      *
      * @param assignee  the username of task assignee
@@ -445,11 +413,13 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             Long projectId,
             String owner,
             List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasks,
+            List<SampleTask> repoSampleTasks,
             Integer reminderBeforeTask,
             List<String> assignees,
             List<Long> labels
     ) {
         Preconditions.checkNotNull(assignees);
+
         List<CreateTaskParams> createTaskParams = new ArrayList<>();
         sampleTasks.forEach(sampleTask -> createTaskParams.add(sampleTaskToCreateTaskParams(
                 sampleTask,
@@ -457,12 +427,38 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 assignees,
                 labels)
         ));
-        List<Task> tasks = create(projectId, owner, createTaskParams);
 
-        this.notificationService.addContentBatch(new ContentBatch(
-                sampleTasks.stream().map(sampleTask -> new TaskContent(sampleTask.getContent())).collect(Collectors.toList()),
-                tasks,
-                tasks.stream().map(ProjectItemModel::getOwner).collect(Collectors.toList())));
+        List<Task> tasks;
+        try {
+            tasks = create(projectId, owner, createTaskParams);
+        } catch (Exception ex) {
+            LOGGER.info("createTaskFromSampleTask failed", ex);
+            return Collections.emptyList();
+        }
+        Preconditions.checkArgument(sampleTasks.size() == tasks.size(),
+                sampleTasks.size() + " does not match " + tasks.size());
+        List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasksForContents = new ArrayList<>();
+        List<Task> tasksForContents = new ArrayList<>();
+        for (int i = 0; i < sampleTasks.size(); i++) {
+            if (sampleTasks.get(i).isRefreshable()) {
+                long sampleTaskId = sampleTasks.get(i).getId();
+                tasks.get(i).setSampleTask(
+                        repoSampleTasks.stream().filter(s -> sampleTaskId == s.getId()).findFirst().get());
+                continue;
+            }
+            sampleTasksForContents.add(sampleTasks.get(i));
+            tasksForContents.add(tasks.get(i));
+        }
+
+        this.saveAll(tasks);
+
+        if (!sampleTasksForContents.isEmpty()) {
+            this.notificationService.addContentBatch(new ContentBatch(
+                    sampleTasksForContents.stream()
+                            .map(sampleTask -> new TaskContent(sampleTask.getContent())).collect(Collectors.toList()),
+                    tasksForContents,
+                    tasksForContents.stream().map(ProjectItemModel::getOwner).collect(Collectors.toList())));
+        }
 
         return tasks;
     }

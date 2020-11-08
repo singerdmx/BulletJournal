@@ -36,13 +36,12 @@ var (
 )
 
 const cookieName = "__discourse_proxy"
-const homePage = "/home/index.html"
 const tokenPage = "/tokens/"
 const systemUpdateRoute = "/api/system/updates"
 const tokenForCookieUrl = "/api/tokens/"
 const guestUsername = "Guest"
 const ssoLoginUrlPrefix = "/sso_login"
-var guestToken string = ""
+var guestToken = ""
 
 func main() {
 	{

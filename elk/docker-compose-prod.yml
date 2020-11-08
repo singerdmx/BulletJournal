@@ -8,8 +8,8 @@ services:
       - /root/ws/BulletJournal/elk/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
       - $HOME/docker/volumes/elasticsearch:/usr/share/elasticsearch/data
     ports:
-      - "9200:9200"
-      - "9300:9300"
+      - "127.0.0.1:9200:9200"
+      - "127.0.0.1:9300:9300"
     environment:
       ES_JAVA_OPTS: "-Xmx512m -Xms256m"
       ELASTIC_PASSWORD: changeme
@@ -24,9 +24,9 @@ services:
       - /root/ws/BulletJournal/elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
       - /root/ws/BulletJournal/elk/logstash/pipeline:/usr/share/logstash/pipeline
     ports:
-      - "5000:5000/tcp"
-      - "5000:5000/udp"
-      - "9600:9600"
+      - "127.0.0.1:5000:5000/tcp"
+      - "127.0.0.1:5000:5000/udp"
+      - "127.0.0.1:9600:9600"
     environment:
       LS_JAVA_OPTS: "-Xmx512m -Xms256m"
       postgres_hostname: db

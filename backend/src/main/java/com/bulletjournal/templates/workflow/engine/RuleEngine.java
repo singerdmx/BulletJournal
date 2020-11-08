@@ -53,8 +53,10 @@ public class RuleEngine {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.templates.controller.model.SampleTask> importTasks(
             String requester, RemoveUserSampleTasksParams importTasksParams, int frequency) {
-        List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasks = sampleTaskDaoJpa
-                .findAllById(importTasksParams.getSampleTasks()).stream().map(SampleTask::toPresentationModel).collect(Collectors.toList());
+        List<SampleTask> repoSampleTasks = sampleTaskDaoJpa
+                .findAllById(importTasksParams.getSampleTasks());
+        List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasks = repoSampleTasks
+                .stream().map(SampleTask::toPresentationModel).collect(Collectors.toList());
         // if there is any sample task that does not have due date, we need to set due date for it
         List<com.bulletjournal.templates.controller.model.SampleTask> tasksNeedTimingArrangement = sampleTasks.stream()
                 .filter(t -> StringUtils.isBlank(t.getDueDate())).collect(Collectors.toList());
@@ -104,6 +106,7 @@ public class RuleEngine {
                 importTasksParams.getProjectId(),
                 requester,
                 sampleTasks,
+                repoSampleTasks,
                 importTasksParams.getReminderBefore(),
                 importTasksParams.getAssignees(),
                 importTasksParams.getLabels());
