@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {CardElement, useElements, useStripe} from "@stripe/react-stripe-js";
 import {StripeError} from "@stripe/stripe-js";
+import {paymentIntentConfirm} from'../../apis/paymentApis'
 
 const CardField = ({onChange}: any) => (
     <div className="FormRow">
@@ -87,7 +88,6 @@ export const CheckoutForm = (props: any) => {
     });
     const handleSubmit = async (event: any) => {
         event.preventDefault();
-        console.log(props, "props")
         if (!stripe) {
             // Stripe.js has not loaded yet. Make sure to disable
             // form submission until Stripe.js has loaded.
@@ -102,14 +102,13 @@ export const CheckoutForm = (props: any) => {
             setProcessing(true);
         }
 
-        // @ts-ignore
-        const payload = await stripe.confirmCardPayment(secret, {
+        const body : any = {
             payment_method: {
                 card: elements.getElement(CardElement),
                 billing_details: billingDetails,
             }
-        });
-
+        };
+        const payload : any = await stripe.confirmCardPayment(secret, body);
         setProcessing(false);
 
         if (payload.error) {
@@ -117,7 +116,9 @@ export const CheckoutForm = (props: any) => {
         } else {
             setPaymentMethod(payload.paymentMethod);
             paymentReceived(true);
+            paymentIntentConfirm(payload);
         }
+
     };
 
     const reset = () => {
