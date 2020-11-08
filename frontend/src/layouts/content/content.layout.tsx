@@ -28,6 +28,7 @@ import AdminStepPage from "../../pages/admin/step.pages";
 import AdminMetadataPage from "../../pages/admin/admin-metadata.pages";
 import AdminSampleTaskPage from "../../pages/admin/sample-task.pages";
 import SampleTaskPage from "../../pages/task/sample-task.pages";
+import {PaymentPage} from "../../pages/payment/payment.pages";
 
 const { Content } = Layout;
 class ContentLayout extends React.Component {
@@ -50,6 +51,7 @@ class ContentLayout extends React.Component {
           <Route path='/labels' component={LabelsPage} />
           <Route exact path='/note/:noteId' component={NotePage} />
           <Route exact path='/task/:taskId' component={TaskPage} />
+          <Route exact path='/payment' component={PaymentPage} />
           <Route
             exact
             path='/completedTask/:taskId'
