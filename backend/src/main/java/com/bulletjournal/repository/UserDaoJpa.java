@@ -119,15 +119,15 @@ public class UserDaoJpa {
     public User updateMyself(String user, UpdateMyselfParams updateMyselfParams) {
         User self = getByName(user);
         DaoHelper.updateIfPresent(updateMyselfParams.hasTimezone(),
-            updateMyselfParams.getTimezone(), self::setTimezone);
+                updateMyselfParams.getTimezone(), self::setTimezone);
         DaoHelper.updateIfPresent(updateMyselfParams.hasReminderBeforeTask(),
                 updateMyselfParams.getReminderBeforeTask(), self::setReminderBeforeTask);
         DaoHelper.updateIfPresent(updateMyselfParams.hasCurrency(),
-            updateMyselfParams.getCurrency(), self::setCurrency);
+                updateMyselfParams.getCurrency(), self::setCurrency);
         DaoHelper.updateIfPresent(updateMyselfParams.hasTheme(),
-            updateMyselfParams.getTheme(), self::setTheme);
+                updateMyselfParams.getTheme(), self::setTheme);
         DaoHelper.updateIfPresent(updateMyselfParams.hasEmail(),
-            updateMyselfParams.getEmail(), self::setEmail);
+                updateMyselfParams.getEmail(), self::setEmail);
         return self;
     }
 
@@ -150,12 +150,13 @@ public class UserDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void changeUserPoints(String username, Integer points, String description) {
+    public Integer changeUserPoints(String username, Integer points, String description) {
         userPointActivityDaoJpa.create(username, points, description);
         User user = this.getByName(username);
         Integer pts = user.getPoints() + points;
         user.setPoints(pts);
         this.userRepository.save(user);
+        return pts;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

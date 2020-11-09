@@ -1,7 +1,9 @@
 import React, {useState} from 'react';
 import {CardElement, useElements, useStripe} from "@stripe/react-stripe-js";
 import {StripeError} from "@stripe/stripe-js";
-import {paymentIntentConfirm} from'../../apis/paymentApis'
+import {paymentIntentConfirm} from '../../apis/paymentApis'
+import {updatePoints} from "../../features/myself/actions";
+import {connect} from "react-redux";
 
 const CardField = ({onChange}: any) => (
     <div className="FormRow">
@@ -73,8 +75,15 @@ const ResetButton = ({onClick}: any) => (
     </button>
 );
 
-export const CheckoutForm = (props: any) => {
+type CheckoutFormProps = {
+    updatePoints: (points: number) => void;
+    secret: {};
+    paymentReceived: (flag: boolean) => void;
+};
+
+const CheckoutForm: React.FC<CheckoutFormProps> = (props: any) => {
     const stripe = useStripe();
+    const {updatePoints} = props;
     const elements = useElements();
     const {secret, paymentReceived} = props;
     const [error, setError] = useState<StripeError | undefined>(undefined);
@@ -102,21 +111,28 @@ export const CheckoutForm = (props: any) => {
             setProcessing(true);
         }
 
-        const body : any = {
+        const body: any = {
             payment_method: {
                 card: elements.getElement(CardElement),
                 billing_details: billingDetails,
             }
         };
-        const payload : any = await stripe.confirmCardPayment(secret, body);
+        const payload: any = await stripe.confirmCardPayment(secret, body);
         setProcessing(false);
 
         if (payload.error) {
             setError(payload.error);
         } else {
+            paymentIntentConfirm(payload)
+                .then(res => {
+                    res.text().then(
+                        obj => {
+                            updatePoints(JSON.parse(obj).points);
+                        }
+                    )
+                });
             setPaymentMethod(payload.paymentMethod);
             paymentReceived(true);
-            paymentIntentConfirm(payload);
         }
 
     };
@@ -131,6 +147,7 @@ export const CheckoutForm = (props: any) => {
             name: '',
         });
     };
+
 
     // for test valid card number : 4242 4242 4242 4242 any future date
     return paymentMethod ? (
@@ -196,4 +213,8 @@ export const CheckoutForm = (props: any) => {
         </form>
     );
 };
+
+const mapStateToProps = () => ({});
+
+export default connect(mapStateToProps, {updatePoints})(CheckoutForm);
 

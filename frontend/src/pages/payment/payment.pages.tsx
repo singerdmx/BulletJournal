@@ -5,7 +5,7 @@ import {Radio, Steps} from 'antd';
 import {LoadingOutlined, SmileOutlined, SolutionOutlined,} from '@ant-design/icons';
 import {paymentIntentReceive} from '../../apis/paymentApis'
 import 'antd/dist/antd.css';
-import {CheckoutForm} from "./checkout.pages";
+import CheckoutForm from "./checkout.pages";
 import './payment-page.styles.less'
 import "antd/dist/antd.css";
 

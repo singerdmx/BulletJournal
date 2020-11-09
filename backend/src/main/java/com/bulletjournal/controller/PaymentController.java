@@ -2,6 +2,7 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.PaymentConfig;
+import com.bulletjournal.controller.models.ConfirmPaymentIntent;
 import com.bulletjournal.controller.models.CreatePaymentParams;
 import com.bulletjournal.daemon.Cleaner;
 import com.bulletjournal.repository.UserDaoJpa;
@@ -46,7 +47,7 @@ public class PaymentController {
     }
 
     @PostMapping(PAYMENT_CONFIRM_ROUTE)
-    public void confirmPaymentIntent(@PathVariable @NotNull String paymentIntentId) throws StripeException {
+    public ConfirmPaymentIntent confirmPaymentIntent(@PathVariable @NotNull String paymentIntentId) throws StripeException {
         PaymentIntent paymentIntent = PaymentIntent.retrieve(paymentIntentId);
         if (paymentIntent.getStatus().equals("succeeded")) {
             String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -62,8 +63,11 @@ public class PaymentController {
                     points = 500;
                     break;
             }
-            String description = "Exchange " + points + " points for " + paymentIntent.getAmountReceived() + " dollars";
-            this.userDaoJpa.changeUserPoints(username, points, description);
+            String description = "Exchange " + points + " points for " + paymentIntent.getAmountReceived() / 100 + " dollars";
+            Integer totalPoints = this.userDaoJpa.changeUserPoints(username, points, description);
+            ConfirmPaymentIntent confirmPaymentIntent = new ConfirmPaymentIntent();
+            confirmPaymentIntent.setPoints(totalPoints);
+            return confirmPaymentIntent;
         } else {
             LOGGER.error("paymentIntentId {} not succeeded", paymentIntentId);
             throw new IllegalStateException("paymentIntent not succeeded");
