@@ -62,12 +62,12 @@ func (c *IPOClient) toSampleTasks(response [][]byte) ([]persistence.SampleTask, 
 	var fetchedData []IPO
 	for _, resp := range response {
 		data := IPOData{}
-		if len(resp) == 0 {
+		if resp == nil || len(resp) == 0 {
 			continue
 		}
 		if err := json.Unmarshal(resp, &data); err != nil {
 			//logger.Error(fmt.Sprintf("%s Unmarshal ipos response failed: %s", url, string(resp.Body())))
-			logger.Error(fmt.Sprintf("Unmarshal ipos response failed: %s", string(resp)))
+			logger.Errorf("Unmarshal ipos response failed: %v", resp)
 			continue
 		}
 		fetchedData = append(fetchedData, data.IPO...)

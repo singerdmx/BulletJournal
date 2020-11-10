@@ -53,12 +53,12 @@ func (c *DividendsClient) toSampleTasks(response [][]byte) ([]persistence.Sample
 	var fetchedData []Dividends
 	for _, resp := range response {
 		data := DividendsData{}
-		if len(resp) == 0 {
+		if resp == nil || len(resp) == 0 {
 			continue
 		}
 		if err := json.Unmarshal(resp, &data); err != nil {
 			//logger.Error(fmt.Sprintf("%s Unmarshal dividends response failed: %s", url, string(resp.Body())))
-			logger.Error(fmt.Sprintf("Unmarshal dividends response failed: %s", string(resp)))
+			logger.Errorf("Unmarshal dividends response failed: %v", resp)
 			continue
 		}
 		fetchedData = append(fetchedData, data.Dividends...)
