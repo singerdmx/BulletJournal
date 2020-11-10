@@ -3,6 +3,7 @@ package investment
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -59,6 +60,7 @@ func (c *IPOClient) ProcessData() (*[]uint64, *[]uint64, error) {
 
 
 func (c *IPOClient) toSampleTasks(response [][]byte) ([]persistence.SampleTask, error) {
+	logger := *logging.GetLogger()
 	var fetchedData []IPO
 	for _, resp := range response {
 		data := IPOData{}

@@ -8,7 +8,6 @@ import (
 	"time"
 )
 
-var logger logging.Logger
 
 type (
 	Extractor interface {
@@ -32,6 +31,7 @@ func Init(categoryName string, sampleTaskDao *persistence.SampleTaskDao, restCli
 }
 
 func (c *InvestmentClient) fetchAllData(days int) [][]byte{
+	logger := *logging.GetLogger()
 	yearFrom, monthFrom, dayFrom := time.Now().AddDate(0, 0, days).Date()
 	yearTo, monthTo, dayTo := time.Now().AddDate(0, 1, 0).Date()
 

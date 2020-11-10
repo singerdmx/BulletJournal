@@ -3,6 +3,7 @@ package investment
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -64,6 +65,7 @@ func (c *EarningClient) ProcessData() (*[]uint64, *[]uint64, error) {
 }
 
 func (c *EarningClient) toSampleTasks(response [][]byte) ([]persistence.SampleTask, error) {
+	logger := *logging.GetLogger()
 	var fetchedData []Earning
 	for _, resp := range response {
 		data := EarningsData{}
