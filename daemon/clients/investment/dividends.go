@@ -51,7 +51,9 @@ func (c *DividendsClient) ProcessData() (*[]uint64, *[]uint64, error) {
 }
 
 func (c *DividendsClient) toSampleTasks(response [][]byte) ([]persistence.SampleTask, error) {
+
 	logger := *logging.GetLogger()
+	set := make(map[string]void)
 	var fetchedData []Dividends
 	for _, resp := range response {
 		data := DividendsData{}
@@ -75,6 +77,10 @@ func (c *DividendsClient) toSampleTasks(response [][]byte) ([]persistence.Sample
 	var sampleTasks []persistence.SampleTask
 	for i := range c.data.Dividends {
 		item := c.toSampleTask(c.data.Dividends[i])
+		if _, exists := set[item.Uid]; exists {
+			continue
+		}
+		set[item.Uid] = val
 		sampleTasks = append(sampleTasks, item)
 	}
 	return sampleTasks, nil
@@ -85,7 +91,7 @@ func (c *DividendsClient) toSampleTask(data Dividends) persistence.SampleTask {
 
 	availBefore := data.Date
 	t, _ := time.Parse(layoutISO, availBefore)
-	t = t.AddDate(0, 0, 0)
+	t = t.AddDate(0, 0, expireInDays)
 	dueDate := data.ExDividendDate
 	if len(dueDate) > 10 {
 		dueDate = dueDate[0:10] // yyyy-MM-dd

@@ -61,6 +61,7 @@ func (c *IPOClient) ProcessData() (*[]uint64, *[]uint64, error) {
 
 func (c *IPOClient) toSampleTasks(response [][]byte) ([]persistence.SampleTask, error) {
 	logger := *logging.GetLogger()
+	set := make(map[string]void)
 	var fetchedData []IPO
 	for _, resp := range response {
 		data := IPOData{}
@@ -84,16 +85,19 @@ func (c *IPOClient) toSampleTasks(response [][]byte) ([]persistence.SampleTask, 
 	var sampleTasks []persistence.SampleTask
 	for i := range c.data.IPO {
 		item := c.toSampleTask(c.data.IPO[i])
+		if _, exists := set[item.Uid]; exists {
+			continue
+		}
+		set[item.Uid] = val
 		sampleTasks = append(sampleTasks, item)
 	}
 	return sampleTasks, nil
 }
 
 func (c *IPOClient) toSampleTask(data IPO) persistence.SampleTask { // data IPOData
-
 	availBefore := data.Date
 	t, _ := time.Parse(layoutISO, availBefore)
-	t = t.AddDate(0, 0, 0) // expire in days -> to constant
+	t = t.AddDate(0, 0, expireInDays)
 	dueDate := data.Date
 	if len(dueDate) > 10 {
 		dueDate = dueDate[0:10] // yyyy-MM-dd

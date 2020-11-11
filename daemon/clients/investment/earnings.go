@@ -65,7 +65,9 @@ func (c *EarningClient) ProcessData() (*[]uint64, *[]uint64, error) {
 }
 
 func (c *EarningClient) toSampleTasks(response [][]byte) ([]persistence.SampleTask, error) {
+
 	logger := *logging.GetLogger()
+	set := make(map[string]void)
 	var fetchedData []Earning
 	for _, resp := range response {
 		data := EarningsData{}
@@ -89,6 +91,10 @@ func (c *EarningClient) toSampleTasks(response [][]byte) ([]persistence.SampleTa
 	var sampleTasks []persistence.SampleTask
 	for i := range c.data.Earning {
 		item := c.toSampleTask(c.data.Earning[i])
+		if _, exists := set[item.Uid]; exists {
+			continue
+		}
+		set[item.Uid] = val
 		sampleTasks = append(sampleTasks, item)
 	}
 	return sampleTasks, nil
@@ -99,7 +105,7 @@ func (c *EarningClient) toSampleTask(data Earning) persistence.SampleTask { // d
 
 	availBefore := data.Date
 	t, _ := time.Parse(layoutISO, availBefore)
-	t = t.AddDate(0, 0, 0)
+	t = t.AddDate(0, 0, expireInDays)
 	dueDate := data.Date
 	if len(dueDate) > 10 {
 		dueDate = dueDate[0:10] // yyyy-MM-dd

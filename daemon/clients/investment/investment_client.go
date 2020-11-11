@@ -9,6 +9,13 @@ import (
 )
 
 
+const (
+	expireInDays = 0
+)
+
+type void struct{}
+var val void
+
 type (
 	Extractor interface {
 		ProcessData() (*[]uint64, *[]uint64, error)
