@@ -53,7 +53,7 @@ func (s *SampleTaskDao) Upsert(t *SampleTask) (uint64, bool) {
 	//}
 
 	// Update the SampleTask for only Content, DueDate, availableBefore, DueTime
-	s.Db.Model(&t).Where("uid = ?", t.Uid).Select("raw", "due_date", "due_time", "available_before").
+	s.Db.Model(&t).Where("uid = ?", t.Uid).Select("raw", "due_date", "due_time", "available_before", "name").
 		Updates(map[string]interface{}{
 			"raw":              t.Raw,
 			"due_date":         t.DueDate,
