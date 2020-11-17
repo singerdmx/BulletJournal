@@ -469,7 +469,7 @@ function* transactionContentsUpdate(
         contents: contents,
       })
     );
-    
+
     let targetContent = undefined;
     if (contents && contents.length > 0) {
       const state: IState = yield select();
