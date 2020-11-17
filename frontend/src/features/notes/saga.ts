@@ -96,17 +96,24 @@ function* notesUpdate(action: PayloadAction<UpdateNotes>) {
 function* noteContentsUpdate(action: PayloadAction<UpdateNoteContents>) {
   try {
     const { noteId, updateDisplayMore } = action.payload;
-    const contents = yield call(getContents, noteId);
+    const contents : Content[] = yield call(getContents, noteId);
     yield put(
       notesActions.noteContentsReceived({
         contents: contents,
       })
     );
+    let targetContent = undefined;
     if (contents && contents.length > 0) {
-      yield put(updateTargetContent(contents[0]));
-    } else {
-      yield put(updateTargetContent(undefined));
+      const state: IState = yield select();
+      targetContent = contents[0];
+      if (state.content.content && state.content.content.id) {
+        const found = contents.find((c) => c.id === state.content.content!.id);
+        if (found) {
+          targetContent = found;
+        }
+      }
     }
+    yield put(updateTargetContent(targetContent));
 
     if (updateDisplayMore === true) {
       yield put(setDisplayMore(true));

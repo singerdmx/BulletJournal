@@ -952,17 +952,24 @@ function* createTaskContent(action: PayloadAction<CreateContent>) {
 function* taskContentsUpdate(action: PayloadAction<UpdateTaskContents>) {
   try {
     const { taskId, updateDisplayMore } = action.payload;
-    const contents = yield call(getContents, taskId);
+    const contents : Content[] = yield call(getContents, taskId);
     yield put(
         tasksActions.taskContentsReceived({
           contents: contents,
         })
     );
+    let targetContent = undefined;
     if (contents && contents.length > 0) {
-      yield put(updateTargetContent(contents[0]));
-    } else {
-      yield put(updateTargetContent(undefined));
+      const state: IState = yield select();
+      targetContent = contents[0];
+      if (state.content.content && state.content.content.id) {
+        const found = contents.find((c) => c.id === state.content.content!.id);
+        if (found) {
+          targetContent = found;
+        }
+      }
     }
+    yield put(updateTargetContent(targetContent));
 
     if (updateDisplayMore === true) {
       yield put(setDisplayMore(true));

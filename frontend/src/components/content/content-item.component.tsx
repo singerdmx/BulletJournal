@@ -100,16 +100,16 @@ const ContentItem: React.FC<ContentProps> = ({
     console.log(delta)
     console.log('revisionContents');
     console.log(revisionContents)
-    if (targetContent) {
+    if (content) {
       switch (projectItem.contentType) {
         case ContentType.TASK:
-          patchTaskRevisionContents(projectItem.id, targetContent.id, revisionContents, targetContent.etag);
+          patchTaskRevisionContents(projectItem.id, content.id, revisionContents, content.etag);
           break;
         case ContentType.NOTE:
-          patchNoteRevisionContents(projectItem.id, targetContent.id, revisionContents, targetContent.etag);
+          patchNoteRevisionContents(projectItem.id, content.id, revisionContents, content.etag);
           break;
         case ContentType.TRANSACTION:
-          patchTransactionRevisionContents(projectItem.id, targetContent.id, revisionContents, targetContent.etag);
+          patchTransactionRevisionContents(projectItem.id, content.id, revisionContents, content.etag);
           break;
       }
     }
