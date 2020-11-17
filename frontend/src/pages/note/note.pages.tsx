@@ -97,6 +97,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
 
     const handleRefresh = () => {
         note && note.id && updateNoteContents(note.id);
+        note && note.id && getNote(note.id);
     };
 
     const labelEditableHandler = () => {
@@ -105,6 +106,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
     if (!note) return null;
 
     const handleEdit = () => {
+        note && note.id && updateNoteContents(note.id);
         setDisplayMore(true);
     };
 

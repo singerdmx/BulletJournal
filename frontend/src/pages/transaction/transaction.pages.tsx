@@ -139,6 +139,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   };
 
   const handleEdit = () => {
+    transaction && transaction.id && updateTransactionContents(transaction.id);
     setDisplayMore(true);
   };
 

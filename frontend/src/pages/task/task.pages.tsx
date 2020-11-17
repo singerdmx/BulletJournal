@@ -128,6 +128,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
   };
 
   const handleEdit = () => {
+    task && task.id && updateTaskContents(task.id);
     setDisplayMore(true);
   };
 
