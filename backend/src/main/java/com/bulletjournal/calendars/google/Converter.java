@@ -12,7 +12,6 @@ import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.EventReminder;
 import com.google.common.collect.ImmutableList;
-import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.dmfs.rfc5545.DateTime;
 import org.slf4j.Logger;
