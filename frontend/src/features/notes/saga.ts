@@ -626,7 +626,7 @@ function* patchNoteRevisionContents(action: PayloadAction<PatchRevisionContents>
     const {noteId, contentId, revisionContents, etag} = action.payload;
     yield call(patchRevisionContents, noteId, contentId, revisionContents, etag);
   } catch (error) {
-    if (error.message === 'reload') {
+    if (error.message === 'reload' || error.message === 'Invalid etag') {
       yield put(reloadReceived(true));
     } else {
       yield call(message.error, `patchNoteRevisionContents Error Received: ${error}`);

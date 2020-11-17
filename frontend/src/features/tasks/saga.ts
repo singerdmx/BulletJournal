@@ -1272,7 +1272,7 @@ function* patchTaskRevisionContents(action: PayloadAction<PatchRevisionContents>
     const {taskId, contentId, revisionContents, etag} = action.payload;
     yield call(patchRevisionContents, taskId, contentId, revisionContents, etag);
   } catch (error) {
-    if (error.message === 'reload') {
+    if (error.message === 'reload' || error.message === 'Invalid etag') {
       yield put(reloadReceived(true));
     } else {
       yield call(message.error, `patchTaskRevisionContents Error Received: ${error}`);
