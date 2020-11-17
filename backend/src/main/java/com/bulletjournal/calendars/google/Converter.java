@@ -1,15 +1,22 @@
 package com.bulletjournal.calendars.google;
 
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.Content;
+import com.bulletjournal.controller.models.CreateTaskParams;
+import com.bulletjournal.controller.models.ReminderSetting;
+import com.bulletjournal.controller.models.Task;
+import com.bulletjournal.controller.models.User;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.EventReminder;
 import com.google.common.collect.ImmutableList;
+import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.dmfs.rfc5545.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import java.util.Collections;
@@ -19,10 +26,11 @@ import java.util.stream.Collectors;
 
 public class Converter {
     private static final int DEFAULT_REMINDER_SETTING = 30;
+    public static final Logger LOGGER = LoggerFactory.getLogger(Converter.class);
 
     public static GoogleCalendarEvent toTask(Event event, String timezone) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-
+        LOGGER.info("GoogleCalendarEvent = {}" + new Gson().toJson(event));
         Task task = new Task();
         task.setOwner(new User(username));
         task.setAssignees(ImmutableList.of(new User(username)));
