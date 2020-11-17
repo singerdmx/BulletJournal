@@ -237,7 +237,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             // read etag from DB content text column
             String noteEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                     EtagGenerator.HashType.TO_HASHCODE, content.getText());
-            LOGGER.info("web etag =" + etag + " \t db etag =" + noteEtag);
+            LOGGER.info("web etag =" + etag + " and db etag =" + noteEtag);
             if (!Objects.equals(etag, noteEtag)) {
                 throw new BadRequestException("Invalid etag");
             }
