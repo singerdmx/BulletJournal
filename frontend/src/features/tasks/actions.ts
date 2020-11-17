@@ -123,8 +123,8 @@ export const revokeTaskSharable = (
 ) => actions.TaskRevokeSharable({ taskId: taskId, user: user, link: link });
 export const removeSharedTask = (taskId: number) =>
     actions.TaskRemoveShared({taskId: taskId});
-export const updateTaskContents = (taskId: number) =>
-  actions.TaskContentsUpdate({ taskId: taskId });
+export const updateTaskContents = (taskId: number, updateDisplayMore?: boolean) =>
+  actions.TaskContentsUpdate({ taskId: taskId, updateDisplayMore: updateDisplayMore });
 export const updateCompleteTaskContents = (taskId: number) =>
   actions.CompleteTaskContentsUpdate({ taskId: taskId });
 export const updateTaskContentRevision = (

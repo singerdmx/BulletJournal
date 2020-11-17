@@ -56,7 +56,7 @@ import {Note} from './interface';
 import {ProjectItemUIType} from "../project/constants";
 import {ContentType} from "../myBuJo/constants";
 import {recentItemsReceived} from "../recent/actions";
-import {updateTargetContent} from "../content/actions";
+import {setDisplayMore, updateTargetContent} from "../content/actions";
 import {reloadReceived} from "../myself/actions";
 
 function* noteApiErrorReceived(action: PayloadAction<NoteApiErrorAction>) {
@@ -95,7 +95,8 @@ function* notesUpdate(action: PayloadAction<UpdateNotes>) {
 
 function* noteContentsUpdate(action: PayloadAction<UpdateNoteContents>) {
   try {
-    const contents = yield call(getContents, action.payload.noteId);
+    const { noteId, updateDisplayMore } = action.payload;
+    const contents = yield call(getContents, noteId);
     yield put(
       notesActions.noteContentsReceived({
         contents: contents,
@@ -105,6 +106,10 @@ function* noteContentsUpdate(action: PayloadAction<UpdateNoteContents>) {
       yield put(updateTargetContent(contents[0]));
     } else {
       yield put(updateTargetContent(undefined));
+    }
+
+    if (updateDisplayMore === true) {
+      yield put(setDisplayMore(true));
     }
   } catch (error) {
     if (error.message === 'reload') {

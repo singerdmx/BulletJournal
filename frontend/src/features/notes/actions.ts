@@ -5,8 +5,8 @@ import {ProjectItemUIType} from "../project/constants";
 
 export const updateNotes = (projectId: number) =>
   actions.NotesUpdate({ projectId: projectId });
-export const updateNoteContents = (noteId: number) =>
-  actions.NoteContentsUpdate({ noteId: noteId });
+export const updateNoteContents = (noteId: number, updateDisplayMore?: boolean) =>
+  actions.NoteContentsUpdate({ noteId: noteId, updateDisplayMore: updateDisplayMore });
 export const updateNoteContentRevision = (
   noteId: number,
   contentId: number,

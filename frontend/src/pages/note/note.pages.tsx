@@ -37,7 +37,7 @@ interface NotePageHandler {
     content: Content | undefined;
     getNote: (noteId: number) => void;
     deleteNote: (noteId: number, type: ProjectItemUIType) => void;
-    updateNoteContents: (noteId: number) => void;
+    updateNoteContents: (noteId: number, updateDisplayMore?: boolean) => void;
     setDisplayMore: (displayMore: boolean) => void;
     setDisplayRevision: (displayRevision: boolean) => void;
     deleteContent: (noteId: number, contentId: number) => void;
@@ -106,8 +106,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
     if (!note) return null;
 
     const handleEdit = () => {
-        note && note.id && updateNoteContents(note.id);
-        setDisplayMore(true);
+        note && note.id && updateNoteContents(note.id, true);
     };
 
     const handleOpenRevisions = () => {

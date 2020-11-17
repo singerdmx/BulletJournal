@@ -16,6 +16,7 @@ export type UpdateNotes = {
 
 export type UpdateNoteContents = {
   noteId: number;
+  updateDisplayMore?: boolean;
 };
 
 export type UpdateNoteContentRevision = {

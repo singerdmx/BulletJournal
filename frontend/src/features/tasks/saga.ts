@@ -74,7 +74,7 @@ import {completedTaskPageSize, ProjectItemUIType} from '../project/constants';
 import {Task, TaskStatistics} from './interface';
 import {recentItemsReceived} from '../recent/actions';
 import {ContentType} from '../myBuJo/constants';
-import {updateTargetContent} from "../content/actions";
+import {setDisplayMore, updateTargetContent} from "../content/actions";
 import {reloadReceived} from "../myself/actions";
 import {fetchSampleTask} from "../../apis/templates/workflowApis";
 
@@ -951,7 +951,8 @@ function* createTaskContent(action: PayloadAction<CreateContent>) {
 
 function* taskContentsUpdate(action: PayloadAction<UpdateTaskContents>) {
   try {
-    const contents = yield call(getContents, action.payload.taskId);
+    const { taskId, updateDisplayMore } = action.payload;
+    const contents = yield call(getContents, taskId);
     yield put(
         tasksActions.taskContentsReceived({
           contents: contents,
@@ -961,6 +962,10 @@ function* taskContentsUpdate(action: PayloadAction<UpdateTaskContents>) {
       yield put(updateTargetContent(contents[0]));
     } else {
       yield put(updateTargetContent(undefined));
+    }
+
+    if (updateDisplayMore === true) {
+      yield put(setDisplayMore(true));
     }
   } catch (error) {
     if (error.message === 'reload') {

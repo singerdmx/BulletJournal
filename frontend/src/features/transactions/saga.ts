@@ -47,7 +47,7 @@ import {projectLabelsUpdate, updateItemsByLabels} from '../label/actions';
 import { ProjectItemUIType } from "../project/constants";
 import { ContentType } from "../myBuJo/constants";
 import { recentItemsReceived } from "../recent/actions";
-import { updateTargetContent } from "../content/actions";
+import {setDisplayMore, updateTargetContent} from "../content/actions";
 import {reloadReceived} from "../myself/actions";
 
 
@@ -462,7 +462,8 @@ function* transactionContentsUpdate(
   action: PayloadAction<UpdateTransactionContents>
 ) {
   try {
-    const contents: Content[] = yield call(getContents, action.payload.transactionId);
+    const {transactionId, updateDisplayMore} = action.payload;
+    const contents: Content[] = yield call(getContents, transactionId);
     yield put(
       transactionsActions.transactionContentsReceived({
         contents: contents,
@@ -472,6 +473,9 @@ function* transactionContentsUpdate(
       yield put(updateTargetContent(contents[0]));
     } else {
       yield put(updateTargetContent(undefined));
+    }
+    if (updateDisplayMore === true) {
+      yield put(setDisplayMore(true));
     }
   } catch (error) {
     if (error.message === 'reload') {

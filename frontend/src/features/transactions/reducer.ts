@@ -15,6 +15,7 @@ export type TransactionApiErrorAction = {
 
 export type UpdateTransactionContents = {
   transactionId: number;
+  updateDisplayMore?: boolean;
 };
 
 export type UpdateTransactionContentRevision = {
