@@ -641,11 +641,7 @@ function* patchTransactionRevisionContents(action: PayloadAction<PatchRevisionCo
     const {transactionId, contentId, revisionContents, etag} = action.payload;
     yield call(patchRevisionContents, transactionId, contentId, revisionContents, etag);
   } catch (error) {
-    if (error.message === 'reload' || error.message === 'Invalid etag') {
-      yield put(reloadReceived(true));
-    } else {
-      yield call(message.error, `patchTransactionRevisionContents Error Received: ${error}`);
-    }
+    yield put(reloadReceived(true));
   }
 }
 
