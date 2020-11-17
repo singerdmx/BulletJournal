@@ -30,7 +30,7 @@ public class Converter {
 
     public static GoogleCalendarEvent toTask(Event event, String timezone) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        LOGGER.info("GoogleCalendarEvent = {}" + new Gson().toJson(event));
+        LOGGER.info("GoogleCalendarEvent: {}", event);
         Task task = new Task();
         task.setOwner(new User(username));
         task.setAssignees(ImmutableList.of(new User(username)));

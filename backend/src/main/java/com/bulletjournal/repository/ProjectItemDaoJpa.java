@@ -223,16 +223,17 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> void patchRevisionContentHistory(Long contentId, Long projectItemId,
-                                                                         String requester, List<String> revisionContents,
-                                                                         String etag) {
-        T projectItem = getProjectItem(projectItemId, requester);
-        K content = getContent(contentId, requester);
-        int n = revisionContents.size();
-        String lastRevisionContent = revisionContents.get(n - 1);
+    public K patchRevisionContentHistory(Long contentId, Long projectItemId,
+                                         String requester, List<String> revisionContents,
+                                         String etag) {
         LOGGER.info(GSON.toJson(revisionContents));
 
+        getProjectItem(projectItemId, requester); // permission check
+        int n = revisionContents.size();
+        String lastRevisionContent = revisionContents.get(n - 1);
+        K content;
         synchronized (this) {
+            content = getContent(contentId, requester);
             // read etag from DB content text column
             String noteEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                     EtagGenerator.HashType.TO_HASHCODE, content.getText());
@@ -251,6 +252,9 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             LOGGER.info("first=" + first + "\t second=" + second);
             updateRevision(content, requester, second, first);
         }
+
+        LOGGER.info("patchRevisionContentHistory return {}", content);
+        return content;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
