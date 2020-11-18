@@ -287,7 +287,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             String itemEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                     EtagGenerator.HashType.TO_HASHCODE, oldText);
             if (!Objects.equals(etag.get(), itemEtag)) {
-                LOGGER.error("Invalid Etag: {} v.s. {}", itemEtag, etag.get());
+                LOGGER.error("Invalid Etag: {} v.s. {}, oldText: {}", itemEtag, etag.get(), oldText);
                 throw new BadRequestException("Invalid Etag");
             }
         });

@@ -48,6 +48,7 @@ public class Content {
         this.text = text;
         this.etag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE, text);
+        LOGGER.info("etag {} for {}", this.etag, text);
         this.baseText = baseText;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
