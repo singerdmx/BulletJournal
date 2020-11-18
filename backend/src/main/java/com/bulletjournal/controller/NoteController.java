@@ -5,7 +5,6 @@ import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.notifications.*;
-import com.bulletjournal.redis.RedisCachedContentRepository;
 import com.bulletjournal.repository.NoteDaoJpa;
 import com.bulletjournal.repository.NoteRepository;
 import com.bulletjournal.repository.models.ContentModel;
