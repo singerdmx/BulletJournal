@@ -242,7 +242,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
                 throw new BadRequestException("Invalid etag");
             }
             content.setText(DeltaConverter.mergeContentText(lastRevisionContent, content.getText()) );
-            this.getContentJpaRepository().save(content);
+            this.getContentJpaRepository().saveAndFlush(content);
         }
 
         // iterate pairs
