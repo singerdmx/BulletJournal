@@ -61,7 +61,8 @@ import {
   setTaskStatus as setTaskStatusApi,
   shareTaskWithOther,
   uncompleteTaskById,
-  updateContent, updateSampleContent,
+  updateContent,
+  updateSampleContent,
   updateTask
 } from '../../apis/taskApis';
 import {updateLoadingCompletedTask, updateTaskContents, updateTasks,} from './actions';
@@ -1282,7 +1283,11 @@ function* getSearchCompletedTasks(
 function* patchTaskRevisionContents(action: PayloadAction<PatchRevisionContents>) {
   try {
     const {taskId, contentId, revisionContents, etag} = action.payload;
-    yield call(patchRevisionContents, taskId, contentId, revisionContents, etag);
+    const data = yield call(patchRevisionContents, taskId, contentId, revisionContents, etag);
+    const state: IState = yield select();
+    if (data && state.content.content && data.id === state.content.content.id) {
+      yield put(updateTargetContent(data));
+    }
   } catch (error) {
     yield put(reloadReceived(true));
   }

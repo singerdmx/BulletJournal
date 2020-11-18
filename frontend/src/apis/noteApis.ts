@@ -233,6 +233,7 @@ export const patchRevisionContents = (
     revisionContents: revisionContents,
   });
   return doPost(`/api/notes/${noteId}/contents/${contentId}/patchRevisionContents`, patchBody, etag)
+      .then((res) => res.json())
       .catch((err) => {
         throw Error(err);
       });

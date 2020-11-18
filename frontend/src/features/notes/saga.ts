@@ -636,7 +636,11 @@ function* removeSharedNote(action: PayloadAction<RemoveShared>) {
 function* patchNoteRevisionContents(action: PayloadAction<PatchRevisionContents>) {
   try {
     const {noteId, contentId, revisionContents, etag} = action.payload;
-    yield call(patchRevisionContents, noteId, contentId, revisionContents, etag);
+    const data = yield call(patchRevisionContents, noteId, contentId, revisionContents, etag);
+    const state: IState = yield select();
+    if (data && state.content.content && data.id === state.content.content.id) {
+      yield put(updateTargetContent(data));
+    }
   } catch (error) {
     yield put(reloadReceived(true));
   }
