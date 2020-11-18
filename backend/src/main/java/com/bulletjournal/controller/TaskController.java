@@ -493,12 +493,13 @@ public class TaskController {
     }
 
     @PostMapping(REVISION_CONTENT_ROUTE)
-    public void patchRevisionContents(@NotNull @PathVariable Long taskId,
+    public Content patchRevisionContents(@NotNull @PathVariable Long taskId,
                                       @NotNull @PathVariable Long contentId,
                                       @NotNull @RequestBody  RevisionContentsParams revisionContentsParams,
                                       @RequestHeader(IF_NONE_MATCH) String etag) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.taskDaoJpa.patchRevisionContentHistory(
+        TaskContent content = this.taskDaoJpa.patchRevisionContentHistory(
                 contentId, taskId, username, revisionContentsParams.getRevisionContents(), etag);
+        return content == null ? new Content() : content.toPresentationModel();
     }
 }

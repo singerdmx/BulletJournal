@@ -5,6 +5,7 @@ import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.notifications.*;
+import com.bulletjournal.redis.RedisCachedContentRepository;
 import com.bulletjournal.repository.NoteDaoJpa;
 import com.bulletjournal.repository.NoteRepository;
 import com.bulletjournal.repository.models.ContentModel;
@@ -293,11 +294,13 @@ public class NoteController {
     }
 
     @PostMapping(REVISION_CONTENT_ROUTE)
-    public void patchRevisionContents(@NotNull @PathVariable Long noteId,
+    public Content patchRevisionContents(@NotNull @PathVariable Long noteId,
                                       @NotNull @PathVariable Long contentId,
                                       @NotNull @RequestBody  RevisionContentsParams revisionContentsParams,
                                       @RequestHeader(IF_NONE_MATCH) String etag) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.noteDaoJpa.patchRevisionContentHistory(contentId, noteId, username, revisionContentsParams.getRevisionContents(), etag);
+        NoteContent content = this.noteDaoJpa.patchRevisionContentHistory(
+            contentId, noteId, username, revisionContentsParams.getRevisionContents(), etag);
+        return content == null ? new Content() : content.toPresentationModel();
     }
 }

@@ -10,6 +10,8 @@ import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.*;
+import com.bulletjournal.redis.RedisCachedContentRepository;
+import com.bulletjournal.redis.models.CachedContent;
 import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.ProjectItemModel;
@@ -59,6 +61,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     private ProjectRepository projectRepository;
     @Autowired
     protected NotificationService notificationService;
+    @Autowired
+    private RedisCachedContentRepository redisCachedContentRepository;
 
     abstract <T extends ProjectItemModel> JpaRepository<T, Long> getJpaRepository();
 
@@ -233,6 +237,9 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         String lastRevisionContent = revisionContents.get(n - 1);
         K content;
         synchronized (this) {
+            if (redisCachedContentRepository.existsById(contentId)) {
+                return null;
+            }
             content = getContent(contentId, requester);
             // read etag from DB content text column
             String noteEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
@@ -242,7 +249,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
                 throw new BadRequestException("Invalid etag");
             }
             content.setText(DeltaConverter.mergeContentText(lastRevisionContent, content.getText()) );
-            this.getContentJpaRepository().saveAndFlush(content);
+            content = this.getContentJpaRepository().saveAndFlush(content);
+            redisCachedContentRepository.save(new CachedContent(contentId));
         }
 
         // iterate pairs
@@ -252,7 +260,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             LOGGER.info("first=" + first + "\t second=" + second);
             updateRevision(content, requester, second, first);
         }
-
+        content = this.getContentJpaRepository().saveAndFlush(content);
         LOGGER.info("patchRevisionContentHistory return {}", content);
         return content;
     }

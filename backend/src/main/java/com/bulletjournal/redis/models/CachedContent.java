@@ -11,20 +11,20 @@ import org.springframework.data.redis.core.RedisHash;
 public class CachedContent implements Serializable {
 
   @Id
-  private String contentId;
+  private Long contentId;
 
   public CachedContent() {
   }
 
-  public CachedContent(String contentId) {
+  public CachedContent(Long contentId) {
     this.contentId = contentId;
   }
 
-  public String getContentId() {
+  public Long getContentId() {
     return contentId;
   }
 
-  public void setContentId(String contentId) {
+  public void setContentId(Long contentId) {
     this.contentId = contentId;
   }
 
