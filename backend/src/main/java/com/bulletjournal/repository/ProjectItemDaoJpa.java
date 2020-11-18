@@ -278,6 +278,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         String mdiff = updateContentParams.getMdiff();
         String diff = updateContentParams.getDiff();
         if (mdiff != null && diff != null) {
+            LOGGER.error("Cannot have both diff and mdiff");
             throw new BadRequestException("Cannot have both diff and mdiff");
         }
 
@@ -286,6 +287,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             String itemEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                     EtagGenerator.HashType.TO_HASHCODE, oldText);
             if (!Objects.equals(etag.get(), itemEtag)) {
+                LOGGER.error("Invalid Etag: {} v.s. {}", itemEtag, etag.get());
                 throw new BadRequestException("Invalid Etag");
             }
         });
@@ -332,6 +334,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             content.setText(newContent.toJSON());
             // save to db: {delta: YYYYY, mdelta:XXXXXX2, diff: [d2] }
         } else {
+            LOGGER.error("Cannot have null in both diff and mdiff");
             throw new BadRequestException("Cannot have null in both diff and mdiff");
         }
 
