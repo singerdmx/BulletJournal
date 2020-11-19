@@ -636,10 +636,26 @@ function* removeSharedNote(action: PayloadAction<RemoveShared>) {
 function* patchNoteRevisionContents(action: PayloadAction<PatchRevisionContents>) {
   try {
     const {noteId, contentId, revisionContents, etag} = action.payload;
-    const data = yield call(patchRevisionContents, noteId, contentId, revisionContents, etag);
+    const data : Content = yield call(patchRevisionContents, noteId, contentId, revisionContents, etag);
     const state: IState = yield select();
     if (data && state.content.content && data.id === state.content.content.id) {
       yield put(updateTargetContent(data));
+    }
+
+    if (data && data.id) {
+      const contents : Content[] = [];
+      state.task.contents.forEach(c => {
+        if (c.id === data.id) {
+          contents.push(data);
+        } else {
+          contents.push(c);
+        }
+      });
+      yield put(
+          notesActions.noteContentsReceived({
+            contents: contents,
+          })
+      );
     }
   } catch (error) {
     yield put(reloadReceived(true));
