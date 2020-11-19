@@ -237,10 +237,10 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         String lastRevisionContent = revisionContents.get(n - 1);
         K content;
         synchronized (this) {
-            if (redisCachedContentRepository.existsById(contentId)) {
-                return null;
-            }
             content = getContent(contentId, requester);
+            if (redisCachedContentRepository.existsById(contentId)) {
+                return content;
+            }
             // read etag from DB content text column
             String noteEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                     EtagGenerator.HashType.TO_HASHCODE, content.getText());
