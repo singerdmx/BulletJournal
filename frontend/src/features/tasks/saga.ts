@@ -1285,7 +1285,9 @@ function* patchTaskRevisionContents(action: PayloadAction<PatchRevisionContents>
     const {taskId, contentId, revisionContents, etag} = action.payload;
     const data : Content = yield call(patchRevisionContents, taskId, contentId, revisionContents, etag);
     const state: IState = yield select();
+    console.log("data", data);
     if (data && state.content.content && data.id === state.content.content.id) {
+      console.log("updateTargetContent");
       yield put(updateTargetContent(data));
     }
 
@@ -1298,6 +1300,7 @@ function* patchTaskRevisionContents(action: PayloadAction<PatchRevisionContents>
           contents.push(c);
         }
       });
+      console.log("update contents", contents);
       yield put(
           tasksActions.taskContentsReceived({
             contents: contents,
