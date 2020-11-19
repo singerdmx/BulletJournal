@@ -162,7 +162,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
                   <span>
                 <ProfileOutlined/>
                 <Tooltip placement='right' title='BuJo created by me'>
-                  <span>Own BuJo</span>
+                  <span>My Own</span>
                 </Tooltip>
               </span>
                 }
@@ -175,7 +175,7 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
                   <span>
                 <TeamOutlined/>
                 <Tooltip placement='right' title='BuJo shared with me'>
-                  <span>Shared BuJo</span>
+                  <span>Shared with Me</span>
                 </Tooltip>
               </span>
                 }
