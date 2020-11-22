@@ -6,7 +6,9 @@ import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.controller.models.User;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.util.BuJoRecurrenceRule;
+import com.bulletjournal.util.StringUtil;
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -163,6 +165,10 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
 
     public boolean hasReminderDateTime() {
         return this.reminderDateTime != null;
+    }
+
+    public boolean hasRecurrenceRule() {
+        return StringUtils.isNotBlank(recurrenceRule);
     }
 
     public void setReminderDateTime(Timestamp reminderDateTime) {

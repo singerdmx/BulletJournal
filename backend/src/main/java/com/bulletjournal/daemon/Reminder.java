@@ -103,7 +103,7 @@ public class Reminder {
 
         tasks.forEach(t -> {
             LOGGER.info("generateTaskReminder {}", t);
-            DaoHelper.getReminderRecords(t, interval.getFirst(), interval.getSecond()).forEach(e -> {
+            DaoHelper.getReminderRecordMap(t, interval.getFirst(), interval.getSecond()).forEach((e, clonedTask) -> {
                         LOGGER.info("getReminderRecords {}", e);
                         if (!concurrentHashMap.containsKey(e)) {
                             LOGGER.info("getReminderRecords in map: {}", e);
@@ -113,7 +113,7 @@ public class Reminder {
                                 executorService.schedule(() -> this.process(e), delay, TimeUnit.MILLISECONDS);
                             }
                         }
-                        concurrentHashMap.put(e, t);
+                        concurrentHashMap.put(e, clonedTask);
                     }
             );
         });
@@ -153,9 +153,23 @@ public class Reminder {
         taskRepository.findById(record.getId()).ifPresent(task -> {
             if (filterInvalidTask(record, interval.getFirst(), interval.getSecond(), task)) {
                 LOGGER.info("Push notification record {}", record);
-                messagingService.sendTaskDueNotificationAndEmailToUsers(Arrays.asList(task));
+                fillDueDateTimeForRecurringTask(task, record);
+                messagingService.sendTaskDueNotificationAndEmailToUsers(Collections.singletonList(task));
             }
         });
+    }
+
+    private void fillDueDateTimeForRecurringTask(Task task, ReminderRecord reminderRecord) {
+        if (!task.hasRecurrenceRule()) {
+            return;
+        }
+        Task cachedTask = concurrentHashMap.get(reminderRecord);
+        if (cachedTask == null) {
+            LOGGER.error("Cached task id {} doesn't exist in ConcurrentHashMap", task.getId());
+            return;
+        }
+        task.setDueDate(cachedTask.getDueDate());
+        task.setDueTime(cachedTask.getDueTime());
     }
 
     private boolean filterInvalidTask(ReminderRecord record, ZonedDateTime startTime, ZonedDateTime endTime, Task task) {

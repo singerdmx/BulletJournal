@@ -381,9 +381,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     public void fillReminderRecordTaskMap(Map<ReminderRecord, Task> reminderRecordTaskMap,
                                           List<Task> tasks, ZonedDateTime start, ZonedDateTime end) {
         tasks.forEach(t -> {
-            List<ReminderRecord> records = DaoHelper.getReminderRecords(t, start, end);
-            for (ReminderRecord record : records) {
-                reminderRecordTaskMap.put(record, t);
+            Map<ReminderRecord, Task> records = DaoHelper.getReminderRecordMap(t, start, end);
+            for (Map.Entry<ReminderRecord, Task> entry : records.entrySet()) {
+                reminderRecordTaskMap.put(entry.getKey(), entry.getValue());
             }
         });
     }
