@@ -10,6 +10,8 @@ import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.*;
+import com.bulletjournal.redis.RedisCachedContentRepository;
+import com.bulletjournal.redis.models.CachedContent;
 import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.ProjectItemModel;
@@ -59,6 +61,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     private ProjectRepository projectRepository;
     @Autowired
     protected NotificationService notificationService;
+    @Autowired
+    private RedisCachedContentRepository redisCachedContentRepository;
 
     abstract <T extends ProjectItemModel> JpaRepository<T, Long> getJpaRepository();
 
@@ -223,25 +227,30 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> void patchRevisionContentHistory(Long contentId, Long projectItemId,
-                                                                         String requester, List<String> revisionContents,
-                                                                         String etag) {
-        T projectItem = getProjectItem(projectItemId, requester);
-        K content = getContent(contentId, requester);
-        int n = revisionContents.size();
-        String lastRevisionContent = revisionContents.get(n - 1);
+    public K patchRevisionContentHistory(Long contentId, Long projectItemId,
+                                         String requester, List<String> revisionContents,
+                                         String etag) {
         LOGGER.info(GSON.toJson(revisionContents));
 
+        getProjectItem(projectItemId, requester); // permission check
+        int n = revisionContents.size();
+        String lastRevisionContent = revisionContents.get(n - 1);
+        K content;
         synchronized (this) {
+            content = getContent(contentId, requester);
+            if (redisCachedContentRepository.existsById(contentId)) {
+                return content;
+            }
             // read etag from DB content text column
             String noteEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                     EtagGenerator.HashType.TO_HASHCODE, content.getText());
-            LOGGER.info("web etag =" + etag + " \t db etag =" + noteEtag);
+            LOGGER.info("web etag =" + etag + " and db etag =" + noteEtag);
             if (!Objects.equals(etag, noteEtag)) {
                 throw new BadRequestException("Invalid etag");
             }
             content.setText(DeltaConverter.mergeContentText(lastRevisionContent, content.getText()) );
-            this.getContentJpaRepository().save(content);
+            content = this.getContentJpaRepository().saveAndFlush(content);
+            redisCachedContentRepository.save(new CachedContent(contentId));
         }
 
         // iterate pairs
@@ -251,6 +260,9 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             LOGGER.info("first=" + first + "\t second=" + second);
             updateRevision(content, requester, second, first);
         }
+        content = this.getContentJpaRepository().saveAndFlush(content);
+        LOGGER.info("patchRevisionContentHistory return {}", content);
+        return content;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -266,6 +278,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         String mdiff = updateContentParams.getMdiff();
         String diff = updateContentParams.getDiff();
         if (mdiff != null && diff != null) {
+            LOGGER.error("Cannot have both diff and mdiff");
             throw new BadRequestException("Cannot have both diff and mdiff");
         }
 
@@ -274,6 +287,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             String itemEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                     EtagGenerator.HashType.TO_HASHCODE, oldText);
             if (!Objects.equals(etag.get(), itemEtag)) {
+                LOGGER.error("Invalid Etag: {} v.s. {}, oldText: {}", itemEtag, etag.get(), oldText);
                 throw new BadRequestException("Invalid Etag");
             }
         });
@@ -320,6 +334,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             content.setText(newContent.toJSON());
             // save to db: {delta: YYYYY, mdelta:XXXXXX2, diff: [d2] }
         } else {
+            LOGGER.error("Cannot have null in both diff and mdiff");
             throw new BadRequestException("Cannot have null in both diff and mdiff");
         }
 

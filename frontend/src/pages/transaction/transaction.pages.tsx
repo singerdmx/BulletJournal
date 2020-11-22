@@ -70,7 +70,7 @@ type TransactionProps = {
   transaction: Transaction | undefined;
   contents: Content[];
   deleteTransaction: (transactionId: number, type: ProjectItemUIType) => void;
-  updateTransactionContents: (transactionId: number) => void;
+  updateTransactionContents: (transactionId: number, updateDisplayMore?: boolean) => void;
   getProject: (projectId: number) => void;
 };
 
@@ -139,7 +139,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   };
 
   const handleEdit = () => {
-    setDisplayMore(true);
+    transaction && transaction.id && updateTransactionContents(transaction.id, true);
   };
 
   const handleOpenRevisions = () => {

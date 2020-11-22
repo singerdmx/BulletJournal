@@ -54,7 +54,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     private static final String EVERYONE = "Everyone";
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskDaoJpa.class);
     private static final Gson GSON = new Gson();
-    private static final int REMINDING_TASK_BUFFER_IN_MINS = 10;
 
     private static final Gson GSON_ALLOW_EXPOSE_ONLY = new GsonBuilder().excludeFieldsWithoutExposeAnnotation()
             .create();

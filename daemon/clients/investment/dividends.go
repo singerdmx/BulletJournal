@@ -3,6 +3,7 @@ package investment
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -50,15 +51,18 @@ func (c *DividendsClient) ProcessData() (*[]uint64, *[]uint64, error) {
 }
 
 func (c *DividendsClient) toSampleTasks(response [][]byte) ([]persistence.SampleTask, error) {
+
+	logger := *logging.GetLogger()
+	set := make(map[string]void)
 	var fetchedData []Dividends
 	for _, resp := range response {
 		data := DividendsData{}
-		if len(resp) == 0 {
+		if resp == nil || len(resp) == 0 {
 			continue
 		}
 		if err := json.Unmarshal(resp, &data); err != nil {
 			//logger.Error(fmt.Sprintf("%s Unmarshal dividends response failed: %s", url, string(resp.Body())))
-			logger.Error(fmt.Sprintf("Unmarshal dividends response failed: %s", string(resp)))
+			logger.Errorf("Unmarshal dividends response failed: %v", resp)
 			continue
 		}
 		fetchedData = append(fetchedData, data.Dividends...)
@@ -73,6 +77,10 @@ func (c *DividendsClient) toSampleTasks(response [][]byte) ([]persistence.Sample
 	var sampleTasks []persistence.SampleTask
 	for i := range c.data.Dividends {
 		item := c.toSampleTask(c.data.Dividends[i])
+		if _, exists := set[item.Uid]; exists {
+			continue
+		}
+		set[item.Uid] = val
 		sampleTasks = append(sampleTasks, item)
 	}
 	return sampleTasks, nil
@@ -83,7 +91,7 @@ func (c *DividendsClient) toSampleTask(data Dividends) persistence.SampleTask {
 
 	availBefore := data.Date
 	t, _ := time.Parse(layoutISO, availBefore)
-	t = t.AddDate(0, 0, 0)
+	t = t.AddDate(0, 0, expireInDays)
 	dueDate := data.ExDividendDate
 	if len(dueDate) > 10 {
 		dueDate = dueDate[0:10] // yyyy-MM-dd

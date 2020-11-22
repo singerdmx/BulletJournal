@@ -96,22 +96,18 @@ const ContentItem: React.FC<ContentProps> = ({
       revisionContents.push(JSON.stringify({delta: delta, '###html###': createHTML(new Delta(delta))}));
     });
 
-    console.log('new Delta')
-    console.log(delta)
-    console.log('revisionContents');
-    console.log(revisionContents)
-    if (targetContent) {
-      switch (projectItem.contentType) {
-        case ContentType.TASK:
-          patchTaskRevisionContents(projectItem.id, targetContent.id, revisionContents, targetContent.etag);
-          break;
-        case ContentType.NOTE:
-          patchNoteRevisionContents(projectItem.id, targetContent.id, revisionContents, targetContent.etag);
-          break;
-        case ContentType.TRANSACTION:
-          patchTransactionRevisionContents(projectItem.id, targetContent.id, revisionContents, targetContent.etag);
-          break;
-      }
+    console.log('new Delta', delta)
+    console.log('revisionContents', revisionContents);
+    switch (projectItem.contentType) {
+      case ContentType.TASK:
+        patchTaskRevisionContents(projectItem.id, content.id, revisionContents, content.etag);
+        break;
+      case ContentType.NOTE:
+        patchNoteRevisionContents(projectItem.id, content.id, revisionContents, content.etag);
+        break;
+      case ContentType.TRANSACTION:
+        patchTransactionRevisionContents(projectItem.id, content.id, revisionContents, content.etag);
+        break;
     }
   }
 

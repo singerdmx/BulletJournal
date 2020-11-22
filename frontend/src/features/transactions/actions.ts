@@ -114,8 +114,8 @@ export const moveTransaction = (
     history: history,
   });
 
-export const updateTransactionContents = (transactionId: number) =>
-  actions.TransactionContentsUpdate({ transactionId: transactionId });
+export const updateTransactionContents = (transactionId: number, updateDisplayMore?: boolean) =>
+  actions.TransactionContentsUpdate({ transactionId: transactionId, updateDisplayMore: updateDisplayMore });
 export const updateTransactionContentRevision = (
   transactionId: number,
   contentId: number,

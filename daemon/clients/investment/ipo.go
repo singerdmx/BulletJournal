@@ -3,6 +3,7 @@ package investment
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -59,15 +60,17 @@ func (c *IPOClient) ProcessData() (*[]uint64, *[]uint64, error) {
 
 
 func (c *IPOClient) toSampleTasks(response [][]byte) ([]persistence.SampleTask, error) {
+	logger := *logging.GetLogger()
+	set := make(map[string]void)
 	var fetchedData []IPO
 	for _, resp := range response {
 		data := IPOData{}
-		if len(resp) == 0 {
+		if resp == nil || len(resp) == 0 {
 			continue
 		}
 		if err := json.Unmarshal(resp, &data); err != nil {
 			//logger.Error(fmt.Sprintf("%s Unmarshal ipos response failed: %s", url, string(resp.Body())))
-			logger.Error(fmt.Sprintf("Unmarshal ipos response failed: %s", string(resp)))
+			logger.Errorf("Unmarshal ipos response failed: %v", resp)
 			continue
 		}
 		fetchedData = append(fetchedData, data.IPO...)
@@ -82,16 +85,19 @@ func (c *IPOClient) toSampleTasks(response [][]byte) ([]persistence.SampleTask, 
 	var sampleTasks []persistence.SampleTask
 	for i := range c.data.IPO {
 		item := c.toSampleTask(c.data.IPO[i])
+		if _, exists := set[item.Uid]; exists {
+			continue
+		}
+		set[item.Uid] = val
 		sampleTasks = append(sampleTasks, item)
 	}
 	return sampleTasks, nil
 }
 
 func (c *IPOClient) toSampleTask(data IPO) persistence.SampleTask { // data IPOData
-
 	availBefore := data.Date
 	t, _ := time.Parse(layoutISO, availBefore)
-	t = t.AddDate(0, 0, 0) // expire in days -> to constant
+	t = t.AddDate(0, 0, expireInDays)
 	dueDate := data.Date
 	if len(dueDate) > 10 {
 		dueDate = dueDate[0:10] // yyyy-MM-dd

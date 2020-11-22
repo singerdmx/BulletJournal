@@ -185,10 +185,10 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
         <div className='projects' style={{paddingTop: '30px'}}>
             <BackTop />
             <Collapse defaultActiveKey={['OwnedBuJo', 'SharedBuJo']}>
-                <Panel header="Own BuJo" key="OwnedBuJo">
+                <Panel header="BuJo Created by Me" key="OwnedBuJo">
                     {getOwnedBuJo(ownedProjects)}
                 </Panel>
-                <Panel header="Shared BuJo" key="SharedBuJo">
+                <Panel header="BuJo Shared with Me" key="SharedBuJo">
                     {getSharedBuJo(sharedProjects)}
                 </Panel>
             </Collapse>

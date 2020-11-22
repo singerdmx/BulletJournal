@@ -61,7 +61,8 @@ import {
   setTaskStatus as setTaskStatusApi,
   shareTaskWithOther,
   uncompleteTaskById,
-  updateContent, updateSampleContent,
+  updateContent,
+  updateSampleContent,
   updateTask
 } from '../../apis/taskApis';
 import {updateLoadingCompletedTask, updateTaskContents, updateTasks,} from './actions';
@@ -74,7 +75,7 @@ import {completedTaskPageSize, ProjectItemUIType} from '../project/constants';
 import {Task, TaskStatistics} from './interface';
 import {recentItemsReceived} from '../recent/actions';
 import {ContentType} from '../myBuJo/constants';
-import {updateTargetContent} from "../content/actions";
+import {setDisplayMore, updateTargetContent} from "../content/actions";
 import {reloadReceived} from "../myself/actions";
 import {fetchSampleTask} from "../../apis/templates/workflowApis";
 
@@ -951,16 +952,28 @@ function* createTaskContent(action: PayloadAction<CreateContent>) {
 
 function* taskContentsUpdate(action: PayloadAction<UpdateTaskContents>) {
   try {
-    const contents = yield call(getContents, action.payload.taskId);
+    const { taskId, updateDisplayMore } = action.payload;
+    const contents : Content[] = yield call(getContents, taskId);
     yield put(
         tasksActions.taskContentsReceived({
           contents: contents,
         })
     );
+    let targetContent = undefined;
     if (contents && contents.length > 0) {
-      yield put(updateTargetContent(contents[0]));
-    } else {
-      yield put(updateTargetContent(undefined));
+      const state: IState = yield select();
+      targetContent = contents[0];
+      if (state.content.content && state.content.content.id) {
+        const found = contents.find((c) => c.id === state.content.content!.id);
+        if (found) {
+          targetContent = found;
+        }
+      }
+    }
+    yield put(updateTargetContent(targetContent));
+
+    if (updateDisplayMore === true) {
+      yield put(setDisplayMore(true));
     }
   } catch (error) {
     if (error.message === 'reload') {
@@ -1270,13 +1283,32 @@ function* getSearchCompletedTasks(
 function* patchTaskRevisionContents(action: PayloadAction<PatchRevisionContents>) {
   try {
     const {taskId, contentId, revisionContents, etag} = action.payload;
-    yield call(patchRevisionContents, taskId, contentId, revisionContents, etag);
-  } catch (error) {
-    if (error.message === 'reload') {
-      yield put(reloadReceived(true));
-    } else {
-      yield call(message.error, `patchTaskRevisionContents Error Received: ${error}`);
+    const data : Content = yield call(patchRevisionContents, taskId, contentId, revisionContents, etag);
+    const state: IState = yield select();
+    console.log("data", data);
+    if (data && state.content.content && data.id === state.content.content.id) {
+      console.log("updateTargetContent");
+      yield put(updateTargetContent(data));
     }
+
+    if (data && data.id) {
+      const contents : Content[] = [];
+      state.task.contents.forEach(c => {
+        if (c.id === data.id) {
+          contents.push(data);
+        } else {
+          contents.push(c);
+        }
+      });
+      console.log("update contents", contents);
+      yield put(
+          tasksActions.taskContentsReceived({
+            contents: contents,
+          })
+      );
+    }
+  } catch (error) {
+    yield put(reloadReceived(true));
   }
 }
 

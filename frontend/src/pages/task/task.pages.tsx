@@ -57,7 +57,7 @@ interface TaskPageHandler {
   content: Content | undefined;
   getTask: (taskId: number) => void;
   deleteTask: (taskId: number, type: ProjectItemUIType) => void;
-  updateTaskContents: (taskId: number) => void;
+  updateTaskContents: (taskId: number, updateDisplayMore?: boolean) => void;
   completeTask: (
     taskId: number,
     type: ProjectItemUIType,
@@ -128,7 +128,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
   };
 
   const handleEdit = () => {
-    setDisplayMore(true);
+    task && task.id && updateTaskContents(task.id, true);
   };
 
   const handleOpenRevisions = () => {

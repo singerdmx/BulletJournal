@@ -47,7 +47,7 @@ import {projectLabelsUpdate, updateItemsByLabels} from '../label/actions';
 import { ProjectItemUIType } from "../project/constants";
 import { ContentType } from "../myBuJo/constants";
 import { recentItemsReceived } from "../recent/actions";
-import { updateTargetContent } from "../content/actions";
+import {setDisplayMore, updateTargetContent} from "../content/actions";
 import {reloadReceived} from "../myself/actions";
 
 
@@ -462,16 +462,29 @@ function* transactionContentsUpdate(
   action: PayloadAction<UpdateTransactionContents>
 ) {
   try {
-    const contents: Content[] = yield call(getContents, action.payload.transactionId);
+    const {transactionId, updateDisplayMore} = action.payload;
+    const contents: Content[] = yield call(getContents, transactionId);
     yield put(
       transactionsActions.transactionContentsReceived({
         contents: contents,
       })
     );
+
+    let targetContent = undefined;
     if (contents && contents.length > 0) {
-      yield put(updateTargetContent(contents[0]));
-    } else {
-      yield put(updateTargetContent(undefined));
+      const state: IState = yield select();
+      targetContent = contents[0];
+      if (state.content.content && state.content.content.id) {
+        const found = contents.find((c) => c.id === state.content.content!.id);
+        if (found) {
+          targetContent = found;
+        }
+      }
+    }
+    yield put(updateTargetContent(targetContent));
+
+    if (updateDisplayMore === true) {
+      yield put(setDisplayMore(true));
     }
   } catch (error) {
     if (error.message === 'reload') {
@@ -639,13 +652,28 @@ function* getTransactionsByPayer(
 function* patchTransactionRevisionContents(action: PayloadAction<PatchRevisionContents>) {
   try {
     const {transactionId, contentId, revisionContents, etag} = action.payload;
-    yield call(patchRevisionContents, transactionId, contentId, revisionContents, etag);
-  } catch (error) {
-    if (error.message === 'reload') {
-      yield put(reloadReceived(true));
-    } else {
-      yield call(message.error, `patchTransactionRevisionContents Error Received: ${error}`);
+    const data : Content = yield call(patchRevisionContents, transactionId, contentId, revisionContents, etag);
+    const state: IState = yield select();
+    if (data && state.content.content && data.id === state.content.content.id) {
+      yield put(updateTargetContent(data));
     }
+    if (data && data.id) {
+      const contents : Content[] = [];
+      state.transaction.contents.forEach(c => {
+        if (c.id === data.id) {
+          contents.push(data);
+        } else {
+          contents.push(c);
+        }
+      });
+      yield put(
+          transactionsActions.transactionContentsReceived({
+            contents: contents,
+          })
+      );
+    }
+  } catch (error) {
+    yield put(reloadReceived(true));
   }
 }
 

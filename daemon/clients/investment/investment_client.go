@@ -8,7 +8,13 @@ import (
 	"time"
 )
 
-var logger logging.Logger
+
+const (
+	expireInDays = 0
+)
+
+type void struct{}
+var val void
 
 type (
 	Extractor interface {
@@ -32,6 +38,7 @@ func Init(categoryName string, sampleTaskDao *persistence.SampleTaskDao, restCli
 }
 
 func (c *InvestmentClient) fetchAllData(days int) [][]byte{
+	logger := *logging.GetLogger()
 	yearFrom, monthFrom, dayFrom := time.Now().AddDate(0, 0, days).Date()
 	yearTo, monthTo, dayTo := time.Now().AddDate(0, 1, 0).Date()
 

@@ -332,12 +332,13 @@ public class TransactionController {
     }
 
     @PostMapping(REVISION_CONTENT_ROUTE)
-    public void patchRevisionContents(@NotNull @PathVariable Long transactionId,
+    public Content patchRevisionContents(@NotNull @PathVariable Long transactionId,
                                       @NotNull @PathVariable Long contentId,
                                       @NotNull @RequestBody  RevisionContentsParams revisionContentsParams,
                                       @RequestHeader(IF_NONE_MATCH) String etag) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.transactionDaoJpa.patchRevisionContentHistory(
+        TransactionContent content = this.transactionDaoJpa.patchRevisionContentHistory(
                 contentId, transactionId, username, revisionContentsParams.getRevisionContents(), etag);
+        return content == null ? new Content() : content.toPresentationModel();
     }
 }

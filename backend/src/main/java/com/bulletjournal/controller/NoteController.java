@@ -293,11 +293,13 @@ public class NoteController {
     }
 
     @PostMapping(REVISION_CONTENT_ROUTE)
-    public void patchRevisionContents(@NotNull @PathVariable Long noteId,
+    public Content patchRevisionContents(@NotNull @PathVariable Long noteId,
                                       @NotNull @PathVariable Long contentId,
                                       @NotNull @RequestBody  RevisionContentsParams revisionContentsParams,
                                       @RequestHeader(IF_NONE_MATCH) String etag) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.noteDaoJpa.patchRevisionContentHistory(contentId, noteId, username, revisionContentsParams.getRevisionContents(), etag);
+        NoteContent content = this.noteDaoJpa.patchRevisionContentHistory(
+            contentId, noteId, username, revisionContentsParams.getRevisionContents(), etag);
+        return content == null ? new Content() : content.toPresentationModel();
     }
 }

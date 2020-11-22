@@ -12,6 +12,7 @@ export type TaskApiErrorAction = {
 
 export type UpdateTaskContents = {
   taskId: number;
+  updateDisplayMore?: boolean;
 };
 
 export type UpdateTaskContentRevision = {

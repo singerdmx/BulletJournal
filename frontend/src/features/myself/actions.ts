@@ -20,6 +20,10 @@ export const updateBefore = (before: number) =>
   actions.myselfDataReceived({
     before: before
   });
+export const updatePoints = (points: number) =>
+    actions.myselfDataReceived({
+        points: points
+    });
 export const patchMyself = (
   timezone?: string,
   before?: number,
