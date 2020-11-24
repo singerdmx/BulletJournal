@@ -30,6 +30,8 @@ public class CreateTaskParams {
 
     private String recurrenceRule;
 
+    private String location;
+
     public CreateTaskParams() {
     }
 
@@ -44,6 +46,13 @@ public class CreateTaskParams {
             @NotBlank @Size(min = 1, max = 100) String name, String dueDate, String dueTime,
             Integer duration, ReminderSetting reminderSetting, List<String> assignees,
             @NotBlank @Size(min = 1, max = 100) String timezone, String recurrenceRule, List<Long> labels) {
+        this(name, dueDate, dueTime, duration, reminderSetting, assignees, timezone, recurrenceRule, labels, null);
+    }
+
+    public CreateTaskParams(
+            @NotBlank @Size(min = 1, max = 100) String name, String dueDate, String dueTime,
+            Integer duration, ReminderSetting reminderSetting, List<String> assignees,
+            @NotBlank @Size(min = 1, max = 100) String timezone, String recurrenceRule, List<Long> labels, String location) {
         this.name = name;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
@@ -53,6 +62,7 @@ public class CreateTaskParams {
         this.timezone = timezone;
         this.recurrenceRule = recurrenceRule;
         this.labels = labels;
+        this.location = location;
     }
 
     public void selfClean() {
@@ -144,5 +154,13 @@ public class CreateTaskParams {
 
     public void setLabels(List<Long> labels) {
         this.labels = labels;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }
