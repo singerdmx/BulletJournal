@@ -70,6 +70,17 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
     @Column(name = "assignees", columnDefinition = "text[]")
     private String[] assignees;
 
+    @Column(name = "location", nullable = true)
+    private String location;
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
     public Timestamp getStartTime() {
         return startTime;
     }
@@ -298,23 +309,48 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
         if (this.getReminderDateTime() != null) {
             reminderDateTime = this.getReminderDateTime().getTime();
         }
+
         com.bulletjournal.controller.models.Task task = new com.bulletjournal.controller.models.Task(
-                this.getId(), new User(this.getOwner()),
-                this.getAssignees().stream().map(a -> new User(a)).collect(Collectors.toList()), this.getDueDate(),
-                this.getDueTime(), this.getTimezone(), this.getName(), this.getDuration(), this.getProject(), labels,
-                reminderSetting, this.getRecurrenceRule(), this.getCreatedAt().getTime(), this.getUpdatedAt().getTime(),
-                null, reminderDateTime);
+            this.getId(),
+            new User(this.getOwner()),
+            this.getAssignees().stream().map(a -> new User(a)).collect(Collectors.toList()),
+            this.getDueDate(),
+            this.getDueTime(),
+            this.getTimezone(),
+            this.getName(),
+            this.getDuration(),
+            this.getProject(),
+            labels,
+            reminderSetting,
+            this.getRecurrenceRule(),
+            this.getCreatedAt().getTime(),
+            this.getUpdatedAt().getTime(),
+            null,
+            reminderDateTime,
+            this.location
+        );
+
         task.setShared(this.isShared());
         return task;
     }
 
     @Override
     public String toString() {
-        return "TaskModel{" + "dueDate='" + dueDate + '\'' + ", dueTime='" + dueTime + '\'' + ", timezone='" + timezone
-                + '\'' + ", duration=" + duration + ", reminderDate='" + reminderDate + '\'' + ", reminderTime='"
-                + reminderTime + '\'' + ", reminderBeforeTask=" + reminderBeforeTask + ", startTime=" + startTime
-                + ", endTime=" + endTime + ", reminderDateTime=" + reminderDateTime + ", recurrenceRule='"
-                + recurrenceRule + '\'' + ", googleCalendarEventId='" + googleCalendarEventId + '\'' + ", assignees="
-                + Arrays.toString(assignees) + '}';
+        return "TaskModel{" +
+            "dueDate='" + dueDate + '\'' +
+            ", dueTime='" + dueTime + '\'' +
+            ", timezone='" + timezone + '\'' +
+            ", duration=" + duration +
+            ", reminderDate='" + reminderDate + '\'' +
+            ", reminderTime='" + reminderTime + '\'' +
+            ", reminderBeforeTask=" + reminderBeforeTask +
+            ", startTime=" + startTime +
+            ", endTime=" + endTime +
+            ", reminderDateTime=" + reminderDateTime +
+            ", recurrenceRule='" + recurrenceRule + '\'' +
+            ", googleCalendarEventId='" + googleCalendarEventId + '\'' +
+            ", assignees=" + Arrays.toString(assignees) +
+            ", location='" + location + '\'' +
+            '}';
     }
 }
