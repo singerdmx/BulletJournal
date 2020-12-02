@@ -637,6 +637,10 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             task.setLabels(updateTaskParams.getLabels());
         }
 
+        if (updateTaskParams.hasLocation()) {
+            task.setLocation(updateTaskParams.getLocation());
+        }
+
         return this.taskRepository.save(task);
     }
 
