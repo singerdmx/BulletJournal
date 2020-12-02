@@ -40,8 +40,6 @@ public class Task extends TaskModel {
     @Column(name = "completed_slots", columnDefinition = "TEXT")
     private String completedSlots;
 
-    @Column(name = "location", nullable = true)
-    private String location;
 
     @Override
     public Long getId() {
@@ -78,21 +76,13 @@ public class Task extends TaskModel {
         this.status = status;
     }
 
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
     @Override
     public com.bulletjournal.controller.models.Task toPresentationModel() {
         com.bulletjournal.controller.models.Task task = super.toPresentationModel();
         if (this.status != null) {
             task.setStatus(TaskStatus.getType(this.status));
         }
-        task.setLocation(this.location);
+        task.setLocation(this.getLocation());
         return task;
     }
 
@@ -103,7 +93,7 @@ public class Task extends TaskModel {
         if (this.status != null) {
             task.setStatus(TaskStatus.getType(this.status));
         }
-        task.setLocation(this.location);
+        task.setLocation(this.getLocation());
         return task;
     }
 
