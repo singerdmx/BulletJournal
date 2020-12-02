@@ -169,4 +169,6 @@ public class UpdateTaskParams {
     public void setLocation(String location) {
         this.location = location;
     }
+
+    public boolean hasLocation() { return this.location != null; }
 }
