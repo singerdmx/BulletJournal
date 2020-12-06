@@ -40,6 +40,7 @@ public class Task extends TaskModel {
     @Column(name = "completed_slots", columnDefinition = "TEXT")
     private String completedSlots;
 
+
     @Override
     public Long getId() {
         return id;
@@ -81,6 +82,7 @@ public class Task extends TaskModel {
         if (this.status != null) {
             task.setStatus(TaskStatus.getType(this.status));
         }
+        task.setLocation(this.getLocation());
         return task;
     }
 
@@ -91,6 +93,7 @@ public class Task extends TaskModel {
         if (this.status != null) {
             task.setStatus(TaskStatus.getType(this.status));
         }
+        task.setLocation(this.getLocation());
         return task;
     }
 

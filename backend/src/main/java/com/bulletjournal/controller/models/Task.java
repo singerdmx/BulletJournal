@@ -41,6 +41,8 @@ public class Task extends ProjectItem {
 
     private Long reminderDateTime;
 
+    private String location;
+
     @Expose
     @Valid
     private List<Task> subTasks = new ArrayList<>();
@@ -52,6 +54,13 @@ public class Task extends ProjectItem {
                 @NotBlank String timezone, @NotNull String name, Integer duration, @NotNull Project project,
                 List<Label> labels, ReminderSetting reminderSetting, String recurrenceRule, Long createdAt, Long updatedAt,
                 TaskStatus status, Long reminderDateTime) {
+        this(id, owner, assignees, dueDate, dueTime, timezone, name, duration, project, labels, reminderSetting, recurrenceRule, createdAt, updatedAt, status, reminderDateTime, null);
+    }
+
+    public Task(Long id, @NotNull User owner, List<User> assignees, String dueDate, String dueTime,
+                @NotBlank String timezone, @NotNull String name, Integer duration, @NotNull Project project,
+                List<Label> labels, ReminderSetting reminderSetting, String recurrenceRule, Long createdAt, Long updatedAt,
+                TaskStatus status, Long reminderDateTime, String location) {
         super(id, name, owner, project, labels);
         this.assignees = assignees;
         this.dueDate = dueDate;
@@ -67,6 +76,7 @@ public class Task extends ProjectItem {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         getView(this);
+        this.location = location;
     }
 
     @Override
@@ -178,6 +188,14 @@ public class Task extends ProjectItem {
         this.reminderDateTime = reminderDateTime;
     }
 
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -217,6 +235,7 @@ public class Task extends ProjectItem {
         this.setRecurrenceRule(task.getRecurrenceRule());
         this.setAssignees(task.getAssignees());
         this.setReminderDateTime(task.getReminderDateTime());
+        this.setLocation(task.location);
     }
 
     public static Task getView(Task task) {

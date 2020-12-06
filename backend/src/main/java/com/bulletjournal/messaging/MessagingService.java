@@ -178,6 +178,16 @@ public class MessagingService {
     public void sendTaskDueNotificationAndEmailToUsers(List<Task> taskList) {
         LOGGER.info("Sending task due notification for tasks: {}", taskList);
         try {
+            taskList = taskList.stream().filter((task -> {
+                if (task.getAssignees().isEmpty()) {
+                    LOGGER.error("Task id: {} has empty assignee list", task.getId());
+                    return false;
+                }
+                return true;
+            })).collect(Collectors.toList());
+            if (taskList.isEmpty()) {
+                return;
+            }
             Set<String> distinctUsers = taskList.stream()
                 .flatMap(task -> task.getAssignees().stream())
                 .collect(Collectors.toSet());

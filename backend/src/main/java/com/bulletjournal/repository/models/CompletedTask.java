@@ -44,6 +44,7 @@ public class CompletedTask extends TaskModel {
         this.setContents(contents);
         this.setGoogleCalendarEventId(task.getGoogleCalendarEventId());
         this.setAssignees(task.getAssignees());
+        this.setLocation(task.getLocation());
     }
 
     @Override

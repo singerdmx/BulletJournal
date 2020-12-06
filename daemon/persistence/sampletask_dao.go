@@ -61,6 +61,11 @@ func (s *SampleTaskDao) Upsert(t *SampleTask) (uint64, bool) {
 	//	return 0, false
 	//}
 
+	// Update all tasks referring this sample task if they have different name
+	if t.Name != prevReport.Name {
+		s.Db.Exec("update tasks set name = ? where sample_task_id = ?", t.Name, t.ID)
+	}
+
 	// Update the SampleTask for only Content, DueDate, availableBefore, DueTime
 	s.Db.Model(&t).Where("uid = ?", t.Uid).Select("raw", "due_date", "due_time", "available_before", "name").
 		Updates(map[string]interface{}{

@@ -381,9 +381,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     public void fillReminderRecordTaskMap(Map<ReminderRecord, Task> reminderRecordTaskMap,
                                           List<Task> tasks, ZonedDateTime start, ZonedDateTime end) {
         tasks.forEach(t -> {
-            List<ReminderRecord> records = DaoHelper.getReminderRecords(t, start, end);
-            for (ReminderRecord record : records) {
-                reminderRecordTaskMap.put(record, t);
+            Map<ReminderRecord, Task> records = DaoHelper.getReminderRecordMap(t, start, end);
+            for (Map.Entry<ReminderRecord, Task> entry : records.entrySet()) {
+                reminderRecordTaskMap.put(entry.getKey(), entry.getValue());
             }
         });
     }
@@ -533,6 +533,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         ReminderSetting reminderSetting = getReminderSetting(date, task, time, timezone,
                 createTaskParams.getRecurrenceRule(), createTaskParams.getReminderSetting());
         task.setReminderSetting(reminderSetting);
+        task.setLocation(createTaskParams.getLocation());
         return task;
     }
 
@@ -634,6 +635,10 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         if (updateTaskParams.hasLabels()) {
             task.setLabels(updateTaskParams.getLabels());
+        }
+
+        if (updateTaskParams.hasLocation()) {
+            task.setLocation(updateTaskParams.getLocation());
         }
 
         return this.taskRepository.save(task);
@@ -910,7 +915,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      */
     private CreateTaskParams getCreateTaskParams(CompletedTask task) {
         return new CreateTaskParams(task.getName(), task.getDueDate(), task.getDueTime(), task.getDuration(),
-                new ReminderSetting(), task.getAssignees(), task.getTimezone(), task.getRecurrenceRule());
+                new ReminderSetting(), task.getAssignees(), task.getTimezone(), task.getRecurrenceRule(),
+                Collections.emptyList(), task.getLocation());
     }
 
     /**

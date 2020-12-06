@@ -25,12 +25,20 @@ public class UpdateTaskParams {
 
     private List<Long> labels;
 
+    private String location;
+
     public UpdateTaskParams() {
     }
 
     public UpdateTaskParams(String dueDate, String dueTime, String name, Integer duration,
             ReminderSetting reminderSetting, List<String> assignees, String timezone, String recurrenceRule,
             List<Long> labels) {
+        this(dueDate, dueTime, name, duration, reminderSetting, assignees, timezone, recurrenceRule, labels, null);
+    }
+
+    public UpdateTaskParams(String dueDate, String dueTime, String name, Integer duration,
+                            ReminderSetting reminderSetting, List<String> assignees, String timezone, String recurrenceRule,
+                            List<Long> labels, String location) {
         this.dueDate = dueDate;
         this.dueTime = dueTime;
         this.name = name;
@@ -40,6 +48,7 @@ public class UpdateTaskParams {
         this.timezone = timezone;
         this.recurrenceRule = recurrenceRule;
         this.labels = labels;
+        this.location = location;
     }
 
     public void selfClean() {
@@ -153,4 +162,13 @@ public class UpdateTaskParams {
         return this.labels != null;
     }
 
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public boolean hasLocation() { return this.location != null; }
 }

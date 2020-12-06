@@ -156,7 +156,6 @@ public class DaoHelper {
         if (!cloned.hasReminderDateTime()) {
             LOGGER.warn("Task {} ReminderDateTime is null", task.getReminderSetting());
         }
-
         return cloned;
     }
 }

@@ -62,6 +62,7 @@ public class Converter {
             text.append(event.getDescription()).append(System.lineSeparator());
         }
         if (event.getLocation() != null) {
+            task.setLocation(event.getLocation());
             text.append(System.lineSeparator())
                     .append("Location: ").append(event.getLocation()).append(System.lineSeparator());
         }
@@ -142,6 +143,6 @@ public class Converter {
         return new CreateTaskParams(task.getName(), task.getDueDate(),
                 task.getDueTime(), task.getDuration(), task.getReminderSetting(),
                 task.getAssignees().stream().map(a -> a.getName()).collect(Collectors.toList()),
-                task.getTimezone(), task.getRecurrenceRule());
+                task.getTimezone(), task.getRecurrenceRule(), Collections.emptyList(), task.getLocation());
     }
 }

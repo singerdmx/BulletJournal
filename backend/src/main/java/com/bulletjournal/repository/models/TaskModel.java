@@ -7,6 +7,7 @@ import com.bulletjournal.controller.models.User;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.util.BuJoRecurrenceRule;
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +69,17 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
     @Type(type = "string-array")
     @Column(name = "assignees", columnDefinition = "text[]")
     private String[] assignees;
+
+    @Column(name = "location", nullable = true)
+    private String location;
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
     public Timestamp getStartTime() {
         return startTime;
@@ -163,6 +175,10 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
 
     public boolean hasReminderDateTime() {
         return this.reminderDateTime != null;
+    }
+
+    public boolean hasRecurrenceRule() {
+        return StringUtils.isNotBlank(recurrenceRule);
     }
 
     public void setReminderDateTime(Timestamp reminderDateTime) {
@@ -293,23 +309,48 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
         if (this.getReminderDateTime() != null) {
             reminderDateTime = this.getReminderDateTime().getTime();
         }
+
         com.bulletjournal.controller.models.Task task = new com.bulletjournal.controller.models.Task(
-                this.getId(), new User(this.getOwner()),
-                this.getAssignees().stream().map(a -> new User(a)).collect(Collectors.toList()), this.getDueDate(),
-                this.getDueTime(), this.getTimezone(), this.getName(), this.getDuration(), this.getProject(), labels,
-                reminderSetting, this.getRecurrenceRule(), this.getCreatedAt().getTime(), this.getUpdatedAt().getTime(),
-                null, reminderDateTime);
+            this.getId(),
+            new User(this.getOwner()),
+            this.getAssignees().stream().map(a -> new User(a)).collect(Collectors.toList()),
+            this.getDueDate(),
+            this.getDueTime(),
+            this.getTimezone(),
+            this.getName(),
+            this.getDuration(),
+            this.getProject(),
+            labels,
+            reminderSetting,
+            this.getRecurrenceRule(),
+            this.getCreatedAt().getTime(),
+            this.getUpdatedAt().getTime(),
+            null,
+            reminderDateTime,
+            this.location
+        );
+
         task.setShared(this.isShared());
         return task;
     }
 
     @Override
     public String toString() {
-        return "TaskModel{" + "dueDate='" + dueDate + '\'' + ", dueTime='" + dueTime + '\'' + ", timezone='" + timezone
-                + '\'' + ", duration=" + duration + ", reminderDate='" + reminderDate + '\'' + ", reminderTime='"
-                + reminderTime + '\'' + ", reminderBeforeTask=" + reminderBeforeTask + ", startTime=" + startTime
-                + ", endTime=" + endTime + ", reminderDateTime=" + reminderDateTime + ", recurrenceRule='"
-                + recurrenceRule + '\'' + ", googleCalendarEventId='" + googleCalendarEventId + '\'' + ", assignees="
-                + Arrays.toString(assignees) + '}';
+        return "TaskModel{" +
+            "dueDate='" + dueDate + '\'' +
+            ", dueTime='" + dueTime + '\'' +
+            ", timezone='" + timezone + '\'' +
+            ", duration=" + duration +
+            ", reminderDate='" + reminderDate + '\'' +
+            ", reminderTime='" + reminderTime + '\'' +
+            ", reminderBeforeTask=" + reminderBeforeTask +
+            ", startTime=" + startTime +
+            ", endTime=" + endTime +
+            ", reminderDateTime=" + reminderDateTime +
+            ", recurrenceRule='" + recurrenceRule + '\'' +
+            ", googleCalendarEventId='" + googleCalendarEventId + '\'' +
+            ", assignees=" + Arrays.toString(assignees) +
+            ", location='" + location + '\'' +
+            '}';
     }
 }
