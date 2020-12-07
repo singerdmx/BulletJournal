@@ -90,7 +90,8 @@ public class DaemonServiceClient {
                         case SAMPLETASKMSG:
                             SubscribeSampleTaskMsg msg = streamMsg.getSampleTaskMsg();
                             LOGGER.info("Received SubscribeInvestmentSampleTaskMsg with sampleTaskId: {}", msg.getSampleTaskId());
-                            DaemonServiceClient.this.notificationService.addSampleTaskChange(new SampleTaskChange(msg.getSampleTaskId()));
+                            // TODO: ADD IT BACK
+                            // DaemonServiceClient.this.notificationService.addSampleTaskChange(new SampleTaskChange(msg.getSampleTaskId()));
                             break;
                         default:
                             LOGGER.warn("Unsupported NotificationStreamMsg body");
