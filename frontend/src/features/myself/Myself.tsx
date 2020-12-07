@@ -56,20 +56,20 @@ class Myself extends React.Component<MyselfProps & PathProps, ModalState> {
         inputList: [""],
     };
 
-    interval: any = 0;
+    // interval: any = 0;
 
     componentDidMount() {
         const loginCookie = getCookie('__discourse_proxy');
         if (loginCookie) {
             this.props.updateMyself();
         }
-        this.interval = setInterval(() => {
-            this.props.updateSystem(false, this.props.history);
-        }, 50000);
+        // this.interval = setInterval(() => {
+        //     this.props.updateSystem(false, this.props.history);
+        // }, 50000);
     }
 
     componentWillUnmount() {
-        clearInterval(this.interval);
+        // clearInterval(this.interval);
     }
 
     handleRefreshOnClick = () => {
