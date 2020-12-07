@@ -2,7 +2,6 @@ package com.bulletjournal.clients;
 
 import com.bulletjournal.config.DaemonClientConfig;
 import com.bulletjournal.notifications.NotificationService;
-import com.bulletjournal.notifications.SampleTaskChange;
 import com.bulletjournal.protobuf.daemon.grpc.services.DaemonGrpc;
 import com.bulletjournal.protobuf.daemon.grpc.types.NotificationStreamMsg;
 import com.bulletjournal.protobuf.daemon.grpc.types.SubscribeNotificationMsg;
