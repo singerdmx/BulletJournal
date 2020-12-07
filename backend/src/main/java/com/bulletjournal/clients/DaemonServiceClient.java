@@ -2,6 +2,7 @@ package com.bulletjournal.clients;
 
 import com.bulletjournal.config.DaemonClientConfig;
 import com.bulletjournal.notifications.NotificationService;
+import com.bulletjournal.notifications.SampleTaskChange;
 import com.bulletjournal.protobuf.daemon.grpc.services.DaemonGrpc;
 import com.bulletjournal.protobuf.daemon.grpc.types.NotificationStreamMsg;
 import com.bulletjournal.protobuf.daemon.grpc.types.SubscribeNotificationMsg;
@@ -89,8 +90,7 @@ public class DaemonServiceClient {
                         case SAMPLETASKMSG:
                             SubscribeSampleTaskMsg msg = streamMsg.getSampleTaskMsg();
                             LOGGER.info("Received SubscribeInvestmentSampleTaskMsg with sampleTaskId: {}", msg.getSampleTaskId());
-                            // TODO: ADD IT BACK
-                            // DaemonServiceClient.this.notificationService.addSampleTaskChange(new SampleTaskChange(msg.getSampleTaskId()));
+                            DaemonServiceClient.this.notificationService.addSampleTaskChange(new SampleTaskChange(msg.getSampleTaskId()));
                             break;
                         default:
                             LOGGER.warn("Unsupported NotificationStreamMsg body");
