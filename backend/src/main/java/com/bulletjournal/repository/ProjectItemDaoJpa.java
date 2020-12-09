@@ -190,7 +190,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             return;
         }
 
-        ContentBatch left = new ContentBatch(
+        ContentBatch<K, T> left = new ContentBatch<>(
                 contents.subList(CONTENT_BATCH_SIZE, contents.size()),
                 projectItems.subList(CONTENT_BATCH_SIZE, projectItems.size()),
                 owners.subList(CONTENT_BATCH_SIZE, owners.size()));
@@ -294,10 +294,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
                     EtagGenerator.HashType.TO_HASHCODE, oldText);
             if (!Objects.equals(etag.get(), itemEtag)) {
                 LOGGER.info("Invalid Etag: {} v.s. {}, oldText: {}; created a new content", itemEtag, etag.get(), oldText);
-                this.entityManager.detach(projectItem);
-                projectItem.setId(null);
-                this.getJpaRepository().save(projectItem);
-                return (Pair<K, T>) this.addContent(projectItemId, requester, this.newContent(new DeltaContent(updateContentParams.getText()).toJSON()));
+                return (Pair<K, T>) this.addContent(
+                        projectItemId, requester, this.newContent(updateContentParams.getText()));
             }
         }
 
@@ -382,7 +380,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SetLabelEvent setLabels(String requester, Long projectItemId, List<Long> labels) {
-        ProjectItemModel projectItem = getProjectItem(projectItemId, requester);
+        ProjectItemModel<ProjectItem> projectItem = getProjectItem(projectItemId, requester);
         projectItem.setLabels(labels);
         Set<UserGroup> targetUsers = projectItem.getProject().getGroup().getAcceptedUsers();
         List<Event> events = new ArrayList<>();
