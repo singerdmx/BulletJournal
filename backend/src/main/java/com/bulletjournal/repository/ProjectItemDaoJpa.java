@@ -70,6 +70,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     abstract <T extends ProjectItemModel> List<K> findContents(T projectItem);
 
+    abstract K newContent(String text);
+
     abstract List<Long> findItemLabelsByProject(com.bulletjournal.repository.models.Project project);
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

@@ -16,7 +16,6 @@ import com.bulletjournal.hierarchy.NoteRelationsProcessor;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
-import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +35,6 @@ import java.util.stream.Collectors;
 
 @Repository
 public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
-
-    private static final Gson GSON = new Gson();
 
     @PersistenceContext
     EntityManager entityManager;
@@ -254,6 +251,11 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     @Override
     public <T extends ProjectItemModel> List<NoteContent> findContents(T projectItem) {
         return this.noteContentRepository.findNoteContentByNote((Note) projectItem);
+    }
+
+    @Override
+    NoteContent newContent(String text) {
+        return new NoteContent(text);
     }
 
     @Override

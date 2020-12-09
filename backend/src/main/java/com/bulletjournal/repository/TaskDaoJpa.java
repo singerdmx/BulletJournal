@@ -959,6 +959,11 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return this.taskContentRepository.findTaskContentByTask((Task) projectItem);
     }
 
+    @Override
+    TaskContent newContent(String text) {
+        return new TaskContent(text);
+    }
+
 
     @Override
     public <T extends ProjectItemModel> List<TaskContent> getContents(Long projectItemId, String requester) {
