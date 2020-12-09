@@ -30,6 +30,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -63,6 +64,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     protected NotificationService notificationService;
     @Autowired
     private RedisCachedContentRepository redisCachedContentRepository;
+    @Autowired
+    private EntityManager entityManager;
 
     abstract <T extends ProjectItemModel> JpaRepository<T, Long> getJpaRepository();
 
@@ -285,14 +288,18 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         }
 
         String oldText = content.getText();
-        etag.ifPresent(e -> {
+
+        if (etag.isPresent()) {
             String itemEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                     EtagGenerator.HashType.TO_HASHCODE, oldText);
             if (!Objects.equals(etag.get(), itemEtag)) {
-                LOGGER.error("Invalid Etag: {} v.s. {}, oldText: {}", itemEtag, etag.get(), oldText);
-                throw new BadRequestException("Invalid Etag");
+                LOGGER.info("Invalid Etag: {} v.s. {}, oldText: {}; created a new content", itemEtag, etag.get(), oldText);
+                this.entityManager.detach(projectItem);
+                projectItem.setId(null);
+                this.getJpaRepository().save(projectItem);
+                return (Pair<K, T>) this.addContent(projectItemId, requester, this.newContent(new DeltaContent(updateContentParams.getText()).toJSON()));
             }
-        });
+        }
 
         if (diff != null) {
             // from web: {delta: YYYYY2, ###html###:ZZZZZZ2}, diff
