@@ -100,7 +100,7 @@ public class SystemController {
         String notificationsEtag = null;
         String groupsEtag = null;
         String remindingTaskEtag = null;
-        List<Task> remindingTasks = null;
+        List<Task> remindingTasks = Collections.emptyList();
         List<Etag> cachingEtags = new ArrayList<>();
 
         if (targetEtags == null || targetEtags.contains("projectsEtag")) {
