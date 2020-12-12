@@ -172,7 +172,7 @@ public class SystemController {
             // clone reminderRecords so we don't hold references to keys of concurrentHashMap
             List<ReminderRecord> reminderRecordsClone = reminderRecords.stream()
                     .map(reminderRecord -> reminderRecord.clone()).collect(Collectors.toList());
-            List<Task> tasks = this.reminder.getRemindingTasks(reminderRecords, startTime)
+            List<Task> tasks = this.reminder.getRemindingTasks(reminderRecordsClone, startTime)
                     .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList());
             remindingTasks = this.labelDaoJpa.getLabelsForProjectItemList(tasks);
             remindingTaskEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
