@@ -32,6 +32,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 
@@ -168,9 +169,9 @@ public class SystemController {
             final ZonedDateTime endTime = ZonedDateTime.now().plusMinutes(2);
             List<ReminderRecord> reminderRecords = this.reminder.getTasksAssignedThatNeedsWebPopupReminder(
                     username, startTime, endTime);
-//            remindingTasks = this.labelDaoJpa.getLabelsForProjectItemList(
-//                    this.reminder.getRemindingTasks(reminderRecords, startTime)
-//                            .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList()));
+            List<Task> tasks = this.reminder.getRemindingTasks(reminderRecords, startTime)
+                    .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList());
+//            remindingTasks = this.labelDaoJpa.getLabelsForProjectItemList(tasks);
             remindingTaskEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                     EtagGenerator.HashType.TO_HASHCODE,
                     Collections.emptyList());
