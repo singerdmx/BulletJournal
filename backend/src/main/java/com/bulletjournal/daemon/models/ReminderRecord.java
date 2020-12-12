@@ -50,4 +50,8 @@ public class ReminderRecord {
         return "ReminderRecord={id:" + this.id
                 + ",timestampSecond:" + this.getTimestampSecond() + "}";
     }
+
+    public ReminderRecord clone() {
+        return new ReminderRecord(this.id, this.timestampMilli);
+    }
 }

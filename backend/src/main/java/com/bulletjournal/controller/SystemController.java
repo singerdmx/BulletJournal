@@ -169,15 +169,18 @@ public class SystemController {
             final ZonedDateTime endTime = ZonedDateTime.now().plusMinutes(2);
             List<ReminderRecord> reminderRecords = this.reminder.getTasksAssignedThatNeedsWebPopupReminder(
                     username, startTime, endTime);
+            // clone reminderRecords so we don't hold references to keys of concurrentHashMap
+            List<ReminderRecord> reminderRecordsClone = reminderRecords.stream()
+                    .map(reminderRecord -> reminderRecord.clone()).collect(Collectors.toList());
             List<Task> tasks = this.reminder.getRemindingTasks(reminderRecords, startTime)
                     .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList());
-//            remindingTasks = this.labelDaoJpa.getLabelsForProjectItemList(tasks);
+            remindingTasks = this.labelDaoJpa.getLabelsForProjectItemList(tasks);
             remindingTaskEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                     EtagGenerator.HashType.TO_HASHCODE,
-                    Collections.emptyList());
-//            if (remindingTaskRequestEtag.isPresent() && remindingTaskEtag.equals(remindingTaskRequestEtag.get())) {
-//                remindingTasks = null;
-//            }
+                    remindingTasks);
+            if (remindingTaskRequestEtag.isPresent() && remindingTaskEtag.equals(remindingTaskRequestEtag.get())) {
+                remindingTasks = Collections.emptyList();
+            }
         }
 
         if (cachingEtags.size() > 0) {
