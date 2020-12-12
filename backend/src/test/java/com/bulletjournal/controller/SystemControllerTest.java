@@ -99,7 +99,7 @@ public class SystemControllerTest {
 
         String remindingTaskEtag = systemUpdates.getRemindingTaskEtag();
         systemUpdates = testRemindingTaskEtagMatch(p1, remindingTaskEtag);
-        assertNull(systemUpdates.getReminders());
+        assertTrue(systemUpdates.getReminders().isEmpty());
 
         deleteTask(t1);
         deleteTask(t2);
