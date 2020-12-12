@@ -6,6 +6,7 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.daemon.Reminder;
+import com.bulletjournal.daemon.models.ReminderRecord;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
@@ -29,6 +30,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
@@ -162,10 +164,10 @@ public class SystemController {
         }
 
         if (targetEtags == null || targetEtags.contains("taskReminders")) {
-//            final ZonedDateTime startTime = ZonedDateTime.now().minusHours(2);
-//            final ZonedDateTime endTime = ZonedDateTime.now().plusMinutes(2);
-//            List<ReminderRecord> reminderRecords = this.reminder.getTasksAssignedThatNeedsWebPopupReminder(
-//                    username, startTime, endTime);
+            final ZonedDateTime startTime = ZonedDateTime.now().minusHours(2);
+            final ZonedDateTime endTime = ZonedDateTime.now().plusMinutes(2);
+            List<ReminderRecord> reminderRecords = this.reminder.getTasksAssignedThatNeedsWebPopupReminder(
+                    username, startTime, endTime);
 //            remindingTasks = this.labelDaoJpa.getLabelsForProjectItemList(
 //                    this.reminder.getRemindingTasks(reminderRecords, startTime)
 //                            .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList()));
