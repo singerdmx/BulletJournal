@@ -10,7 +10,6 @@ import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
 import com.bulletjournal.redis.models.Etag;
-import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.factory.ProjectItemDaos;
 import com.bulletjournal.repository.models.ProjectItemModel;
@@ -103,63 +102,63 @@ public class SystemController {
         List<Task> remindingTasks = Collections.emptyList();
         List<Etag> cachingEtags = new ArrayList<>();
 
-        if (targetEtags == null || targetEtags.contains("projectsEtag")) {
-            Projects projects = this.projectDaoJpa.getProjects(username);
-            ownedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                    EtagGenerator.HashType.TO_HASHCODE,
-                    projects.getOwned());
-            sharedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                    EtagGenerator.HashType.TO_HASHCODE,
-                    projects.getShared());
-        }
-        if (targetEtags == null || targetEtags.contains("notificationsEtag")) {
-
-            // Look up etag from cache
-            Etag cache = this.redisEtagDaoJpa.findEtagsByIndex(username, EtagType.NOTIFICATION);
-
-            if (cache == null) {
-                notificationsEtag = this.notificationDaoJpa.getUserEtag(username);
-                cachingEtags.add(new Etag(username, EtagType.NOTIFICATION, notificationsEtag));
-            } else {
-                notificationsEtag = cache.getEtag();
-            }
-        }
-        if (targetEtags == null || targetEtags.contains("groupsEtag")) {
-
-            // Look up etag from cache
-            Etag cache = this.redisEtagDaoJpa.findEtagsByIndex(username, EtagType.GROUP);
-
-            if (cache == null) {
-                groupsEtag = this.groupDaoJpa.getUserEtag(username);
-                cachingEtags.add(new Etag(username, EtagType.GROUP, groupsEtag));
-            } else {
-                groupsEtag = cache.getEtag();
-            }
-        }
-
-        if (projectId != null) {
-            try {
-                Project project = this.projectDaoJpa.getProject(projectId, username).toPresentationModel();
-                switch (project.getProjectType()) {
-                    case TODO:
-                        List<Task> taskList = this.taskDaoJpa.getTasks(projectId, username);
-                        tasksEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                                EtagGenerator.HashType.TO_HASHCODE,
-                                taskList);
-                        break;
-                    case NOTE:
-                        List<Note> noteList = this.noteDaoJpa.getNotes(projectId, username);
-                        notesEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                                EtagGenerator.HashType.TO_HASHCODE,
-                                noteList);
-                        break;
-                    default:
-                        throw new IllegalArgumentException();
-                }
-            } catch (Exception ex) {
-                LOGGER.info("Skipping tasksEtag or notesEtag");
-            }
-        }
+//        if (targetEtags == null || targetEtags.contains("projectsEtag")) {
+//            Projects projects = this.projectDaoJpa.getProjects(username);
+//            ownedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+//                    EtagGenerator.HashType.TO_HASHCODE,
+//                    projects.getOwned());
+//            sharedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+//                    EtagGenerator.HashType.TO_HASHCODE,
+//                    projects.getShared());
+//        }
+//        if (targetEtags == null || targetEtags.contains("notificationsEtag")) {
+//
+//            // Look up etag from cache
+//            Etag cache = this.redisEtagDaoJpa.findEtagsByIndex(username, EtagType.NOTIFICATION);
+//
+//            if (cache == null) {
+//                notificationsEtag = this.notificationDaoJpa.getUserEtag(username);
+//                cachingEtags.add(new Etag(username, EtagType.NOTIFICATION, notificationsEtag));
+//            } else {
+//                notificationsEtag = cache.getEtag();
+//            }
+//        }
+//        if (targetEtags == null || targetEtags.contains("groupsEtag")) {
+//
+//            // Look up etag from cache
+//            Etag cache = this.redisEtagDaoJpa.findEtagsByIndex(username, EtagType.GROUP);
+//
+//            if (cache == null) {
+//                groupsEtag = this.groupDaoJpa.getUserEtag(username);
+//                cachingEtags.add(new Etag(username, EtagType.GROUP, groupsEtag));
+//            } else {
+//                groupsEtag = cache.getEtag();
+//            }
+//        }
+//
+//        if (projectId != null) {
+//            try {
+//                Project project = this.projectDaoJpa.getProject(projectId, username).toPresentationModel();
+//                switch (project.getProjectType()) {
+//                    case TODO:
+//                        List<Task> taskList = this.taskDaoJpa.getTasks(projectId, username);
+//                        tasksEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+//                                EtagGenerator.HashType.TO_HASHCODE,
+//                                taskList);
+//                        break;
+//                    case NOTE:
+//                        List<Note> noteList = this.noteDaoJpa.getNotes(projectId, username);
+//                        notesEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+//                                EtagGenerator.HashType.TO_HASHCODE,
+//                                noteList);
+//                        break;
+//                    default:
+//                        throw new IllegalArgumentException();
+//                }
+//            } catch (Exception ex) {
+//                LOGGER.info("Skipping tasksEtag or notesEtag");
+//            }
+//        }
 
 //        if (targetEtags == null || targetEtags.contains("taskReminders")) {
 //            final ZonedDateTime startTime = ZonedDateTime.now().minusHours(2);
