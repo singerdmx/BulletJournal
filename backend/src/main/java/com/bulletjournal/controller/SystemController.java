@@ -6,7 +6,6 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.daemon.Reminder;
-import com.bulletjournal.daemon.models.ReminderRecord;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
@@ -30,9 +29,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 
@@ -164,24 +161,24 @@ public class SystemController {
             }
         }
 
-        if (targetEtags == null || targetEtags.contains("taskReminders")) {
-            final ZonedDateTime startTime = ZonedDateTime.now().minusHours(2);
-            final ZonedDateTime endTime = ZonedDateTime.now().plusMinutes(2);
-            List<ReminderRecord> reminderRecords = this.reminder.getTasksAssignedThatNeedsWebPopupReminder(
-                    username, startTime, endTime);
-            // clone reminderRecords so we don't hold references to keys of concurrentHashMap
-            List<ReminderRecord> reminderRecordsClone = reminderRecords.stream()
-                    .map(reminderRecord -> reminderRecord.clone()).collect(Collectors.toList());
-            List<Task> tasks = this.reminder.getRemindingTasks(reminderRecordsClone, startTime)
-                    .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList());
-            remindingTasks = this.labelDaoJpa.getLabelsForProjectItemList(tasks);
-            remindingTaskEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                    EtagGenerator.HashType.TO_HASHCODE,
-                    remindingTasks);
-            if (remindingTaskRequestEtag.isPresent() && remindingTaskEtag.equals(remindingTaskRequestEtag.get())) {
-                remindingTasks = Collections.emptyList();
-            }
-        }
+//        if (targetEtags == null || targetEtags.contains("taskReminders")) {
+//            final ZonedDateTime startTime = ZonedDateTime.now().minusHours(2);
+//            final ZonedDateTime endTime = ZonedDateTime.now().plusMinutes(2);
+//            List<ReminderRecord> reminderRecords = this.reminder.getTasksAssignedThatNeedsWebPopupReminder(
+//                    username, startTime, endTime);
+//            // clone reminderRecords so we don't hold references to keys of concurrentHashMap
+//            List<ReminderRecord> reminderRecordsClone = reminderRecords.stream()
+//                    .map(reminderRecord -> reminderRecord.clone()).collect(Collectors.toList());
+//            List<Task> tasks = this.reminder.getRemindingTasks(reminderRecordsClone, startTime)
+//                    .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList());
+//            remindingTasks = this.labelDaoJpa.getLabelsForProjectItemList(tasks);
+        remindingTaskEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                EtagGenerator.HashType.TO_HASHCODE,
+                remindingTasks);
+//            if (remindingTaskRequestEtag.isPresent() && remindingTaskEtag.equals(remindingTaskRequestEtag.get())) {
+//                remindingTasks = Collections.emptyList();
+//            }
+//        }
 
         if (cachingEtags.size() > 0) {
             this.redisEtagDaoJpa.batchCache(cachingEtags);
