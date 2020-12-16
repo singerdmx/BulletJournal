@@ -22,6 +22,8 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -84,6 +86,7 @@ public class SystemController {
     private Reminder reminder;
 
     @GetMapping(UPDATES_ROUTE)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SystemUpdates getUpdates(@RequestParam(name = "targets", required = false) String targets,
                                     @RequestParam(name = "projectId", required = false) Long projectId,
                                     @RequestHeader(IF_NONE_MATCH) Optional<String> remindingTaskRequestEtag) {

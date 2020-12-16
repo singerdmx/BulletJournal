@@ -2,6 +2,7 @@ package com.bulletjournal.clients;
 
 import com.bulletjournal.config.DaemonClientConfig;
 import com.bulletjournal.notifications.NotificationService;
+import com.bulletjournal.notifications.SampleTaskChange;
 import com.bulletjournal.protobuf.daemon.grpc.services.DaemonGrpc;
 import com.bulletjournal.protobuf.daemon.grpc.types.NotificationStreamMsg;
 import com.bulletjournal.protobuf.daemon.grpc.types.SubscribeNotificationMsg;
@@ -63,17 +64,11 @@ public class DaemonServiceClient {
         }
     }
 
-    private SubscribeNotificationMsg getSubscribeNotificationMsg() {
-        return SubscribeNotificationMsg.newBuilder()
-            .setServiceName(SERVICE_NAME)
-            .setClientId(this.clientId).build();
-    }
-
     private void subscribeNotification() {
         LOGGER.info("Sending subscribeNotification to daemon server");
         this.daemonAsyncStub.subscribeNotification(
-            SubscribeNotificationMsg.newBuilder().setServiceName(SERVICE_NAME).setClientId(this.clientId).build(),
-            newResponseObserver());
+                SubscribeNotificationMsg.newBuilder().setServiceName(SERVICE_NAME).setClientId(this.clientId).build(),
+                newResponseObserver());
     }
 
     private StreamObserver<NotificationStreamMsg> newResponseObserver() {
@@ -88,8 +83,8 @@ public class DaemonServiceClient {
                             break;
                         case SAMPLETASKMSG:
                             SubscribeSampleTaskMsg msg = streamMsg.getSampleTaskMsg();
-//                            LOGGER.info("Received SubscribeInvestmentSampleTaskMsg with sampleTaskId: {}", msg.getSampleTaskId());
-//                            DaemonServiceClient.this.notificationService.addSampleTaskChange(new SampleTaskChange(msg.getSampleTaskId()));
+                            LOGGER.info("Received SubscribeInvestmentSampleTaskMsg with sampleTaskId: {}", msg.getSampleTaskId());
+                            DaemonServiceClient.this.notificationService.addSampleTaskChange(new SampleTaskChange(msg.getSampleTaskId()));
                             break;
                         default:
                             LOGGER.warn("Unsupported NotificationStreamMsg body");

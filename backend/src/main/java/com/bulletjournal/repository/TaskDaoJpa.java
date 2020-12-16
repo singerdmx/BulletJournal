@@ -540,8 +540,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void create(Long projectId, String owner, CreateTaskParams createTaskParams, String eventId, String text) {
         // Skip duplicated eventId
-        if (this.taskRepository.findTaskByGoogleCalendarEventId(eventId).isPresent()) {
-            LOGGER.info("Task with eventId {} already exists", eventId);
+        Project project = this.projectDaoJpa.getProject(projectId, owner);
+        if (this.taskRepository.findTaskByGoogleCalendarEventIdAndProject(eventId, project).isPresent()) {
+            LOGGER.info("Task with eventId {} and project {} already exists", eventId, projectId);
             return;
         }
 
@@ -555,8 +556,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void deleteTaskByGoogleEvenId(String eventId) {
-        Optional<Task> task = this.taskRepository.findTaskByGoogleCalendarEventId(eventId);
+    public void deleteTaskByGoogleEvenId(String eventId, Project project) {
+        Optional<Task> task = this.taskRepository.findTaskByGoogleCalendarEventIdAndProject(eventId, project);
         if (!task.isPresent()) {
             LOGGER.info("Task with eventId {} doesn't  exists", eventId);
             return;
@@ -565,8 +566,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Optional<Task> getTaskByGoogleCalendarEventId(String eventId) {
-        return this.taskRepository.findTaskByGoogleCalendarEventId(eventId);
+    public Optional<Task> getTaskByGoogleCalendarEventId(String eventId, Project project) {
+        return this.taskRepository.findTaskByGoogleCalendarEventIdAndProject(eventId, project);
     }
 
     private static ReminderSetting getReminderSetting(String dueDate, Task task, String time, String timezone,
