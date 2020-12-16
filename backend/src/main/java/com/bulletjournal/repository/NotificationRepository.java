@@ -13,9 +13,13 @@ import java.util.List;
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
     List<Notification> findByTargetUser(String targetUser);
 
+    long countNotificationsByTargetUser(String targetUser);
+
+    long countNotificationsByUpdatedAtBefore(Timestamp timestamp);
+
     @Modifying
     @Transactional
-    void deleteByUpdatedAtBefore(Timestamp expiryTime);
+    long deleteByUpdatedAtBefore(Timestamp expiryTime);
 
     @Modifying
     @Transactional

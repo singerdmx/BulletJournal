@@ -1,6 +1,7 @@
 package com.bulletjournal.repository;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.config.NotificationConfig;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.messaging.MessagingService;
 import com.bulletjournal.notifications.Action;
@@ -19,10 +20,13 @@ import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -32,6 +36,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class NotificationDaoJpa implements Etaggable {
 
     private static final Gson GSON = new Gson();
+    private static final long MAX_NOTIFICATIONS_COUNT_PER_USER = 100;
+    private static final Logger LOGGER = LoggerFactory.getLogger(NotificationDaoJpa.class);
     @Autowired
     private NotificationRepository notificationRepository;
     @Autowired
@@ -44,9 +50,17 @@ public class NotificationDaoJpa implements Etaggable {
     private SampleTaskNotificationsRepository sampleTaskNotificationsRepository;
     @Autowired
     private MessagingService messagingService;
-
+    @Autowired
+    private NotificationConfig notificationConfig;
 
     public List<com.bulletjournal.controller.models.Notification> getNotifications(String username) {
+        long count = this.notificationRepository.countNotificationsByTargetUser(username);
+        int maxRetentionTimeInDays = notificationConfig.getCleaner().getMaxRetentionTimeInDays();
+        while (count > MAX_NOTIFICATIONS_COUNT_PER_USER && maxRetentionTimeInDays >= 0) {
+            LOGGER.warn("{} has {} notifications!", username, count);
+            long expirationTime = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(--maxRetentionTimeInDays);
+            count -= deleteAllExpiredNotifications(new Timestamp(expirationTime));
+        }
         List<Notification> notifications = this.notificationRepository.findByTargetUser(username);
         List<com.bulletjournal.controller.models.Notification> returnNotifications = notifications.stream().map(n -> {
             com.bulletjournal.controller.models.Notification notification = n.toPresentationModel();
@@ -125,8 +139,11 @@ public class NotificationDaoJpa implements Etaggable {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void deleteAllExpiredNotifications(Timestamp expirationTime) {
-        this.notificationRepository.deleteByUpdatedAtBefore(expirationTime);
+    public long deleteAllExpiredNotifications(Timestamp expirationTime) {
+        if (this.notificationRepository.countNotificationsByUpdatedAtBefore(expirationTime) > 0) {
+            return this.notificationRepository.deleteByUpdatedAtBefore(expirationTime);
+        }
+        return 0;
     }
 
     @Override

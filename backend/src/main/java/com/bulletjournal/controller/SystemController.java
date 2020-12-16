@@ -6,10 +6,12 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.daemon.Reminder;
+import com.bulletjournal.daemon.models.ReminderRecord;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
 import com.bulletjournal.redis.models.Etag;
+import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.factory.ProjectItemDaos;
 import com.bulletjournal.repository.models.ProjectItemModel;
@@ -30,7 +32,9 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 
@@ -105,82 +109,82 @@ public class SystemController {
         List<Task> remindingTasks = Collections.emptyList();
         List<Etag> cachingEtags = new ArrayList<>();
 
-//        if (targetEtags == null || targetEtags.contains("projectsEtag")) {
-//            Projects projects = this.projectDaoJpa.getProjects(username);
-//            ownedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-//                    EtagGenerator.HashType.TO_HASHCODE,
-//                    projects.getOwned());
-//            sharedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-//                    EtagGenerator.HashType.TO_HASHCODE,
-//                    projects.getShared());
-//        }
-//        if (targetEtags == null || targetEtags.contains("notificationsEtag")) {
-//
-//            // Look up etag from cache
-//            Etag cache = this.redisEtagDaoJpa.findEtagsByIndex(username, EtagType.NOTIFICATION);
-//
-//            if (cache == null) {
-//                notificationsEtag = this.notificationDaoJpa.getUserEtag(username);
-//                cachingEtags.add(new Etag(username, EtagType.NOTIFICATION, notificationsEtag));
-//            } else {
-//                notificationsEtag = cache.getEtag();
-//            }
-//        }
-//        if (targetEtags == null || targetEtags.contains("groupsEtag")) {
-//
-//            // Look up etag from cache
-//            Etag cache = this.redisEtagDaoJpa.findEtagsByIndex(username, EtagType.GROUP);
-//
-//            if (cache == null) {
-//                groupsEtag = this.groupDaoJpa.getUserEtag(username);
-//                cachingEtags.add(new Etag(username, EtagType.GROUP, groupsEtag));
-//            } else {
-//                groupsEtag = cache.getEtag();
-//            }
-//        }
-//
-//        if (projectId != null) {
-//            try {
-//                Project project = this.projectDaoJpa.getProject(projectId, username).toPresentationModel();
-//                switch (project.getProjectType()) {
-//                    case TODO:
-//                        List<Task> taskList = this.taskDaoJpa.getTasks(projectId, username);
-//                        tasksEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-//                                EtagGenerator.HashType.TO_HASHCODE,
-//                                taskList);
-//                        break;
-//                    case NOTE:
-//                        List<Note> noteList = this.noteDaoJpa.getNotes(projectId, username);
-//                        notesEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-//                                EtagGenerator.HashType.TO_HASHCODE,
-//                                noteList);
-//                        break;
-//                    default:
-//                        throw new IllegalArgumentException();
-//                }
-//            } catch (Exception ex) {
-//                LOGGER.info("Skipping tasksEtag or notesEtag");
-//            }
-//        }
+        if (targetEtags == null || targetEtags.contains("projectsEtag")) {
+            Projects projects = this.projectDaoJpa.getProjects(username);
+            ownedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                    EtagGenerator.HashType.TO_HASHCODE,
+                    projects.getOwned());
+            sharedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                    EtagGenerator.HashType.TO_HASHCODE,
+                    projects.getShared());
+        }
+        if (targetEtags == null || targetEtags.contains("notificationsEtag")) {
 
-//        if (targetEtags == null || targetEtags.contains("taskReminders")) {
-//            final ZonedDateTime startTime = ZonedDateTime.now().minusHours(2);
-//            final ZonedDateTime endTime = ZonedDateTime.now().plusMinutes(2);
-//            List<ReminderRecord> reminderRecords = this.reminder.getTasksAssignedThatNeedsWebPopupReminder(
-//                    username, startTime, endTime);
-//            // clone reminderRecords so we don't hold references to keys of concurrentHashMap
-//            List<ReminderRecord> reminderRecordsClone = reminderRecords.stream()
-//                    .map(reminderRecord -> reminderRecord.clone()).collect(Collectors.toList());
-//            List<Task> tasks = this.reminder.getRemindingTasks(reminderRecordsClone, startTime)
-//                    .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList());
-//            remindingTasks = this.labelDaoJpa.getLabelsForProjectItemList(tasks);
-        remindingTaskEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                EtagGenerator.HashType.TO_HASHCODE,
-                remindingTasks);
-//            if (remindingTaskRequestEtag.isPresent() && remindingTaskEtag.equals(remindingTaskRequestEtag.get())) {
-//                remindingTasks = Collections.emptyList();
-//            }
-//        }
+            // Look up etag from cache
+            Etag cache = this.redisEtagDaoJpa.findEtagsByIndex(username, EtagType.NOTIFICATION);
+
+            if (cache == null) {
+                notificationsEtag = this.notificationDaoJpa.getUserEtag(username);
+                cachingEtags.add(new Etag(username, EtagType.NOTIFICATION, notificationsEtag));
+            } else {
+                notificationsEtag = cache.getEtag();
+            }
+        }
+        if (targetEtags == null || targetEtags.contains("groupsEtag")) {
+
+            // Look up etag from cache
+            Etag cache = this.redisEtagDaoJpa.findEtagsByIndex(username, EtagType.GROUP);
+
+            if (cache == null) {
+                groupsEtag = this.groupDaoJpa.getUserEtag(username);
+                cachingEtags.add(new Etag(username, EtagType.GROUP, groupsEtag));
+            } else {
+                groupsEtag = cache.getEtag();
+            }
+        }
+
+        if (projectId != null) {
+            try {
+                Project project = this.projectDaoJpa.getProject(projectId, username).toPresentationModel();
+                switch (project.getProjectType()) {
+                    case TODO:
+                        List<Task> taskList = this.taskDaoJpa.getTasks(projectId, username);
+                        tasksEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                                EtagGenerator.HashType.TO_HASHCODE,
+                                taskList);
+                        break;
+                    case NOTE:
+                        List<Note> noteList = this.noteDaoJpa.getNotes(projectId, username);
+                        notesEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                                EtagGenerator.HashType.TO_HASHCODE,
+                                noteList);
+                        break;
+                    default:
+                        throw new IllegalArgumentException();
+                }
+            } catch (Exception ex) {
+                LOGGER.info("Skipping tasksEtag or notesEtag");
+            }
+        }
+
+        if (targetEtags == null || targetEtags.contains("taskReminders")) {
+            final ZonedDateTime startTime = ZonedDateTime.now().minusHours(2);
+            final ZonedDateTime endTime = ZonedDateTime.now().plusMinutes(2);
+            List<ReminderRecord> reminderRecords = this.reminder.getTasksAssignedThatNeedsWebPopupReminder(
+                    username, startTime, endTime);
+            // clone reminderRecords so we don't hold references to keys of concurrentHashMap
+            List<ReminderRecord> reminderRecordsClone = reminderRecords.stream()
+                    .map(reminderRecord -> reminderRecord.clone()).collect(Collectors.toList());
+            List<Task> tasks = this.reminder.getRemindingTasks(reminderRecordsClone, startTime)
+                    .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList());
+            remindingTasks = this.labelDaoJpa.getLabelsForProjectItemList(tasks);
+            remindingTaskEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
+                    EtagGenerator.HashType.TO_HASHCODE,
+                    remindingTasks);
+            if (remindingTaskRequestEtag.isPresent() && remindingTaskEtag.equals(remindingTaskRequestEtag.get())) {
+                remindingTasks = Collections.emptyList();
+            }
+        }
 
         if (cachingEtags.size() > 0) {
             this.redisEtagDaoJpa.batchCache(cachingEtags);
