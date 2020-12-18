@@ -1,7 +1,6 @@
 package com.bulletjournal.es.repository;
 
 import com.bulletjournal.config.SpringESConfig;
-import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.es.repository.models.SearchIndex;
 import com.bulletjournal.notifications.RemoveElasticsearchDocumentEvent;
 import com.bulletjournal.repository.UserDaoJpa;
