@@ -9,6 +9,7 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.redis.RedisCachedContentRepository;
 import com.bulletjournal.redis.models.CachedContent;
@@ -502,6 +503,16 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
 
         return new ArrayList<>(projectItemIdMap.values());
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<ProjectItemModel> findAllById(Iterable<Long> ids,
+                                              com.bulletjournal.repository.models.Project project) {
+        List<ProjectItemModel> items = this.getJpaRepository().findAllById(ids);
+        if (items.stream().anyMatch(item -> !Objects.equals(project.getId(), item.getProject().getId()))) {
+            throw new UnAuthorizedException("Not in project");
+        }
+        return items;
     }
 }
 

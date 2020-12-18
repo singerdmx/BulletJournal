@@ -9,6 +9,7 @@ import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.UpdateTransactionParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
+import com.bulletjournal.es.ESUtil;
 import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.ledger.TransactionType;
@@ -329,7 +330,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         List<String> deleteESDocumentIds = new ArrayList<>();
         Transaction transaction = this.getProjectItem(transactionId, requester);
 
-        deleteESDocumentIds.add(this.searchIndexDaoJpa.getProjectItemSearchIndexId(transaction));
+        deleteESDocumentIds.add(ESUtil.getProjectItemSearchIndexId(transaction));
         List<TransactionContent> transactionContents = findContents(transaction);
         for (TransactionContent content : transactionContents) {
             deleteESDocumentIds.add(this.searchIndexDaoJpa.getContentSearchIndexId(content));

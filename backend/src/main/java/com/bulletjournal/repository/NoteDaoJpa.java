@@ -8,6 +8,7 @@ import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.UpdateNoteParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
+import com.bulletjournal.es.ESUtil;
 import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.hierarchy.HierarchyItem;
@@ -292,7 +293,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         List<String> deleteESDocumentIds = new ArrayList<>();
         Note note = this.getProjectItem(noteId, requester);
 
-        deleteESDocumentIds.add(this.searchIndexDaoJpa.getProjectItemSearchIndexId(note));
+        deleteESDocumentIds.add(ESUtil.getProjectItemSearchIndexId(note));
         List<NoteContent> noteContents = findContents(note);
         for (NoteContent content : noteContents) {
             deleteESDocumentIds.add(this.searchIndexDaoJpa.getContentSearchIndexId(content));

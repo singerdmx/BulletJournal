@@ -7,6 +7,7 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.daemon.models.ReminderRecord;
+import com.bulletjournal.es.ESUtil;
 import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
@@ -1040,7 +1041,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         List<String> deleteESDocumentIds = new ArrayList<>();
         Task task = this.getProjectItem(taskId, requester);
 
-        deleteESDocumentIds.add(this.searchIndexDaoJpa.getProjectItemSearchIndexId(task));
+        deleteESDocumentIds.add(ESUtil.getProjectItemSearchIndexId(task));
         List<TaskContent> taskContents = findContents(task);
         for (TaskContent content : taskContents) {
             deleteESDocumentIds.add(this.searchIndexDaoJpa.getContentSearchIndexId(content));

@@ -2,8 +2,10 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentAction;
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
+import com.bulletjournal.es.ESUtil;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.ProjectDaoJpa;
@@ -292,11 +294,32 @@ public class TaskController {
         // curl -X DELETE
         // "http://localhost:8080/api/projects/11/transactions?transactions=12&transactions=11&transactions=13&transactions=14"
         // -H "accept: */*"
-        tasks.forEach(t -> {
-            if (this.taskRepository.existsById(t)) {
-                this.deleteSingleTask(t);
-            }
-        });
+        if (tasks.isEmpty()) {
+            return getTasks(projectId, null, null, null, null, null);
+        }
+
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        com.bulletjournal.repository.models.Project project = this.projectDaoJpa.getProject(projectId, username);
+        List<com.bulletjournal.repository.models.Task> taskList =
+                this.taskDaoJpa.findAllById(tasks, project).stream()
+                        .filter(t -> t != null)
+                        .map(t -> (com.bulletjournal.repository.models.Task) t)
+                        .collect(Collectors.toList());
+        if (taskList.isEmpty()) {
+            return getTasks(projectId, null, null, null, null, null);
+        }
+
+        this.taskRepository.deleteInBatch(taskList);
+
+        List<String> deleteESDocumentIds = ESUtil.getProjectItemSearchIndexIds(tasks, ContentType.TASK);
+        this.notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(deleteESDocumentIds));
+
+        for (com.bulletjournal.repository.models.Task task : taskList) {
+            this.notificationService.trackActivity(
+                    new Auditable(projectId, "deleted Task ##" + task.getName() +
+                            "## in BuJo ##" + project.getName() + "##", username,
+                            task.getId(), Timestamp.from(Instant.now()), ContentAction.DELETE_TASK));
+        }
         return getTasks(projectId, null, null, null, null, null);
     }
 
