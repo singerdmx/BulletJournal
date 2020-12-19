@@ -2,11 +2,14 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentAction;
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
+import com.bulletjournal.es.ESUtil;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.repository.NoteDaoJpa;
 import com.bulletjournal.repository.NoteRepository;
+import com.bulletjournal.repository.ProjectDaoJpa;
 import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.NoteContent;
 import com.bulletjournal.repository.models.ProjectItemModel;
@@ -54,6 +57,9 @@ public class NoteController {
 
     @Autowired
     private UserClient userClient;
+
+    @Autowired
+    private ProjectDaoJpa projectDaoJpa;
 
     @Autowired
     private NoteRepository noteRepository;
@@ -157,11 +163,32 @@ public class NoteController {
         // curl -X DELETE
         // "http://localhost:8080/api/projects/11/transactions?transactions=12&transactions=11&transactions=13&transactions=14"
         // -H "accept: */*"
-        notes.forEach(n -> {
-            if (this.noteRepository.existsById(n)) {
-                this.deleteSingleNote(n);
-            }
-        });
+        if (notes.isEmpty()) {
+            return getNotes(projectId, null, null, null, null, null);
+        }
+
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        com.bulletjournal.repository.models.Project project = this.projectDaoJpa.getProject(projectId, username);
+        List<com.bulletjournal.repository.models.Note> noteList =
+                this.noteDaoJpa.findAllById(notes, project).stream()
+                        .filter(t -> t != null)
+                        .map(t -> (com.bulletjournal.repository.models.Note) t)
+                        .collect(Collectors.toList());
+        if (noteList.isEmpty()) {
+            return getNotes(projectId, null, null, null, null, null);
+        }
+
+        this.noteRepository.deleteInBatch(noteList);
+
+        List<String> deleteESDocumentIds = ESUtil.getProjectItemSearchIndexIds(notes, ContentType.TASK);
+        this.notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(deleteESDocumentIds));
+
+        for (com.bulletjournal.repository.models.Note note : noteList) {
+            this.notificationService.trackActivity(
+                    new Auditable(projectId, "deleted Note ##" + note.getName() +
+                            "## in BuJo ##" + project.getName() + "##", username,
+                            note.getId(), Timestamp.from(Instant.now()), ContentAction.DELETE_NOTE));
+        }
         return getNotes(projectId, null, null, null, null, null);
     }
 
