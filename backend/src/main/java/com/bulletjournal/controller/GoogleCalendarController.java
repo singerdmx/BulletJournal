@@ -150,16 +150,16 @@ public class GoogleCalendarController {
     public void createEvents(
             @Valid @RequestBody @NotNull CreateGoogleCalendarEventsParams createGoogleCalendarEventsParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        createGoogleCalendarEventsParams.getEvents().forEach((e -> {
-            createTaskFromEvent(createGoogleCalendarEventsParams.getProjectId(), username, e);
-        }));
+        createGoogleCalendarEventsParams.getEvents().forEach((e ->
+                createTaskFromEvent(createGoogleCalendarEventsParams.getProjectId(), username, e)));
     }
 
-    private void deleteTaskFromEvent(String eventId) {
-        taskDaoJpa.deleteTaskByGoogleEvenId(eventId);
+    private void deleteTaskFromEvent(String eventId, com.bulletjournal.repository.models.Project project) {
+        taskDaoJpa.deleteTaskByGoogleEvenId(eventId, project);
     }
 
     private void createTaskFromEvent(Long projectId, String username, GoogleCalendarEvent e) {
+        LOGGER.info("createTaskFromEvent: {}", e);
         String text = e.getContent().getText();
         if (StringUtils.isNotBlank(text)) {
             List<String> l = Arrays.stream(e.getContent().getText().split(System.lineSeparator()))
@@ -289,12 +289,12 @@ public class GoogleCalendarController {
         events.stream()
                 .forEach(e -> {
                     if (e.getStatus().equals("cancelled")) {
-                        deleteTaskFromEvent(e.getId());
+                        deleteTaskFromEvent(e.getId(), googleCalendarProject.getProject());
                         return;
                     }
 
                     Optional<com.bulletjournal.repository.models.Task> taskOptional =
-                            taskDaoJpa.getTaskByGoogleCalendarEventId(e.getId());
+                            taskDaoJpa.getTaskByGoogleCalendarEventId(e.getId(), googleCalendarProject.getProject());
                     if (taskOptional.isPresent()) {
                         com.bulletjournal.repository.models.Task task = taskOptional.get();
                         if (taskDaoJpa.isTaskModified(task, requester)) {

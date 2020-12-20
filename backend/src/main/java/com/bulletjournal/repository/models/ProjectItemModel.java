@@ -61,6 +61,8 @@ public abstract class ProjectItemModel<T extends ProjectItem> extends AuditModel
 
     public abstract Long getId();
 
+    public abstract void setId(Long id);
+
     public String getName() {
         return name;
     }

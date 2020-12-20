@@ -60,4 +60,13 @@ public class GoogleCalendarEvent {
     public void setEventId(String eventId) {
         this.eventId = eventId;
     }
+
+    @Override
+    public String toString() {
+        return "GoogleCalendarEvent{" +
+                "task=" + task +
+                ", content=" + content +
+                ", eventId='" + eventId + '\'' +
+                '}';
+    }
 }

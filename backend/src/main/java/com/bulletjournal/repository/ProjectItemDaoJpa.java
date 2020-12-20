@@ -9,6 +9,7 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.redis.RedisCachedContentRepository;
 import com.bulletjournal.redis.models.CachedContent;
@@ -30,6 +31,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -63,12 +65,16 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     protected NotificationService notificationService;
     @Autowired
     private RedisCachedContentRepository redisCachedContentRepository;
+    @Autowired
+    private EntityManager entityManager;
 
     abstract <T extends ProjectItemModel> JpaRepository<T, Long> getJpaRepository();
 
     abstract JpaRepository<K, Long> getContentJpaRepository();
 
     abstract <T extends ProjectItemModel> List<K> findContents(T projectItem);
+
+    abstract K newContent(String text);
 
     abstract List<Long> findItemLabelsByProject(com.bulletjournal.repository.models.Project project);
 
@@ -185,7 +191,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             return;
         }
 
-        ContentBatch left = new ContentBatch(
+        ContentBatch<K, T> left = new ContentBatch<>(
                 contents.subList(CONTENT_BATCH_SIZE, contents.size()),
                 projectItems.subList(CONTENT_BATCH_SIZE, projectItems.size()),
                 owners.subList(CONTENT_BATCH_SIZE, owners.size()));
@@ -283,14 +289,16 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         }
 
         String oldText = content.getText();
-        etag.ifPresent(e -> {
+
+        if (etag.isPresent()) {
             String itemEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                     EtagGenerator.HashType.TO_HASHCODE, oldText);
             if (!Objects.equals(etag.get(), itemEtag)) {
-                LOGGER.error("Invalid Etag: {} v.s. {}, oldText: {}", itemEtag, etag.get(), oldText);
-                throw new BadRequestException("Invalid Etag");
+                LOGGER.info("Invalid Etag: {} v.s. {}, oldText: {}; created a new content", itemEtag, etag.get(), oldText);
+                return (Pair<K, T>) this.addContent(
+                        projectItemId, requester, this.newContent(updateContentParams.getText()));
             }
-        });
+        }
 
         if (diff != null) {
             // from web: {delta: YYYYY2, ###html###:ZZZZZZ2}, diff
@@ -373,7 +381,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SetLabelEvent setLabels(String requester, Long projectItemId, List<Long> labels) {
-        ProjectItemModel projectItem = getProjectItem(projectItemId, requester);
+        ProjectItemModel<ProjectItem> projectItem = getProjectItem(projectItemId, requester);
         projectItem.setLabels(labels);
         Set<UserGroup> targetUsers = projectItem.getProject().getGroup().getAcceptedUsers();
         List<Event> events = new ArrayList<>();
@@ -495,6 +503,16 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
 
         return new ArrayList<>(projectItemIdMap.values());
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<ProjectItemModel> findAllById(Iterable<Long> ids,
+                                              com.bulletjournal.repository.models.Project project) {
+        List<ProjectItemModel> items = this.getJpaRepository().findAllById(ids);
+        if (items.stream().anyMatch(item -> !Objects.equals(project.getId(), item.getProject().getId()))) {
+            throw new UnAuthorizedException("Not in project");
+        }
+        return items;
     }
 }
 

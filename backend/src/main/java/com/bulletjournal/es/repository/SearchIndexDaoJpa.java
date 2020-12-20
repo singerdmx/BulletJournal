@@ -3,7 +3,7 @@ package com.bulletjournal.es.repository;
 import com.bulletjournal.config.SpringESConfig;
 import com.bulletjournal.es.repository.models.SearchIndex;
 import com.bulletjournal.notifications.RemoveElasticsearchDocumentEvent;
-import com.bulletjournal.repository.*;
+import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.*;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 @Repository
 public class SearchIndexDaoJpa {
+    public static final char SEARCH_INDEX_SPLITTER = '@';
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchIndexDaoJpa.class);
     private static final String PRE_TAG = "<em class='highlight'>";
     private static final String POST_TAG = "</em>";
@@ -37,7 +38,6 @@ public class SearchIndexDaoJpa {
     private static final String SEARCH_FIELD = "value";
     private static final String FRAGMENTER = "span";
     private static final String SEARCH_INDEX_NAME = "project_items";
-    private static final char SEARCH_INDEX_SPLITTER = '@';
     private static final String CONTENT_TYPE_SUFFIX = "_content";
     private static final String PROJECT_ID = "projectId";
 
@@ -191,16 +191,6 @@ public class SearchIndexDaoJpa {
     public <K extends ContentModel> String getContentSearchIndexId(K content) {
         return content.getProjectItem().getContentType().toString().toLowerCase() +
                 CONTENT_TYPE_SUFFIX + SEARCH_INDEX_SPLITTER + content.getId();
-    }
-
-    /**
-     * Return projectItem's search index id
-     *
-     * @param projectItem target projectItem
-     * @return String- projectItem id in search index format
-     */
-    public <T extends ProjectItemModel> String getProjectItemSearchIndexId(T projectItem) {
-        return projectItem.getContentType().toString().toLowerCase() + SEARCH_INDEX_SPLITTER + projectItem.getId();
     }
 
     public void delete(List<RemoveElasticsearchDocumentEvent> events) {

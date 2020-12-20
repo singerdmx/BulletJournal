@@ -24,6 +24,8 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -88,6 +90,7 @@ public class SystemController {
     private Reminder reminder;
 
     @GetMapping(UPDATES_ROUTE)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SystemUpdates getUpdates(@RequestParam(name = "targets", required = false) String targets,
                                     @RequestParam(name = "projectId", required = false) Long projectId,
                                     @RequestHeader(IF_NONE_MATCH) Optional<String> remindingTaskRequestEtag) {
@@ -103,7 +106,7 @@ public class SystemController {
         String notificationsEtag = null;
         String groupsEtag = null;
         String remindingTaskEtag = null;
-        List<Task> remindingTasks = null;
+        List<Task> remindingTasks = Collections.emptyList();
         List<Etag> cachingEtags = new ArrayList<>();
 
         if (targetEtags == null || targetEtags.contains("projectsEtag")) {
@@ -169,14 +172,17 @@ public class SystemController {
             final ZonedDateTime endTime = ZonedDateTime.now().plusMinutes(2);
             List<ReminderRecord> reminderRecords = this.reminder.getTasksAssignedThatNeedsWebPopupReminder(
                     username, startTime, endTime);
-            remindingTasks = this.labelDaoJpa.getLabelsForProjectItemList(
-                    this.reminder.getRemindingTasks(reminderRecords, startTime)
-                            .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList()));
+            // clone reminderRecords so we don't hold references to keys of concurrentHashMap
+            List<ReminderRecord> reminderRecordsClone = reminderRecords.stream()
+                    .map(reminderRecord -> reminderRecord.clone()).collect(Collectors.toList());
+            List<Task> tasks = this.reminder.getRemindingTasks(reminderRecordsClone, startTime)
+                    .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList());
+            remindingTasks = this.labelDaoJpa.getLabelsForProjectItemList(tasks);
             remindingTaskEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                     EtagGenerator.HashType.TO_HASHCODE,
                     remindingTasks);
             if (remindingTaskRequestEtag.isPresent() && remindingTaskEtag.equals(remindingTaskRequestEtag.get())) {
-                remindingTasks = null;
+                remindingTasks = Collections.emptyList();
             }
         }
 

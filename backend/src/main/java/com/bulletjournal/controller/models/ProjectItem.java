@@ -180,4 +180,14 @@ public abstract class ProjectItem {
         this.setUpdatedAt(projectItem.getUpdatedAt());
         this.setCreatedAt(projectItem.getCreatedAt());
     }
+
+    @Override
+    public String toString() {
+        return "ProjectItem{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", projectId=" + projectId +
+                ", owner=" + owner +
+                '}';
+    }
 }

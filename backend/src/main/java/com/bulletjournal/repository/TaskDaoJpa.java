@@ -7,6 +7,7 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.daemon.models.ReminderRecord;
+import com.bulletjournal.es.ESUtil;
 import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
@@ -540,8 +541,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void create(Long projectId, String owner, CreateTaskParams createTaskParams, String eventId, String text) {
         // Skip duplicated eventId
-        if (this.taskRepository.findTaskByGoogleCalendarEventId(eventId).isPresent()) {
-            LOGGER.info("Task with eventId {} already exists", eventId);
+        Project project = this.projectDaoJpa.getProject(projectId, owner);
+        if (this.taskRepository.findTaskByGoogleCalendarEventIdAndProject(eventId, project).isPresent()) {
+            LOGGER.info("Task with eventId {} and project {} already exists", eventId, projectId);
             return;
         }
 
@@ -555,8 +557,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void deleteTaskByGoogleEvenId(String eventId) {
-        Optional<Task> task = this.taskRepository.findTaskByGoogleCalendarEventId(eventId);
+    public void deleteTaskByGoogleEvenId(String eventId, Project project) {
+        Optional<Task> task = this.taskRepository.findTaskByGoogleCalendarEventIdAndProject(eventId, project);
         if (!task.isPresent()) {
             LOGGER.info("Task with eventId {} doesn't  exists", eventId);
             return;
@@ -565,8 +567,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Optional<Task> getTaskByGoogleCalendarEventId(String eventId) {
-        return this.taskRepository.findTaskByGoogleCalendarEventId(eventId);
+    public Optional<Task> getTaskByGoogleCalendarEventId(String eventId, Project project) {
+        return this.taskRepository.findTaskByGoogleCalendarEventIdAndProject(eventId, project);
     }
 
     private static ReminderSetting getReminderSetting(String dueDate, Task task, String time, String timezone,
@@ -959,6 +961,11 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return this.taskContentRepository.findTaskContentByTask((Task) projectItem);
     }
 
+    @Override
+    TaskContent newContent(String text) {
+        return new TaskContent(text);
+    }
+
 
     @Override
     public <T extends ProjectItemModel> List<TaskContent> getContents(Long projectItemId, String requester) {
@@ -1034,7 +1041,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         List<String> deleteESDocumentIds = new ArrayList<>();
         Task task = this.getProjectItem(taskId, requester);
 
-        deleteESDocumentIds.add(this.searchIndexDaoJpa.getProjectItemSearchIndexId(task));
+        deleteESDocumentIds.add(ESUtil.getProjectItemSearchIndexId(task));
         List<TaskContent> taskContents = findContents(task);
         for (TaskContent content : taskContents) {
             deleteESDocumentIds.add(this.searchIndexDaoJpa.getContentSearchIndexId(content));

@@ -8,6 +8,7 @@ import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.UpdateNoteParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
+import com.bulletjournal.es.ESUtil;
 import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.hierarchy.HierarchyItem;
@@ -16,7 +17,6 @@ import com.bulletjournal.hierarchy.NoteRelationsProcessor;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
-import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +36,6 @@ import java.util.stream.Collectors;
 
 @Repository
 public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
-
-    private static final Gson GSON = new Gson();
 
     @PersistenceContext
     EntityManager entityManager;
@@ -257,6 +255,11 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     }
 
     @Override
+    NoteContent newContent(String text) {
+        return new NoteContent(text);
+    }
+
+    @Override
     List<Long> findItemLabelsByProject(Project project) {
         return noteRepository.findUniqueLabelsByProject(project.getId());
     }
@@ -290,7 +293,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         List<String> deleteESDocumentIds = new ArrayList<>();
         Note note = this.getProjectItem(noteId, requester);
 
-        deleteESDocumentIds.add(this.searchIndexDaoJpa.getProjectItemSearchIndexId(note));
+        deleteESDocumentIds.add(ESUtil.getProjectItemSearchIndexId(note));
         List<NoteContent> noteContents = findContents(note);
         for (NoteContent content : noteContents) {
             deleteESDocumentIds.add(this.searchIndexDaoJpa.getContentSearchIndexId(content));

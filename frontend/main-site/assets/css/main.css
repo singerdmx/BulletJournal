@@ -1939,3 +1939,10 @@ Mobile
 .carousel-caption {
   filter: invert(100%);
 }
+
+@media only screen and (max-width: 600px) {
+  .video-promo .video-promo-content iframe {
+    width: 100vw !important;
+    height: auto !important;
+  }
+}

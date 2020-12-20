@@ -64,17 +64,11 @@ public class DaemonServiceClient {
         }
     }
 
-    private SubscribeNotificationMsg getSubscribeNotificationMsg() {
-        return SubscribeNotificationMsg.newBuilder()
-            .setServiceName(SERVICE_NAME)
-            .setClientId(this.clientId).build();
-    }
-
     private void subscribeNotification() {
         LOGGER.info("Sending subscribeNotification to daemon server");
         this.daemonAsyncStub.subscribeNotification(
-            SubscribeNotificationMsg.newBuilder().setServiceName(SERVICE_NAME).setClientId(this.clientId).build(),
-            newResponseObserver());
+                SubscribeNotificationMsg.newBuilder().setServiceName(SERVICE_NAME).setClientId(this.clientId).build(),
+                newResponseObserver());
     }
 
     private StreamObserver<NotificationStreamMsg> newResponseObserver() {

@@ -2,16 +2,20 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentAction;
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
+import com.bulletjournal.es.ESUtil;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.ledger.FrequencyType;
 import com.bulletjournal.ledger.LedgerSummary;
 import com.bulletjournal.ledger.LedgerSummaryCalculator;
 import com.bulletjournal.ledger.LedgerSummaryType;
 import com.bulletjournal.notifications.*;
+import com.bulletjournal.repository.ProjectDaoJpa;
 import com.bulletjournal.repository.TransactionDaoJpa;
+import com.bulletjournal.repository.TransactionRepository;
 import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.TransactionContent;
@@ -55,6 +59,12 @@ public class TransactionController {
 
     @Autowired
     private TransactionDaoJpa transactionDaoJpa;
+
+    @Autowired
+    private ProjectDaoJpa projectDaoJpa;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     @Autowired
     private NotificationService notificationService;
@@ -204,6 +214,33 @@ public class TransactionController {
         // "http://localhost:8080/api/projects/11/transactions?transactions=12&transactions=11&transactions=13&transactions=14"
         // -H "accept: */*"
         transactions.forEach(id -> this.deleteTransaction(id));
+
+        if (transactions.isEmpty()) {
+            return;
+        }
+
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        com.bulletjournal.repository.models.Project project = this.projectDaoJpa.getProject(projectId, username);
+        List<com.bulletjournal.repository.models.Transaction> transactionList =
+                this.transactionDaoJpa.findAllById(transactions, project).stream()
+                        .filter(t -> t != null)
+                        .map(t -> (com.bulletjournal.repository.models.Transaction) t)
+                        .collect(Collectors.toList());
+        if (transactionList.isEmpty()) {
+            return;
+        }
+
+        this.transactionRepository.deleteInBatch(transactionList);
+
+        List<String> deleteESDocumentIds = ESUtil.getProjectItemSearchIndexIds(transactions, ContentType.TRANSACTION);
+        this.notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(deleteESDocumentIds));
+
+        for (com.bulletjournal.repository.models.Transaction transaction : transactionList) {
+            this.notificationService.trackActivity(
+                    new Auditable(projectId, "deleted Transaction ##" + transaction.getName() +
+                            "## in BuJo ##" + project.getName() + "##", username,
+                            transaction.getId(), Timestamp.from(Instant.now()), ContentAction.DELETE_TRANSACTION));
+        }
     }
 
     @PutMapping(TRANSACTION_SET_LABELS_ROUTE)
@@ -333,9 +370,9 @@ public class TransactionController {
 
     @PostMapping(REVISION_CONTENT_ROUTE)
     public Content patchRevisionContents(@NotNull @PathVariable Long transactionId,
-                                      @NotNull @PathVariable Long contentId,
-                                      @NotNull @RequestBody  RevisionContentsParams revisionContentsParams,
-                                      @RequestHeader(IF_NONE_MATCH) String etag) {
+                                         @NotNull @PathVariable Long contentId,
+                                         @NotNull @RequestBody RevisionContentsParams revisionContentsParams,
+                                         @RequestHeader(IF_NONE_MATCH) String etag) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         TransactionContent content = this.transactionDaoJpa.patchRevisionContentHistory(
                 contentId, transactionId, username, revisionContentsParams.getRevisionContents(), etag);

@@ -149,4 +149,11 @@ public class Content {
     public void setEtag(String etag) {
         this.etag = etag;
     }
+
+    @Override
+    public String toString() {
+        return "Content{" +
+                "text='" + text + '\'' +
+                '}';
+    }
 }

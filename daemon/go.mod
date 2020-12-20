@@ -7,6 +7,7 @@ require (
 	github.com/go-resty/resty/v2 v2.3.0
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.0.1
 	github.com/mailjet/mailjet-apiv3-go v0.0.0-20201009050126-c24bc15a9394
 	github.com/pkg/errors v0.9.1
 	github.com/singerdmx/BulletJournal/protobuf/daemon v0.0.0
