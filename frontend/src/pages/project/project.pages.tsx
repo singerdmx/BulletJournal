@@ -584,7 +584,7 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
 
     if (project.description) {
       projectHeader = <Popover
-          placement="bottom"
+          placement="leftTop"
           content={<div className="project-description">
             {project.description.split('\n').map((s, key) => {
               return <p key={key}>{s}</p>;
