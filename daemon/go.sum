@@ -338,10 +338,12 @@ github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529/go.mod h1:DxrIzT+xaE7yg
 github.com/shopspring/decimal v0.0.0-20180709203117-cd690d0c9e24/go.mod h1:M+9NzErvs504Cn4c5DxATwIqPbtswREoFCre64PpcG4=
 github.com/shopspring/decimal v0.0.0-20200227202807-02e2044944cc h1:jUIKcSPO9MoMJBbEoyE/RJoE8vz7Mb8AjvifMMwSyvY=
 github.com/shopspring/decimal v0.0.0-20200227202807-02e2044944cc/go.mod h1:DKyhrW/HYNuLGql+MJL6WCR6knT2jwCFRcu2hWCYk4o=
+github.com/singerdmx/BulletJournal v0.1.0 h1:e2a/5q/FEkUomDXqHhSNUUceKspENYTm0j+UGyXhcIo=
 github.com/singerdmx/BulletJournal/protobuf/daemon v0.0.0-20201010013622-25160d0f1bbd h1:Jzzrj1Citja4QNu5TBHTifVU7o1kC2mUZhpRkkJpp4k=
 github.com/singerdmx/BulletJournal/protobuf/daemon v0.0.0-20201010013622-25160d0f1bbd/go.mod h1:cs44NK2+Q/ap2aIAJk2LaFNUf4aTQjh0WCa21BbO6Vo=
 github.com/singerdmx/BulletJournal/protobuf/daemon v0.0.0-20201010022516-3679a673ee82 h1:ThVyupebTnA1ccElAz07nxsYneLc11woI8/SFyn65gk=
 github.com/singerdmx/BulletJournal/protobuf/daemon v0.0.0-20201010022516-3679a673ee82/go.mod h1:D6966DSHCWVZGEVoBDd9t2MJ/a6FSlamoQIyMN01oz0=
+github.com/singerdmx/BulletJournal/protobuf/daemon v0.0.0-20201222041924-09fcb74d1fbe h1:r/bV9WelXHrhSYs4UA6kRkhW5l6G+PHFV1c5a5fTEVk=
 github.com/sirupsen/logrus v1.2.0/go.mod h1:LxeOpSwHxABJmUn/MG1IvRgCAasNZTLOkJPxbbu5VWo=
 github.com/sirupsen/logrus v1.4.1/go.mod h1:ni0Sbl8bgC9z8RoU9G6nDWqqs/fq4eDPysMBDgk/93Q=
 github.com/sirupsen/logrus v1.4.2/go.mod h1:tLMulIdttU9McNUspp0xgXVQah82FyeX6MwdIuYE2rE=
