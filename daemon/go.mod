@@ -15,7 +15,6 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/zywangzy/JobScheduler v0.0.0-20200810024552-d2006de1954a
 	go.uber.org/zap v1.16.0
-	google.golang.org/genproto v0.0.0-20201102152239-715cce707fb0 // indirect
 	google.golang.org/grpc v1.33.1
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22 // indirect
