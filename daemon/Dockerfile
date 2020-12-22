@@ -49,8 +49,8 @@ RUN apk update && \
     apk add git protobuf make && \
     go get -u github.com/golang/protobuf/protoc-gen-go
 
-RUN go mod vendor && \
-    GOOS=linux TARGET=/go/bin make build
+RUN go mod vendor
+RUN GOOS=linux TARGET=/go/bin make build
 
 
 # Target image with only executables
