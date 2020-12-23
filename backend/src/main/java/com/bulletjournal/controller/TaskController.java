@@ -195,7 +195,11 @@ public class TaskController {
         }
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        List<com.bulletjournal.repository.models.Task> taskList = this.taskRepository.findAllById(tasks);
+        List<com.bulletjournal.repository.models.Task> taskList = this.taskRepository
+                .findAllById(tasks).stream().filter(t -> t != null).collect(Collectors.toList());
+        if (taskList.isEmpty()) {
+            return getTasks(projectId, null, null, null, null, null);
+        }
         this.taskDaoJpa.completeInBatch(username, taskList);
 
         List<String> deleteESDocumentIds = ESUtil.getProjectItemSearchIndexIds(tasks, ContentType.TASK);
