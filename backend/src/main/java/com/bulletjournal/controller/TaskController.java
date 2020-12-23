@@ -188,20 +188,15 @@ public class TaskController {
 
     @PostMapping(COMPLETE_TASKS_ROUTE)
     public ResponseEntity<List<Task>> completeTasks(@NotNull @PathVariable Long projectId,
-            @RequestParam List<Long> tasks) {
+                                                    @RequestParam List<Long> tasks) {
 
-
-        String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.taskDaoJpa.completeInBatch(username, tasks);
-
-        List<com.bulletjournal.repository.models.Task> taskList =
-                this.taskDaoJpa.findAllById(tasks, project).stream()
-                        .filter(t -> t != null)
-                        .map(t -> (com.bulletjournal.repository.models.Task) t)
-                        .collect(Collectors.toList());
-        if (taskList.isEmpty()) {
+        if (tasks.isEmpty()) {
             return getTasks(projectId, null, null, null, null, null);
         }
+
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        List<com.bulletjournal.repository.models.Task> taskList = this.taskRepository.findAllById(tasks);
+        this.taskDaoJpa.completeInBatch(username, taskList);
 
         List<String> deleteESDocumentIds = ESUtil.getProjectItemSearchIndexIds(tasks, ContentType.TASK);
         this.notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(deleteESDocumentIds));

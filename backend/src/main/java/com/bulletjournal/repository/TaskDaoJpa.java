@@ -711,9 +711,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @return List<CompleteTask> - a list of repository model complete task objects
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<CompletedTask> completeInBatch(String requester, List<Long> taskIds) {
-
-        List<Task> taskList = this.taskRepository.findAllById(taskIds);
+    public List<CompletedTask> completeInBatch(String requester, List<Task> taskList) {
         List<CompletedTask> completedTaskList = new LinkedList<>();
 
         taskList.forEach(t -> {
