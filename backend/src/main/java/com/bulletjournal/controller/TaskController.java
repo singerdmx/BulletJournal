@@ -190,11 +190,27 @@ public class TaskController {
     public ResponseEntity<List<Task>> completeTasks(@NotNull @PathVariable Long projectId,
             @RequestParam List<Long> tasks) {
 
-        tasks.forEach(t -> {
-            if (this.taskRepository.existsById(t)) {
-                this.completeSingleTask(t, null);
-            }
-        });
+
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.taskDaoJpa.completeInBatch(username, tasks);
+
+        List<com.bulletjournal.repository.models.Task> taskList =
+                this.taskDaoJpa.findAllById(tasks, project).stream()
+                        .filter(t -> t != null)
+                        .map(t -> (com.bulletjournal.repository.models.Task) t)
+                        .collect(Collectors.toList());
+        if (taskList.isEmpty()) {
+            return getTasks(projectId, null, null, null, null, null);
+        }
+
+        List<String> deleteESDocumentIds = ESUtil.getProjectItemSearchIndexIds(tasks, ContentType.TASK);
+        this.notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(deleteESDocumentIds));
+
+        for (com.bulletjournal.repository.models.Task task : taskList) {
+            this.notificationService.trackActivity(new Auditable(task.getProject().getId(),
+                    "completed Task ##" + task.getName() + "## in BuJo ##" + task.getProject().getName() + "##", username,
+                    task.getId(), Timestamp.from(Instant.now()), ContentAction.COMPLETE_TASK));
+        }
 
         return getTasks(projectId, null, null, null, null, null);
     }
