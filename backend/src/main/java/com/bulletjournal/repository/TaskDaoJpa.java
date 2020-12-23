@@ -700,6 +700,39 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     /**
+     * Set all tasks to complete
+     * <p>
+     * 1. Get tasks from task table
+     * 2. Delete tasks and its sub tasks from task table
+     * 3. Add tasks and its sub tasks to complete task table
+     *
+     * @param requester the username of action requester
+     * @param taskIds   the task ids
+     * @return List<CompleteTask> - a list of repository model complete task objects
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<CompletedTask> completeInBatch(String requester, List<Long> taskIds) {
+
+        List<Task> taskList = this.taskRepository.findAllById(taskIds);
+        List<CompletedTask> completedTaskList = new LinkedList<>();
+
+        taskList.forEach(t -> {
+            this.authorizationService.validateRequesterInProjectGroup(requester, t);
+            this.authorizationService.checkAuthorizedToOperateOnContent(t.getOwner(), requester, ContentType.TASK,
+                    Operation.UPDATE, t.getProject().getId(), t.getProject().getOwner());
+            // clone its contents
+            String contents = GSON_ALLOW_EXPOSE_ONLY
+                    .toJson(this.getContents(t.getId(), requester).stream().collect(Collectors.toList()));
+
+            completedTaskList.add(new CompletedTask(t, contents));
+        });
+
+        this.taskRepository.deleteAll(taskList);
+        this.completedTaskRepository.saveAll(completedTaskList);
+        return completedTaskList;
+    }
+
+    /**
      * Set a task to complete
      * <p>
      * 1. Get task from task table 2. Delete task and its sub tasks from task table
