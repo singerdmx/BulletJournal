@@ -81,7 +81,7 @@ export const modules = {
   toolbar: {
     container: [
       [
-        { header: [1, 2, false] },
+        { header: [1, 2, 3, false] },
         { color: [] },
         { background: [] },
         { align: [] },
