@@ -25,7 +25,7 @@ import { RollbackOutlined } from '@ant-design/icons';
 import { IState } from '../../store';
 import { Project } from '../../features/project/interface';
 import { ContentType } from '../../features/myBuJo/constants';
-import { isContentEditable } from '../content/content-item.component';
+import {createHTML, isContentEditable} from '../content/content-item.component';
 import Quill from "quill";
 import {getProject} from "../../features/project/actions";
 const Delta = Quill.import('delta');
@@ -169,6 +169,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
     return null;
   };
 
+  const htmlBody = history ? createHTML(new Delta(JSON.parse(history)['delta'])) : '<p></p>';
   return (
     <div className="revision-container">
       <div className="revision-content">
@@ -189,7 +190,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
             {moment(revisions[revisionIndex - 1].createdAt).fromNow()}
           </span>
         </div>
-        <div dangerouslySetInnerHTML={{ __html: history && JSON.parse(history)['###html###'] }}></div>
+        <div dangerouslySetInnerHTML={{ __html: htmlBody }}></div>
       </div>
       <div className="revision-content">
         <div className="revision-header">
