@@ -145,7 +145,21 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = (
             }
         };
     };
-    modules.toolbar.handlers = {image: imageUploader};
+    const undoHistory = () => {
+        if (!quillRef) return;
+        const editor = quillRef.current!.getEditor();
+        editor.getModule('history').undo();
+    }
+    const redoHistory = () => {
+        if (!quillRef) return;
+        const editor = quillRef.current!.getEditor();
+        editor.getModule('history').redo();
+    }
+    modules.toolbar.handlers = {
+        image: imageUploader,
+        undo: undoHistory,
+        redo: redoHistory
+    };
 
     /**
      * Do something to our dropped or pasted image
