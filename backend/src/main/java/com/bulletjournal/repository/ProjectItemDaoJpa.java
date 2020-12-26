@@ -254,7 +254,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             if (!Objects.equals(etag, noteEtag)) {
                 throw new BadRequestException("Invalid etag");
             }
-            content.setText(DeltaConverter.mergeContentText(lastRevisionContent, content.getText()) );
+            content.setText(DeltaConverter.mergeContentText(lastRevisionContent, content.getText()));
             content = this.getContentJpaRepository().saveAndFlush(content);
             redisCachedContentRepository.save(new CachedContent(contentId));
         }
@@ -283,6 +283,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
                 projectItem);
         String mdiff = updateContentParams.getMdiff();
         String diff = updateContentParams.getDiff();
+
         if (mdiff != null && diff != null) {
             LOGGER.error("Cannot have both diff and mdiff");
             throw new BadRequestException("Cannot have both diff and mdiff");
@@ -298,6 +299,15 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
                 return (Pair<K, T>) this.addContent(
                         projectItemId, requester, this.newContent(updateContentParams.getText()));
             }
+        }
+
+        if (mdiff == null && diff == null) {
+            // from new mobile version
+            LOGGER.info("from new mobile version " + updateContentParams.getText());
+            content.setText(updateContentParams.getText());
+            updateRevision(content, requester, content.getText(), oldText, false);
+            this.getContentJpaRepository().save(content);
+            return Pair.of(content, projectItem);
         }
 
         if (diff != null) {
@@ -425,7 +435,11 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     }
 
     private void updateRevision(K content, String requester, String newText, String oldText) {
-        if (!newText.contains(DeltaContent.HTML_TAG)) {
+        updateRevision(content, requester, newText, oldText, true);
+    }
+
+    private void updateRevision(K content, String requester, String newText, String oldText, boolean checkHTMLTag) {
+        if (checkHTMLTag && !newText.contains(DeltaContent.HTML_TAG)) {
             LOGGER.info("{} does not contain {}", newText, DeltaContent.HTML_TAG);
             return;
         }
