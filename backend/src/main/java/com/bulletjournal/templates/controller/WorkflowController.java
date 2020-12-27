@@ -122,6 +122,7 @@ public class WorkflowController {
                     this.ruleEngine.getSampleTasksForFinalStep(
                             nextStep.getStep().getId(), selections, prevSelections))
                     .stream().map(e -> e.toSimplePresentationModel()).collect(Collectors.toList());
+            sampleTasks = sortSampleTasks(sampleTasks);
             // store in redis and generate scrollId
             // setSampleTasks with the first 10 tasks
             if (sampleTasks.size() <= 10) {
@@ -136,6 +137,15 @@ public class WorkflowController {
         }
 
         return nextStep;
+    }
+
+    private List<SampleTask> sortSampleTasks(List<SampleTask> sampleTasks) {
+//        if (sampleTasks.stream().allMatch(t -> StringUtils.isNotBlank(t.getName()))) {
+//            return sampleTasks.stream()
+//                    .sorted(Comparator.comparing(SampleTask::getName)).collect(Collectors.toList());
+//        }
+        return sampleTasks.stream()
+                .sorted(Comparator.comparing(SampleTask::getId)).collect(Collectors.toList());
     }
 
     @GetMapping(PUBLIC_SAMPLE_TASKS_ROUTE)
