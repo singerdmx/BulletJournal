@@ -84,6 +84,7 @@ public class WorkflowController {
 
 
     private static final Gson GSON = new Gson();
+    private static final Comparator<String> NATURAL_ORDER_COMPARATOR = Comparator.naturalOrder();
 
     @GetMapping(SUBSCRIBED_CATEGORIES_ROUTE)
     public List<SubscribedCategory> getUserSubscribedCategories() {
@@ -140,10 +141,12 @@ public class WorkflowController {
     }
 
     private List<SampleTask> sortSampleTasks(List<SampleTask> sampleTasks) {
-//        if (sampleTasks.stream().allMatch(t -> StringUtils.isNotBlank(t.getName()))) {
-//            return sampleTasks.stream()
-//                    .sorted(Comparator.comparing(SampleTask::getName)).collect(Collectors.toList());
-//        }
+
+        if (sampleTasks.stream().allMatch(t -> StringUtils.isNotBlank(t.getName()))) {
+            sampleTasks.stream()
+                    .sorted((a, b) -> NATURAL_ORDER_COMPARATOR.compare(a.getName(), b.getName()))
+                    .collect(Collectors.toList());
+        }
         return sampleTasks.stream()
                 .sorted(Comparator.comparing(SampleTask::getId)).collect(Collectors.toList());
     }
