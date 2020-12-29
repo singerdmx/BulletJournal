@@ -57,7 +57,6 @@ public class TaskController {
     protected static final String COMPLETED_TASK_CONTENTS_ROUTE = "/api/completedTasks/{taskId}/contents";
     protected static final String CONTENT_REVISIONS_ROUTE = "/api/tasks/{taskId}/contents/{contentId}/revisions/{revisionId}";
     protected static final String TASK_STATISTICS_ROUTE = "/api/taskStatistics";
-    protected static final String REVISION_CONTENT_ROUTE = "/api/tasks/{taskId}/contents/{contentId}/patchRevisionContents";
 
     @Autowired
     private TaskDaoJpa taskDaoJpa;
@@ -530,14 +529,4 @@ public class TaskController {
         return taskStatistics;
     }
 
-    @PostMapping(REVISION_CONTENT_ROUTE)
-    public Content patchRevisionContents(@NotNull @PathVariable Long taskId,
-                                      @NotNull @PathVariable Long contentId,
-                                      @NotNull @RequestBody  RevisionContentsParams revisionContentsParams,
-                                      @RequestHeader(IF_NONE_MATCH) String etag) {
-        String username = MDC.get(UserClient.USER_NAME_KEY);
-        TaskContent content = this.taskDaoJpa.patchRevisionContentHistory(
-                contentId, taskId, username, revisionContentsParams.getRevisionContents(), etag);
-        return content == null ? new Content() : content.toPresentationModel();
-    }
 }

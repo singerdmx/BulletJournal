@@ -8,8 +8,7 @@ import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.Transaction;
 import com.google.common.collect.ImmutableList;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
+import com.google.gson.Gson;
 import org.springframework.http.*;
 
 import java.sql.Timestamp;
@@ -20,12 +19,8 @@ import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
 public class TestHelpers {
-    private static TestRestTemplate restTemplate = new TestRestTemplate();
-    @LocalServerPort
-    private int randomServerPort;
     private static final String ROOT_URL = "http://localhost:";
-    private static String TIMEZONE = "America/Los_Angeles";
-    private static int randomPort = 8080;
+    private static final Gson GSON = new Gson();
 
     @SafeVarargs
     public static <T> void assertIfContains(List<T> container, T... objects) {
@@ -155,5 +150,14 @@ public class TestHelpers {
         Group updated = groupsResponse.getBody();
         assertEquals(expectedSize, updated.getUsers().size());
         return updated;
+    }
+
+    public static String generateDeltaContent(String contentStr) {
+        String content = "{\"delta\":{\"ops\":[{\"insert\":\"TEMPLATE\\n\"}]},\"###html###\":\"<p>TEMPLATE</p><p><br></p>\"}";
+        return content.replace("TEMPLATE", contentStr);
+    }
+
+    public static UpdateContentParams strToUpdateContentParams(String text) {
+        return GSON.fromJson(text, UpdateContentParams.class);
     }
 }

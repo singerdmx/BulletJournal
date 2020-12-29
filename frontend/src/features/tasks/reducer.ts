@@ -215,13 +215,6 @@ export type SetTaskStatus = {
   type: ProjectItemUIType;
 };
 
-export type PatchRevisionContents = {
-  taskId: number;
-  contentId: number;
-  revisionContents: string[];
-  etag: string;
-}
-
 export type GetTaskStatisticsAction = {
   projectIds: number[];
   timezone: string;
@@ -384,7 +377,6 @@ const slice = createSlice({
     TaskContentPatch: (state, action: PayloadAction<PatchContent>) => state,
     SampleTaskContentPatch: (state, action: PayloadAction<PatchContent>) => state,
     TaskStatusSet: (state, action: PayloadAction<SetTaskStatus>) => state,
-    TaskPatchRevisionContents: (state, action: PayloadAction<PatchRevisionContents>) => state,
     GetTaskStatistics: (state, action: PayloadAction<GetTaskStatisticsAction>) => state,
     TaskStatisticsReceived: (state, action: PayloadAction<TaskStatisticsAction>) => {
       const { projectStatistics } = action.payload;

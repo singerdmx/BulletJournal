@@ -9,10 +9,6 @@ import {connect} from 'react-redux';
 import {setDisplayMore, setDisplayRevision,} from '../../features/content/actions';
 import Quill, {DeltaStatic} from "quill";
 import ReactQuill from "react-quill";
-import {patchTransactionRevisionContents} from "../../features/transactions/actions";
-import {patchTaskRevisionContents} from "../../features/tasks/actions";
-import {patchNoteRevisionContents} from "../../features/notes/actions";
-import {ContentType} from "../../features/myBuJo/constants";
 import 'react-quill/dist/quill.core.css';
 import 'react-quill/dist/quill.bubble.css';
 import 'react-quill/dist/quill.snow.css';
@@ -27,24 +23,6 @@ type ContentProps = {
   displayRevision: boolean;
   setDisplayMore: (displayMore: boolean) => void;
   setDisplayRevision: (displayRevision: boolean) => void;
-  patchNoteRevisionContents: (
-      noteId: number,
-      contentId: number,
-      revisionContents: string[],
-      etag: string
-  ) => void;
-  patchTaskRevisionContents: (
-      taskId: number,
-      contentId: number,
-      revisionContents: string[],
-      etag: string
-  ) => void;
-  patchTransactionRevisionContents: (
-      transactionId: number,
-      contentId: number,
-      revisionContents: string[],
-      etag: string
-  ) => void;
 };
 
 export const isContentEditable = (
@@ -75,41 +53,9 @@ const ContentItem: React.FC<ContentProps> = ({
   displayRevision,
   setDisplayRevision,
   setDisplayMore,
-  patchNoteRevisionContents,
-  patchTaskRevisionContents,
-  patchTransactionRevisionContents
 }) => {
   const contentJson = JSON.parse(content.text);
-  let delta = contentJson['delta'];
-  if (contentJson['diff']) {
-    let revisionContents = [content.text];
-    if (!contentJson['###html###']) {
-      // first time opened by web and created by mobile
-      const c0 = JSON.stringify({delta: delta, '###html###': createHTML(new Delta(delta))});
-      revisionContents = [c0, c0]; // first revision
-    }
-    console.log(contentJson['diff'])
-    console.log(delta)
-    contentJson['diff'].forEach((d: any) => {
-      console.log("Applying diff " + JSON.stringify(d));
-      delta = new Delta(delta).compose(new Delta(d));
-      revisionContents.push(JSON.stringify({delta: delta, '###html###': createHTML(new Delta(delta))}));
-    });
-
-    console.log('new Delta', delta)
-    console.log('revisionContents', revisionContents);
-    switch (projectItem.contentType) {
-      case ContentType.TASK:
-        patchTaskRevisionContents(projectItem.id, content.id, revisionContents, content.etag);
-        break;
-      case ContentType.NOTE:
-        patchNoteRevisionContents(projectItem.id, content.id, revisionContents, content.etag);
-        break;
-      case ContentType.TRANSACTION:
-        patchTransactionRevisionContents(projectItem.id, content.id, revisionContents, content.etag);
-        break;
-    }
-  }
+  const delta = contentJson['delta'];
 
   let contentHtml = contentJson['###html###'];
   if (!contentHtml) {
@@ -187,7 +133,4 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
   setDisplayMore,
   setDisplayRevision,
-  patchNoteRevisionContents,
-  patchTaskRevisionContents,
-  patchTransactionRevisionContents
 })(ContentItem);

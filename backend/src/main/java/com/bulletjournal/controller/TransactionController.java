@@ -52,7 +52,6 @@ public class TransactionController {
     protected static final String CONTENT_ROUTE = "/api/transactions/{transactionId}/contents/{contentId}";
     protected static final String CONTENTS_ROUTE = "/api/transactions/{transactionId}/contents";
     protected static final String CONTENT_REVISIONS_ROUTE = "/api/transactions/{transactionId}/contents/{contentId}/revisions/{revisionId}";
-    protected static final String REVISION_CONTENT_ROUTE = "/api/transactions/{transactionId}/contents/{contentId}/patchRevisionContents";
 
     @Autowired
     private LedgerSummaryCalculator ledgerSummaryCalculator;
@@ -366,16 +365,5 @@ public class TransactionController {
         Revision revision = this.transactionDaoJpa.getContentRevision(username, transactionId, contentId,
                 revisionId);
         return Revision.addAvatar(revision, this.userClient);
-    }
-
-    @PostMapping(REVISION_CONTENT_ROUTE)
-    public Content patchRevisionContents(@NotNull @PathVariable Long transactionId,
-                                         @NotNull @PathVariable Long contentId,
-                                         @NotNull @RequestBody RevisionContentsParams revisionContentsParams,
-                                         @RequestHeader(IF_NONE_MATCH) String etag) {
-        String username = MDC.get(UserClient.USER_NAME_KEY);
-        TransactionContent content = this.transactionDaoJpa.patchRevisionContentHistory(
-                contentId, transactionId, username, revisionContentsParams.getRevisionContents(), etag);
-        return content == null ? new Content() : content.toPresentationModel();
     }
 }

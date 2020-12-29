@@ -18,7 +18,6 @@ import com.bulletjournal.templates.repository.model.*;
 import com.bulletjournal.templates.workflow.engine.RuleEngine;
 import com.bulletjournal.templates.workflow.models.RuleExpression;
 import com.bulletjournal.util.DeltaContent;
-import com.bulletjournal.util.DeltaConverter;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
@@ -321,7 +320,6 @@ public class WorkflowController {
         if (StringUtils.isBlank(content)) {
             content = DeltaContent.EMPTY_CONTENT;
         }
-        content = DeltaConverter.supplementContentText(content, false);
         return new Content(this.userDaoJpa.isAdmin(requester) ? sampleTaskId : 0L,
                 user, content, content,
                 System.currentTimeMillis(), System.currentTimeMillis(), "");

@@ -9,7 +9,6 @@ import com.bulletjournal.ledger.FrequencyType;
 import com.bulletjournal.ledger.LedgerSummary;
 import com.bulletjournal.ledger.LedgerSummaryType;
 import com.bulletjournal.notifications.Action;
-import com.bulletjournal.util.DeltaConverter;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
@@ -909,7 +908,7 @@ public class ProjectControllerTest {
     }
 
     private Content createTaskContent(Task task) {
-        String text = DeltaConverter.generateDeltaContent("TEXT1");
+        String text = TestHelpers.generateDeltaContent("TEXT1");
         CreateContentParams createContentParams = new CreateContentParams(text);
         ResponseEntity<Content> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.ADD_CONTENT_ROUTE,
@@ -921,14 +920,14 @@ public class ProjectControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         Content content = response.getBody();
         assertEquals(expectedOwner, content.getOwner().getName());
-        assertEquals(DeltaConverter.supplementContentText(text), content.getText());
+        assertEquals(text, content.getText());
         assertNotNull(content.getId());
         getTaskContents(task, ImmutableList.of(content), text);
 
         text = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 2\\\\n\\\"}]},\\\"###html###\\\":\\\"<p>Test Content 2</p>\\\"}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"2\\\"},{\\\"delete\\\":1}]}\"}";
-        String expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 2\\n\"}]},\"mdelta\":[{\"insert\":\"TEXT1\\n\"}],\"###html###\":\"<p>Test Content 2</p>\",\"mdiff\":[[{\"retain\":13},{\"insert\":\"2\"},{\"delete\":1}]]}";
+        String expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 2\\n\"}]},\"###html###\":\"<p>Test Content 2</p>\"}";
         Long contentId = content.getId();
-        UpdateContentParams updateContentParams = DeltaConverter.strToUpdateContentParams(text);
+        UpdateContentParams updateContentParams = TestHelpers.strToUpdateContentParams(text);
         ResponseEntity<Content[]> updateResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.CONTENT_ROUTE,
                 HttpMethod.PATCH,

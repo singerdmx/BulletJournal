@@ -222,19 +222,3 @@ export const getContentRevision = (
       throw Error(err.message);
     });
 };
-
-export const patchRevisionContents = (
-    noteId: number,
-    contentId: number,
-    revisionContents: string[],
-    etag: string,
-) => {
-  const patchBody = JSON.stringify({
-    revisionContents: revisionContents,
-  });
-  return doPost(`/api/notes/${noteId}/contents/${contentId}/patchRevisionContents`, patchBody, etag)
-      .then((res) => res.json())
-      .catch((err) => {
-        throw Error(err);
-      });
-};

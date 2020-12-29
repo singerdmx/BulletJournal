@@ -18,7 +18,6 @@ import com.bulletjournal.templates.controller.model.CreateSampleTaskParams;
 import com.bulletjournal.templates.controller.model.UpdateSampleTaskParams;
 import com.bulletjournal.templates.repository.model.*;
 import com.bulletjournal.templates.repository.utils.InvestmentUtil;
-import com.bulletjournal.util.DeltaConverter;
 import com.bulletjournal.util.StringUtil;
 import com.google.common.collect.ImmutableList;
 import org.apache.http.util.TextUtils;
@@ -166,10 +165,6 @@ public class SampleTaskDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SampleTask save(SampleTask sampleTask) {
-        if (sampleTask.hasContent()) {
-            sampleTask.setContent(
-                    DeltaConverter.supplementContentText(sampleTask.getContent(), false));
-        }
         return this.sampleTaskRepository.save(sampleTask);
     }
 

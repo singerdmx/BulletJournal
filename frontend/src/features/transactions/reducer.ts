@@ -151,13 +151,6 @@ export type TransactionsByPayerAction = {
   transactionsByPayer: Array<Transaction>;
 };
 
-export type PatchRevisionContents = {
-  transactionId: number;
-  contentId: number;
-  revisionContents: string[];
-  etag: string;
-}
-
 let initialState = {
   contents: [] as Array<Content>,
   transaction: undefined as Transaction | undefined,
@@ -270,7 +263,6 @@ const slice = createSlice({
         state.timezone = timezone;
       }
     },
-    TransactionPatchRevisionContents: (state, action: PayloadAction<PatchRevisionContents>) => state,
   },
 });
 

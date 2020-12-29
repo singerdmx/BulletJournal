@@ -8,7 +8,6 @@ import com.bulletjournal.repository.TaskContentRepository;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
 import com.bulletjournal.templates.repository.model.SampleTask;
-import com.bulletjournal.util.DeltaConverter;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import org.junit.Before;
@@ -87,15 +86,15 @@ public class TaskControllerTest {
      */
     @Test
     public void testGetContentRevision() {
-        String testContent1 = DeltaConverter.generateDeltaContent("Test content 1.");
-        String testContent2 = DeltaConverter.generateDeltaContent("Test content 2.");
+        String testContent1 = TestHelpers.generateDeltaContent("Test content 1.");
+        String testContent2 = TestHelpers.generateDeltaContent("Test content 2.");
         String testUpdateContent2 = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 2\\\\n\\\"}]},\\\"###html###\\\":\\\"<p>Test Content 2</p>\\\"}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"2\\\"},{\\\"delete\\\":1}]}\"}";
         String testUpdateContent3 = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 3\\\\n\\\"}]},\\\"###html###\\\":\\\"<p>Test Content 3</p>\\\"}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"3\\\"},{\\\"delete\\\":1}]}\"}";
         String testUpdateContent4 = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 4\\\\n\\\"}]},\\\"###html###\\\":\\\"<p>Test Content 4</p>\\\"}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"4\\\"},{\\\"delete\\\":1}]}\"}";
 
-        String testUpdateContent2Expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 2\\n\"}]},\"mdelta\":[{\"insert\":\"Test content 1.\\n\"}],\"###html###\":\"<p>Test Content 2</p>\",\"mdiff\":[[{\"retain\":13},{\"insert\":\"2\"},{\"delete\":1}]]}";
-        String testUpdateContent3Expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 3\\n\"}]},\"mdelta\":[{\"insert\":\"Test content 1.\\n\"}],\"###html###\":\"<p>Test Content 3</p>\",\"mdiff\":[[{\"retain\":13},{\"insert\":\"2\"},{\"delete\":1}],[{\"retain\":13},{\"insert\":\"3\"},{\"delete\":1}]]}";
-        String testUpdateContent4Expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 4\\n\"}]},\"mdelta\":[{\"insert\":\"Test content 1.\\n\"}],\"###html###\":\"<p>Test Content 4</p>\",\"mdiff\":[[{\"retain\":13},{\"insert\":\"2\"},{\"delete\":1}],[{\"retain\":13},{\"insert\":\"3\"},{\"delete\":1}],[{\"retain\":13},{\"insert\":\"4\"},{\"delete\":1}]]}";
+        String testUpdateContent2Expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 2\\n\"}]},\"###html###\":\"<p>Test Content 2</p>\"}";
+        String testUpdateContent3Expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 3\\n\"}]},\"###html###\":\"<p>Test Content 3</p>\"}";
+        String testUpdateContent4Expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 4\\n\"}]},\"###html###\":\"<p>Test Content 4</p>\"}";
         Group group = TestHelpers.createGroup(requestParams, USER, "Group_ProjectItem");
         List<String> users = new ArrayList<>();
         users.add("xlf");
@@ -114,7 +113,7 @@ public class TaskControllerTest {
         List<Content> contents1 = updateContent(task1.getId(), content1.getId(), testUpdateContent2);
         List<Content> contents2 = updateContent(task1.getId(), content1.getId(), testUpdateContent3);
         List<Content> contents3 = updateContent(task1.getId(), content1.getId(), testUpdateContent4);
-        assertEquals(DeltaConverter.supplementContentText(testContent1), getContentRevision(task1.getId(), content1.getId(), 1L));
+        assertEquals(testContent1, getContentRevision(task1.getId(), content1.getId(), 1L));
         assertEquals(testUpdateContent2Expected, getContentRevision(task1.getId(), content1.getId(), 2L));
         assertEquals(testUpdateContent3Expected, getContentRevision(task1.getId(), content1.getId(), 3L));
         assertEquals(testUpdateContent4Expected, getContentRevision(task1.getId(), content1.getId(), 4L));
@@ -366,7 +365,7 @@ public class TaskControllerTest {
         );
 
         Content content = response.getBody();
-        assertEquals(DeltaConverter.supplementContentText(params.getText()), content.getText());
+        assertEquals(params.getText(), content.getText());
         return content;
     }
 

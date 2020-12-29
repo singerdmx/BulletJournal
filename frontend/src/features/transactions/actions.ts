@@ -187,13 +187,5 @@ export const getTransactionsByPayer = (
     payer: payer,
   });
 
-export const patchTransactionRevisionContents = (
-    transactionId: number,
-    contentId: number,
-    revisionContents: string[],
-    etag: string
-) => actions.TransactionPatchRevisionContents({
-    transactionId: transactionId, contentId: contentId, revisionContents: revisionContents, etag: etag});
-
 export const transactionReceived = (transaction: Transaction | undefined) =>
     actions.transactionReceived({transaction: transaction});

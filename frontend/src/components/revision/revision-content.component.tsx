@@ -195,7 +195,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
       <div className="revision-content">
         <div className="revision-header">
           <div>
-            Current version{' '}
+            Current Version{' '}
             <Tooltip title={`Edited by ${content.owner.alias}`}>
               <Avatar
                 src={content.owner.avatar}

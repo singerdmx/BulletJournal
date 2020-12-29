@@ -14,7 +14,6 @@ import java.util.Map;
 public class DeltaContent {
 
     public static final String DELTA = "delta";
-    public static final String MDELTA = "mdelta";
     public static final String HTML_TAG = "###html###";
     public static final String EMPTY_CONTENT = "{\"delta\":{\"ops\":[{\"insert\":\" \\n\"}]}," +
             "\"###html###\":\"<p> </p>\"}";
@@ -32,22 +31,15 @@ public class DeltaContent {
     @SerializedName(DELTA)
     private Map deltaMap;
 
-    @SerializedName(MDELTA)
-    private List mdeltaList;
-
     @SerializedName(value = HTML_TAG)
     private String html;
 
-    private List<Object> mdiff;
     private List<Object> diff;
 
     public DeltaContent(String text) {
-        // LOGGER.info("DeltaContent {}", text);
         LinkedHashMap<String, Object> map = GSON.fromJson(text, LinkedHashMap.class);
         deltaMap = adjustDelta((Map) map.get(DELTA));
-        mdeltaList = (List) map.get(MDELTA);
         diff = (List) map.get("diff");
-        mdiff = (List) map.get("mdiff");
         this.html = map.get(HTML_TAG) == null ? null : map.get(HTML_TAG).toString();
     }
 
@@ -85,36 +77,12 @@ public class DeltaContent {
         this.html = html;
     }
 
-    public boolean hasMdeltaList() {
-        return this.mdeltaList != null;
-    }
-
     public Map getDeltaMap() {
         return deltaMap;
     }
 
     public void setDeltaMap(Map deltaMap) {
         this.deltaMap = deltaMap;
-    }
-
-    public List getMdeltaList() {
-        return mdeltaList;
-    }
-
-    public void setMdeltaList(List mdeltaList) {
-        this.mdeltaList = mdeltaList;
-    }
-
-    public List<Object> getMdiff() {
-        return mdiff;
-    }
-
-    public List<Object> getMdiffOrDefault(List<Object> defaultValue) {
-        return mdiff != null ? mdiff : defaultValue;
-    }
-
-    public void setMdiff(List<Object> mdiff) {
-        this.mdiff = mdiff;
     }
 
     public List<Object> getDiff() {
