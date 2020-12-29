@@ -169,7 +169,8 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
     return null;
   };
 
-  const htmlBody = history ? createHTML(new Delta(JSON.parse(history)['delta'])) : '<p></p>';
+  const previousRevisionHtmlBody = history ? createHTML(new Delta(JSON.parse(history)['delta'])) : '<p></p>';
+  const currentVersionHtmlBody = createHTML(new Delta(JSON.parse(content.text)['delta']));
   return (
     <div className="revision-container">
       <div className="revision-content">
@@ -190,7 +191,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
             {moment(revisions[revisionIndex - 1].createdAt).fromNow()}
           </span>
         </div>
-        <div dangerouslySetInnerHTML={{ __html: htmlBody }}></div>
+        <div dangerouslySetInnerHTML={{ __html: previousRevisionHtmlBody }}></div>
       </div>
       <div className="revision-content">
         <div className="revision-header">
@@ -206,7 +207,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
           </div>
           <span>{moment(content.updatedAt).fromNow()}</span>
         </div>
-        <div dangerouslySetInnerHTML={{ __html: JSON.parse(content.text)['###html###'] }}></div>
+        <div dangerouslySetInnerHTML={{ __html: currentVersionHtmlBody}}></div>
       </div>
     </div>
   );

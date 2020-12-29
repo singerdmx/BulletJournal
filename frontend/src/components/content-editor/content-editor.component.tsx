@@ -84,7 +84,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = (
     }) => {
     const isEdit = !!delta;
     const [editorContent, setEditorContent] = useState(
-        delta ? {delta: delta, '###html###': ''} : {delta: {}, '###html###': ''}
+        delta ? {delta: delta} : {delta: {}}
     );
     const quillRef = useRef<ReactQuill>(null);
     const [error, setError] = useState('');
@@ -277,7 +277,6 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = (
     ) => {
         setEditorContent({
             delta: editor.getContents(),
-            '###html###': content,
         });
     };
     return (

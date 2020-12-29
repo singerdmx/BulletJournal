@@ -56,11 +56,7 @@ const ContentItem: React.FC<ContentProps> = ({
 }) => {
   const contentJson = JSON.parse(content.text);
   const delta = contentJson['delta'];
-
-  let contentHtml = contentJson['###html###'];
-  if (!contentHtml) {
-    contentHtml = createHTML(new Delta(delta));
-  }
+  const contentHtml = createHTML(new Delta(delta));
 
   const handleRevisionClose = () => {
     setDisplayRevision(false);
