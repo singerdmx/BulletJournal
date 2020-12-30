@@ -739,7 +739,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         taskList.forEach(t -> {
             this.authorizationService.validateRequesterInProjectGroup(requester, t);
         });
-        List<TaskContent> allTaskContents = this.taskContentRepository.findTaskContentsByTasks(taskList);
+        List<TaskContent> allTaskContents = this.taskContentRepository.findByTaskIn(taskList);
 
         allTaskContents.forEach(taskContent -> {
             Task currentTask = taskContent.getTask();
