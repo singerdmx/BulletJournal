@@ -409,6 +409,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return reminderRecordTaskMap;
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> createTaskFromSampleTask(
             Long projectId,
             String owner,
@@ -420,17 +421,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     ) {
         Preconditions.checkNotNull(assignees);
 
-        List<CreateTaskParams> createTaskParams = new ArrayList<>();
-        sampleTasks.forEach(sampleTask -> createTaskParams.add(sampleTaskToCreateTaskParams(
-                sampleTask,
-                reminderBeforeTask,
-                assignees,
-                labels)
-        ));
-
         List<Task> tasks;
         try {
-            tasks = create(projectId, owner, createTaskParams);
+            tasks = create(projectId, owner, sampleTasks, repoSampleTasks, reminderBeforeTask, assignees, labels);
         } catch (Exception ex) {
             LOGGER.info("createTaskFromSampleTask failed", ex);
             return Collections.emptyList();
@@ -441,16 +434,11 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         List<Task> tasksForContents = new ArrayList<>();
         for (int i = 0; i < sampleTasks.size(); i++) {
             if (sampleTasks.get(i).isRefreshable()) {
-                long sampleTaskId = sampleTasks.get(i).getId();
-                tasks.get(i).setSampleTask(
-                        repoSampleTasks.stream().filter(s -> sampleTaskId == s.getId()).findFirst().get());
                 continue;
             }
             sampleTasksForContents.add(sampleTasks.get(i));
             tasksForContents.add(tasks.get(i));
         }
-
-        this.saveAll(tasks);
 
         if (!sampleTasksForContents.isEmpty()) {
             this.notificationService.addContentBatch(new ContentBatch(
@@ -481,13 +469,34 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return this.taskRepository.saveAndFlush(task);
     }
 
-    public List<Task> create(Long projectId, String owner, List<CreateTaskParams> createTaskParamsList) {
+    public List<Task> create(Long projectId, String owner,
+                             List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasks,
+                             List<SampleTask> repoSampleTasks,
+                             Integer reminderBeforeTask,
+                             List<String> assignees,
+                             List<Long> labels) {
         Project project = this.projectDaoJpa.getProject(projectId, owner);
         if (!ProjectType.TODO.equals(ProjectType.getType(project.getType()))) {
             throw new BadRequestException("Project Type expected to be TODO while request is " + project.getType());
         }
-        List<Task> tasks = createTaskParamsList.stream()
-                .map(createTaskParams -> generateTask(owner, project, createTaskParams)).collect(Collectors.toList());
+
+        List<Task> tasks = new ArrayList<>();
+        for (int i = 0; i < sampleTasks.size(); i++) {
+            SampleTask referredSampleTask = null;
+            if (sampleTasks.get(i).isRefreshable()) {
+                long sampleTaskId = sampleTasks.get(i).getId();
+                referredSampleTask =
+                        repoSampleTasks.stream().filter(s -> sampleTaskId == s.getId()).findFirst().get();
+            }
+
+            com.bulletjournal.templates.controller.model.SampleTask sampleTask = sampleTasks.get(i);
+            CreateTaskParams createTaskParams = sampleTaskToCreateTaskParams(
+                    sampleTask,
+                    reminderBeforeTask,
+                    assignees,
+                    labels);
+            tasks.add(generateTask(owner, project, createTaskParams, referredSampleTask));
+        }
 
         List<Task> batch = new ArrayList<>();
         List<Task> result = new ArrayList<>();
@@ -509,6 +518,11 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     public static Task generateTask(String owner, Project project, CreateTaskParams createTaskParams) {
+        return generateTask(owner, project, createTaskParams, null);
+    }
+
+    public static Task generateTask(String owner, Project project, CreateTaskParams createTaskParams,
+                                    SampleTask sampleTask) {
         createTaskParams.selfClean();
 
         Task task = new Task();
@@ -535,6 +549,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 createTaskParams.getRecurrenceRule(), createTaskParams.getReminderSetting());
         task.setReminderSetting(reminderSetting);
         task.setLocation(createTaskParams.getLocation());
+        task.setSampleTask(sampleTask);
         return task;
     }
 
@@ -707,7 +722,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * 3. Add tasks and its sub tasks to complete task table
      *
      * @param requester the username of action requester
-     * @param taskIds   the task ids
+     * @param taskList   the task ids
      * @return List<CompleteTask> - a list of repository model complete task objects
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
