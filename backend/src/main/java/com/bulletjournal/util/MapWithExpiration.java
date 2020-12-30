@@ -11,7 +11,7 @@ public class MapWithExpiration {
         Object val;
         long expirationTime;
 
-        public Value(Object val, long expirationTime) {
+        Value(Object val, long expirationTime) {
             this.val = val;
             this.expirationTime = expirationTime;
         }
