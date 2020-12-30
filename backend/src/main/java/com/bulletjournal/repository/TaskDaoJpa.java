@@ -498,6 +498,11 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             tasks.add(generateTask(owner, project, createTaskParams, referredSampleTask));
         }
 
+        LOGGER.info("create batch of {} tasks", tasks.size());
+        if (tasks.size() <= 200) {
+            return this.taskRepository.saveAll(tasks);
+        }
+
         List<Task> batch = new ArrayList<>();
         List<Task> result = new ArrayList<>();
         for (Task task : tasks) {
