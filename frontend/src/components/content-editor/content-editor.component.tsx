@@ -246,7 +246,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = (
         },
         [ContentType.SAMPLE_TASK]: patchSampleTaskContent,
     };
-    let patchContentFunction = patchContentCall[contentType];
+    const patchContentFunction = patchContentCall[contentType];
 
     const handleFormSubmit = () => {
         if (!isEdit) {
