@@ -5,10 +5,7 @@ import com.bulletjournal.daemon.Reminder;
 import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.notifications.informed.Informed;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
-import com.bulletjournal.repository.AuditableDaoJpa;
-import com.bulletjournal.repository.NotificationDaoJpa;
-import com.bulletjournal.repository.ProjectDaoJpa;
-import com.bulletjournal.repository.TaskDaoJpa;
+import com.bulletjournal.repository.*;
 import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
 import com.bulletjournal.util.CustomThreadFactory;
 import org.slf4j.Logger;
@@ -52,6 +49,9 @@ public class NotificationService {
     @Lazy
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
+
+    @Autowired
+    private CompletedTaskRepository completedTaskRepository;
 
     @Autowired
     public NotificationService(NotificationDaoJpa notificationDaoJpa, AuditableDaoJpa auditableDaoJpa,
@@ -99,6 +99,14 @@ public class NotificationService {
             return;
         }
         this.eventQueue.offer(removeElasticsearchDocumentEvent);
+    }
+
+    public void saveCompleteTasks(SaveCompleteTasksEvent saveCompleteTasksEvent) {
+        LOGGER.info("Received saveCompleteTask: " + saveCompleteTasksEvent);
+        if (saveCompleteTasksEvent == null) {
+            return;
+        }
+        this.eventQueue.offer(saveCompleteTasksEvent);
     }
 
     public void cacheEtag(EtagEvent etagEvent) {
@@ -160,6 +168,7 @@ public class NotificationService {
             List<Informed> informeds = new ArrayList<>();
             List<Auditable> auditables = new ArrayList<>();
             List<RemoveElasticsearchDocumentEvent> removeElasticsearchDocumentEvents = new ArrayList<>();
+            List<SaveCompleteTasksEvent> saveCompleteTasksEvents = new ArrayList<>();
             List<EtagEvent> etagEvents = new ArrayList<>();
             List<Remindable> remindables = new ArrayList<>();
             List<ContentBatch> contentBatches = new ArrayList<>();
@@ -173,6 +182,8 @@ public class NotificationService {
                     auditables.add((Auditable) e);
                 } else if (e instanceof RemoveElasticsearchDocumentEvent) {
                     removeElasticsearchDocumentEvents.add((RemoveElasticsearchDocumentEvent) e);
+                } else if (e instanceof SaveCompleteTasksEvent) {
+                    saveCompleteTasksEvents.add((SaveCompleteTasksEvent) e);
                 } else if (e instanceof EtagEvent) {
                     etagEvents.add((EtagEvent) e);
                 } else if (e instanceof Remindable) {
@@ -207,6 +218,15 @@ public class NotificationService {
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error on deleting records in SearchIndexDaoJpa", ex);
+            }
+            try {
+                if (!saveCompleteTasksEvents.isEmpty()) {
+                    saveCompleteTasksEvents.forEach(saveCompleteTasksEvent -> {
+                        this.completedTaskRepository.saveAll(saveCompleteTasksEvent.getCompletedTaskList());
+                    });
+                }
+            } catch (Exception ex) {
+                LOGGER.error("Error on saving completeTasks", ex);
             }
             try {
                 if (!etagEvents.isEmpty()) {

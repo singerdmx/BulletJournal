@@ -728,26 +728,40 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * 3. Add tasks and its sub tasks to complete task table
      *
      * @param requester the username of action requester
-     * @param taskList   the task ids
+     * @param taskList  the tasks
      * @return List<CompleteTask> - a list of repository model complete task objects
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<CompletedTask> completeInBatch(String requester, List<Task> taskList) {
         List<CompletedTask> completedTaskList = new LinkedList<>();
+        List<Long> taskIds = new LinkedList<>();
+        Map<Task, List<TaskContent>> taskToTaskContentsMap = new HashMap<>();
 
         taskList.forEach(t -> {
             this.authorizationService.validateRequesterInProjectGroup(requester, t);
-            this.authorizationService.checkAuthorizedToOperateOnContent(t.getOwner(), requester, ContentType.TASK,
-                    Operation.UPDATE, t.getProject().getId(), t.getProject().getOwner());
-            // clone its contents
-            String contents = GSON_ALLOW_EXPOSE_ONLY
-                    .toJson(this.getContents(t.getId(), requester).stream().collect(Collectors.toList()));
 
-            completedTaskList.add(new CompletedTask(t, contents));
+            taskIds.add(t.getId());
+        });
+        List<Long> taskContentIds = this.taskContentRepository.findAllByTaskIds(taskIds);
+        List<TaskContent> allTaskContents = this.taskContentRepository.findAllById(taskContentIds);
+
+        allTaskContents.forEach(taskContent -> {
+            Task currentTask = taskContent.getTask();
+            List<TaskContent> currentList = taskToTaskContentsMap.getOrDefault(currentTask, new LinkedList<>());
+            currentList.add(taskContent);
+            taskToTaskContentsMap.put(currentTask, currentList);
         });
 
+        taskToTaskContentsMap.forEach((task, taskContentList) -> {
+            //clone task contents
+            String contents = GSON_ALLOW_EXPOSE_ONLY
+                    .toJson(taskContentList.stream().collect(Collectors.toList()));
+
+            completedTaskList.add(new CompletedTask(task, contents));
+        });
+
+
         this.taskRepository.deleteAll(taskList);
-        this.completedTaskRepository.saveAll(completedTaskList);
         return completedTaskList;
     }
 

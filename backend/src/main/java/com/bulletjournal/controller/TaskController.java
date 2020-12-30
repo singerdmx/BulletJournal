@@ -203,10 +203,12 @@ public class TaskController {
         if (taskList.isEmpty()) {
             return getTasks(projectId, null, null, null, null, null);
         }
-        this.taskDaoJpa.completeInBatch(username, taskList);
+        List<CompletedTask> completedTaskList = this.taskDaoJpa.completeInBatch(username, taskList);
 
         List<String> deleteESDocumentIds = ESUtil.getProjectItemSearchIndexIds(tasks, ContentType.TASK);
         this.notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(deleteESDocumentIds));
+
+        this.notificationService.saveCompleteTasks(new SaveCompleteTasksEvent(completedTaskList));
 
         for (com.bulletjournal.repository.models.Task task : taskList) {
             this.notificationService.trackActivity(new Auditable(task.getProject().getId(),
