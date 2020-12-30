@@ -510,7 +510,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             batch.add(task);
             if (batch.size() == 200) {
                 result.addAll(this.taskRepository.saveAll(batch));
-                batch.clear();
+                batch = new ArrayList<>();
                 entityManager.flush();
                 entityManager.clear();
             }
