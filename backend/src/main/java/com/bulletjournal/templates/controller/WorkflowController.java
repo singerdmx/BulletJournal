@@ -21,6 +21,8 @@ import com.bulletjournal.util.DeltaContent;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +52,7 @@ public class WorkflowController {
     public static final String REMOVE_USER_SAMPLE_TASKS_ROUTE = "/api/userSampleTasks/remove";
     public static final String REMOVE_USER_SAMPLE_TASK_ROUTE = "/api/userSampleTasks/{sampleTaskId}";
     public static final String SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}";
+    private static final Logger LOGGER = LoggerFactory.getLogger(WorkflowController.class);
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
@@ -256,6 +259,7 @@ public class WorkflowController {
 
     @PostMapping(SAMPLE_TASKS_IMPORT_ROUTE)
     public List<SampleTask> importSampleTasks(@Valid @RequestBody ImportTasksParams importTasksParams) {
+        LOGGER.info("importSampleTasks {}", importTasksParams.getSampleTasks().size());
         String username = MDC.get(UserClient.USER_NAME_KEY);
         String scrollId = importTasksParams.getScrollId();
         if (StringUtils.isNotBlank(scrollId)) {
