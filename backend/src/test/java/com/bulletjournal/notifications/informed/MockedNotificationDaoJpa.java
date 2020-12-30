@@ -1,4 +1,4 @@
-package com.bulletjournal.notifications;
+package com.bulletjournal.notifications.informed;
 
 import com.bulletjournal.repository.NotificationDaoJpa;
 import com.bulletjournal.repository.models.Notification;

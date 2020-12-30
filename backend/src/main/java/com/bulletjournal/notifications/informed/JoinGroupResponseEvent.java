@@ -1,6 +1,8 @@
-package com.bulletjournal.notifications;
+package com.bulletjournal.notifications.informed;
 
 import com.bulletjournal.contents.ContentType;
+import com.bulletjournal.notifications.Action;
+import com.bulletjournal.notifications.Event;
 
 import java.util.List;
 

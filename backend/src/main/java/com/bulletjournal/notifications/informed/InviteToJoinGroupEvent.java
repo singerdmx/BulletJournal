@@ -1,6 +1,7 @@
-package com.bulletjournal.notifications;
+package com.bulletjournal.notifications.informed;
 
 import com.bulletjournal.contents.ContentType;
+import com.bulletjournal.notifications.Event;
 
 public class InviteToJoinGroupEvent extends Informed {
 

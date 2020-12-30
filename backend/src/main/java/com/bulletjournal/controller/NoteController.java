@@ -7,6 +7,8 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.es.ESUtil;
 import com.bulletjournal.notifications.*;
+import com.bulletjournal.notifications.informed.Informed;
+import com.bulletjournal.notifications.informed.RemoveNoteEvent;
 import com.bulletjournal.repository.NoteDaoJpa;
 import com.bulletjournal.repository.NoteRepository;
 import com.bulletjournal.repository.ProjectDaoJpa;

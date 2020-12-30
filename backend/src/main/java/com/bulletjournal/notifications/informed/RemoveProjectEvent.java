@@ -1,16 +1,17 @@
-package com.bulletjournal.notifications;
+package com.bulletjournal.notifications.informed;
 
 import com.bulletjournal.contents.ContentType;
+import com.bulletjournal.notifications.Event;
 
 import java.util.List;
 
-public class RemoveFromProjectEvent extends Informed {
+public class RemoveProjectEvent extends Informed {
 
-    public RemoveFromProjectEvent(Event event, String originator) {
+    public RemoveProjectEvent(Event event, String originator) {
         super(event, originator);
     }
 
-    public RemoveFromProjectEvent(List<Event> events, String originator) {
+    public RemoveProjectEvent(List<Event> events, String originator) {
         super(events, originator);
     }
 
@@ -21,7 +22,7 @@ public class RemoveFromProjectEvent extends Informed {
 
     @Override
     protected String getEventTitle(Event event) {
-        return "You've been removed from BuJo ##" + event.getContentName() + "##";
+        return "##" + event.getOriginatorAlias() + "## removed BuJo ##" + event.getContentName() + "##";
     }
 
     @Override

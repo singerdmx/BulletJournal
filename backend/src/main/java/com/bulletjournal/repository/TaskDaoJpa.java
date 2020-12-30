@@ -16,7 +16,7 @@ import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.TaskRelationsProcessor;
 import com.bulletjournal.notifications.ContentBatch;
 import com.bulletjournal.notifications.Event;
-import com.bulletjournal.notifications.UpdateTaskAssigneeEvent;
+import com.bulletjournal.notifications.informed.UpdateTaskAssigneeEvent;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.UserGroup;

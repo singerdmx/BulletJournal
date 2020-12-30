@@ -8,6 +8,8 @@ import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.notifications.*;
+import com.bulletjournal.notifications.informed.Informed;
+import com.bulletjournal.notifications.informed.JoinGroupResponseEvent;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
 import com.bulletjournal.redis.RedisNotificationRepository;
 import com.bulletjournal.redis.models.EtagType;

@@ -3,6 +3,7 @@ package com.bulletjournal.notifications;
 import com.bulletjournal.config.SpringESConfig;
 import com.bulletjournal.daemon.Reminder;
 import com.bulletjournal.es.repository.SearchIndexDaoJpa;
+import com.bulletjournal.notifications.informed.Informed;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
 import com.bulletjournal.repository.AuditableDaoJpa;
 import com.bulletjournal.repository.NotificationDaoJpa;
