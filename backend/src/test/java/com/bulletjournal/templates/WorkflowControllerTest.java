@@ -183,15 +183,20 @@ public class WorkflowControllerTest {
         assertEquals(18, sampleTasks.size());
 
         // Get Tasks
-        ResponseEntity<Task[]> tasksResponse = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
-                HttpMethod.GET,
-                null,
-                Task[].class,
-                16);
-        List<Task> tasks = Arrays.asList(tasksResponse.getBody());
+        List<Task> tasks;
+        do {
+            ResponseEntity<Task[]> tasksResponse = this.restTemplate.exchange(
+                    ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
+                    HttpMethod.GET,
+                    null,
+                    Task[].class,
+                    16);
+            tasks = Arrays.asList(tasksResponse.getBody());
+            Thread.sleep(100);
+        } while (tasks.size() < 18);
+
         assertEquals(18, tasks.size());
-//        Thread.sleep(3000);
+
         for (int i = 0; i < 16; i++) {
             Task task = tasks.get(i);
             assertEquals("America/Los_Angeles", task.getTimezone());

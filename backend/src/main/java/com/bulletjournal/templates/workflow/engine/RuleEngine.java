@@ -1,6 +1,8 @@
 package com.bulletjournal.templates.workflow.engine;
 
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
+import com.bulletjournal.notifications.ImportSampleTasksEvent;
+import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.User;
@@ -14,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +53,10 @@ public class RuleEngine {
 
     @Autowired
     private SelectionMetadataKeywordDaoJpa selectionMetadataKeywordDaoJpa;
+
+    @Lazy
+    @Autowired
+    private NotificationService notificationService;
 
     public static List<com.bulletjournal.templates.controller.model.SampleTask> sortSampleTasks(
             List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasks) {
@@ -117,14 +124,8 @@ public class RuleEngine {
         sampleTasks.sort(
                 Comparator.comparing(s -> (s.getDueDate() + (StringUtils.isBlank(s.getDueTime()) ? "00:00" : s.getDueTime()))));
 
-        this.taskDaoJpa.createTaskFromSampleTask(
-                importTasksParams.getProjectId(),
-                requester,
-                sampleTasks,
-                repoSampleTasks,
-                importTasksParams.getReminderBefore(),
-                importTasksParams.getAssignees(),
-                importTasksParams.getLabels());
+        this.notificationService.handleImportSampleTasksEvent(
+                new ImportSampleTasksEvent(importTasksParams, requester, sampleTasks, repoSampleTasks));
         return sampleTasks;
     }
 

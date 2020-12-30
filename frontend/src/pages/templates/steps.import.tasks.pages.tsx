@@ -166,7 +166,7 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
                     notification.open({
                         placement: 'bottomRight',
                         message: 'Events successfully imported',
-                        description: 'Please go to your BuJo to view them',
+                        description: 'It may take some time to show up. Please go to your BuJo to view them.',
                         icon: <SmileOutlined style={{ color: '#4ddbff' }} />,
                     });
                     if (isMobile()) {
@@ -174,7 +174,7 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
                     } else {
                         setTimeout(() => {
                             window.location.href = `${window.location.protocol}//${window.location.host}/#/projects/${projectId}`;
-                        }, 5000);
+                        }, 10000);
                     }
                 },
                 () => {
@@ -187,11 +187,11 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
                     if (isMobile()) {
                         setTimeout(() => {
                             window.location.href = `${window.location.protocol}//${window.location.host}/public/templates`;
-                        }, 5000);
+                        }, 10000);
                     } else {
                         setTimeout(() => {
                             window.location.href = `${window.location.protocol}//${window.location.host}/#/projects/${projectId}`;
-                        }, 5000);
+                        }, 10000);
                     }
                 },
                 getSampleTasks().map(s => s.id), curSelections, category.id,

@@ -133,6 +133,14 @@ public class NotificationService {
         this.eventQueue.offer(sampleTaskChange);
     }
 
+    public void handleImportSampleTasksEvent(ImportSampleTasksEvent event) {
+        LOGGER.info("Received ImportSampleTasksEvent: {}", event);
+        if (event == null) {
+            return;
+        }
+        this.eventQueue.offer(event);
+    }
+
     public void handleNotifications() {
         Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
         List<Object> events = new ArrayList<>();
@@ -157,6 +165,7 @@ public class NotificationService {
             List<ContentBatch> contentBatches = new ArrayList<>();
             List<SampleProjectsCreation> sampleProjectsCreations = new ArrayList<>();
             List<SampleTaskChange> sampleTaskChanges = new ArrayList<>();
+            List<ImportSampleTasksEvent> importSampleTasksEvents = new ArrayList<>();
             events.forEach((e) -> {
                 if (e instanceof Informed) {
                     informeds.add((Informed) e);
@@ -174,6 +183,8 @@ public class NotificationService {
                     sampleProjectsCreations.add((SampleProjectsCreation) e);
                 } else if (e instanceof SampleTaskChange) {
                     sampleTaskChanges.add((SampleTaskChange) e);
+                } else if (e instanceof ImportSampleTasksEvent) {
+                    importSampleTasksEvents.add((ImportSampleTasksEvent) e);
                 }
             });
             try {
@@ -233,6 +244,21 @@ public class NotificationService {
             for (SampleTaskChange sampleTaskChange : sampleTaskChanges) {
                 try {
                     this.sampleTaskDaoJpa.handleSampleTaskChange(sampleTaskChange.getId());
+                } catch (Exception ex) {
+                    LOGGER.error("Error on SampleTaskChange", ex);
+                }
+            }
+
+            for (ImportSampleTasksEvent importSampleTasksEvent : importSampleTasksEvents) {
+                try {
+                    this.taskDaoJpa.createTaskFromSampleTask(
+                            importSampleTasksEvent.getImportTasksParams().getProjectId(),
+                            importSampleTasksEvent.getRequester(),
+                            importSampleTasksEvent.getSampleTasks(),
+                            importSampleTasksEvent.getRepoSampleTasks(),
+                            importSampleTasksEvent.getImportTasksParams().getReminderBefore(),
+                            importSampleTasksEvent.getImportTasksParams().getAssignees(),
+                            importSampleTasksEvent.getImportTasksParams().getLabels());
                 } catch (Exception ex) {
                     LOGGER.error("Error on SampleTaskChange", ex);
                 }
