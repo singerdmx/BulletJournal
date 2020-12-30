@@ -21,6 +21,6 @@ public interface TaskContentRepository extends JpaRepository<TaskContent, Long> 
     @Query(nativeQuery = true, value = "SELECT id FROM task_contents WHERE task_contents.task_id IN (:taskIds)")
     List<Long> findAllByTaskIds(List<Long> taskIds);
 
-    @Query(nativeQuery = true, value = "SELECT task_id, text FROM task_contents WHERE task_contents.task_id IN (:taskIds)")
-    List<TaskContent> findTaskContentsByTaskIds(List<Long> taskIds);
+    @Query("SELECT taskContent FROM TaskContent taskContent WHERE taskContent.task IN (:tasks)")
+    List<TaskContent> findTaskContentsByTasks(List<Task> tasks);
 }

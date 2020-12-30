@@ -734,16 +734,12 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<CompletedTask> completeInBatch(String requester, List<Task> taskList) {
         List<CompletedTask> completedTaskList = new LinkedList<>();
-        List<Long> taskIds = new LinkedList<>();
         Map<Task, List<TaskContent>> taskToTaskContentsMap = new HashMap<>();
 
         taskList.forEach(t -> {
             this.authorizationService.validateRequesterInProjectGroup(requester, t);
-
-            taskIds.add(t.getId());
         });
-        List<Long> taskContentIds = this.taskContentRepository.findAllByTaskIds(taskIds);
-        List<TaskContent> allTaskContents = this.taskContentRepository.findAllById(taskContentIds);
+        List<TaskContent> allTaskContents = this.taskContentRepository.findTaskContentsByTasks(taskList);
 
         allTaskContents.forEach(taskContent -> {
             Task currentTask = taskContent.getTask();
