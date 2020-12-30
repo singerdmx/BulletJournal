@@ -469,6 +469,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return this.taskRepository.saveAndFlush(task);
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> create(Long projectId, String owner,
                              List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasks,
                              List<SampleTask> repoSampleTasks,
