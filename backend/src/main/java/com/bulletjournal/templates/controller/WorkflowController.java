@@ -1,6 +1,7 @@
 package com.bulletjournal.templates.controller;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.config.MDCConfig;
 import com.bulletjournal.controller.models.Content;
 import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.controller.models.User;
@@ -18,6 +19,7 @@ import com.bulletjournal.templates.repository.model.*;
 import com.bulletjournal.templates.workflow.engine.RuleEngine;
 import com.bulletjournal.templates.workflow.models.RuleExpression;
 import com.bulletjournal.util.DeltaContent;
+import com.bulletjournal.util.MapWithExpiration;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
@@ -84,7 +86,12 @@ public class WorkflowController {
     @Autowired
     private UserSampleTaskDaoJpa userSampleTaskDaoJpa;
 
+    @Autowired
+    private MDCConfig mdcConfig;
 
+    private MapWithExpiration mapWithExpiration = new MapWithExpiration();
+    private static final long DEFAULT_TTL = 500_000L;
+    private static final Object PLACE_HOLDER_FOR_RESPONSE = new Object();
     private static final Gson GSON = new Gson();
 
     @GetMapping(SUBSCRIBED_CATEGORIES_ROUTE)
@@ -260,6 +267,15 @@ public class WorkflowController {
     @PostMapping(SAMPLE_TASKS_IMPORT_ROUTE)
     public List<SampleTask> importSampleTasks(@Valid @RequestBody ImportTasksParams importTasksParams) {
         LOGGER.info("importSampleTasks {}", importTasksParams.getSampleTasks().size());
+        if (importTasksParams.getSampleTasks().isEmpty()) {
+            return Collections.emptyList();
+        }
+        String requestId = MDC.get(mdcConfig.getDefaultRequestIdKey());
+        LOGGER.info("requestId {}", requestId);
+        if (this.mapWithExpiration.get(requestId) != null) {
+            return waitForMapWithExpiration(requestId);
+        }
+        this.mapWithExpiration.put(requestId, PLACE_HOLDER_FOR_RESPONSE, DEFAULT_TTL);
         String username = MDC.get(UserClient.USER_NAME_KEY);
         String scrollId = importTasksParams.getScrollId();
         if (StringUtils.isNotBlank(scrollId)) {
@@ -282,7 +298,25 @@ public class WorkflowController {
             sampleTask.setUid(null);
             sampleTask.setMetadata(null);
         });
+        this.mapWithExpiration.put(requestId, sampleTasks, DEFAULT_TTL);
         return sampleTasks;
+    }
+
+    private List<SampleTask> waitForMapWithExpiration(String requestId) {
+        int retry = 600;
+        while (retry-- > 0) {
+            Object result = this.mapWithExpiration.get(requestId);
+            if (result != null && result != PLACE_HOLDER_FOR_RESPONSE) {
+                return (List<SampleTask>) result;
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        throw new IllegalStateException("Timeout when waiting for response");
     }
 
     @PostMapping(SAMPLE_TASKS_ROUTE)
