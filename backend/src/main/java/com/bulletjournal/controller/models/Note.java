@@ -26,8 +26,9 @@ public class Note extends ProjectItem {
                 @NotNull Project project,
                 List<Label> labels,
                 Long createdAt,
-                Long updatedAt) {
-        super(id, name, owner, project, labels);
+                Long updatedAt,
+                String location) {
+        super(id, name, owner, project, labels, location);
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }

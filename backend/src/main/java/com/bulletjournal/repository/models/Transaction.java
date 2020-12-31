@@ -154,7 +154,8 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
                 this.getTransactionType().getValue(),
                 this.getCreatedAt().getTime(),
                 this.getUpdatedAt().getTime(),
-                labels);
+                labels,
+                this.getLocation());
     }
 
     @Override

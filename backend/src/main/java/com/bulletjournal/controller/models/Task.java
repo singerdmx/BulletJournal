@@ -59,7 +59,7 @@ public class Task extends ProjectItem {
                 @NotBlank String timezone, @NotNull String name, Integer duration, @NotNull Project project,
                 List<Label> labels, ReminderSetting reminderSetting, String recurrenceRule, Long createdAt, Long updatedAt,
                 TaskStatus status, Long reminderDateTime, String location) {
-        super(id, name, owner, project, labels);
+        super(id, name, owner, project, labels, location);
         this.assignees = assignees;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
@@ -74,7 +74,6 @@ public class Task extends ProjectItem {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         getView(this);
-        this.setLocation(location);
     }
 
     @Override
