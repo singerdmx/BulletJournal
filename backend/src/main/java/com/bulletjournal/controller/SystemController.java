@@ -1,6 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.authz.AuthorizationService;
+import com.bulletjournal.clients.GoogleMapsClient;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
@@ -16,6 +17,8 @@ import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.factory.ProjectItemDaos;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.util.StringUtil;
+import com.google.maps.errors.ApiException;
+import com.google.maps.model.FindPlaceFromText;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -30,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
@@ -88,6 +92,9 @@ public class SystemController {
 
     @Autowired
     private Reminder reminder;
+
+    @Autowired
+    private GoogleMapsClient googleMapsClient;
 
     @GetMapping(UPDATES_ROUTE)
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -304,5 +311,14 @@ public class SystemController {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setLocation(new URI(topicUrl));
         return ResponseEntity.ok().headers(responseHeaders).build();
+    }
+
+    @GetMapping("/api/places")
+    public FindPlaceFromText findPlaceFromText(
+            @RequestParam String input,
+            @RequestParam double lat,
+            @RequestParam double lng)
+            throws InterruptedException, ApiException, IOException {
+        return this.googleMapsClient.findPlaceFromText(input, lat, lng);
     }
 }
