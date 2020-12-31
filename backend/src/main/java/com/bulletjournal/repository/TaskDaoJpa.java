@@ -727,7 +727,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * 2. Delete tasks and its sub tasks from task table
      * 3. Add tasks and its sub tasks to complete task table
      *
-     * @param requester the username of action requester
      * @param taskList  the tasks
      * @return List<CompleteTask> - a list of repository model complete task objects
      */
