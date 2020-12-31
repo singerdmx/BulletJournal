@@ -21,6 +21,8 @@ import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.TaskContent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -41,6 +43,7 @@ import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 @RestController
 public class TaskController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskController.class);
     public static final String TASKS_ROUTE = "/api/projects/{projectId}/tasks";
     protected static final String TASK_ROUTE = "/api/tasks/{taskId}";
     protected static final String SET_TASK_STATUS_ROUTE = "/api/tasks/{taskId}/setStatus";
@@ -220,6 +223,7 @@ public class TaskController {
                     task.getId(), Timestamp.from(Instant.now()), ContentAction.COMPLETE_TASK));
         }
 
+        LOGGER.info("completeTasks done");
         return getTasks(projectId, null, null, null, null, null);
     }
 

@@ -732,7 +732,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<CompletedTask> completeInBatch(List<Task> taskList) {
+        LOGGER.info("Start findByTaskIn {}", taskList.size());
         List<TaskContent> allTaskContents = this.taskContentRepository.findByTaskIn(taskList);
+        LOGGER.info("Finish findByTaskIn {}", taskList.size());
 
         final Map<Task, List<TaskContent>> taskToTaskContentsMap = new HashMap<>();
 
@@ -751,7 +753,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             completedTaskList.add(new CompletedTask(task, contents));
         });
 
-        this.taskRepository.deleteAll(taskList);
+        LOGGER.info("Start deleteInBatch {}", taskList.size());
+        this.taskRepository.deleteInBatch(taskList);
+        LOGGER.info("Finish deleteInBatch {}", taskList.size());
         return completedTaskList;
     }
 
