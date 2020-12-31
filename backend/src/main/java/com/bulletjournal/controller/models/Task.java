@@ -41,8 +41,6 @@ public class Task extends ProjectItem {
 
     private Long reminderDateTime;
 
-    private String location;
-
     @Expose
     @Valid
     private List<Task> subTasks = new ArrayList<>();
@@ -76,7 +74,7 @@ public class Task extends ProjectItem {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         getView(this);
-        this.location = location;
+        this.setLocation(location);
     }
 
     @Override
@@ -188,14 +186,6 @@ public class Task extends ProjectItem {
         this.reminderDateTime = reminderDateTime;
     }
 
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -235,7 +225,7 @@ public class Task extends ProjectItem {
         this.setRecurrenceRule(task.getRecurrenceRule());
         this.setAssignees(task.getAssignees());
         this.setReminderDateTime(task.getReminderDateTime());
-        this.setLocation(task.location);
+        this.setLocation(task.getLocation());
     }
 
     public static Task getView(Task task) {

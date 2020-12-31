@@ -33,6 +33,8 @@ public class CreateTransactionParams {
 
     private List<Long> labels;
 
+    private String location;
+
     public CreateTransactionParams() {
     }
 
@@ -110,5 +112,13 @@ public class CreateTransactionParams {
 
     public void setLabels(List<Long> labels) {
         this.labels = labels;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }

@@ -27,6 +27,8 @@ public abstract class ProjectItem {
     @NotNull
     protected User owner;
 
+    private String location;
+
     protected List<Label> labels;
 
     protected Long updatedAt;
@@ -144,6 +146,14 @@ public abstract class ProjectItem {
 
     public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public boolean isShared() {

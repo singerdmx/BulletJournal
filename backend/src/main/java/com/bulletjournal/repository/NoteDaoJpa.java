@@ -148,6 +148,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         note.setProject(project);
         note.setOwner(owner);
         note.setName(createNoteParams.getName());
+        note.setLocation(createNoteParams.getLocation());
         if (createNoteParams.getLabels() != null && !createNoteParams.getLabels().isEmpty()) {
             note.setLabels(createNoteParams.getLabels());
         }
@@ -163,6 +164,9 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
 
         DaoHelper.updateIfPresent(updateNoteParams.hasName(), updateNoteParams.getName(),
                 (value) -> note.setName(value));
+
+        DaoHelper.updateIfPresent(updateNoteParams.hasLocation(), updateNoteParams.getLocation(),
+                (value) -> note.setLocation(value));
 
         if (updateNoteParams.hasLabels()) {
             note.setLabels(updateNoteParams.getLabels());
