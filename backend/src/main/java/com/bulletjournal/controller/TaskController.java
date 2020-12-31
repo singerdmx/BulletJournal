@@ -198,12 +198,16 @@ public class TaskController {
         }
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        List<com.bulletjournal.repository.models.Task> taskList = this.taskRepository
-                .findAllById(tasks).stream().filter(t -> t != null).collect(Collectors.toList());
+        com.bulletjournal.repository.models.Project project = this.projectDaoJpa.getProject(projectId, username);
+        List<com.bulletjournal.repository.models.Task> taskList =
+                this.taskDaoJpa.findAllById(tasks, project).stream()
+                        .filter(Objects::nonNull)
+                        .map(t -> (com.bulletjournal.repository.models.Task) t)
+                        .collect(Collectors.toList());
         if (taskList.isEmpty()) {
             return getTasks(projectId, null, null, null, null, null);
         }
-        List<CompletedTask> completedTaskList = this.taskDaoJpa.completeInBatch(username, taskList);
+        List<CompletedTask> completedTaskList = this.taskDaoJpa.completeInBatch(taskList);
 
         List<String> deleteESDocumentIds = ESUtil.getProjectItemSearchIndexIds(tasks, ContentType.TASK);
         this.notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(deleteESDocumentIds));

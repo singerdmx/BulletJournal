@@ -732,21 +732,17 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @return List<CompleteTask> - a list of repository model complete task objects
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<CompletedTask> completeInBatch(String requester, List<Task> taskList) {
-        List<CompletedTask> completedTaskList = new LinkedList<>();
-        Map<Task, List<TaskContent>> taskToTaskContentsMap = new HashMap<>();
-
-        taskList.forEach(t -> {
-            this.authorizationService.validateRequesterInProjectGroup(requester, t);
-        });
+    public List<CompletedTask> completeInBatch(List<Task> taskList) {
         List<TaskContent> allTaskContents = this.taskContentRepository.findByTaskIn(taskList);
+
+        final Map<Task, List<TaskContent>> taskToTaskContentsMap = new HashMap<>();
 
         allTaskContents.forEach(taskContent -> {
             Task currentTask = taskContent.getTask();
-            List<TaskContent> currentList = taskToTaskContentsMap.getOrDefault(currentTask, new LinkedList<>());
-            currentList.add(taskContent);
-            taskToTaskContentsMap.put(currentTask, currentList);
+            taskToTaskContentsMap.computeIfAbsent(currentTask, k -> new LinkedList<>()).add(taskContent);
         });
+
+        final List<CompletedTask> completedTaskList = new LinkedList<>();
 
         taskToTaskContentsMap.forEach((task, taskContentList) -> {
             //clone task contents
@@ -755,7 +751,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
             completedTaskList.add(new CompletedTask(task, contents));
         });
-
 
         this.taskRepository.deleteAll(taskList);
         return completedTaskList;
