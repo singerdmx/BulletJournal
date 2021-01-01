@@ -924,8 +924,8 @@ public class ProjectControllerTest {
         assertNotNull(content.getId());
         getTaskContents(task, ImmutableList.of(content), text);
 
-        text = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 2\\\\n\\\"}]},\\\"###html###\\\":\\\"<p>Test Content 2</p>\\\"}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"2\\\"},{\\\"delete\\\":1}]}\"}";
-        String expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 2\\n\"}]},\"###html###\":\"<p>Test Content 2</p>\"}";
+        text = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 2\\\\n\\\"}]}}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"2\\\"},{\\\"delete\\\":1}]}\"}";
+        String expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 2\\n\"}]}}";
         Long contentId = content.getId();
         UpdateContentParams updateContentParams = TestHelpers.strToUpdateContentParams(text);
         ResponseEntity<Content[]> updateResponse = this.restTemplate.exchange(

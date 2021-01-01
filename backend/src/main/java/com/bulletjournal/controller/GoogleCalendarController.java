@@ -162,10 +162,7 @@ public class GoogleCalendarController {
         LOGGER.info("createTaskFromEvent: {}", e);
         String text = e.getContent().getText();
         if (StringUtils.isNotBlank(text)) {
-            List<String> l = Arrays.stream(e.getContent().getText().split(System.lineSeparator()))
-                    .map(s -> "<p>" + s + "</p>").collect(Collectors.toList());
-            String html = StringUtils.join(l, "");
-            text = "{\"delta\":{\"ops\":[{\"insert\":\"" + text + "\"}]},\"###html###\":\"" + html + "\"}";
+            text = "{\"delta\":{\"ops\":[{\"insert\":\"" + text + "\"}]}}";
         }
         taskDaoJpa.create(projectId, username,
                 Converter.toCreateTaskParams(e), e.getEventId(), text);

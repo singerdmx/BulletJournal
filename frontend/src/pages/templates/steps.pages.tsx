@@ -346,7 +346,8 @@ const StepsPage: React.FC<StepsProps> = (
                     </div>
                     {tasks.length > 0 && <div className='sample-tasks'>
                         {tasks.map((sampleTask: SampleTask) => {
-                            return <div className='sample-task' onClick={() => window.location.href = `${window.location.protocol}//${window.location.host}/public/sampleTasks/${sampleTask.id}`}>
+                            return <div className='sample-task' onClick={() => window.open(
+                                `${window.location.protocol}//${window.location.host}/public/sampleTasks/${sampleTask.id}`, '_blank')}>
                                 <div className='remove-task-icon'>
                                     <Tooltip title='Remove this'>
                                         <CloseOutlined onClick={(e) => onRemoveTask(e, sampleTask.id)}/>

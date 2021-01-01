@@ -14,9 +14,7 @@ import java.util.Map;
 public class DeltaContent {
 
     public static final String DELTA = "delta";
-    public static final String HTML_TAG = "###html###";
-    public static final String EMPTY_CONTENT = "{\"delta\":{\"ops\":[{\"insert\":\" \\n\"}]}," +
-            "\"###html###\":\"<p> </p>\"}";
+    public static final String EMPTY_CONTENT = "{\"delta\":{\"ops\":[{\"insert\":\" \\n\"}]}}";
     private static final Gson GSON = new GsonBuilder().
             registerTypeAdapter(Double.class, new JsonSerializer<Double>() {
                 @Override
@@ -31,16 +29,12 @@ public class DeltaContent {
     @SerializedName(DELTA)
     private Map deltaMap;
 
-    @SerializedName(value = HTML_TAG)
-    private String html;
-
     private List<Object> diff;
 
     public DeltaContent(String text) {
         LinkedHashMap<String, Object> map = GSON.fromJson(text, LinkedHashMap.class);
         deltaMap = adjustDelta((Map) map.get(DELTA));
         diff = (List) map.get("diff");
-        this.html = map.get(HTML_TAG) == null ? null : map.get(HTML_TAG).toString();
     }
 
     private Map adjustDelta(final Map<String, Object> deltaMap) {
@@ -67,14 +61,6 @@ public class DeltaContent {
 
     public boolean hasDeltaMap() {
         return this.deltaMap != null;
-    }
-
-    public String getHtml() {
-        return html;
-    }
-
-    public void setHtml(String html) {
-        this.html = html;
     }
 
     public Map getDeltaMap() {

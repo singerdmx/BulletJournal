@@ -88,13 +88,13 @@ public class TaskControllerTest {
     public void testGetContentRevision() {
         String testContent1 = TestHelpers.generateDeltaContent("Test content 1.");
         String testContent2 = TestHelpers.generateDeltaContent("Test content 2.");
-        String testUpdateContent2 = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 2\\\\n\\\"}]},\\\"###html###\\\":\\\"<p>Test Content 2</p>\\\"}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"2\\\"},{\\\"delete\\\":1}]}\"}";
-        String testUpdateContent3 = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 3\\\\n\\\"}]},\\\"###html###\\\":\\\"<p>Test Content 3</p>\\\"}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"3\\\"},{\\\"delete\\\":1}]}\"}";
-        String testUpdateContent4 = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 4\\\\n\\\"}]},\\\"###html###\\\":\\\"<p>Test Content 4</p>\\\"}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"4\\\"},{\\\"delete\\\":1}]}\"}";
+        String testUpdateContent2 = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 2\\\\n\\\"}]}}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"2\\\"},{\\\"delete\\\":1}]}\"}";
+        String testUpdateContent3 = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 3\\\\n\\\"}]}}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"3\\\"},{\\\"delete\\\":1}]}\"}";
+        String testUpdateContent4 = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 4\\\\n\\\"}]}}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"4\\\"},{\\\"delete\\\":1}]}\"}";
 
-        String testUpdateContent2Expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 2\\n\"}]},\"###html###\":\"<p>Test Content 2</p>\"}";
-        String testUpdateContent3Expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 3\\n\"}]},\"###html###\":\"<p>Test Content 3</p>\"}";
-        String testUpdateContent4Expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 4\\n\"}]},\"###html###\":\"<p>Test Content 4</p>\"}";
+        String testUpdateContent2Expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 2\\n\"}]}}";
+        String testUpdateContent3Expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 3\\n\"}]}}";
+        String testUpdateContent4Expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 4\\n\"}]}}";
         Group group = TestHelpers.createGroup(requestParams, USER, "Group_ProjectItem");
         List<String> users = new ArrayList<>();
         users.add("xlf");
