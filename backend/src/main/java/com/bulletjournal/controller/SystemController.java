@@ -338,6 +338,7 @@ public class SystemController {
             content.setText(DeltaContent.EMPTY_CONTENT);
             content.setCreatedAt(System.currentTimeMillis());
             content.setUpdatedAt(System.currentTimeMillis());
+            content.setRevisions(new Revision[0]);
             publicProjectItem.setContents(ImmutableList.of(content));
             return ResponseEntity.ok().body(publicProjectItem);
         }
