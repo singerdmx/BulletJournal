@@ -154,16 +154,17 @@
                             data-wow-duration="1000ms"
                             data-wow-delay="500ms"
                     >
-<!--                        <div class="icon" style="cursor:pointer">-->
-                        <div class="icon">
-                            <i class="lni-users"></i>
-                        </div>
-                        <div class="feature-content">
-                            <h3>Collaborate Freely</h3>
-                            <p>
-                                Share your tasks and notes with teammates, and see changes as they happen in real-time,
-                                across all devices
-                            </p>
+                        <div style="cursor:pointer" onclick="goToCollabPage()">
+                            <div class="icon">
+                                <i class="lni-users"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h3>Collaborate Freely</h3>
+                                <p>
+                                    Share your tasks and notes with teammates, and see changes as they happen in real-time,
+                                    across all devices
+                                </p>
+                            </div>
                         </div>
                     </div>
                     <div
@@ -615,6 +616,15 @@
             );
             break;
         default:
+    }
+
+    function goToCollabPage() {
+        const chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let result = '';
+        for (let i = 8; i > 0; --i) {
+            result += chars[Math.floor(Math.random() * chars.length)];
+        }
+        window.open('https://bulletjournal.us/collab/' + result);
     }
 </script>
 </body>
