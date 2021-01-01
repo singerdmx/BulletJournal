@@ -16,15 +16,16 @@ type TemplatesProps = {
     getCategories: () => void;
 };
 
+export const isMobilePage = () => {
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    return userAgent.includes('mobile') && !userAgent.includes('ipad');
+}
+
 const TemplatesPage: React.FC<TemplatesProps> = (
     {
         reload,
         getCategories,
     }) => {
-
-    const isMobilePage = () => {
-        return window.navigator.userAgent.toLowerCase().includes('mobile');
-    }
 
     useEffect(() => {
         document.title = 'Templates';

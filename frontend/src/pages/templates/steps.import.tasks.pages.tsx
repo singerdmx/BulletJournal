@@ -21,8 +21,9 @@ import {QuestionCircleTwoTone, SmileOutlined} from "@ant-design/icons";
 import {Category, SampleTask, SampleTasks} from "../../features/templates/interface";
 import {zones} from "../../components/settings/constants";
 import {importTasks, sampleTasksReceived} from "../../features/templates/actions";
-import {getSelections, isMobile, SAMPLE_TASKS} from "./steps.pages";
+import {getSelections, SAMPLE_TASKS} from "./steps.pages";
 import ReactLoading from "react-loading";
+import {isMobilePage} from "../../template";
 
 const {Option} = Select;
 
@@ -169,7 +170,7 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
                         description: 'It may take some time to show up. Please go to your BuJo to view them.',
                         icon: <SmileOutlined style={{ color: '#4ddbff' }} />,
                     });
-                    if (isMobile()) {
+                    if (isMobilePage()) {
                         hideImportTasksCard();
                     } else {
                         setTimeout(() => {
@@ -184,7 +185,7 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
                         description: 'Please go to your BuJo later to view them',
                         icon: <SmileOutlined style={{color: '#4ddbff'}}/>,
                     });
-                    if (isMobile()) {
+                    if (isMobilePage()) {
                         setTimeout(() => {
                             window.location.href = `${window.location.protocol}//${window.location.host}/public/templates`;
                         }, 10000);

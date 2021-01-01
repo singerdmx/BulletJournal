@@ -42,13 +42,15 @@ export const inPublicPage = () => {
 
 const isMobilePage = () => {
     const userAgent = window.navigator.userAgent.toLowerCase();
-    return userAgent.includes('mobile') && !inPublicPage() && !window.location.href.toLowerCase().includes('/tokens');
+    return userAgent.includes('mobile') && !userAgent.includes('ipad')
+        && !inPublicPage() && !userAgent.includes('/tokens');
 };
 
 function listen() {
     if (document.readyState === 'complete') {
+        const userAgent = window.navigator.userAgent.toLowerCase();
         if (process.env.NODE_ENV === 'production' &&
-            !inPublicPage() && !window.navigator.userAgent.toLowerCase().includes('mobile')) {
+            !inPublicPage() && (!userAgent.includes('mobile') || userAgent.includes('ipad'))) {
             const loginCookie = getCookie('__discourse_proxy');
             if (!loginCookie) {
                 if (caches) {

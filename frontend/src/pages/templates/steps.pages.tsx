@@ -26,6 +26,7 @@ import StepsImportTasksPage from "./steps.import.tasks.pages";
 import {updateProjects} from "../../features/project/actions";
 import {updateExpandedMyself} from "../../features/myself/actions";
 import Feedback from "./feedback.page";
+import {isMobilePage} from "../../template";
 
 const {Meta} = Card;
 const {Option} = Select;
@@ -54,11 +55,6 @@ export const getSelections = () => {
     const selectionsText = localStorage.getItem(SELECTIONS);
     const selections: any = selectionsText ? JSON.parse(selectionsText) : {};
     return selections;
-}
-
-export const isMobile = () => {
-    const userAgent = window.navigator.userAgent.toLowerCase();
-    return userAgent.includes('mobile');
 }
 
 const StepsPage: React.FC<StepsProps> = (
@@ -274,7 +270,7 @@ const StepsPage: React.FC<StepsProps> = (
     }
 
     const onScrollNext = () => {
-        getSampleTasksByScrollId(scrollId, isMobile() ? 10 : 20);
+        getSampleTasksByScrollId(scrollId, isMobilePage() ? 10 : 20);
         setTimeout(() => {
             window.scrollTo(0, document.body.scrollHeight);
         }, 300);
@@ -358,7 +354,7 @@ const StepsPage: React.FC<StepsProps> = (
                         })}
                     </div>}
                     <div className='confirm-button'>
-                        {(isMobile() || showConfirmButton) && curStep.choices.length > 0 && <Button
+                        {(isMobilePage() || showConfirmButton) && curStep.choices.length > 0 && <Button
                             onClick={onConfirmNext}
                             style={{color: '#4ddbff', margin: '3px'}} shape="round">
                             Next

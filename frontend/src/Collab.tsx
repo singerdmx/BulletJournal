@@ -4,13 +4,14 @@ import {connect} from 'react-redux';
 
 import './styles/main.less';
 import './Public.styles.less';
-import {useParams} from "react-router-dom";
 
 type CollabPageProps = {};
 
 const CollabPage: React.FC<CollabPageProps> = (props) => {
-    const {itemId} = useParams();
-    return <div>Collab {itemId}</div>;
+    return <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <img alt='Coming Soon'
+             src='https://user-images.githubusercontent.com/122956/92905797-d299c600-f3d8-11ea-813a-3ac75c2f5677.gif'/>
+    </div>;
 };
 
 const mapStateToProps = (state: IState) => ({});
