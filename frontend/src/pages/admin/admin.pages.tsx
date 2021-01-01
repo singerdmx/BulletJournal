@@ -179,21 +179,21 @@ const AdminPage: React.FC<AdminProps> = (props) => {
         <FloatButton
             tooltip="Metadata"
             onClick={() => history.push(`/admin/metadata`)}
-            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
         >
           <DatabaseOutlined />
         </FloatButton>
         <FloatButton
             tooltip="Categories"
             onClick={() => history.push(`/admin/categories`)}
-            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
         >
           <CopyrightOutlined />
         </FloatButton>
         <FloatButton
             tooltip="Workflow"
             onClick={() => history.push(`/admin/workflow`)}
-            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
         >
           <FundViewOutlined />
         </FloatButton>

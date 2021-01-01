@@ -42,7 +42,7 @@ const SampleTaskPage: React.FC<SampleTaskProps> = (
             {<FloatButton
                 tooltip="Edit Content"
                 onClick={handleEdit}
-                styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+                styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
             >
                 <EditOutlined/>
             </FloatButton>}

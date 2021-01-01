@@ -121,7 +121,7 @@ const AddNote: React.FC<
         <FloatButton
             tooltip="Add New Note"
             onClick={openModal}
-            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
         >
           <PlusOutlined/>
         </FloatButton>

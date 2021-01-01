@@ -243,21 +243,21 @@ const TaskStatusPage: React.FC<TaskStatusProps> = (
             <FloatButton
                 onClick={() => history.push(`/projects/${projectId}`)}
                 tooltip="Go to BuJo"
-                styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+                styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
             >
               <UpSquareOutlined/>
             </FloatButton>
             <FloatButton
                 onClick={getTasksByStatus}
                 tooltip="Refresh"
-                styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+                styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
             >
               <SyncOutlined/>
             </FloatButton>
             <FloatButton
                 tooltip="Tasks Ordered by Due Date"
                 onClick={handleGetTasksByOrder}
-                styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+                styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
             >
               <FieldTimeOutlined/>
             </FloatButton>

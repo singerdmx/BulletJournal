@@ -235,7 +235,7 @@ const AddProject: React.FC<GroupProps & ProjectProps> = (props) => {
         <FloatButton
             tooltip="Add New BuJo"
             onClick={openModal}
-            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
         >
           <PlusOutlined/>
         </FloatButton>

@@ -210,7 +210,7 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
             {notes.length > 0 && <FloatButton
                 tooltip="Note(s) Ordered by Update Time"
                 onClick={handleShowNotesOrdered}
-                styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+                styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
             >
                 <FieldTimeOutlined/>
             </FloatButton>}

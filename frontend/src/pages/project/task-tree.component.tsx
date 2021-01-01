@@ -331,34 +331,34 @@ const TaskTree: React.FC<TasksProps> = (props) => {
       {completeTasksShown ? <FloatButton
           tooltip="Hide Completed Tasks"
           onClick={hideCompletedTask}
-          styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+          styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
       >
         <CloseCircleOutlined/>
       </FloatButton> : <FloatButton
           tooltip="Show Completed Tasks"
           onClick={handleClickShowCompletedTasksButton}
-          styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+          styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
       >
         <CheckCircleOutlined/>
       </FloatButton>}
       {tasks.length > 0 && <FloatButton
           tooltip="Task(s) Ordered by Due Date"
           onClick={handleShowTasksOrdered}
-          styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+          styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
       >
         <FieldTimeOutlined/>
       </FloatButton>}
       {tasks.length > 0 && <FloatButton
           tooltip="Statistics"
           onClick={() => history.push(`/projects/${project.id}/statistics`)}
-          styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+          styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
       >
         <ProjectOutlined/>
       </FloatButton>}
       {tasks.length > 0 && <FloatButton
           tooltip="Tasks by Status"
           onClick={() => history.push(`/projects/${project.id}/taskStatus`)}
-          styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+          styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
       >
         <UnorderedListOutlined/>
       </FloatButton>}

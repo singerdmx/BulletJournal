@@ -163,14 +163,14 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
       <FloatButton
           tooltip="Go to Parent BuJo"
           onClick={() => history.push(`/projects/${transaction.projectId}`)}
-          styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+          styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
       >
         <UpSquareOutlined/>
       </FloatButton>
       <FloatButton
           tooltip="Refresh Contents"
           onClick={handleRefresh}
-          styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+          styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
       >
         <SyncOutlined/>
       </FloatButton>
