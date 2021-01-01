@@ -122,7 +122,7 @@ const PublicPage: React.FC<PageProps> = (props) => {
         <FloatButton
             onClick={() => window.open(`${window.location.protocol}//${window.location.host}/collab/${randomString(8) + content.id}`)}
             tooltip="Collaborative Real-Time Editing"
-            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
         >
             <FileSyncOutlined/>
         </FloatButton>
