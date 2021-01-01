@@ -24,9 +24,11 @@ public class GoogleMapsClient {
 
     @PostConstruct
     public void init() {
-        geoApiContext = new GeoApiContext.Builder()
-                .apiKey(this.googleMapsClientConfig.getApiKey())
-                .build();
+        if (this.googleMapsClientConfig.getApiKey() != null) {
+            geoApiContext = new GeoApiContext.Builder()
+                    .apiKey(this.googleMapsClientConfig.getApiKey())
+                    .build();
+        }
     }
 
     @PreDestroy

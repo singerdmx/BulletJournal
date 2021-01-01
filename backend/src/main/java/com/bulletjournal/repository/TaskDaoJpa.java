@@ -737,11 +737,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         LOGGER.info("Finish findByTaskIn {}", taskList.size());
 
         final Map<Task, List<TaskContent>> taskToTaskContentsMap = new HashMap<>();
-
-        allTaskContents.forEach(taskContent -> {
-            Task currentTask = taskContent.getTask();
-            taskToTaskContentsMap.computeIfAbsent(currentTask, k -> new LinkedList<>()).add(taskContent);
-        });
+        taskList.forEach(task -> taskToTaskContentsMap.put(task, new ArrayList<>()));
+        allTaskContents.forEach(taskContent -> taskToTaskContentsMap.get(taskContent.getTask()).add(taskContent));
 
         final List<CompletedTask> completedTaskList = new LinkedList<>();
 
