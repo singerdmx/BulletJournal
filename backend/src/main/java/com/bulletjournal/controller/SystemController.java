@@ -326,12 +326,12 @@ public class SystemController {
 
     @GetMapping(COLLAB_ITEM_ROUTE)
     public ResponseEntity<?> getCollabItem(@NotNull @PathVariable String itemId) {
-        if (itemId.length() < 8) {
+        if (itemId.length() < StringUtil.UUID_LENGTH) {
             throw new IllegalArgumentException("Invalid itemId " + itemId);
         }
 
         PublicProjectItem publicProjectItem;
-        if (itemId.length() == 8) { // brand new page
+        if (itemId.length() == StringUtil.UUID_LENGTH) { // brand new page
             publicProjectItem = new PublicProjectItem();
             Content content = new Content();
             content.setBaseText(DeltaContent.EMPTY_CONTENT);
