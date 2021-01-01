@@ -9,6 +9,7 @@ import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.daemon.Reminder;
 import com.bulletjournal.daemon.models.ReminderRecord;
 import com.bulletjournal.exceptions.BadRequestException;
+import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
 import com.bulletjournal.redis.models.Etag;
@@ -16,9 +17,9 @@ import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.factory.ProjectItemDaos;
 import com.bulletjournal.repository.models.ProjectItemModel;
+import com.bulletjournal.util.DeltaContent;
 import com.bulletjournal.util.StringUtil;
-import com.google.maps.errors.ApiException;
-import com.google.maps.model.FindPlaceFromText;
+import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -33,7 +34,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
@@ -49,6 +49,7 @@ public class SystemController {
     public static final String PUBLIC_ITEM_ROUTE = PUBLIC_ITEM_ROUTE_PREFIX + "{itemId}";
     private static final String CONTACTS_ROUTE = "/api/contacts";
     private static final String SHARED_ITEM_SET_LABELS_ROUTE = "/api/sharedItems/{itemId}/setLabels";
+    private static final String COLLAB_ITEM_ROUTE = "/api/public/collab/{itemId}";
     private static final Logger LOGGER = LoggerFactory.getLogger(SystemController.class);
 
     @Autowired
@@ -228,6 +229,22 @@ public class SystemController {
         if (item == null) {
             return null;
         }
+        PublicProjectItem publicProjectItem = getPublicProjectItem(item);
+
+        if (!isUUID(itemId)) {
+            // For shared item, replace projectItem's labels with shared item's labels
+            publicProjectItem.getProjectItem().setLabels(this.labelDaoJpa.getLabels(item.getSharedItemLabels()));
+        }
+
+        com.bulletjournal.repository.models.Project project = projectDaoJpa.getSharedProject(
+                item.getContentType(), originalUser);
+        if (project != null) {
+            publicProjectItem.setProjectId(project.getId());
+        }
+        return ResponseEntity.ok().body(publicProjectItem);
+    }
+
+    private PublicProjectItem getPublicProjectItem(ProjectItemModel item) {
         List<Content> contents;
         ProjectItem projectItem;
         ContentType contentType = item.getContentType();
@@ -244,16 +261,10 @@ public class SystemController {
                 throw new IllegalArgumentException();
         }
 
-        if (!isUUID(itemId)) {
-            // For shared item, replace projectItem's labels with shared item's labels
-            projectItem.setLabels(this.labelDaoJpa.getLabels(item.getSharedItemLabels()));
-        }
-
         projectItem.setShared(true);
         contents.forEach(content -> content.setRevisions(new Revision[0])); // clear revisions
-        com.bulletjournal.repository.models.Project project = projectDaoJpa.getSharedProject(contentType, originalUser);
-        return ResponseEntity.ok().body(
-                new PublicProjectItem(contentType, contents, projectItem, project != null ? project.getId() : null));
+        PublicProjectItem publicProjectItem = new PublicProjectItem(contentType, contents, projectItem, null);
+        return publicProjectItem;
     }
 
     private ProjectItemModel getSharedItem(String itemId, String requester) {
@@ -313,12 +324,37 @@ public class SystemController {
         return ResponseEntity.ok().headers(responseHeaders).build();
     }
 
-    @GetMapping("/api/places")
-    public FindPlaceFromText findPlaceFromText(
-            @RequestParam String input,
-            @RequestParam double lat,
-            @RequestParam double lng)
-            throws InterruptedException, ApiException, IOException {
-        return this.googleMapsClient.findPlaceFromText(input, lat, lng);
+    @GetMapping(COLLAB_ITEM_ROUTE)
+    public ResponseEntity<?> getCollabItem(@NotNull @PathVariable String itemId) {
+        if (itemId.length() < 8) {
+            throw new IllegalArgumentException("Invalid itemId " + itemId);
+        }
+
+        PublicProjectItem publicProjectItem;
+        if (itemId.length() == 8) { // brand new page
+            publicProjectItem = new PublicProjectItem();
+            Content content = new Content();
+            content.setBaseText(DeltaContent.EMPTY_CONTENT);
+            content.setText(DeltaContent.EMPTY_CONTENT);
+            content.setCreatedAt(System.currentTimeMillis());
+            content.setUpdatedAt(System.currentTimeMillis());
+            publicProjectItem.setContents(ImmutableList.of(content));
+            return ResponseEntity.ok().body(publicProjectItem);
+        }
+
+        // itemId is uuid + content id
+        String uuid = itemId.substring(0, StringUtil.UUID_LENGTH);
+        long contentId = Long.parseLong(itemId.substring(StringUtil.UUID_LENGTH));
+        if (!isUUID(uuid)) {
+            throw new IllegalArgumentException("Invalid uuid " + uuid);
+        }
+
+        ProjectItemModel item = this.publicProjectItemDaoJpa.getPublicItem(uuid);
+        publicProjectItem = getPublicProjectItem(item);
+        Content content = publicProjectItem.getContents().stream().filter(c -> contentId == c.getId().longValue())
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("contentId " + contentId + " not found"));
+        publicProjectItem.setContents(ImmutableList.of(content));
+        return ResponseEntity.ok().body(publicProjectItem);
     }
 }
