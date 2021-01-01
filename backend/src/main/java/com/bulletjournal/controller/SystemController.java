@@ -341,7 +341,8 @@ public class SystemController {
             publicProjectItem.setContents(ImmutableList.of(content));
             return ResponseEntity.ok().body(publicProjectItem);
         }
-
+        
+        MDC.put(UserClient.USER_NAME_KEY, AuthorizationService.SUPER_USER);
         // itemId is uuid + content id
         String uuid = itemId.substring(0, StringUtil.UUID_LENGTH);
         long contentId = Long.parseLong(itemId.substring(StringUtil.UUID_LENGTH));
