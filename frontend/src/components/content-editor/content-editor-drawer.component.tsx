@@ -25,7 +25,7 @@ const ContentEditorDrawer: React.FC<
   const fullHeight = global.window.innerHeight;
   const fullWidth = global.window.innerWidth;
   const drawerWidth =
-    fullWidth > fullHeight ? Math.floor(fullHeight / 1.4) : fullWidth;
+    fullWidth > fullHeight ? fullWidth * 0.65 : fullWidth;
   if (!projectItem) return null;
   return (
     <Drawer
