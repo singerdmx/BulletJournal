@@ -32,6 +32,7 @@ const RevisionDrawer: React.FC<RevisionDrawerProps> = ({
   revisionDisplay,
 }) => {
   const [revisionIndex, setRevisionIndex] = useState(revisions.length - 1);
+
   const handlePageChange = (page: number) => {
     setRevisionIndex(page);
   };
