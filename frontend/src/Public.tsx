@@ -20,7 +20,6 @@ import LabelManagement from './pages/project/label-management.compoent';
 import {getRandomBackgroundImage} from './assets/background';
 import {inPublicPage} from "./index";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
-import {randomString} from "./utils/Util";
 
 type PageProps = {
   note: Note | undefined;
@@ -115,12 +114,12 @@ const PublicPage: React.FC<PageProps> = (props) => {
   };
 
   const collabButton = () => {
-    if (!content || isMobilePage() || !inPublicPage()) {
+    if (!content || isMobilePage() || !inPublicPage() || !itemId) {
         return null;
     }
     return <Container>
         <FloatButton
-            onClick={() => window.open(`${window.location.protocol}//${window.location.host}/collab/${randomString(8) + content.id}`)}
+            onClick={() => window.open(`${window.location.protocol}//${window.location.host}/collab/${itemId + content.id}`)}
             tooltip="Collaborative Real-Time Editing"
             styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
         >
