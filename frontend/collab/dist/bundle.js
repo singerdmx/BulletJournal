@@ -29254,6 +29254,12 @@ function getCookie(cname) {
     return "";
 }
 
+function pad(num, size) {
+    num = num.toString();
+    while (num.length < size) num = "0" + num;
+    return num;
+}
+
 window.addEventListener('load', () => {
     let defaultName = 'anonymous' + Math.floor(Math.random() * 20);
     const loginCookie = getCookie('__discourse_proxy');
@@ -29267,7 +29273,7 @@ window.addEventListener('load', () => {
     console.log(name);
 
     const params = new URLSearchParams(window.location.search);
-    const contentId = params.get('uid');
+    const contentId = params.has('uid') ? params.get('uid') : pad(Math.floor(Math.random() * 99999999), 8);
     fetch("/api/public/collab/" + contentId).then(response => {
         console.log(response.json());
     }).catch(reason => {
