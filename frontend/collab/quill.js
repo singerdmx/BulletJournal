@@ -77,13 +77,15 @@ window.addEventListener('load', () => {
 
     const params = new URLSearchParams(window.location.search);
     const contentId = params.has('uid') ? params.get('uid') : pad(Math.floor(Math.random() * 99999999), 8);
-    fetch("/api/public/collab/" + contentId).then(response => {
-        console.log(response.json());
-    }).catch(reason => {
-            console.log(reason);
-        }
-    );
-
+    fetch("/api/public/collab/" + contentId)
+        .then(response => response.json())
+        .then(data => {
+            if (data['projectItem'] && data['projectItem']['name']) {
+                document.title = data['projectItem']['name'];
+                document.getElementById('editor-title').innerText = data['projectItem']['name'];
+            }
+        })
+        .catch(reason => console.log(reason));
 
     const ydoc = new Y.Doc();
     const rtcProviderUrl = 'ws://' + window.location.hostname + ':4444';
