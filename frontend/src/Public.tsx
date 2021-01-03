@@ -119,7 +119,7 @@ const PublicPage: React.FC<PageProps> = (props) => {
     }
     return <Container>
         <FloatButton
-            onClick={() => window.open(`${window.location.protocol}//${window.location.host}/collab/${itemId + content.id}`)}
+            onClick={() => window.open(`${window.location.protocol}//${window.location.host}/?collab=${itemId + content.id}`)}
             tooltip="Collaborative Real-Time Editing"
             styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
         >

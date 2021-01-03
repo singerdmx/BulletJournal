@@ -125,7 +125,7 @@ class Myself extends React.Component<MyselfProps & PathProps, ModalState> {
             <div className='myselfContainer'>
                 <Tooltip placement='bottom' title='Collaborative Real-Time Editor'>
                     <FileSyncOutlined
-                        onClick={() => window.open(`${window.location.protocol}//${window.location.host}/collab/${randomString(8)}`)}
+                        onClick={() => window.open(`${window.location.protocol}//${window.location.host}/?collab=${randomString(8)}`)}
                     />
                 </Tooltip>
                 <span id='createNewBuJo'>{plusIcon}</span>

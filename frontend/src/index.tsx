@@ -12,7 +12,6 @@ import TemplatesPage from './template';
 import TokenPage from "./Token";
 import PublicNotificationsPage from "./public-notifications";
 import PublicSampleTaskPage from "./public-sample-task.pages";
-import CollabPage from "./Collab";
 
 const store = createStore();
 
@@ -72,7 +71,6 @@ function listen() {
                             <Route exact path="/public/privacy" component={PrivacyPage}/>
                             <Route exact path="/public/tos" component={TermsOfServicePage}/>
                             <Route exact path="/public/items/:itemId" component={PublicPage}/>
-                            <Route exact path="/collab/:itemId" component={CollabPage}/>
                             <Route exact path="/public/notifications/:id" component={PublicNotificationsPage}/>
                             <Route exact path="/public/sampleTasks/:taskId" component={PublicSampleTaskPage}/>
                             <Route exact path="/tokens/:token" component={TokenPage}/>
