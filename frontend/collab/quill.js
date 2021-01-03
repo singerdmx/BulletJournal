@@ -56,9 +56,7 @@ window.addEventListener('load', () => {
     const rtcProviderUrl = 'ws://'+ window.location.hostname + ':4444';
     const provider = new WebrtcProvider('your-room-name1', ydoc, {signaling: [rtcProviderUrl]});
     const type = ydoc.getText('quill');
-    const editorContainer = document.createElement('div');
-    editorContainer.setAttribute('id', 'editor');
-    document.body.insertBefore(editorContainer, null);
+    const editorContainer = document.getElementById('editor');
 
     var editor = new Quill(editorContainer, {
         modules: {

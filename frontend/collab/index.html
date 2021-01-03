@@ -2,14 +2,284 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>Title</title>
+        <title>Collaborative Real-Time Editor</title>
         <!--    <script type="text/javascript" src="./dist/quill.bundle.js" async></script>-->
         <script type="text/javascript" src="./dist/bundle.js" async></script>
         <link rel="icon" href="https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css" integrity="sha512-/FHUK/LsH78K9XTqsR9hbzr21J8B8RwHR/r8Jv9fzry6NVAOVIGFKQCNINsbhK7a1xubVu2r5QZcz2T9cKpubw==" crossorigin="anonymous" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.bubble.min.css" integrity="sha512-laOBZ+/WvReCfvAK076yy3Hm3J+X1iI0wIYGMzsmm4HJbYvQdAGZZ1kszc1hVYUIZQ/faZ+eEtJVL28sxPSJag==" crossorigin="anonymous" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.core.min.css" integrity="sha512-AqSNjpJ7R92d+ANZrrP/hSBerCkDCQE/EILn5MylysaRmbi0Jwi56r39McL3p7LJnO+bjthpFu8GQ2y/d0fECg==" crossorigin="anonymous" />
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/parallax.js/1.5.0/parallax.min.js" crossorigin="anonymous"></script>
+        <style>
+            body {
+                font-family: "Open Sans", Arial, Helvetica, sans-serif;
+                font-size: 18px;
+                font-weight: 400;
+                overflow-x: hidden;
+                color: #707172;
+                background-color: #666;
+            }
+
+            p {
+                line-height: 2;
+            }
+
+            a {
+                transition: all 0.3s ease;
+            }
+
+            .container-fluid {
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            .small {
+                font-size: 0.95rem;
+            }
+
+            .tm-color-primary {
+                color: #069;
+            }
+
+            .tm-color-gray {
+                color: #333;
+            }
+
+            .tm-bg-black-transparent {
+                background-color: rgba(0, 0, 0, 0.3);
+            }
+
+            .tm-bg-white-transparent {
+                background-color: rgba(255, 255, 255, 0.3);
+                border: 1px solid white;
+            }
+
+            .tm-intro {
+                width: 100%;
+                height: 90vh;
+                padding: 55px;
+                margin-right: 0;
+                margin-left: auto;
+            }
+
+            .tm-section-title {
+                font-size: 1.6rem;
+            }
+
+            .parallax-window {
+                min-height: 662px;
+                background: transparent;
+            }
+
+            .tm-section {
+                display: flex;
+                align-items: center;
+                height: auto;
+                max-width: 1275px;
+                padding: 66px 60px;
+            }
+
+            #intro {
+                min-height: 100vh;
+                max-width: none;
+            }
+
+            .tm-brand-box {
+                box-sizing: content-box;
+                width: 100%;
+                max-width: 230px;
+                min-height: 160px;
+                color: white;
+                text-align: center;
+                margin: 70px auto 90px;
+            }
+
+            .tm-double-border-1,
+            .tm-double-border-2 {
+                border: 1px solid #fff;
+                position: relative;
+            }
+
+            .tm-double-border-2 {
+                top: 10px;
+                left: 10px;
+            }
+
+            .tm-sidebar {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                z-index: 100;
+                padding-left: 70px;
+                padding-right: 70px;
+                width: 400px;
+                max-width: 400px;
+            }
+
+            /* Hide scrollbar */
+            .tm-sidebar {
+                overflow-y: scroll;
+                scrollbar-width: none; /* Firefox */
+                -ms-overflow-style: none; /* IE 10+ */
+            }
+            .tm-sidebar::-webkit-scrollbar {
+                /* WebKit */
+                width: 0;
+                height: 0;
+            }
+
+            .tm-sidebar-sticky {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .tm-section-wrap {
+                width: calc(100% - 400px);
+                margin-left: auto;
+                margin-right: 0;
+            }
+
+            .tm-white-rect {
+                display: block;
+                width: 15px;
+                height: 15px;
+                background-color: white;
+            }
+
+            @keyframes blinker {
+                0% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.1;
+                }
+                100% {
+                    opacity: 1;
+                }
+            }
+
+            .tm-section-half {
+                padding: 55px;
+            }
+
+            .tm-section-icon {
+                color: #369;
+                width: 120px;
+                height: 120px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+
+            @media (max-width: 1600px) {
+                .tm-sidebar {
+                    width: 30%;
+                    max-width: none;
+                    padding-left: 30px;
+                    padding-right: 30px;
+                }
+
+                .tm-section-wrap {
+                    width: 70%;
+                }
+
+                .tm-img-wrap a {
+                    width: 100%;
+                    height: 100%;
+                }
+            }
+
+            @media (max-width: 991px) {
+                .tm-bg-black-transparent {
+                    background-color: rgba(0, 0, 0, 0.5);
+                }
+
+                .tm-brand-box {
+                    margin-top: 30px;
+                    margin-bottom: 30px;
+                    max-width: 200px;
+                    min-height: 100px;
+                }
+
+                .tm-brand {
+                    padding: 20px 30px;
+                }
+
+                footer p {
+                    line-height: 1;
+                }
+
+                .tm-sidebar {
+                    width: 250px;
+                    left: -250px;
+                    padding: 15px;
+                    transition: all 0.3s ease;
+                }
+
+                .tm-section-wrap {
+                    width: 100%;
+                }
+
+            }
+
+            @media (max-width: 767px) {
+                .tm-section {
+                    padding: 30px;
+                }
+            }
+
+            @media (max-width: 554px) {
+                .tm-section {
+                    padding: 15px;
+                }
+            }
+        </style>
     </head>
     <body>
+    <main class="container-fluid">
+        <div class="row">
+            <nav id="tmSidebar" class="tm-bg-black-transparent tm-sidebar">
+                <button class="navbar-toggler" type="button" aria-label="Toggle navigation">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="tm-sidebar-sticky">
+                    <div class="tm-brand-box">
+                        <div class="tm-double-border-1">
+                            <div class="tm-double-border-2">
+                                <a href="https://bulletjournal.us/home/index.html" target="_blank">
+                                    <img src="https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png"
+                                         width="120px" height="120px">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </nav>
+            <main role="main" class="ml-sm-auto col-12">
+                <div
+                        class="parallax-window"
+                        data-parallax="scroll"
+                        data-image-src="https://user-images.githubusercontent.com/122956/103475552-d45e0f80-4d62-11eb-8fe0-7dcf0b15bb3a.jpg">
+                    <div class="tm-section-wrap">
+                        <section id="intro" class="tm-section">
+                            <div class="tm-bg-white-transparent tm-intro">
+                                <h2 class="tm-section-title mb-5 tm-color-primary">Collaborative Real-Time Editor</h2>
+                                <div id="editor-container">
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </main>
     </body>
 </html>
