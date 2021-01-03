@@ -65,6 +65,7 @@ const ShareProjectItem: React.FC<ProjectItemProps> = (props) => {
         destroyOnClose={true}
         centered
         visible={visible}
+        width={650}
         onCancel={(e) => handleCancel(e)}
         footer={false}
       >

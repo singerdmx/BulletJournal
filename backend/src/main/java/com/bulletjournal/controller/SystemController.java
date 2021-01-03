@@ -329,34 +329,53 @@ public class SystemController {
         if (itemId.length() < StringUtil.UUID_LENGTH) {
             throw new IllegalArgumentException("Invalid itemId " + itemId);
         }
-
-        PublicProjectItem publicProjectItem;
-        if (itemId.length() == StringUtil.UUID_LENGTH) { // brand new page
-            publicProjectItem = new PublicProjectItem();
-            Content content = new Content();
-            content.setBaseText(DeltaContent.EMPTY_CONTENT);
-            content.setText(DeltaContent.EMPTY_CONTENT);
-            content.setCreatedAt(System.currentTimeMillis());
-            content.setUpdatedAt(System.currentTimeMillis());
-            content.setRevisions(new Revision[0]);
-            publicProjectItem.setContents(ImmutableList.of(content));
-            return ResponseEntity.ok().body(publicProjectItem);
-        }
-
-        MDC.put(UserClient.USER_NAME_KEY, AuthorizationService.SUPER_USER);
         // itemId is uuid + content id
         String uuid = itemId.substring(0, StringUtil.UUID_LENGTH);
-        long contentId = Long.parseLong(itemId.substring(StringUtil.UUID_LENGTH));
         if (!isUUID(uuid)) {
             throw new IllegalArgumentException("Invalid uuid " + uuid);
         }
+        MDC.put(UserClient.USER_NAME_KEY, AuthorizationService.SUPER_USER);
 
-        ProjectItemModel item = this.publicProjectItemDaoJpa.getPublicItem(uuid);
+        ProjectItemModel item = null;
+        try {
+            item = this.publicProjectItemDaoJpa.getPublicItem(uuid);
+        } catch (ResourceNotFoundException ex) {
+        }
+
+        PublicProjectItem publicProjectItem;
+        if (itemId.length() == StringUtil.UUID_LENGTH && item == null) { // brand new page
+            publicProjectItem = createEmptyPublicProjectItem();
+            return ResponseEntity.ok().body(publicProjectItem);
+        }
+
         publicProjectItem = getPublicProjectItem(item);
-        Content content = publicProjectItem.getContents().stream().filter(c -> contentId == c.getId().longValue())
-                .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("contentId " + contentId + " not found"));
-        publicProjectItem.setContents(ImmutableList.of(content));
+        Content content = null;
+        if (itemId.length() == StringUtil.UUID_LENGTH) {
+            if (!publicProjectItem.getContents().isEmpty()) {
+                // use first content if there is any
+                content = publicProjectItem.getContents().get(0);
+            }
+        } else {
+            long contentId = Long.parseLong(itemId.substring(StringUtil.UUID_LENGTH));
+            content = publicProjectItem.getContents().stream().filter(c -> contentId == c.getId().longValue())
+                    .findFirst()
+                    .orElseThrow(() -> new ResourceNotFoundException("contentId " + contentId + " not found"));
+        }
+
+        publicProjectItem.setContents(content == null ? Collections.emptyList() : ImmutableList.of(content));
         return ResponseEntity.ok().body(publicProjectItem);
+    }
+
+    private PublicProjectItem createEmptyPublicProjectItem() {
+        PublicProjectItem publicProjectItem;
+        publicProjectItem = new PublicProjectItem();
+        Content content = new Content();
+        content.setBaseText(DeltaContent.EMPTY_CONTENT);
+        content.setText(DeltaContent.EMPTY_CONTENT);
+        content.setCreatedAt(System.currentTimeMillis());
+        content.setUpdatedAt(System.currentTimeMillis());
+        content.setRevisions(new Revision[0]);
+        publicProjectItem.setContents(ImmutableList.of(content));
+        return publicProjectItem;
     }
 }
