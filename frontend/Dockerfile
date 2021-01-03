@@ -22,4 +22,5 @@ RUN ln -s /usr/share/nginx/html/static /usr/share/nginx/html/tokens/static
 # Copy the default nginx.conf provided by tiangolo/node-frontend
 # COPY --from=build-stage /nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build-stage /app/nginx.conf /etc/nginx/conf.d/default.conf
-COPY main-site /usr/share/nginx/home 
+COPY main-site /usr/share/nginx/home
+COPY collab /usr/share/nginx/collab
