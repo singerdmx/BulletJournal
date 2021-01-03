@@ -5,13 +5,37 @@ import {QuillBinding} from 'y-quill'
 import Quill from 'quill'
 import QuillCursors from 'quill-cursors'
 import {WebrtcProvider} from 'y-webrtc'
-import * as Emoji from "quill-emoji";
 
 
 Quill.register('modules/cursors', QuillCursors);
 
+function getCookie(cname) {
+    const name = cname + "=";
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) === 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+
+    if (window.location.host === 'localhost') {
+        return "BulletJournal##group##sig";
+    }
+    return "";
+}
+
 window.addEventListener('load', () => {
-    var name = prompt("Please enter your name", 'unknown');
+    let defaultName = 'anonymous' + Math.floor(Math.random() * 20);
+    const loginCookie = getCookie('__discourse_proxy');
+    if (loginCookie) {
+        defaultName = decodeURIComponent(loginCookie.split('##')[0]);
+    }
+    const name = prompt("Please enter your name", defaultName);
     console.log(name);
 
     const params = new URLSearchParams(window.location.search);
@@ -68,10 +92,9 @@ window.addEventListener('load', () => {
     // Define user name and user name
     // Check the quill-cursors package on how to change the way cursors are rendered
     provider.awareness.setLocalStateField('user', {
-      name: name,
-      color: randomColor
+        name: name,
+        color: randomColor
     });
-
 
 
     // @ts-ignore
@@ -79,6 +102,6 @@ window.addEventListener('load', () => {
 });
 
 
-const colors= ['aqua', 'black', 'blue', 'fuchsia', 'gray', 'green',
+const colors = ['aqua', 'black', 'blue', 'fuchsia', 'gray', 'green',
     'lime', 'maroon', 'navy', 'olive', 'orange', 'purple', 'red',
     'silver', 'teal', 'white', 'yellow'];
