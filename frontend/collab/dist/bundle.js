@@ -29260,6 +29260,17 @@ function pad(num, size) {
     return num;
 }
 
+const updateUserList = (map) =>{
+    const userListDiv = document.getElementById('userList');
+    userListDiv.innerHTML = "";
+    map.forEach((values)=>{
+        let span = document.createElement("SPAN");
+        span.innerText = values.user.name + " ";
+        span.setAttribute("style", "color:" + values.user.color);
+        userListDiv.appendChild(span);
+    });
+};
+
 window.addEventListener('load', () => {
     let defaultName = 'anonymous' + Math.floor(Math.random() * 20);
     const loginCookie = getCookie('__discourse_proxy');
@@ -29286,7 +29297,6 @@ window.addEventListener('load', () => {
     const rtcProviderUrl = 'ws://'+ window.location.hostname + ':4444';
     const provider = new y_webrtc__WEBPACK_IMPORTED_MODULE_4__["WebrtcProvider"]('your-room-name1', ydoc, {signaling: [rtcProviderUrl]});
     const type = ydoc.getText('quill');
-    const undoManager = new yjs__WEBPACK_IMPORTED_MODULE_0__["UndoManager"](type)
     const editorContainer = document.getElementById('editor-container');
 
     var editor = new quill__WEBPACK_IMPORTED_MODULE_2___default.a(editorContainer, {
@@ -29332,11 +29342,13 @@ window.addEventListener('load', () => {
 
     userList = provider.awareness.getStates();
     console.log(userList);
+    updateUserList(userList);
 
     provider.awareness.on('update', ({ added, updated,removed}) => {
         if(added.length !== 0 || removed.length !== 0 ){
             userList = provider.awareness.getStates();
             console.log(userList);
+            updateUserList(userList);
         }
     });
 
