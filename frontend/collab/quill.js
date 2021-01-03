@@ -5,6 +5,8 @@ import {QuillBinding} from 'y-quill';
 import Quill from 'quill';
 import QuillCursors from 'quill-cursors';
 import {WebrtcProvider} from 'y-webrtc';
+import hljs from 'highlight.js';
+
 
 const Delta = Quill.import('delta');
 
@@ -14,6 +16,7 @@ let targetContentId = null;
 let projectItem = null;
 
 Quill.register('modules/cursors', QuillCursors);
+hljs.initHighlightingOnLoad();
 
 function getCookie(cname) {
     const name = cname + "=";
@@ -96,6 +99,7 @@ window.addEventListener('load', () => {
 
     const editor = new Quill(editorContainer, {
         modules: {
+            syntax: {highlight: text => hljs.highlightAuto(text).value,},
             cursors: true,
             toolbar: [
                 [
