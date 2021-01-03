@@ -29280,9 +29280,7 @@ window.addEventListener('load', () => {
     const rtcProviderUrl = 'ws://'+ window.location.hostname + ':4444';
     const provider = new y_webrtc__WEBPACK_IMPORTED_MODULE_4__["WebrtcProvider"]('your-room-name1', ydoc, {signaling: [rtcProviderUrl]});
     const type = ydoc.getText('quill');
-    const editorContainer = document.createElement('div');
-    editorContainer.setAttribute('id', 'editor');
-    document.body.insertBefore(editorContainer, null);
+    const editorContainer = document.getElementById('editor-container');
 
     var editor = new quill__WEBPACK_IMPORTED_MODULE_2___default.a(editorContainer, {
         modules: {
