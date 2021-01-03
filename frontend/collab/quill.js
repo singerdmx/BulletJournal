@@ -35,7 +35,10 @@ window.addEventListener('load', () => {
     if (loginCookie) {
         defaultName = decodeURIComponent(loginCookie.split('##')[0]);
     }
-    const name = prompt("Please enter your name", defaultName);
+    let name = prompt("Please enter your name", defaultName);
+    if (!name) {
+        name = defaultName;
+    }
     console.log(name);
 
     const params = new URLSearchParams(window.location.search);
