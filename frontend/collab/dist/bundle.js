@@ -29280,6 +29280,7 @@ window.addEventListener('load', () => {
     const rtcProviderUrl = 'ws://'+ window.location.hostname + ':4444';
     const provider = new y_webrtc__WEBPACK_IMPORTED_MODULE_4__["WebrtcProvider"]('your-room-name1', ydoc, {signaling: [rtcProviderUrl]});
     const type = ydoc.getText('quill');
+    const undoManager = new yjs__WEBPACK_IMPORTED_MODULE_0__["UndoManager"](type)
     const editorContainer = document.getElementById('editor-container');
 
     var editor = new quill__WEBPACK_IMPORTED_MODULE_2___default.a(editorContainer, {
@@ -29292,7 +29293,7 @@ window.addEventListener('load', () => {
                     {background: []},
                     {align: []},
                 ],
-                ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block', 'undo', 'redo'],
+                ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block'],
                 [
                     {list: 'ordered'},
                     {list: 'bullet'},
@@ -29312,18 +29313,6 @@ window.addEventListener('load', () => {
         },
         placeholder: 'Start collaborating...',
         theme: 'snow' // or 'bubble'
-    });
-
-    var undoBotton = document.querySelector('.ql-undo');
-    undoBotton.addEventListener('click', function() {
-        if (!editor) return;
-        editor.history.undo();
-    });
-
-    var redoBotton = document.querySelector('.ql-redo');
-    redoBotton.addEventListener('click', function() {
-        if (!editor) return;
-        editor.history.redo();
     });
 
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
@@ -29356,16 +29345,6 @@ const colors = ['aqua', 'black', 'blue', 'fuchsia', 'gray', 'green',
     'lime', 'maroon', 'navy', 'olive', 'orange', 'purple', 'red',
     'silver', 'teal', 'white', 'yellow'];
 
-
-const icons = quill__WEBPACK_IMPORTED_MODULE_2___default.a.import("ui/icons");
-icons["undo"] = `<svg viewbox="0 0 18 18">
-    <polygon class="ql-fill ql-stroke" points="6 10 4 12 2 10 6 10"></polygon>
-    <path class="ql-stroke" d="M8.09,13.91A4.6,4.6,0,0,0,9,14,5,5,0,1,0,4,9"></path>
-  </svg>`;
-icons["redo"] = `<svg viewbox="0 0 18 18">
-    <polygon class="ql-fill ql-stroke" points="12 10 14 12 16 10 12 10"></polygon>
-    <path class="ql-stroke" d="M9.91,13.91A4.6,4.6,0,0,1,9,14a5,5,0,1,1,5-5"></path>
-  </svg>`;
 
 
 /***/ })
