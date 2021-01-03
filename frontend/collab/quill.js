@@ -14,8 +14,9 @@ window.addEventListener('load', () => {
     var name = prompt("Please enter your name");
     console.log(name);
 
-    const contentId = window.location.href.substring(window.location.href.lastIndexOf('/') + 1);
-    fetch("http://localhost:8080/api/public/collab/" + contentId).then(response => {
+    const params = new URLSearchParams(window.location.search);
+    const contentId = params.get('uid');
+    fetch("http://localhost/api/public/collab/" + contentId).then(response => {
         console.log(response.json());
     }).catch(reason => {
             console.log(reason);
