@@ -11,22 +11,6 @@ let userList = {};
 
 Quill.register('modules/cursors', QuillCursors);
 
-window.addEventListener('beforeunload', function (e) {
-    console.log('beforeunload', e);
-    e = e || window.event;
-
-    const msg = 'You may lose it if you leave this page. Please make sure you have a copy of it.';
-    // For IE and Firefox prior to version 4
-    if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.returnValue = msg;
-    }
-
-    // For Safari
-    return msg;
-});
-
 function getCookie(cname) {
     const name = cname + "=";
     const decodedCookie = decodeURIComponent(document.cookie);
@@ -51,6 +35,11 @@ function pad(num, size) {
     num = num.toString();
     while (num.length < size) num = "0" + num;
     return num;
+}
+
+function saveChanges(editor) {
+    console.log(JSON.stringify(editor.getContents()));
+    setTimeout(saveChanges, 60000, editor);
 }
 
 const updateUserList = (map) => {
@@ -125,10 +114,15 @@ window.addEventListener('load', () => {
                 document.title = data['projectItem']['name'];
                 document.getElementById('editor-title').innerText = data['projectItem']['name'];
             }
-            let delta = JSON.parse(data['contents'][0]['text'])['delta'];
+            const content = data['contents'][0];
+            let delta = JSON.parse(content['text'])['delta'];
             delta = new Delta(delta);
             console.log('delta', delta);
             editor.updateContents(delta);
+
+            if (loginCookie && content['id']) {
+                saveChanges(editor);
+            }
         })
         .catch(reason => console.log(reason));
 
@@ -157,6 +151,22 @@ window.addEventListener('load', () => {
 
     // @ts-ignore
     window.example = {provider, ydoc, type, binding, Y}
+    window.addEventListener('beforeunload', function (e) {
+        console.log('beforeunload', e);
+        saveChanges(editor);
+        e = e || window.event;
+
+        const msg = 'You may lose it if you leave this page. Please make sure you have a copy of it.';
+        // For IE and Firefox prior to version 4
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.returnValue = msg;
+        }
+
+        // For Safari
+        return msg;
+    });
 });
 
 const colors = ['aqua', 'black', 'blue', 'fuchsia', 'gray', 'green',
