@@ -1,10 +1,11 @@
 /* eslint-env browser */
 
-import * as Y from 'yjs'
-import {QuillBinding} from 'y-quill'
-import Quill from 'quill'
-import QuillCursors from 'quill-cursors'
-import {WebrtcProvider} from 'y-webrtc'
+import * as Y from 'yjs';
+import {QuillBinding} from 'y-quill';
+import Quill from 'quill';
+import QuillCursors from 'quill-cursors';
+import {WebrtcProvider} from 'y-webrtc';
+const Delta = Quill.import('delta');
 
 let userList = {};
 
@@ -77,15 +78,6 @@ window.addEventListener('load', () => {
 
     const params = new URLSearchParams(window.location.search);
     const contentId = params.has('uid') ? params.get('uid') : pad(Math.floor(Math.random() * 99999999), 8);
-    fetch("/api/public/collab/" + contentId)
-        .then(response => response.json())
-        .then(data => {
-            if (data['projectItem'] && data['projectItem']['name']) {
-                document.title = data['projectItem']['name'];
-                document.getElementById('editor-title').innerText = data['projectItem']['name'];
-            }
-        })
-        .catch(reason => console.log(reason));
 
     const ydoc = new Y.Doc();
     const rtcProviderUrl = 'ws://' + window.location.hostname + ':4444';
@@ -124,6 +116,21 @@ window.addEventListener('load', () => {
         placeholder: 'Start collaborating...',
         theme: 'snow' // or 'bubble'
     });
+
+    fetch("/api/public/collab/" + contentId)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if (data['projectItem'] && data['projectItem']['name']) {
+                document.title = data['projectItem']['name'];
+                document.getElementById('editor-title').innerText = data['projectItem']['name'];
+            }
+            let delta = JSON.parse(data['contents'][0]['text'])['delta'];
+            delta = new Delta(delta);
+            console.log('delta', delta);
+            editor.updateContents(delta);
+        })
+        .catch(reason => console.log(reason));
 
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
     console.log("color:" + randomColor);
