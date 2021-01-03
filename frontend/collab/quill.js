@@ -5,9 +5,13 @@ import {QuillBinding} from 'y-quill';
 import Quill from 'quill';
 import QuillCursors from 'quill-cursors';
 import {WebrtcProvider} from 'y-webrtc';
+
 const Delta = Quill.import('delta');
 
 let userList = {};
+let loginCookie = null;
+let targetContentId = null;
+let projectItem = null;
 
 Quill.register('modules/cursors', QuillCursors);
 
@@ -38,8 +42,24 @@ function pad(num, size) {
 }
 
 function saveChanges(editor) {
-    console.log(JSON.stringify(editor.getContents()));
-    setTimeout(saveChanges, 60000, editor);
+    if (!loginCookie || !targetContentId || !projectItem) {
+        return;
+    }
+    const newContent = JSON.stringify({
+        delta: editor.getContents()
+    });
+    const patchBody = JSON.stringify({
+        text: newContent,
+    });
+    console.log('Saving content', newContent);
+    const url = '/api/' + projectItem['contentType'].toLowerCase() + 's/' + projectItem['id'] + '/contents/' + targetContentId;
+    console.log('Updating ' + url);
+    const headers = {'Content-Type': 'application/json'};
+    fetch(url, {headers: headers, method: 'PATCH', body: patchBody}).then(res => {
+        if (res.ok) {
+            setTimeout(saveChanges, 60000, editor);
+        }
+    })
 }
 
 const updateUserList = (map) => {
@@ -55,7 +75,7 @@ const updateUserList = (map) => {
 
 window.addEventListener('load', () => {
     let defaultName = 'anonymous' + Math.floor(Math.random() * 20);
-    const loginCookie = getCookie('__discourse_proxy');
+    loginCookie = getCookie('__discourse_proxy');
     if (loginCookie) {
         defaultName = decodeURIComponent(loginCookie.split('##')[0]);
     }
@@ -110,19 +130,19 @@ window.addEventListener('load', () => {
         .then(response => response.json())
         .then(data => {
             console.log(data);
-            if (data['projectItem'] && data['projectItem']['name']) {
-                document.title = data['projectItem']['name'];
-                document.getElementById('editor-title').innerText = data['projectItem']['name'];
+            projectItem = data['projectItem'];
+            if (projectItem && projectItem['name']) {
+                document.title = projectItem['name'];
+                document.getElementById('editor-title').innerText = projectItem['name'];
             }
             const content = data['contents'][0];
+            console.log('content', content);
             let delta = JSON.parse(content['text'])['delta'];
             delta = new Delta(delta);
             console.log('delta', delta);
             editor.updateContents(delta);
-
-            if (loginCookie && content['id']) {
-                saveChanges(editor);
-            }
+            targetContentId = content['id'];
+            setTimeout(saveChanges, 60000, editor);
         })
         .catch(reason => console.log(reason));
 
