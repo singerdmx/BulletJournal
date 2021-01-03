@@ -70,7 +70,7 @@ const ShareProjectItemGenerateLink: React.FC<ProjectItemProps> = (props) => {
 
   let generatedLink = `${window.location.origin.toString()}/public/items/${sharedLink}`;
   if (!readOnlyLink) {
-    generatedLink = `${window.location.origin.toString()}/collab/${sharedLink}`;
+    generatedLink = `${window.location.origin.toString()}/collab/?uid=${sharedLink}`;
     if (content && content.id) {
       generatedLink += content.id;
     }
