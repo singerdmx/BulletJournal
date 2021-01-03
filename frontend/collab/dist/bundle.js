@@ -29259,12 +29259,15 @@ window.addEventListener('load', () => {
     if (loginCookie) {
         defaultName = decodeURIComponent(loginCookie.split('##')[0]);
     }
-    const name = prompt("Please enter your name", defaultName);
+    let name = prompt("Please enter your name", defaultName);
+    if (!name) {
+        name = defaultName;
+    }
     console.log(name);
 
     const params = new URLSearchParams(window.location.search);
     const contentId = params.get('uid');
-    fetch("http://localhost/api/public/collab/" + contentId).then(response => {
+    fetch("/api/public/collab/" + contentId).then(response => {
         console.log(response.json());
     }).catch(reason => {
             console.log(reason);

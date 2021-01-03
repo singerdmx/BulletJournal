@@ -43,7 +43,7 @@ window.addEventListener('load', () => {
 
     const params = new URLSearchParams(window.location.search);
     const contentId = params.get('uid');
-    fetch("http://localhost/api/public/collab/" + contentId).then(response => {
+    fetch("/api/public/collab/" + contentId).then(response => {
         console.log(response.json());
     }).catch(reason => {
             console.log(reason);
