@@ -29230,6 +29230,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+var userList = {};
 
 quill__WEBPACK_IMPORTED_MODULE_2___default.a.register('modules/cursors', quill_cursors__WEBPACK_IMPORTED_MODULE_3___default.a);
 
@@ -29276,7 +29277,8 @@ window.addEventListener('load', () => {
 
 
     const ydoc = new yjs__WEBPACK_IMPORTED_MODULE_0__["Doc"]();
-    const provider = new y_webrtc__WEBPACK_IMPORTED_MODULE_4__["WebrtcProvider"]('your-room-name', ydoc, {signaling: ['ws://localhost:4444']});
+    const rtcProviderUrl = 'ws://'+ window.location.hostname + ':4444';
+    const provider = new y_webrtc__WEBPACK_IMPORTED_MODULE_4__["WebrtcProvider"]('your-room-name1', ydoc, {signaling: [rtcProviderUrl]});
     const type = ydoc.getText('quill');
     const editorContainer = document.createElement('div');
     editorContainer.setAttribute('id', 'editor');
@@ -29312,7 +29314,6 @@ window.addEventListener('load', () => {
         theme: 'snow' // or 'bubble'
     });
 
-    const binding = new y_quill__WEBPACK_IMPORTED_MODULE_1__["QuillBinding"](type, editor, provider.awareness);
 
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
     console.log("color:" + randomColor);
@@ -29323,6 +29324,17 @@ window.addEventListener('load', () => {
         color: randomColor
     });
 
+    userList = provider.awareness.getStates();
+    console.log(userList);
+
+    provider.awareness.on('update', ({ added, updated,removed}) => {
+        if(added.length !== 0 || removed.length !== 0 ){
+            userList = provider.awareness.getStates();
+            console.log(userList);
+        }
+    });
+
+    const binding = new y_quill__WEBPACK_IMPORTED_MODULE_1__["QuillBinding"](type, editor, provider.awareness);
 
     // @ts-ignore
     window.example = {provider, ydoc, type, binding, Y: yjs__WEBPACK_IMPORTED_MODULE_0__}

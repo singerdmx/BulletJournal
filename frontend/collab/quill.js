@@ -53,8 +53,8 @@ window.addEventListener('load', () => {
 
 
     const ydoc = new Y.Doc();
-    const provider = new WebrtcProvider('your-room-name1', ydoc, {signaling: ['ws://localhost:4444']});
-    console.log(provider);
+    const rtcProviderUrl = 'ws://'+ window.location.hostname + ':4444';
+    const provider = new WebrtcProvider('your-room-name1', ydoc, {signaling: [rtcProviderUrl]});
     const type = ydoc.getText('quill');
     const editorContainer = document.createElement('div');
     editorContainer.setAttribute('id', 'editor');
