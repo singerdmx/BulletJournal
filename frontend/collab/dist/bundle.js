@@ -29234,6 +29234,22 @@ let userList = {};
 
 quill__WEBPACK_IMPORTED_MODULE_2___default.a.register('modules/cursors', quill_cursors__WEBPACK_IMPORTED_MODULE_3___default.a);
 
+window.addEventListener('beforeunload', function (e) {
+    console.log('beforeunload', e);
+    e = e || window.event;
+
+    const msg = 'You may lose it if you leave this page. Please make sure you have a copy of it.';
+    // For IE and Firefox prior to version 4
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.returnValue = msg;
+    }
+
+    // For Safari
+    return msg;
+});
+
 function getCookie(cname) {
     const name = cname + "=";
     const decodedCookie = decodeURIComponent(document.cookie);
@@ -29299,7 +29315,7 @@ window.addEventListener('load', () => {
     const type = ydoc.getText('quill');
     const editorContainer = document.getElementById('editor-container');
 
-    var editor = new quill__WEBPACK_IMPORTED_MODULE_2___default.a(editorContainer, {
+    const editor = new quill__WEBPACK_IMPORTED_MODULE_2___default.a(editorContainer, {
         modules: {
             cursors: true,
             toolbar: [

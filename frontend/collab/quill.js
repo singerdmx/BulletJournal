@@ -10,6 +10,22 @@ let userList = {};
 
 Quill.register('modules/cursors', QuillCursors);
 
+window.addEventListener('beforeunload', function (e) {
+    console.log('beforeunload', e);
+    e = e || window.event;
+
+    const msg = 'You may lose it if you leave this page. Please make sure you have a copy of it.';
+    // For IE and Firefox prior to version 4
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.returnValue = msg;
+    }
+
+    // For Safari
+    return msg;
+});
+
 function getCookie(cname) {
     const name = cname + "=";
     const decodedCookie = decodeURIComponent(document.cookie);
@@ -75,7 +91,7 @@ window.addEventListener('load', () => {
     const type = ydoc.getText('quill');
     const editorContainer = document.getElementById('editor-container');
 
-    var editor = new Quill(editorContainer, {
+    const editor = new Quill(editorContainer, {
         modules: {
             cursors: true,
             toolbar: [
