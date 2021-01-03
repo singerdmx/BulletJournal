@@ -11,7 +11,7 @@ import * as Emoji from "quill-emoji";
 Quill.register('modules/cursors', QuillCursors);
 
 window.addEventListener('load', () => {
-    var name = prompt("Please enter your name");
+    var name = prompt("Please enter your name", 'unknown');
     console.log(name);
 
     const params = new URLSearchParams(window.location.search);
@@ -49,16 +49,13 @@ window.addEventListener('load', () => {
                     {indent: '+1'},
                 ],
 
-                ['link', 'image', 'emoji'],
+                ['link'],
 
                 ['clean'],
             ],
             history: {
                 userOnly: true
             },
-            "emoji-toolbar": true,
-            "emoji-textarea": true,
-            "emoji-shortname": true,
         },
         placeholder: 'Start collaborating...',
         theme: 'snow' // or 'bubble'

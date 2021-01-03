@@ -29248,7 +29248,7 @@ __webpack_require__.r(__webpack_exports__);
 quill__WEBPACK_IMPORTED_MODULE_2___default.a.register('modules/cursors', quill_cursors__WEBPACK_IMPORTED_MODULE_3___default.a);
 
 window.addEventListener('load', () => {
-    var name = prompt("Please enter your name");
+    var name = prompt("Please enter your name", 'unknown');
     console.log(name);
 
     const params = new URLSearchParams(window.location.search);
@@ -29286,16 +29286,13 @@ window.addEventListener('load', () => {
                     {indent: '+1'},
                 ],
 
-                ['link', 'image', 'emoji'],
+                ['link'],
 
                 ['clean'],
             ],
             history: {
                 userOnly: true
             },
-            "emoji-toolbar": true,
-            "emoji-textarea": true,
-            "emoji-shortname": true,
         },
         placeholder: 'Start collaborating...',
         theme: 'snow' // or 'bubble'
