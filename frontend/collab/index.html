@@ -60,9 +60,9 @@
             .tm-section-title-div {
                 display: flex;
                 align-items: center;
-                width: 88%;
+                width: 80%;
                 float: left;
-                padding: 15px 0 0 10px
+                padding: 0 0 0 10px;
             }
 
             .tm-section-title {
@@ -74,7 +74,7 @@
                 color: cornflowerblue;
                 text-shadow: 2px 2px aquamarine;
                 font-size: 2rem;
-                margin: 0 !important;
+                margin: 2px !important;
             }
 
             .parallax-window {
@@ -283,8 +283,13 @@
                                         Collaborative Real-Time Editor
                                     </span>
                                 </div>
-                                <div style="width: 12%; float: left; padding: 18px">
-                                    <button type="button" class="btn btn-success" style="float: right" id="share-link-button">
+                                <div style="width: 20%; display: flex; padding: 10px; justify-content: flex-end">
+                                    <button type="button" class="btn btn-default" style="margin-right: 3px"
+                                            id="save-button">
+                                        Save
+                                    </button>
+                                    <button type="button" class="btn btn-success"
+                                            id="share-link-button">
                                         Share
                                     </button>
                                 </div>
