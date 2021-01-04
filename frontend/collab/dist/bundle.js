@@ -73941,7 +73941,7 @@ function saveChanges(editor) {
         if (res.ok) {
             setTimeout(saveChanges, 60000, editor);
         }
-    })
+    });
 }
 
 const updateUserList = (map) => {
@@ -73971,7 +73971,7 @@ const registerShareButton = () => {
 const registerSaveButton = (editor) => {
     const saveButton = document.getElementById('save-button');
     saveButton.onclick = () => {
-        if (!targetContentId || !projectItem) {
+        if (!loginCookie || !targetContentId || !projectItem) {
             return;
         }
         const newContent = JSON.stringify({
@@ -73985,7 +73985,8 @@ const registerSaveButton = (editor) => {
         });
         console.log('Saving content', newContent);
         const headers = {'Content-Type': 'application/json'};
-        fetch("/api/public/collab/" + uid);
+        fetch("/api/public/collab/" + uid, {headers: headers, method: 'PUT', body: putBody})
+            .then(res => console.log(res));
     }
 };
 
@@ -74063,7 +74064,7 @@ window.addEventListener('load', () => {
             console.log('delta', delta);
             editor.updateContents(delta);
             targetContentId = content['id'];
-            if (!targetContentId || !projectItem) {
+            if (!loginCookie || !targetContentId || !projectItem) {
                 document.getElementById('save-button').style.display = "none";
             }
             setTimeout(saveChanges, 60000, editor);
