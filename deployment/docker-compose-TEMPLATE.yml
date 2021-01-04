@@ -14,6 +14,12 @@ services:
     depends_on:
       - frontend
 
+  collab:
+    image: mwangxx/bulletjournal-collab:BULLETJOURNAL_VERSION
+    container_name: collab
+    ports:
+    - "4444:4444"
+
   frontend:
     image: mwangxx/bulletjournal-frontend:BULLETJOURNAL_VERSION
     container_name: react_app
