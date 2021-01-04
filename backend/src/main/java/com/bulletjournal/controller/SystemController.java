@@ -1,6 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.authz.AuthorizationService;
+import com.bulletjournal.authz.Operation;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
@@ -15,7 +16,6 @@ import com.bulletjournal.redis.models.Etag;
 import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.factory.ProjectItemDaos;
-import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.util.DeltaContent;
 import com.bulletjournal.util.StringUtil;
@@ -329,8 +329,6 @@ public class SystemController {
         return ResponseEntity.ok().headers(responseHeaders).build();
     }
 
-    private static final String DEFAULT_COLLAB_SAVER = "BulletJournal";
-
     @PutMapping(COLLAB_ITEM_ROUTE)
     public void saveCollabItem(@NotNull @PathVariable String itemId,
                                @NotNull @Valid @RequestBody SaveCollabItemParams saveCollabItemParams) {
@@ -346,24 +344,29 @@ public class SystemController {
             try {
                 User user = this.userClient.getUser(requester);
                 requester = user.getName();
+                this.authorizationService.checkAuthorizedToOperateOnContent(
+                        item.getOwner(), requester, ContentType.CONTENT,
+                        Operation.UPDATE, saveCollabItemParams.getContentId(), item.getProject().getOwner());
             } catch (ResourceNotFoundException ex) {
                 LOGGER.info("{} not found", requester);
-                requester = DEFAULT_COLLAB_SAVER;
+                requester = null;
+            } catch (UnAuthorizedException ex) {
+                LOGGER.info("{} unauthorized to update content {}", requester, saveCollabItemParams.getContentId());
+                requester = null;
             }
         } else {
-            requester = DEFAULT_COLLAB_SAVER;
+            requester = null;
+        }
+
+        if (requester == null) {
+            throw new UnAuthorizedException("No permission to write");
         }
 
         ProjectItemDaoJpa projectItemDaoJpa = this.projectItemDaos.getDaos()
                 .get(ProjectType.fromContentType(saveCollabItemParams.getContentType()));
 
-        ContentModel content = projectItemDaoJpa
-                .getContent(saveCollabItemParams.getContentId(), AuthorizationService.SUPER_USER);
-
-        // by pass permission check
-        projectItemDaoJpa.updateContent(requester,
-                        new UpdateContentParams(saveCollabItemParams.getText()),
-                        item, content, content.getText());
+        projectItemDaoJpa.updateContent(saveCollabItemParams.getContentId(), saveCollabItemParams.getItemId(), requester,
+                new UpdateContentParams(saveCollabItemParams.getText()), Optional.empty());
     }
 
     @GetMapping(COLLAB_ITEM_ROUTE)

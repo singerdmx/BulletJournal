@@ -250,8 +250,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         return updateContent(requester, updateContentParams, projectItem, content, oldText);
     }
 
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public <T extends ProjectItemModel> Pair<K, T> updateContent(
+    private <T extends ProjectItemModel> Pair<K, T> updateContent(
             String requester, UpdateContentParams updateContentParams,
             T projectItem, K content, String oldText) {
 
