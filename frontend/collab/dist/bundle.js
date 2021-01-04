@@ -74048,28 +74048,6 @@ window.addEventListener('load', () => {
     });
 
     registerSaveButton(editor);
-    fetch("/api/public/collab/" + uid)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            projectItem = data['projectItem'];
-            if (projectItem && projectItem['name']) {
-                document.title = projectItem['name'];
-                document.getElementById('editor-title').innerText = projectItem['name'];
-            }
-            const content = data['contents'][0];
-            console.log('content', content);
-            let delta = JSON.parse(content['text'])['delta'];
-            delta = new Delta(delta);
-            console.log('delta', delta);
-            editor.setContents(delta);
-            targetContentId = content['id'];
-            if (!loginCookie || !targetContentId || !projectItem) {
-                document.getElementById('save-button').style.display = "none";
-            }
-            setTimeout(saveChanges, 60000, editor);
-        })
-        .catch(reason => console.log(reason));
 
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
     console.log("color:" + randomColor);
@@ -74091,6 +74069,35 @@ window.addEventListener('load', () => {
             updateUserList(userList);
         }
     });
+
+    fetch("/api/public/collab/" + uid)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            projectItem = data['projectItem'];
+            if (projectItem && projectItem['name']) {
+                document.title = projectItem['name'];
+                document.getElementById('editor-title').innerText = projectItem['name'];
+            }
+            const content = data['contents'][0];
+            console.log('content', content);
+            let delta = JSON.parse(content['text'])['delta'];
+            delta = new Delta(delta);
+            console.log('delta', delta);
+            console.log('userList', userList);
+            console.log('userList size', userList.size);
+            if (userList.size === 1) {
+                // first user needs to initialize the doc
+                console.log('setContents');
+                editor.setContents(delta);
+            }
+            targetContentId = content['id'];
+            if (!loginCookie || !targetContentId || !projectItem) {
+                document.getElementById('save-button').style.display = "none";
+            }
+            setTimeout(saveChanges, 60000, editor);
+        })
+        .catch(reason => console.log(reason));
 
     const binding = new y_quill__WEBPACK_IMPORTED_MODULE_1__["QuillBinding"](type, editor, provider.awareness);
 
