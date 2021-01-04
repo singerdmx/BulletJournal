@@ -1,10 +1,23 @@
 version: '2.1'
 services:
   collab:
-    image: mwangxx/collab:1
+    image: mwangxx/bulletjournal-collab:1.1.1
     container_name: collab
     ports:
-    - "127.0.0.1:4444:4444"
+    - "4444:4444"
+
+  controller:
+    image: mwangxx/bulletjournal-backend:1.1.202012292058
+    container_name: springboot_app
+    ports:
+      - "8080:8080"
+    environment:
+      spring_profiles_active: dev
+    volumes:
+      - $HOME/docker/volumes/log:/var/log
+    depends_on:
+      database:
+        condition: service_healthy
 
   cache:
     image: redis
