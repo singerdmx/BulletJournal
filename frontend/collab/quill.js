@@ -184,7 +184,7 @@ window.addEventListener('load', () => {
             let delta = JSON.parse(content['text'])['delta'];
             delta = new Delta(delta);
             console.log('delta', delta);
-            editor.updateContents(delta);
+            editor.setContents(delta);
             targetContentId = content['id'];
             if (!loginCookie || !targetContentId || !projectItem) {
                 document.getElementById('save-button').style.display = "none";
