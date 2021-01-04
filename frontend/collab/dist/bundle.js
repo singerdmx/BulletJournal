@@ -74020,7 +74020,7 @@ window.addEventListener('load', () => {
 
     const ydoc = new yjs__WEBPACK_IMPORTED_MODULE_0__["Doc"]();
     ydocClientID = ydoc.clientID;
-    const rtcProviderUrl = 'ws://' + window.location.hostname + ':4444';
+    const rtcProviderUrl = window.location.host === 'localhost' ? 'ws' : 'wss' + '://' + window.location.hostname + ':4444';
     const provider = new y_webrtc__WEBPACK_IMPORTED_MODULE_4__["WebrtcProvider"](uid, ydoc, {signaling: [rtcProviderUrl]});
     console.log("uid", uid);
     console.log("provider", provider);
