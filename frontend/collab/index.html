@@ -57,11 +57,19 @@
                 border-radius: 20px;
             }
 
+            .tm-section-title-div {
+                display: flex;
+                align-items: center;
+            }
+
             .tm-section-title {
-                font-size: 2rem;
-                padding-left: 6px;
+                flex: 1;
+                overflow: hidden;
+                text-overflow: clip;
+                white-space: nowrap;
                 color: cornflowerblue;
                 text-shadow: 2px 2px aquamarine;
+                font-size: 2rem;
             }
 
             .parallax-window {
@@ -265,13 +273,15 @@
                     <div class="tm-section-wrap">
                         <section id="intro" class="tm-section">
                             <div class="tm-bg-white-transparent tm-intro">
-                                <div style="width: 88%; float: left; padding: 10px">
+                                <div class="tm-section-title-div" style="width: 88%; float: left; padding: 12px 0 0 10px">
                                     <span class="tm-section-title mb-5 tm-color-primary" id="editor-title">
                                         Collaborative Real-Time Editor
                                     </span>
                                 </div>
                                 <div style="width: 12%; float: left; padding: 18px">
-                                    <button type="button" class="btn btn-success" style="float: right">Share</button>
+                                    <button type="button" class="btn btn-success" style="float: right" id="share-link-button">
+                                        Share
+                                    </button>
                                 </div>
                                 <div id="editor-container">
                                 </div>
