@@ -73893,6 +73893,7 @@ let loginCookie = null;
 let targetContentId = null;
 let projectItem = null;
 let uid = null;
+let ydocClientID = null;
 
 quill__WEBPACK_IMPORTED_MODULE_2___default.a.register('modules/cursors', quill_cursors__WEBPACK_IMPORTED_MODULE_3___default.a);
 highlight_js__WEBPACK_IMPORTED_MODULE_5___default.a.initHighlightingOnLoad();
@@ -73947,12 +73948,23 @@ function saveChanges(editor) {
 const updateUserList = (map) => {
     const userListDiv = document.getElementById('userList');
     userListDiv.innerHTML = "";
-    map.forEach((values) => {
-        let span = document.createElement("SPAN");
-        span.innerText = values.user.name + " ";
-        span.setAttribute("style", "color:" + values.user.color);
-        userListDiv.appendChild(span);
-    });
+
+    function addToUserListDiv(value) {
+        const div = document.createElement('DIV');
+        const span = document.createElement("SPAN");
+        span.innerText = value.user.name;
+        span.setAttribute("style", "color:" + value.user.color);
+        div.appendChild(span);
+        userListDiv.appendChild(div);
+    }
+
+    addToUserListDiv(map.get(ydocClientID));
+
+    for (const [key, value] of map.entries()) {
+        if (key !== ydocClientID) {
+            addToUserListDiv(value);
+        }
+    }
 };
 
 const registerShareButton = () => {
@@ -74007,6 +74019,7 @@ window.addEventListener('load', () => {
     registerShareButton();
 
     const ydoc = new yjs__WEBPACK_IMPORTED_MODULE_0__["Doc"]();
+    ydocClientID = ydoc.clientID;
     const rtcProviderUrl = 'ws://' + window.location.hostname + ':4444';
     const provider = new y_webrtc__WEBPACK_IMPORTED_MODULE_4__["WebrtcProvider"](uid, ydoc, {signaling: [rtcProviderUrl]});
     console.log("uid", uid);
@@ -74112,7 +74125,7 @@ window.addEventListener('load', () => {
 const colors = ['aqua', 'black', 'blue', 'fuchsia', 'gray', 'green',
     'maroon', 'navy', 'olive', 'orange', 'purple', 'red', 'yellow',
     'silver', 'teal', 'magenta', 'volcano',
-    'gold', 'lime', 'cyan', 'geekblue'];
+    'gold', 'lime', 'cyan', 'geekblue', 'darkblue', 'darkred', 'darkgreen', 'darkorange', 'darkgray'];
 
 
 
