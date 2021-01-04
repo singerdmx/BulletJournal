@@ -1019,7 +1019,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     @Override
-    TaskContent newContent(String text) {
+    public TaskContent newContent(String text) {
         return new TaskContent(text);
     }
 

@@ -346,7 +346,7 @@ public class SystemController {
                 requester = user.getName();
                 this.authorizationService.checkAuthorizedToOperateOnContent(
                         item.getOwner(), requester, ContentType.CONTENT,
-                        Operation.UPDATE, saveCollabItemParams.getContentId(), item.getProject().getOwner());
+                        Operation.UPDATE, saveCollabItemParams.getContentId(), item.getProject().getOwner(), item);
             } catch (ResourceNotFoundException ex) {
                 LOGGER.info("{} not found", requester);
                 requester = null;
@@ -394,12 +394,17 @@ public class SystemController {
         }
 
         publicProjectItem = getPublicProjectItem(item);
-        Content content = null;
+        Content content;
         if (itemId.length() == StringUtil.UUID_LENGTH) {
-            if (!publicProjectItem.getContents().isEmpty()) {
-                // use first content if there is any
-                content = publicProjectItem.getContents().get(0);
+            if (publicProjectItem.getContents().isEmpty()) {
+                ProjectItemDaoJpa projectItemDaoJpa = this.projectItemDaos.getDaos()
+                        .get(ProjectType.fromContentType(item.getContentType()));
+                projectItemDaoJpa.addContent(
+                        item.getId(), item.getOwner(), projectItemDaoJpa.newContent(DeltaContent.EMPTY_CONTENT));
+                publicProjectItem = getPublicProjectItem(item);
             }
+            // use first content if there is any
+            content = publicProjectItem.getContents().get(0);
         } else {
             long contentId = Long.parseLong(itemId.substring(StringUtil.UUID_LENGTH));
             content = publicProjectItem.getContents().stream().filter(c -> contentId == c.getId().longValue())

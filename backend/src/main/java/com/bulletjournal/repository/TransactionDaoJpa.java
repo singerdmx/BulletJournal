@@ -296,7 +296,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     }
 
     @Override
-    TransactionContent newContent(String text) {
+    public TransactionContent newContent(String text) {
         return new TransactionContent(text);
     }
 

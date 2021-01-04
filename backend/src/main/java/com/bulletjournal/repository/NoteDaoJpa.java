@@ -259,7 +259,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     }
 
     @Override
-    NoteContent newContent(String text) {
+    public NoteContent newContent(String text) {
         return new NoteContent(text);
     }
 
