@@ -1,7 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.authz.AuthorizationService;
-import com.bulletjournal.clients.GoogleMapsClient;
+import com.bulletjournal.authz.Operation;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
@@ -53,6 +53,9 @@ public class SystemController {
     private static final Logger LOGGER = LoggerFactory.getLogger(SystemController.class);
 
     @Autowired
+    private AuthorizationService authorizationService;
+
+    @Autowired
     private ProjectDaoJpa projectDaoJpa;
 
     @Autowired
@@ -93,9 +96,6 @@ public class SystemController {
 
     @Autowired
     private Reminder reminder;
-
-    @Autowired
-    private GoogleMapsClient googleMapsClient;
 
     @GetMapping(UPDATES_ROUTE)
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -214,8 +214,7 @@ public class SystemController {
     public ResponseEntity<?> getPublicProjectItem(
             @NotNull @PathVariable String itemId) {
         String originalUser = MDC.get(UserClient.USER_NAME_KEY);
-        String username = AuthorizationService.SUPER_USER;
-        MDC.put(UserClient.USER_NAME_KEY, username);
+        MDC.put(UserClient.USER_NAME_KEY, AuthorizationService.SUPER_USER);
 
         ProjectItemModel item;
         if (!isUUID(itemId)) {
@@ -322,6 +321,35 @@ public class SystemController {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setLocation(new URI(topicUrl));
         return ResponseEntity.ok().headers(responseHeaders).build();
+    }
+
+    @PutMapping(COLLAB_ITEM_ROUTE)
+    public void saveCollabItem(@NotNull @Valid @RequestBody SaveCollabItemParams saveCollabItemParams) {
+        if (saveCollabItemParams.getUuid().length() < StringUtil.UUID_LENGTH) {
+            throw new IllegalArgumentException("Invalid UUID " + saveCollabItemParams.getUuid());
+        }
+        String uuid = saveCollabItemParams.getUuid().substring(0, StringUtil.UUID_LENGTH);
+        String originalUser = MDC.get(UserClient.USER_NAME_KEY);
+        MDC.put(UserClient.USER_NAME_KEY, AuthorizationService.SUPER_USER);
+        ProjectItemModel item = this.publicProjectItemDaoJpa.getPublicItem(uuid);
+        String requester = originalUser;
+        if (StringUtils.isNotBlank(requester)) {
+            try {
+                this.authorizationService.checkAuthorizedToOperateOnContent(
+                        item.getOwner(), requester, ContentType.CONTENT,
+                        Operation.UPDATE, saveCollabItemParams.getContentId(), item.getProject().getOwner());
+            } catch (UnAuthorizedException ex) {
+                LOGGER.info("{} unauthorized to update content {}", requester, saveCollabItemParams.getContentId());
+                requester = AuthorizationService.ADMIN;
+            }
+        } else {
+            requester = AuthorizationService.ADMIN;
+        }
+
+        this.projectItemDaos.getDaos()
+                .get(ProjectType.fromContentType(saveCollabItemParams.getContentType()))
+                .updateContent(saveCollabItemParams.getContentId(), saveCollabItemParams.getItemId(), requester,
+                        new UpdateContentParams(saveCollabItemParams.getText()), Optional.empty());
     }
 
     @GetMapping(COLLAB_ITEM_ROUTE)

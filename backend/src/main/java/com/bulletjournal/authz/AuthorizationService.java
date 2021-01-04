@@ -23,7 +23,9 @@ public class AuthorizationService {
 
     public static String SUPER_USER = UUID.randomUUID().toString();
 
-    public static Set<String> ADMINS = ImmutableSet.of(SUPER_USER);
+    public static String ADMIN = "BulletJournal";
+
+    public static Set<String> ADMINS = ImmutableSet.of(SUPER_USER, ADMIN);
 
     @Autowired
     @Lazy
@@ -54,6 +56,10 @@ public class AuthorizationService {
             String owner, String requester, ContentType contentType,
             Operation operation, Long contentId, Object... other)
             throws UnAuthorizedException {
+        if (ADMINS.contains(requester)) {
+            return;
+        }
+
         switch (contentType) {
             case PROJECT:
                 checkAuthorizedToOperateOnProject(owner, requester, operation, contentId);

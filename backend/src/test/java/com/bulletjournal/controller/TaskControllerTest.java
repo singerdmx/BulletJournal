@@ -1,6 +1,5 @@
 package com.bulletjournal.controller;
 
-
 import com.bulletjournal.config.ContentRevisionConfig;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.TestHelpers;
@@ -26,11 +25,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.transaction.Transactional;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -196,10 +192,8 @@ public class TaskControllerTest {
         completedTasks = Arrays.asList(completedTasksResponse.getBody());
         assertEquals(4, completedTasks.size());
 
-        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-        Date date = new Date(currentTime.getTime());
-        String today = new SimpleDateFormat("yyyy-MM-dd").format(date);
-        TaskStatistics taskStatistics = getTaskStatistics(Arrays.asList(p1.getId()), TIMEZONE, today, "2022-02-26");
+        TaskStatistics taskStatistics = getTaskStatistics(
+                Arrays.asList(p1.getId()), TIMEZONE, "2020-01-26", "2092-02-26");
         assertEquals(4, taskStatistics.getCompleted());
         assertEquals(1, taskStatistics.getUncompleted());
         assertEquals(users.size(), taskStatistics.getUserTaskStatistics().size());
