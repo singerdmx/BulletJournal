@@ -103,7 +103,7 @@ const ShareProjectItemGenerateLink: React.FC<ProjectItemProps> = (props) => {
                 .catch((info) => console.log(info))
             }
           >
-            Read Only
+            View Only
           </Button>
         </Form.Item>
         <Form.Item>
