@@ -73892,6 +73892,7 @@ let userList = {};
 let loginCookie = null;
 let targetContentId = null;
 let projectItem = null;
+let uid = null;
 
 quill__WEBPACK_IMPORTED_MODULE_2___default.a.register('modules/cursors', quill_cursors__WEBPACK_IMPORTED_MODULE_3___default.a);
 highlight_js__WEBPACK_IMPORTED_MODULE_5___default.a.initHighlightingOnLoad();
@@ -73954,6 +73955,19 @@ const updateUserList = (map) => {
     });
 };
 
+const registerShareButton = () =>{
+    const shareButton = document.getElementById('share-link-button');
+    shareButton.onclick = () => {
+        const url = window.location.hostname + "/collab/?uid=" + uid;
+        navigator.clipboard.writeText(url).then(function() {
+            console.log('Async: Copying to clipboard was successful!');
+            alert("Sharable Link Copied to clipboard");
+        }, function(err) {
+            console.error('Async: Could not copy text: ', err);
+        });
+    }
+};
+
 window.addEventListener('load', () => {
     let defaultName = 'anonymous' + Math.floor(Math.random() * 20);
     loginCookie = getCookie('__discourse_proxy');
@@ -73967,11 +73981,16 @@ window.addEventListener('load', () => {
     console.log(name);
 
     const params = new URLSearchParams(window.location.search);
-    const contentId = params.has('uid') ? params.get('uid') : pad(Math.floor(Math.random() * 99999999), 8);
+    uid = params.has('uid') ? params.get('uid') : pad(Math.floor(Math.random() * 99999999), 8);
+    registerShareButton();
 
     const ydoc = new yjs__WEBPACK_IMPORTED_MODULE_0__["Doc"]();
     const rtcProviderUrl = 'ws://' + window.location.hostname + ':4444';
-    const provider = new y_webrtc__WEBPACK_IMPORTED_MODULE_4__["WebrtcProvider"]('your-room-name1', ydoc, {signaling: [rtcProviderUrl]});
+    const provider = new y_webrtc__WEBPACK_IMPORTED_MODULE_4__["WebrtcProvider"](uid, ydoc, {signaling: [rtcProviderUrl]});
+    console.log("uid");
+    console.log(uid);
+    console.log("provider");
+    console.log(provider);
     const type = ydoc.getText('quill');
     const editorContainer = document.getElementById('editor-container');
 
@@ -74008,7 +74027,7 @@ window.addEventListener('load', () => {
         theme: 'snow' // or 'bubble'
     });
 
-    fetch("/api/public/collab/" + contentId)
+    fetch("/api/public/collab/" + uid)
         .then(response => response.json())
         .then(data => {
             console.log(data);
