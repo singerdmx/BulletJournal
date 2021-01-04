@@ -77,16 +77,37 @@ const updateUserList = (map) => {
     });
 };
 
-const registerShareButton = () =>{
+const registerShareButton = () => {
     const shareButton = document.getElementById('share-link-button');
     shareButton.onclick = () => {
         const url = window.location.hostname + "/collab/?uid=" + uid;
-        navigator.clipboard.writeText(url).then(function() {
+        navigator.clipboard.writeText(url).then(function () {
             console.log('Async: Copying to clipboard was successful!');
-            alert("Sharable Link Copied to clipboard");
-        }, function(err) {
+            alert("Link Copied to clipboard: " + url);
+        }, function (err) {
             console.error('Async: Could not copy text: ', err);
         });
+    }
+};
+
+const registerSaveButton = (editor) => {
+    const saveButton = document.getElementById('save-button');
+    saveButton.onclick = () => {
+        if (!targetContentId || !projectItem) {
+            return;
+        }
+        const newContent = JSON.stringify({
+            text: editor.getContents()
+        });
+        const putBody = JSON.stringify({
+            text: newContent,
+            contentType: projectItem['contentType'],
+            itemId: projectItem['id'],
+            contentId: targetContentId,
+        });
+        console.log('Saving content', newContent);
+        const headers = {'Content-Type': 'application/json'};
+        fetch("/api/public/collab/" + uid);
     }
 };
 
@@ -109,10 +130,8 @@ window.addEventListener('load', () => {
     const ydoc = new Y.Doc();
     const rtcProviderUrl = 'ws://' + window.location.hostname + ':4444';
     const provider = new WebrtcProvider(uid, ydoc, {signaling: [rtcProviderUrl]});
-    console.log("uid");
-    console.log(uid);
-    console.log("provider");
-    console.log(provider);
+    console.log("uid", uid);
+    console.log("provider", provider);
     const type = ydoc.getText('quill');
     const editorContainer = document.getElementById('editor-container');
 
@@ -149,6 +168,7 @@ window.addEventListener('load', () => {
         theme: 'snow' // or 'bubble'
     });
 
+    registerSaveButton(editor);
     fetch("/api/public/collab/" + uid)
         .then(response => response.json())
         .then(data => {
@@ -165,6 +185,9 @@ window.addEventListener('load', () => {
             console.log('delta', delta);
             editor.updateContents(delta);
             targetContentId = content['id'];
+            if (!targetContentId || !projectItem) {
+                document.getElementById('save-button').style.display = "none";
+            }
             setTimeout(saveChanges, 60000, editor);
         })
         .catch(reason => console.log(reason));
@@ -197,18 +220,6 @@ window.addEventListener('load', () => {
     window.addEventListener('beforeunload', function (e) {
         console.log('beforeunload', e);
         saveChanges(editor);
-        e = e || window.event;
-
-        const msg = 'You may lose it if you leave this page. Please make sure you have a copy of it.';
-        // For IE and Firefox prior to version 4
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            e.returnValue = msg;
-        }
-
-        // For Safari
-        return msg;
     });
 });
 

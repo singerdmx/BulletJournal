@@ -14,16 +14,6 @@ public class SaveCollabItemParams {
     private Long contentId;
     @NotBlank
     private String text;
-    @NotBlank
-    private String uuid;
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
 
     public ContentType getContentType() {
         return contentType;

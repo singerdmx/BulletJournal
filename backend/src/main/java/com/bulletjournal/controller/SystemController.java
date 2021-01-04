@@ -332,11 +332,12 @@ public class SystemController {
     private static final String DEFAULT_COLLAB_SAVER = "BulletJournal";
 
     @PutMapping(COLLAB_ITEM_ROUTE)
-    public void saveCollabItem(@NotNull @Valid @RequestBody SaveCollabItemParams saveCollabItemParams) {
-        if (saveCollabItemParams.getUuid().length() < StringUtil.UUID_LENGTH) {
-            throw new IllegalArgumentException("Invalid UUID " + saveCollabItemParams.getUuid());
+    public void saveCollabItem(@NotNull @PathVariable String itemId,
+                               @NotNull @Valid @RequestBody SaveCollabItemParams saveCollabItemParams) {
+        if (itemId.length() < StringUtil.UUID_LENGTH) {
+            throw new IllegalArgumentException("Invalid UUID " + itemId);
         }
-        String uuid = saveCollabItemParams.getUuid().substring(0, StringUtil.UUID_LENGTH);
+        String uuid = itemId.substring(0, StringUtil.UUID_LENGTH);
         String originalUser = MDC.get(UserClient.USER_NAME_KEY);
         MDC.put(UserClient.USER_NAME_KEY, AuthorizationService.SUPER_USER);
         ProjectItemModel item = this.publicProjectItemDaoJpa.getPublicItem(uuid);
@@ -384,7 +385,7 @@ public class SystemController {
         }
 
         PublicProjectItem publicProjectItem;
-        if (itemId.length() == StringUtil.UUID_LENGTH && item == null) { // brand new page
+        if (item == null) { // brand new page
             publicProjectItem = createEmptyPublicProjectItem();
             return ResponseEntity.ok().body(publicProjectItem);
         }
