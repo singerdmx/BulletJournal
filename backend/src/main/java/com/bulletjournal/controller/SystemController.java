@@ -1,7 +1,6 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.authz.AuthorizationService;
-import com.bulletjournal.authz.Operation;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
@@ -16,6 +15,7 @@ import com.bulletjournal.redis.models.Etag;
 import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.factory.ProjectItemDaos;
+import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.util.DeltaContent;
 import com.bulletjournal.util.StringUtil;
@@ -84,6 +84,9 @@ public class SystemController {
 
     @Autowired
     private TaskController taskController;
+
+    @Autowired
+    private TransactionController transactionController;
 
     @Autowired
     private UserClient userClient;
@@ -256,6 +259,9 @@ public class SystemController {
                 projectItem = this.taskController.getTask(item.getId());
                 contents = this.taskController.getContents(item.getId());
                 break;
+            case TRANSACTION:
+                projectItem = this.transactionController.getTransaction(item.getId());
+                contents = this.transactionController.getContents(item.getId());
             default:
                 throw new IllegalArgumentException();
         }
@@ -323,6 +329,8 @@ public class SystemController {
         return ResponseEntity.ok().headers(responseHeaders).build();
     }
 
+    private static final String DEFAULT_COLLAB_SAVER = "BulletJournal";
+
     @PutMapping(COLLAB_ITEM_ROUTE)
     public void saveCollabItem(@NotNull @Valid @RequestBody SaveCollabItemParams saveCollabItemParams) {
         if (saveCollabItemParams.getUuid().length() < StringUtil.UUID_LENGTH) {
@@ -335,21 +343,26 @@ public class SystemController {
         String requester = originalUser;
         if (StringUtils.isNotBlank(requester)) {
             try {
-                this.authorizationService.checkAuthorizedToOperateOnContent(
-                        item.getOwner(), requester, ContentType.CONTENT,
-                        Operation.UPDATE, saveCollabItemParams.getContentId(), item.getProject().getOwner());
-            } catch (UnAuthorizedException ex) {
-                LOGGER.info("{} unauthorized to update content {}", requester, saveCollabItemParams.getContentId());
-                requester = AuthorizationService.ADMIN;
+                User user = this.userClient.getUser(requester);
+                requester = user.getName();
+            } catch (ResourceNotFoundException ex) {
+                LOGGER.info("{} not found", requester);
+                requester = DEFAULT_COLLAB_SAVER;
             }
         } else {
-            requester = AuthorizationService.ADMIN;
+            requester = DEFAULT_COLLAB_SAVER;
         }
 
-        this.projectItemDaos.getDaos()
-                .get(ProjectType.fromContentType(saveCollabItemParams.getContentType()))
-                .updateContent(saveCollabItemParams.getContentId(), saveCollabItemParams.getItemId(), requester,
-                        new UpdateContentParams(saveCollabItemParams.getText()), Optional.empty());
+        ProjectItemDaoJpa projectItemDaoJpa = this.projectItemDaos.getDaos()
+                .get(ProjectType.fromContentType(saveCollabItemParams.getContentType()));
+
+        ContentModel content = projectItemDaoJpa
+                .getContent(saveCollabItemParams.getContentId(), AuthorizationService.SUPER_USER);
+
+        // by pass permission check
+        projectItemDaoJpa.updateContent(requester,
+                        new UpdateContentParams(saveCollabItemParams.getText()),
+                        item, content, content.getText());
     }
 
     @GetMapping(COLLAB_ITEM_ROUTE)

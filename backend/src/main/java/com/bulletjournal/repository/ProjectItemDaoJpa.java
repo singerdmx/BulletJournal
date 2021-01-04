@@ -235,7 +235,6 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         this.authorizationService.checkAuthorizedToOperateOnContent(content.getOwner(), requester, ContentType.CONTENT,
                 Operation.UPDATE, content.getId(), projectItem.getOwner(), projectItem.getProject().getOwner(),
                 projectItem);
-        String diff = updateContentParams.getDiff();
 
         String oldText = content.getText();
 
@@ -248,7 +247,15 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
                         projectItemId, requester, this.newContent(updateContentParams.getText()));
             }
         }
+        return updateContent(requester, updateContentParams, projectItem, content, oldText);
+    }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public <T extends ProjectItemModel> Pair<K, T> updateContent(
+            String requester, UpdateContentParams updateContentParams,
+            T projectItem, K content, String oldText) {
+
+        String diff = updateContentParams.getDiff();
         if (diff == null) {
             // from new mobile version
             LOGGER.info("from new mobile version " + updateContentParams.getText());

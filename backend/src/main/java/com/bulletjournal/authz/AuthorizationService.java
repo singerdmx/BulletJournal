@@ -23,9 +23,7 @@ public class AuthorizationService {
 
     public static String SUPER_USER = UUID.randomUUID().toString();
 
-    public static String ADMIN = "BulletJournal";
-
-    public static Set<String> ADMINS = ImmutableSet.of(SUPER_USER, ADMIN);
+    public static Set<String> ADMINS = ImmutableSet.of(SUPER_USER);
 
     @Autowired
     @Lazy
