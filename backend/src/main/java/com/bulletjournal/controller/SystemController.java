@@ -346,7 +346,8 @@ public class SystemController {
                 requester = user.getName();
                 this.authorizationService.checkAuthorizedToOperateOnContent(
                         item.getOwner(), requester, ContentType.CONTENT,
-                        Operation.UPDATE, saveCollabItemParams.getContentId(), item.getProject().getOwner(), item);
+                        Operation.UPDATE, saveCollabItemParams.getContentId(),
+                        item.getOwner(), item.getProject().getOwner(), item);
             } catch (ResourceNotFoundException ex) {
                 LOGGER.info("{} not found", requester);
                 requester = null;
