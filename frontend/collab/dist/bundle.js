@@ -74109,6 +74109,9 @@ window.addEventListener('load', () => {
                 document.getElementById('save-button').style.display = "none";
             }
             setTimeout(saveChanges, 60000, editor);
+            const adsbygoogle = window.adsbygoogle || [];
+            console.log('adsbygoogle', adsbygoogle);
+            adsbygoogle.push({});
         })
         .catch(reason => console.log(reason));
 
