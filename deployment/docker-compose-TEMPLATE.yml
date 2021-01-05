@@ -15,7 +15,7 @@ services:
       - frontend
 
   collab:
-    image: mwangxx/bulletjournal-collab:BULLETJOURNAL_VERSION
+    image: mwangxx/bulletjournal-collab:1.1.202101041234
     container_name: collab
     ports:
     - "4444:4444"
