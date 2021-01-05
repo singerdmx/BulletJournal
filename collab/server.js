@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 const ws = require('ws')
-const http = require('http')
+const https = require('https');
+const fs = require('fs');
 const map = require('lib0/dist/map.cjs')
 
 const wsReadyStateConnecting = 0
@@ -12,10 +13,16 @@ const wsReadyStateClosed = 3 // eslint-disable-line
 const pingTimeout = 30000
 
 const port = process.env.PORT || 4444
+
+const options = {
+  key: fs.readFileSync('/home/node/app/bulletjournal.us.key'),
+  cert: fs.readFileSync('/home/node/app/bulletjournal.us.cert')
+};
+
 // @ts-ignore
 const wss = new ws.Server({ noServer: true })
 
-const server = http.createServer((request, response) => {
+const server = https.createServer(options,(request, response) => {
   response.writeHead(200, { 'Content-Type': 'text/plain' })
   response.end('okay')
 })
