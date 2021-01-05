@@ -77,10 +77,6 @@ build_images() {
     mkdir -p ./proto_gen/github.com/singerdmx/BulletJournal
     cp -R ../protobuf ./proto_gen/github.com/singerdmx/BulletJournal/
     /usr/local/bin/docker build -t $DOCKERHUB_NAME/bulletjournal-daemon:$VERSION .
-
-    # collab
-    cd $ROOTBULLETJOURNAL/collab
-    /usr/local/bin/docker build -t $DOCKERHUB_NAME/bulletjournal-collab:$VERSION .
 }
 
 push_images() {
@@ -92,7 +88,6 @@ push_images() {
     /usr/local/bin/docker push $DOCKERHUB_NAME/bulletjournal-frontend:$VERSION
     /usr/local/bin/docker push $DOCKERHUB_NAME/bulletjournal-backend:$VERSION
     /usr/local/bin/docker push $DOCKERHUB_NAME/bulletjournal-daemon:$VERSION
-    /usr/local/bin/docker push $DOCKERHUB_NAME/bulletjournal-collab:$VERSION
     echo "!!!!!!!! push image !!!!!!!!!!!!!"
 }
 
