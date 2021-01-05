@@ -1,44 +1,23 @@
 package com.bulletjournal.controller.models;
 
-import com.bulletjournal.repository.models.OwnedModel;
+public class ProjectSetting {
+    private String color;
+    private boolean autoDelete;
 
-import javax.persistence.*;
+    public String getColor() {
+        return color;
+    }
 
-@Entity
-@Table(name = "projectSetting")
+    public void setColor(String color) {
+        this.color = color;
+    }
 
-public class ProjectSetting extends OwnedModel {
-        @Id
-        private Long id;
+    public boolean isAutoDelete() {
+        return autoDelete;
+    }
 
-        @Column
-        private String color;
+    public void setAutoDelete(boolean autoDelete) {
+        this.autoDelete = autoDelete;
+    }
 
-        @Column
-        private boolean autoDelete;
-
-        public void setId(Long id) {
-                this.id = id;
-        }
-
-        public String getColor() {
-                return color;
-        }
-
-        public void setColor(String color) {
-                this.color = color;
-        }
-
-        public boolean isAutoDelete() {
-                return autoDelete;
-        }
-
-        public void setAutoDelete(boolean autoDelete) {
-                this.autoDelete = autoDelete;
-        }
-
-        @Override
-        public Long getId() {
-                return id;
-        }
 }

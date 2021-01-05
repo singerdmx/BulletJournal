@@ -39,6 +39,7 @@ import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 public class ProjectController {
     protected static final String PROJECTS_ROUTE = "/api/projects";
     protected static final String PROJECT_ROUTE = "/api/projects/{projectId}";
+    protected static final String PROJECT_SETTINGS_ROUTE = "/api/projects/{projectId}/settings";
     protected static final String PROJECT_HISTORY_ROUTE = "/api/projects/{projectId}/history";
     protected static final String UPDATE_SHARED_PROJECTS_ORDER_ROUTE = "/api/updateSharedProjectsOrder";
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectController.class);
@@ -77,7 +78,7 @@ public class ProjectController {
         return Project.addOwnerAvatar(project, this.userClient);
     }
 
-    @PutMapping(PROJECT_ROUTE)
+    @PutMapping(PROJECT_SETTINGS_ROUTE)
     public void setProjectSettings(@NotNull @PathVariable Long projectId,
                                    @NotNull @Valid @RequestBody ProjectSetting setting) {
         // set project color if exist and autoDelete
