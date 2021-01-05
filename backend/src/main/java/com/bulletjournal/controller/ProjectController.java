@@ -11,7 +11,7 @@ import com.bulletjournal.notifications.informed.RemoveFromProjectEvent;
 import com.bulletjournal.notifications.informed.RemoveProjectEvent;
 import com.bulletjournal.repository.AuditableDaoJpa;
 import com.bulletjournal.repository.ProjectDaoJpa;
-import com.bulletjournal.repository.models.ProjectSetting;
+import com.bulletjournal.controller.models.ProjectSetting;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,8 +77,9 @@ public class ProjectController {
         return Project.addOwnerAvatar(project, this.userClient);
     }
 
-    @PutMapping(PROJECTS_ROUTE)
-    public void setProjectSettings(@Valid @RequestBody ProjectSetting setting) {
+    @PutMapping(PROJECT_ROUTE)
+    public void setProjectSettings(@NotNull @PathVariable Long projectId,
+                                   @NotNull @Valid @RequestBody ProjectSetting setting) {
         // set project color if exist and autoDelete
         String projectColor = setting.getColor();
         boolean autoDelete = setting.isAutoDelete();

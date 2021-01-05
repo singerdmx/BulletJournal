@@ -1,4 +1,6 @@
-package com.bulletjournal.repository.models;
+package com.bulletjournal.controller.models;
+
+import com.bulletjournal.repository.models.OwnedModel;
 
 import javax.persistence.*;
 
