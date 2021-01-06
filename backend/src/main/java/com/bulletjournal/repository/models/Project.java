@@ -40,6 +40,10 @@ public class Project extends OwnedModel {
     @Column(nullable = false, columnDefinition = "Boolean default 'false'")
     private boolean shared;
 
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "project")
+    @PrimaryKeyJoinColumn
+    private ProjectSetting projectSetting;
+
     public Project() {
     }
 
