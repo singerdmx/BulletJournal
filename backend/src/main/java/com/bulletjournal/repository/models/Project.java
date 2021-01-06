@@ -115,6 +115,14 @@ public class Project extends OwnedModel {
                 this.isShared());
     }
 
+    public ProjectSetting getProjectSetting() {
+        return projectSetting;
+    }
+
+    public void setProjectSetting(ProjectSetting projectSetting) {
+        this.projectSetting = projectSetting;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

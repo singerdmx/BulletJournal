@@ -17,7 +17,7 @@ public class ProjectSetting {
     @Column
     private String color;
 
-    @Column
+    @Column(name = "auto_delete")
     private boolean autoDelete;
 
     public Long getId() {
