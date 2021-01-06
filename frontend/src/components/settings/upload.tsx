@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Upload, message, Button } from 'antd';
 import { RcFile } from 'antd/lib/upload';
 import { IState } from '../../store';
-import { UploadOutlined } from '@ant-design/icons';
+import { UploadOutlined} from '@ant-design/icons';
 import Axios from 'axios';
 
 const INITIAL_STATE = {
@@ -12,11 +12,11 @@ const INITIAL_STATE = {
   file: (null as unknown) as RcFile,
 };
 
-type uploadeProps = {
+type uploadProps = {
   avatar: string;
 };
 
-const AvatarUploader: React.FC<uploadeProps> = ({ avatar }) => {
+const AvatarUploader: React.FC<uploadProps> = ({ avatar }) => {
   const [state, setAState] = useState(INITIAL_STATE);
 
   const beforeUpload = (file: RcFile) => {
@@ -65,10 +65,11 @@ const AvatarUploader: React.FC<uploadeProps> = ({ avatar }) => {
         beforeUpload={beforeUpload}
       >
         <img
-          src={state.prevUrl.length > 0 ? state.prevUrl : avatar}
+          src={state.prevUrl.length > 0 ? state.prevUrl : 'https://user-images.githubusercontent.com/122956/103820529-62671e00-5021-11eb-8d36-16dd6e32328f.png'}
           alt="avatar"
           style={{ width: '100%' }}
         />
+
       </Upload>
       <Button
         onClick={() => handleUpload(state.file)}
