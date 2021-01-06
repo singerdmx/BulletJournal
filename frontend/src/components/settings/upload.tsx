@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import {connect} from 'react-redux';
 import {Button, message, Upload} from 'antd';
 import {RcFile} from 'antd/lib/upload';
 import {UploadOutlined} from '@ant-design/icons';
@@ -78,4 +77,4 @@ const AvatarUploader: React.FC<uploadProps> = () => {
   );
 };
 
-export default connect(null, {})(AvatarUploader);
+export default AvatarUploader;
