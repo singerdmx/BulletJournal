@@ -27,7 +27,7 @@ const ProjectSetting: React.FC<ProjectSettingProps> = (props) => {
 
   return (
     <Modal
-      title={'Project Settings'}
+      title={'BuJo Settings'}
       visible={visible}
       onCancel={props.onCancel}
       footer={false}

@@ -34,6 +34,7 @@ type TasksProps = {
   completedTaskPageNo: number;
   timezone: string;
   readOnly: boolean;
+  myself: string;
   project: Project | undefined;
   tasks: Task[];
   completedTasks: Task[];
@@ -192,6 +193,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     project,
     readOnly,
     tasks,
+    myself,
     completedTasks,
     updateTasks,
     updateCompletedTasks,
@@ -337,13 +339,13 @@ const TaskTree: React.FC<TasksProps> = (props) => {
       return null;
     }
     return <Container>
-      <FloatButton
+      {project.owner.name === myself && <FloatButton
           tooltip="Settings"
           onClick={handleSettings}
           styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
       >
         <SettingOutlined />
-      </FloatButton>
+      </FloatButton>}
       {completeTasksShown ? <FloatButton
           tooltip="Hide Completed Tasks"
           onClick={hideCompletedTask}
@@ -435,6 +437,7 @@ const mapStateToProps = (state: IState) => ({
   completedTasks: state.task.completedTasks,
   loadingCompletedTask: state.task.loadingCompletedTask,
   nextCompletedTasks: state.task.nextCompletedTasks,
+  myself: state.myself.username
 });
 
 export default connect(mapStateToProps, {
