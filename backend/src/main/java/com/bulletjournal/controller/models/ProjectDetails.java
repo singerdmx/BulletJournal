@@ -10,7 +10,7 @@ public class ProjectDetails extends Project {
     public ProjectDetails(Project project) {
         super(project.getId(), project.getName(), project.getOwner(),
                 project.getProjectType(), project.getGroup(), project.getDescription(),
-                project.isShared());
+                project.isShared(), project.getSubProjects());
     }
 
     public ProjectSetting getProjectSetting() {

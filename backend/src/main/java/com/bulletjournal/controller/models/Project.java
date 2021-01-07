@@ -44,6 +44,19 @@ public class Project {
         this.id = id;
     }
 
+    public Project(
+            Long id, String name, User owner, ProjectType projectType,
+            Group group, String description, boolean shared, List<Project> subProjects) {
+        this.id = id;
+        this.name = name;
+        this.owner = owner;
+        this.shared = shared;
+        this.projectType = projectType;
+        this.group = group;
+        this.description = description;
+        this.subProjects = subProjects;
+    }
+
     public Project(Long id, String name, User owner, ProjectType projectType,
                    Group group, String description, boolean shared) {
         this.id = id;
