@@ -72,10 +72,12 @@ public class ProjectController {
     }
 
     @GetMapping(PROJECT_ROUTE)
-    public Project getProject(@NotNull @PathVariable Long projectId) {
+    public ProjectDetails getProject(@NotNull @PathVariable Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Project project = this.projectDaoJpa.getProject(projectId, username).toVerbosePresentationModel();
-        return Project.addOwnerAvatar(project, this.userClient);
+        ProjectDetails projectDetails = new ProjectDetails(Project.addOwnerAvatar(project, this.userClient));
+        // projectDetails.setProjectSetting();
+        return projectDetails;
     }
 
     @PutMapping(PROJECT_SETTINGS_ROUTE)
@@ -102,7 +104,7 @@ public class ProjectController {
     }
 
     @PatchMapping(PROJECT_ROUTE)
-    public Project updateProject(@NotNull @PathVariable Long projectId,
+    public ProjectDetails updateProject(@NotNull @PathVariable Long projectId,
             @Valid @RequestBody UpdateProjectParams updateProjectParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Event> joined = new ArrayList<>();
@@ -114,7 +116,7 @@ public class ProjectController {
         if (!removed.isEmpty()) {
             this.notificationService.inform(new RemoveFromProjectEvent(removed, username));
         }
-        Project project = getProject(projectId);
+        ProjectDetails project = getProject(projectId);
         this.notificationService.trackActivity(new Auditable(projectId, "updated BuJo ##" + project.getName() + "##",
                 username, null, Timestamp.from(Instant.now()), ContentAction.UPDATE_PROJECT));
         return project;
