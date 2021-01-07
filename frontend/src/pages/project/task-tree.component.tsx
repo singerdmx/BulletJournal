@@ -23,6 +23,7 @@ import {User} from '../../features/group/interface';
 import {useHistory} from 'react-router-dom';
 import AddTask from '../../components/modals/add-task.component';
 import {ProjectItemUIType} from "../../features/project/constants";
+import ProjectSetting from "../../components/modals/project-setting.component";
 import TasksByOrder from "../../components/modals/tasks-by-order.component";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 import {ProjectOutlined} from "@ant-design/icons/lib";
@@ -218,6 +219,8 @@ const TaskTree: React.FC<TasksProps> = (props) => {
   const history = useHistory();
 
   const [tasksByOrderShown, setTasksByOrderShown] = useState(false);
+  const [projectSettingShown, setProjectSettingShown] = useState(false);
+
 
   const handleLoadMore = () => {
     if (project) {
@@ -326,7 +329,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
 
   const handleSettings = () => {
     console.log('we are changing settings.');
-    setTasksByOrderShown(true);
+    setProjectSettingShown(true);
   };
 
   const createContent = () => {
@@ -392,6 +395,14 @@ const TaskTree: React.FC<TasksProps> = (props) => {
   return (
       <div>
         {createContent()}
+        <div>
+          <ProjectSetting
+              visible={projectSettingShown}
+              onCancel={() => {
+                setProjectSettingShown(false)
+              }}
+          />
+        </div>
         <div>
           <TasksByOrder
               visible={tasksByOrderShown}
