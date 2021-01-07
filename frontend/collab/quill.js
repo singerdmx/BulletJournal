@@ -6,7 +6,8 @@ import Quill from 'quill';
 import QuillCursors from 'quill-cursors';
 import {WebrtcProvider} from 'y-webrtc';
 import hljs from 'highlight.js';
-
+import * as iziToast from 'izitoast'
+import css from "./iziToast.min.css";
 
 const Delta = Quill.import('delta');
 
@@ -63,6 +64,11 @@ function saveChanges(editor) {
     fetch(url, {headers: headers, method: 'PATCH', body: patchBody}).then(res => {
         if (res.ok) {
             setTimeout(saveChanges, 60000, editor);
+        }else{
+            if(res.status === 401){
+                showWarning(noAccessWarning(projectItem['contentType']));
+            }
+            console.error('RES:', res);
         }
     });
 }
@@ -120,7 +126,14 @@ const registerSaveButton = (editor) => {
         console.log('Saving content', newContent);
         const headers = {'Content-Type': 'application/json'};
         fetch("/api/public/collab/" + uid, {headers: headers, method: 'PUT', body: putBody})
-            .then(res => console.log(res));
+            .then(res => {
+                if(res.status === 401){
+                    showWarning(noAccessWarning(projectItem['contentType']));
+                }
+            })
+            .catch((error) => {
+            console.error('Error:', error);
+        });
     }
 };
 
@@ -229,6 +242,7 @@ window.addEventListener('load', () => {
             targetContentId = content['id'];
             if (!loginCookie || !targetContentId || !projectItem) {
                 document.getElementById('save-button').style.display = "none";
+                showWarning(projectItemNotExistWarning);
             }
             setTimeout(saveChanges, 60000, editor);
             const adsbygoogle = window.adsbygoogle || [];
@@ -240,7 +254,7 @@ window.addEventListener('load', () => {
     const binding = new QuillBinding(type, editor, provider.awareness);
 
     // @ts-ignore
-    window.example = {provider, ydoc, type, binding, Y}
+    window.example = {provider, ydoc, type, binding, Y};
     window.addEventListener('beforeunload', function (e) {
         console.log('beforeunload', e);
         saveChanges(editor);
@@ -252,3 +266,20 @@ const colors = ['aqua', 'black', 'blue', 'fuchsia', 'gray', 'green',
     'silver', 'teal', 'magenta', 'volcano',
     'gold', 'lime', 'cyan', 'geekblue', 'darkblue', 'darkred', 'darkgreen', 'darkorange', 'darkgray'];
 
+const showWarning = (warning) =>{
+    iziToast.warning({
+        title: 'Caution',
+        position: 'topRight',
+        titleSize:"20",
+        titleLineHeight: "25",
+        messageSize:'20',
+        messageLineHeight:'25',
+        message: warning,
+        timeout: 10000,
+    });
+};
+
+const projectItemNotExistWarning = "Please note that your change is not being saved in the server and your change will be lost once you leave this page. <br>You can keep a copy of your change before you leave.";
+const noAccessWarning = (contentType)=>{
+    return "Please note that your change is not being saved in the server and your change will be lost once you leave this page. <br>You can either keep a copy of your change before you leave or ask the owner of this "+ contentType + " to grant you access by either <br>inviting you to join its BuJo or use the share button to share it with you."
+};
