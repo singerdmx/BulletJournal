@@ -64,8 +64,8 @@ function saveChanges(editor) {
     fetch(url, {headers: headers, method: 'PATCH', body: patchBody}).then(res => {
         if (res.ok) {
             setTimeout(saveChanges, 60000, editor);
-        }else{
-            if(res.status === 401){
+        } else {
+            if (res.status === 401) {
                 showWarning(noAccessWarning(projectItem['contentType']));
             }
             console.error('RES:', res);
@@ -127,13 +127,13 @@ const registerSaveButton = (editor) => {
         const headers = {'Content-Type': 'application/json'};
         fetch("/api/public/collab/" + uid, {headers: headers, method: 'PUT', body: putBody})
             .then(res => {
-                if(res.status === 401){
+                if (res.status === 401) {
                     showWarning(noAccessWarning(projectItem['contentType']));
                 }
             })
             .catch((error) => {
-            console.error('Error:', error);
-        });
+                console.error('Error:', error);
+            });
     }
 };
 
@@ -266,20 +266,20 @@ const colors = ['aqua', 'black', 'blue', 'fuchsia', 'gray', 'green',
     'silver', 'teal', 'magenta', 'volcano',
     'gold', 'lime', 'cyan', 'geekblue', 'darkblue', 'darkred', 'darkgreen', 'darkorange', 'darkgray'];
 
-const showWarning = (warning) =>{
+const showWarning = (warning) => {
     iziToast.warning({
         title: 'Caution',
         position: 'topRight',
-        titleSize:"20",
+        titleSize: "20",
         titleLineHeight: "25",
-        messageSize:'20',
-        messageLineHeight:'25',
+        messageSize: '20',
+        messageLineHeight: '25',
         message: warning,
         timeout: 10000,
     });
 };
 
 const projectItemNotExistWarning = "Please note that your change is not being saved in the server and your change will be lost once you leave this page. <br>You can keep a copy of your change before you leave.";
-const noAccessWarning = (contentType)=>{
-    return "Please note that your change is not being saved in the server and your change will be lost once you leave this page. <br>You can either keep a copy of your change before you leave or ask the owner of this "+ contentType + " to grant you access by either <br>inviting you to join its BuJo or use the share button to share it with you."
+const noAccessWarning = (contentType) => {
+    return "Please note that your change is not being saved in the server and your change will be lost once you leave this page. <br>You can either keep a copy of your change before you leave or ask the owner of this " + contentType + " to grant you access by either <br>inviting you to join its BuJo or use the share button to share it with you."
 };
