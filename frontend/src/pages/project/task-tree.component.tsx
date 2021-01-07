@@ -15,7 +15,8 @@ import {
   CloudSyncOutlined,
   FieldTimeOutlined,
   SearchOutlined,
-  UnorderedListOutlined
+  UnorderedListOutlined,
+  SettingOutlined,
 } from '@ant-design/icons';
 import './task.styles.less';
 import {User} from '../../features/group/interface';
@@ -323,11 +324,23 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     }, 300);
   };
 
+  const handleSettings = () => {
+    console.log('we are changing settings.');
+    setTasksByOrderShown(true);
+  };
+
   const createContent = () => {
     if (project.shared) {
       return null;
     }
     return <Container>
+      <FloatButton
+          tooltip="Settings"
+          onClick={handleSettings}
+          styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
+      >
+        <SettingOutlined />
+      </FloatButton>
       {completeTasksShown ? <FloatButton
           tooltip="Hide Completed Tasks"
           onClick={hideCompletedTask}
