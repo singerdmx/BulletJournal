@@ -3,6 +3,7 @@ package com.bulletjournal.controller;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
@@ -11,6 +12,8 @@ import com.bulletjournal.daemon.models.ReminderRecord;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
+import com.bulletjournal.notifications.Auditable;
+import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
 import com.bulletjournal.redis.models.Etag;
 import com.bulletjournal.redis.models.EtagType;
@@ -36,6 +39,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -99,6 +104,9 @@ public class SystemController {
 
     @Autowired
     private Reminder reminder;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping(UPDATES_ROUTE)
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -368,6 +376,13 @@ public class SystemController {
 
         projectItemDaoJpa.updateContent(saveCollabItemParams.getContentId(), saveCollabItemParams.getItemId(), requester,
                 new UpdateContentParams(saveCollabItemParams.getText()), Optional.empty());
+
+        this.notificationService.trackActivity(
+                new Auditable(item.getProject().getId(),
+                "updated Content in " + item.getContentType() + " ##" + item.getName() + "## under BuJo ##"
+                        + item.getProject().getName() + "##",
+                requester, item.getId(), Timestamp.from(Instant.now()),
+                        ContentAction.getUpdateContentAction(item.getContentType())));
     }
 
     @GetMapping(COLLAB_ITEM_ROUTE)

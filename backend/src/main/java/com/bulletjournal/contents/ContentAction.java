@@ -48,6 +48,19 @@ public enum ContentAction {
         return null;
     }
 
+    public static ContentAction getUpdateContentAction(ContentType contentType) {
+        switch (contentType) {
+            case NOTE:
+                return UPDATE_NOTE_CONTENT;
+            case TASK:
+                return UPDATE_TASK_CONTENT;
+            case TRANSACTION:
+                return UPDATE_TRANSACTION_CONTENT;
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
     public static String getContentLink(ContentAction action, Long contentId) {
         return getContentLink(action, contentId, null);
     }

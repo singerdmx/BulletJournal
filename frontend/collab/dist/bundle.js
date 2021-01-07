@@ -75776,6 +75776,7 @@ const registerSaveButton = (editor) => {
 window.addEventListener('load', () => {
     let defaultName = 'anonymous' + Math.floor(Math.random() * 20);
     loginCookie = getCookie('__discourse_proxy');
+    console.log('loginCookie', loginCookie);
     if (loginCookie) {
         defaultName = decodeURIComponent(loginCookie.split('##')[0]);
     }
