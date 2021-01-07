@@ -20,6 +20,34 @@ public enum ContentType {
         return null;
     }
 
+    public static ContentType getContentTypeFromLink(String link) {
+        if (link.startsWith("/groups/group")) {
+            return ContentType.GROUP;
+        }
+
+        if (link.startsWith("/projects/")) {
+            return ContentType.PROJECT;
+        }
+
+        if (link.startsWith("/task/")) {
+            return ContentType.TASK;
+        }
+
+        if (link.startsWith("/note/")) {
+            return ContentType.NOTE;
+        }
+
+        if (link.startsWith("/transaction/")) {
+            return ContentType.TRANSACTION;
+        }
+
+        if (link.startsWith("/admin/sampleTasks/")) {
+            return ContentType.SAMPLE_TASK;
+        }
+
+        throw new IllegalArgumentException("link " + link + " is not valid");
+    }
+
     public static ContentType getType(String type) {
         return ContentType.valueOf(type.toUpperCase());
     }

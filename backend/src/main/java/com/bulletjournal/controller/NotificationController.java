@@ -2,28 +2,31 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.AnswerNotificationParams;
 import com.bulletjournal.controller.models.Notification;
+import com.bulletjournal.controller.models.ProjectType;
+import com.bulletjournal.controller.models.ShareProjectItemParams;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.notifications.informed.Informed;
 import com.bulletjournal.notifications.informed.JoinGroupResponseEvent;
+import com.bulletjournal.notifications.informed.RequestProjectItemWriteAccessResponseEvent;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
 import com.bulletjournal.redis.RedisNotificationRepository;
 import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.redis.models.JoinGroupNotification;
 import com.bulletjournal.repository.*;
-import com.bulletjournal.repository.models.Group;
-import com.bulletjournal.repository.models.User;
-import com.bulletjournal.repository.models.UserGroup;
-import com.bulletjournal.repository.models.UserGroupKey;
+import com.bulletjournal.repository.factory.ProjectItemDaos;
+import com.bulletjournal.repository.models.*;
 import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Propagation;
@@ -66,6 +69,10 @@ public class NotificationController {
     @Autowired
     private RedisNotificationRepository redisNotificationRepository;
 
+    @Lazy
+    @Autowired
+    private ProjectItemDaos projectItemDaos;
+
     @GetMapping(NOTIFICATIONS_ROUTE)
     public ResponseEntity<List<Notification>> getNotifications() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -104,8 +111,8 @@ public class NotificationController {
                     " instead of " + username);
         }
 
+        Informed informed = processNotification(notification, answerNotificationParams, username);
         deleteNotification(notification);
-        Informed informed = processNotification(notification, answerNotificationParams);
         if (informed != null) {
             this.notificationService.inform(informed);
         }
@@ -127,12 +134,15 @@ public class NotificationController {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Informed processNotification(
             com.bulletjournal.repository.models.Notification notification,
-            AnswerNotificationParams answerNotificationParams) {
+            AnswerNotificationParams answerNotificationParams,
+            String requester) {
+        String answerAction = answerNotificationParams.getAction();
+        Action action;
+        Event event;
         switch (notification.getType()) {
             case "JoinGroupEvent":
-                String answerAction = answerNotificationParams.getAction();
                 Preconditions.checkNotNull(answerAction, "For JoinGroupEvent, action is required");
-                Action action = Action.getAction(answerAction);
+                action = Action.getAction(answerAction);
                 User user = this.userDaoJpa.getByName(notification.getTargetUser());
                 UserGroupKey userGroupKey = new UserGroupKey(user.getId(), notification.getContentId());
                 UserGroup userGroup = this.userGroupRepository.findById(userGroupKey)
@@ -149,11 +159,33 @@ public class NotificationController {
 
                 Group group = this.groupRepository.findById(notification.getContentId()).orElseThrow(() ->
                         new ResourceNotFoundException("Group " + notification.getContentId() + " not found"));
-                Event event = new Event(
+                event = new Event(
                         notification.getOriginator(),
                         notification.getContentId(),
                         group.getName());
                 return new JoinGroupResponseEvent(event, notification.getTargetUser(), action);
+            case "RequestProjectItemWriteAccessEvent":
+                Preconditions.checkNotNull(answerAction, "For RequestProjectItemWriteAccessEvent, action is required");
+                action = Action.getAction(answerAction);
+                ContentType contentType = ContentType.getContentTypeFromLink(notification.getLink());
+                ProjectItemDaoJpa projectItemDaoJpa = this.projectItemDaos.getDaos()
+                        .get(ProjectType.fromContentType(contentType));
+                long projectItemId = notification.getContentId();
+                ProjectItemModel projectItem = projectItemDaoJpa.getProjectItem(projectItemId, requester);
+                String link = null;
+                if (Action.ACCEPT.equals(action)) {
+                    Informed inform = projectItemDaoJpa.shareProjectItem(notification.getContentId(),
+                            new ShareProjectItemParams(notification.getOriginator()), requester);
+                    this.notificationService.inform(inform);
+                    link = notification.getLink();
+                }
+
+                event = new Event(
+                        notification.getOriginator(),
+                        notification.getContentId(),
+                        projectItem.getName());
+                return new RequestProjectItemWriteAccessResponseEvent(
+                        event, notification.getTargetUser(), action, contentType, link);
         }
 
         return null;

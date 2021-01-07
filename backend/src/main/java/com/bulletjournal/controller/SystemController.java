@@ -13,7 +13,9 @@ import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.notifications.Auditable;
+import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.NotificationService;
+import com.bulletjournal.notifications.informed.RequestProjectItemWriteAccessEvent;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
 import com.bulletjournal.redis.models.Etag;
 import com.bulletjournal.redis.models.EtagType;
@@ -55,6 +57,7 @@ public class SystemController {
     private static final String CONTACTS_ROUTE = "/api/contacts";
     private static final String SHARED_ITEM_SET_LABELS_ROUTE = "/api/sharedItems/{itemId}/setLabels";
     private static final String COLLAB_ITEM_ROUTE = "/api/public/collab/{itemId}";
+    private static final String COLLAB_ITEM_REQUEST_WRITE_ROUTE = "/api/public/collab/{itemId}/requestWrite";
     private static final Logger LOGGER = LoggerFactory.getLogger(SystemController.class);
 
     @Autowired
@@ -335,6 +338,28 @@ public class SystemController {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setLocation(new URI(topicUrl));
         return ResponseEntity.ok().headers(responseHeaders).build();
+    }
+
+    @PostMapping(COLLAB_ITEM_REQUEST_WRITE_ROUTE)
+    public String requestCollabItemWriteAccess(@NotNull @PathVariable String itemId) {
+        if (itemId.length() < StringUtil.UUID_LENGTH) {
+            throw new IllegalArgumentException("Invalid UUID " + itemId);
+        }
+        String uuid = itemId.substring(0, StringUtil.UUID_LENGTH);
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        try {
+            User user = this.userClient.getUser(username);
+            username = user.getName();
+        } catch (ResourceNotFoundException ex) {
+            return "User " + username + " not found";
+        }
+
+        ProjectItemModel item = this.publicProjectItemDaoJpa.getPublicItem(uuid);
+        Event event = new Event(item.getOwner(), item.getId(), item.getName());
+        RequestProjectItemWriteAccessEvent requestProjectItemWriteAccessEvent = new RequestProjectItemWriteAccessEvent(
+                event, username, item.getContentType());
+        this.notificationService.inform(requestProjectItemWriteAccessEvent);
+        return "Owner " + item.getOwner() + " notified";
     }
 
     @PutMapping(COLLAB_ITEM_ROUTE)
