@@ -128,7 +128,7 @@ const registerSaveButton = (editor) => {
         fetch("/api/public/collab/" + uid, {headers: headers, method: 'PUT', body: putBody})
             .then(res => {
                 if (res.status === 401) {
-                    showWarning(noAccessWarning(projectItem['contentType']));
+                    showWarningWithOption(noAccessWarning(projectItem['contentType']));
                 }
             })
             .catch((error) => {
@@ -269,6 +269,19 @@ const colors = ['aqua', 'black', 'blue', 'fuchsia', 'gray', 'green',
     'silver', 'teal', 'magenta', 'volcano',
     'gold', 'lime', 'cyan', 'geekblue', 'darkblue', 'darkred', 'darkgreen', 'darkorange', 'darkgray'];
 
+const showSuccess = (info) => {
+    iziToast.success({
+        title: 'OK',
+        position: 'topRight',
+        titleSize: "20",
+        titleLineHeight: "25",
+        messageSize: '20',
+        messageLineHeight: '25',
+        message: info,
+        timeout: 5000,
+    });
+};
+
 const showWarning = (warning) => {
     iziToast.warning({
         title: 'Caution',
@@ -282,7 +295,38 @@ const showWarning = (warning) => {
     });
 };
 
+const showWarningWithOption = (warning) => {
+    iziToast.warning({
+        title: 'Caution',
+        position: 'topRight',
+        titleSize: "20",
+        titleLineHeight: "25",
+        messageSize: '20',
+        messageLineHeight: '25',
+        message: warning,
+        timeout: 10000,
+        buttons: [
+            ['<button>Request Access</button>', function (instance, toast) {
+                requestAccess();
+            }, true] // true to focus
+        ],
+    });
+};
+
+const requestAccess = () => {
+    console.log('request Access');
+    const headers = {'Content-Type': 'application/json'};
+    fetch("/api/public/collab/" + uid + "/requestWrite", {headers: headers, method: 'POST'})
+        .then(res => {
+            showSuccess("Successfully submitted request ")
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+};
+
 const projectItemNotExistWarning = "Please note that your change is not being saved in the server and your change will be lost once you leave this page. <br>You can keep a copy of your change before you leave.";
 const noAccessWarning = (contentType) => {
     return "Please note that your change is not being saved in the server and your change will be lost once you leave this page. <br>You can either keep a copy of your change before you leave or ask the owner of this " + contentType + " to grant you access by either <br>inviting you to join its BuJo or use the share button to share it with you."
 };
+
