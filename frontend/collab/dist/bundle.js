@@ -75683,7 +75683,7 @@ function pad(num, size) {
     return num;
 }
 
-function saveChanges(editor) {
+function saveChanges(editor, isAutoSave) {
     if (!loginCookie || !targetContentId || !projectItem) {
         return;
     }
@@ -75699,7 +75699,11 @@ function saveChanges(editor) {
     const headers = {'Content-Type': 'application/json'};
     fetch(url, {headers: headers, method: 'PATCH', body: patchBody}).then(res => {
         if (res.ok) {
-            setTimeout(saveChanges, 60000, editor);
+            if (isAutoSave) {
+                setTimeout(saveChanges, 60000, editor);
+            }else{
+                showSuccess("Successfully saved the content");
+            }
         } else {
             if (res.status === 401) {
                 showWarningWithOption(noAccessWarning(projectItem['contentType']));
@@ -75747,7 +75751,7 @@ const registerShareButton = () => {
 const registerSaveButton = (editor) => {
     const saveButton = document.getElementById('save-button');
     saveButton.onclick = () => {
-        saveChanges(editor);
+        saveChanges(editor,false);
     }
 };
 
@@ -75861,7 +75865,7 @@ window.addEventListener('load', () => {
                 document.getElementById('save-button').style.display = "none";
                 showWarning(projectItemNotExistWarning);
             }
-            setTimeout(saveChanges, 60000, editor);
+            setTimeout(saveChanges, 60000, editor,true);
             const adsbygoogle = window.adsbygoogle || [];
             console.log('adsbygoogle', adsbygoogle);
             adsbygoogle.push({});
@@ -75882,6 +75886,19 @@ const colors = ['aqua', 'black', 'blue', 'fuchsia', 'gray', 'green',
     'maroon', 'navy', 'olive', 'orange', 'purple', 'red', 'yellow',
     'silver', 'teal', 'magenta', 'volcano',
     'gold', 'lime', 'cyan', 'geekblue', 'darkblue', 'darkred', 'darkgreen', 'darkorange', 'darkgray'];
+
+const showSuccess = (info) => {
+    izitoast__WEBPACK_IMPORTED_MODULE_6__["success"]({
+        title: 'OK',
+        position: 'topRight',
+        titleSize: "20",
+        titleLineHeight: "25",
+        messageSize: '20',
+        messageLineHeight: '25',
+        message: info,
+        timeout: 5000,
+    });
+};
 
 const showInfo = (info) => {
     izitoast__WEBPACK_IMPORTED_MODULE_6__["info"]({
