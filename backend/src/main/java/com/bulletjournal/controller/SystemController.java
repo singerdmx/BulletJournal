@@ -1,9 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.authz.AuthorizationService;
-import com.bulletjournal.authz.Operation;
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
@@ -12,7 +10,6 @@ import com.bulletjournal.daemon.models.ReminderRecord;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
-import com.bulletjournal.notifications.Auditable;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.informed.RequestProjectItemWriteAccessEvent;
@@ -41,8 +38,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -360,54 +355,6 @@ public class SystemController {
                 event, username, item.getContentType());
         this.notificationService.inform(requestProjectItemWriteAccessEvent);
         return "Owner " + item.getOwner() + " notified";
-    }
-
-    @PutMapping(COLLAB_ITEM_ROUTE)
-    public void saveCollabItem(@NotNull @PathVariable String itemId,
-                               @NotNull @Valid @RequestBody SaveCollabItemParams saveCollabItemParams) {
-        if (itemId.length() < StringUtil.UUID_LENGTH) {
-            throw new IllegalArgumentException("Invalid UUID " + itemId);
-        }
-        String uuid = itemId.substring(0, StringUtil.UUID_LENGTH);
-        String originalUser = MDC.get(UserClient.USER_NAME_KEY);
-        MDC.put(UserClient.USER_NAME_KEY, AuthorizationService.SUPER_USER);
-        ProjectItemModel item = this.publicProjectItemDaoJpa.getPublicItem(uuid);
-        String requester = originalUser;
-        if (StringUtils.isNotBlank(requester)) {
-            try {
-                User user = this.userClient.getUser(requester);
-                requester = user.getName();
-                this.authorizationService.checkAuthorizedToOperateOnContent(
-                        item.getOwner(), requester, ContentType.CONTENT,
-                        Operation.UPDATE, saveCollabItemParams.getContentId(),
-                        item.getOwner(), item.getProject().getOwner(), item);
-            } catch (ResourceNotFoundException ex) {
-                LOGGER.info("{} not found", requester);
-                requester = null;
-            } catch (UnAuthorizedException ex) {
-                LOGGER.info("{} unauthorized to update content {}", requester, saveCollabItemParams.getContentId());
-                requester = null;
-            }
-        } else {
-            requester = null;
-        }
-
-        if (requester == null) {
-            throw new UnAuthorizedException("No permission to write");
-        }
-
-        ProjectItemDaoJpa projectItemDaoJpa = this.projectItemDaos.getDaos()
-                .get(ProjectType.fromContentType(saveCollabItemParams.getContentType()));
-
-        projectItemDaoJpa.updateContent(saveCollabItemParams.getContentId(), saveCollabItemParams.getItemId(), requester,
-                new UpdateContentParams(saveCollabItemParams.getText()), Optional.empty());
-
-        this.notificationService.trackActivity(
-                new Auditable(item.getProject().getId(),
-                "updated Content in " + item.getContentType() + " ##" + item.getName() + "## under BuJo ##"
-                        + item.getProject().getName() + "##",
-                requester, item.getId(), Timestamp.from(Instant.now()),
-                        ContentAction.getUpdateContentAction(item.getContentType())));
     }
 
     @GetMapping(COLLAB_ITEM_ROUTE)
