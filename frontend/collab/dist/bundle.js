@@ -75702,7 +75702,7 @@ function saveChanges(editor) {
             setTimeout(saveChanges, 60000, editor);
         } else {
             if (res.status === 401) {
-                showWarning(noAccessWarning(projectItem['contentType']));
+                showWarningWithOption(noAccessWarning(projectItem['contentType']));
             }
             console.error('RES:', res);
         }
@@ -75747,29 +75747,7 @@ const registerShareButton = () => {
 const registerSaveButton = (editor) => {
     const saveButton = document.getElementById('save-button');
     saveButton.onclick = () => {
-        if (!loginCookie || !targetContentId || !projectItem) {
-            return;
-        }
-        const newContent = JSON.stringify({
-            text: editor.getContents()
-        });
-        const putBody = JSON.stringify({
-            text: newContent,
-            contentType: projectItem['contentType'],
-            itemId: projectItem['id'],
-            contentId: targetContentId,
-        });
-        console.log('Saving content', newContent);
-        const headers = {'Content-Type': 'application/json'};
-        fetch("/api/public/collab/" + uid, {headers: headers, method: 'PUT', body: putBody})
-            .then(res => {
-                if (res.status === 401) {
-                    showWarningWithOption(noAccessWarning(projectItem['contentType']));
-                }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
+        saveChanges(editor);
     }
 };
 
