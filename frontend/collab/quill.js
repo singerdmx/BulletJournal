@@ -233,13 +233,15 @@ window.addEventListener('load', () => {
             let delta = JSON.parse(content['text'])['delta'];
             delta = new Delta(delta);
             console.log('delta', delta);
-            console.log('userList', userList);
-            console.log('userList size', userList.size);
-            if (userList.size === 1) {
-                // first user needs to initialize the doc
-                console.log('setContents');
-                editor.setContents(delta);
-            }
+            setTimeout(() => {
+                console.log('userList', userList);
+                console.log('userList size', userList.size);
+                if (userList.size === 1) {
+                    // first user needs to initialize the doc
+                    console.log('setContents');
+                    editor.setContents(delta);
+                }
+            }, 1000);
             targetContentId = content['id'];
             if (!loginCookie || !targetContentId || !projectItem) {
                 document.getElementById('save-button').style.display = "none";
