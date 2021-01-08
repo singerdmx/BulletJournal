@@ -75905,9 +75905,9 @@ const colors = ['aqua', 'black', 'blue', 'fuchsia', 'gray', 'green',
     'silver', 'teal', 'magenta', 'volcano',
     'gold', 'lime', 'cyan', 'geekblue', 'darkblue', 'darkred', 'darkgreen', 'darkorange', 'darkgray'];
 
-const showSuccess = (info) => {
-    izitoast__WEBPACK_IMPORTED_MODULE_6__["success"]({
-        title: 'OK',
+const showInfo = (info) => {
+    izitoast__WEBPACK_IMPORTED_MODULE_6__["info"]({
+        title: 'Info',
         position: 'topRight',
         titleSize: "20",
         titleLineHeight: "25",
@@ -75953,8 +75953,9 @@ const requestAccess = () => {
     console.log('request Access');
     const headers = {'Content-Type': 'application/json'};
     fetch("/api/public/collab/" + uid + "/requestWrite", {headers: headers, method: 'POST'})
-        .then(res => {
-            showSuccess("Successfully submitted request ")
+        .then(response => response.text())
+        .then((data) => {
+            showInfo(data);
         })
         .catch((error) => {
             console.error('Error:', error);
