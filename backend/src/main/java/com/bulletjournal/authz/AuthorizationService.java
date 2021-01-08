@@ -141,12 +141,16 @@ public class AuthorizationService {
         String projectItemOwner = (String) other[0];
         String projectOwner = (String) other[1];
         ProjectItemModel projectItem = (ProjectItemModel) other[2];
+
         switch (operation) {
-            case DELETE:
             case UPDATE:
-                if (this.sharedProjectItemDaoJpa.getSharedProjectItems(requester).contains(projectItem)) {
+                // contents of project item being shared specifically can be edited
+                if (this.sharedProjectItemDaoJpa.getSharedProjectItems(requester).stream()
+                        .anyMatch(item -> Objects.equals(item.getId(), projectItem.getId()) &&
+                                Objects.equals(item.getContentType(), projectItem.getContentType()))) {
                     return;
                 }
+            case DELETE:
                 if (!Objects.equals(owner, requester) && !Objects.equals(projectOwner, requester)
                         && !Objects.equals(projectItemOwner, requester)) {
                     throw new UnAuthorizedException("Project Item " + contentId + " is owner by " +
