@@ -338,7 +338,7 @@ const setToolTips = (editor)=>{
     toolbar.querySelector('button.ql-code-block').setAttribute('title', 'Code');
 
     toolbar.querySelector('button.ql-list[value=ordered]').setAttribute('title', 'Numbered list');
-    toolbar.querySelector('button.ql-list[value=bullet]').setAttribute('title', 'Bullet list');
+    toolbar.querySelector('button.ql-list[value=bullet]').setAttribute('title', 'Bulleted list');
     toolbar.querySelector('button.ql-indent[value="-1"]').setAttribute('title', 'Indent less');
     toolbar.querySelector('button.ql-indent[value="+1"]').setAttribute('title', 'Indent more');
 
