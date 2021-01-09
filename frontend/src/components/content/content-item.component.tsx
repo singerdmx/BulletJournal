@@ -12,6 +12,7 @@ import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.core.css';
 import 'react-quill/dist/quill.bubble.css';
 import 'react-quill/dist/quill.snow.css';
+import {readOnlyModules} from "../content-editor/content-editor-toolbar";
 
 const Delta = Quill.import('delta');
 
@@ -56,7 +57,6 @@ const ContentItem: React.FC<ContentProps> = ({
 }) => {
   const contentJson = JSON.parse(content.text);
   const delta = contentJson['delta'];
-  const contentHtml = createHTML(new Delta(delta));
 
   const handleRevisionClose = () => {
     setDisplayRevision(false);
@@ -90,17 +90,16 @@ const ContentItem: React.FC<ContentProps> = ({
     return targetContent.id === content.id;
   }
 
+  const val = new Delta(delta);
   return (
-    <div className="content-item-page-contianer">
-      <div className="ql-container ql-snow" style={{position: 'relative', borderWidth: '0', width: '100%'}}>
-        <div className="ql-editor" data-gramm="false" contentEditable="false">
-          <div
-            className="content-item-page"
-            dangerouslySetInnerHTML={{
-              __html: contentHtml ? contentHtml : '<p></p>',
-            }}
+    <div className="content-item-page-container">
+        <div className="content-item-page">
+          <ReactQuill
+              value={val}
+              theme="snow"
+              readOnly={true}
+              modules = {readOnlyModules}
           />
-        </div>
       </div>
 
       <ContentEditorDrawer

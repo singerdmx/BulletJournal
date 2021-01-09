@@ -86,6 +86,13 @@ icons["redo"] = `<svg viewbox="0 0 18 18">
     <path class="ql-stroke" d="M9.91,13.91A4.6,4.6,0,0,1,9,14a5,5,0,1,1,5-5"></path>
   </svg>`;
 
+export const readOnlyModules = {
+  syntax: {
+    highlight: (text: string) => hljs.highlightAuto(text).value,
+  },
+  toolbar: false
+}
+
 // Modules object for setting up the Quill editor
 export const modules = {
   imageResize:{
