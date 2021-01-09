@@ -91,7 +91,7 @@ public class ProjectControllerTest {
         Project p1 = TestHelpers.createProject(requestParams, expectedOwner, projectName, group, ProjectType.TODO);
         p1 = updateProject(p1);
 
-        p1 = addProjectSetting(p1);
+        ProjectDetails p1Detail = testProjectSetting(p1);
 
         // create other projects
         Project p2 = TestHelpers.createProject(requestParams, expectedOwner, "P2", group, ProjectType.LEDGER);
@@ -127,11 +127,11 @@ public class ProjectControllerTest {
     private Project updateProjectGroup(Project p8, Long id) {
         UpdateProjectParams updateProjectParams = new UpdateProjectParams();
         updateProjectParams.setGroupId(id);
-        ResponseEntity<Project> response = this.restTemplate.exchange(
+        ResponseEntity<ProjectDetails> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECT_ROUTE,
                 HttpMethod.PATCH,
                 new HttpEntity<>(updateProjectParams),
-                Project.class,
+                ProjectDetails.class,
                 p8.getId());
         p8 = response.getBody();
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -1217,7 +1217,7 @@ public class ProjectControllerTest {
         assertNotEquals(sharedProjectsEtag, eTags[1]);
     }
 
-    private ProjectDetails addProjectSetting(Project project) {
+    private ProjectDetails testProjectSetting(Project project) {
         ProjectSetting projectSetting = new ProjectSetting("red", true);
         ResponseEntity<ProjectDetails> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECT_SETTINGS_ROUTE,
@@ -1229,7 +1229,34 @@ public class ProjectControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(p.getProjectSetting());
         assertEquals("red", p.getProjectSetting().getColor());
-        assertEquals(true, p.getProjectSetting().isAutoDelete());
+        assertTrue(p.getProjectSetting().isAutoDelete());
+
+        projectSetting = new ProjectSetting("blue", false);
+        response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECT_SETTINGS_ROUTE,
+                HttpMethod.PUT,
+                new HttpEntity<>(projectSetting),
+                ProjectDetails.class,
+                project.getId());
+        p = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(p.getProjectSetting());
+        assertEquals("blue", p.getProjectSetting().getColor());
+        assertFalse(p.getProjectSetting().isAutoDelete());
+
+        ResponseEntity<ProjectDetails> response1 = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECT_ROUTE,
+                HttpMethod.GET,
+                null,
+                ProjectDetails.class,
+                project.getId());
+        p = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(p.getProjectSetting());
+        assertEquals("blue", p.getProjectSetting().getColor());
+        assertFalse(p.getProjectSetting().isAutoDelete());
+
+
         return p;
 
     }

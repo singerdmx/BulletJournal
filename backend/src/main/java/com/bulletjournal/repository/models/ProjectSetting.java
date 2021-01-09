@@ -9,7 +9,7 @@ public class ProjectSetting {
     @Column(name = "project_id")
     private Long id;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @MapsId
     @JoinColumn(name = "project_id")
     private Project project;
@@ -23,9 +23,8 @@ public class ProjectSetting {
     public ProjectSetting() {
     }
 
-    public ProjectSetting(Long id, Project project, String color, boolean autoDelete) {
+    public ProjectSetting(Long id, String color, boolean autoDelete) {
         this.id = id;
-        this.project = project;
         this.color = color;
         this.autoDelete = autoDelete;
     }
