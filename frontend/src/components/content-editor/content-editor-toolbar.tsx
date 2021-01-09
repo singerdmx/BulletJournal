@@ -103,23 +103,23 @@ export const modules = {
   },
   toolbar: {
     container: [
-      [
-        { header: [1, 2, 3, false] },
-        { color: [] },
-        { background: [] },
-        { align: [] },
-      ],
       ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block', 'undo', 'redo'],
       [
-        { list: 'ordered' },
-        { list: 'bullet' },
-        { indent: '-1' },
-        { indent: '+1' },
+        {list: 'ordered'},
+        {list: 'bullet'},
+        {indent: '-1'},
+        {indent: '+1'},
       ],
 
       ['link', 'image', 'emoji'],
 
       ['clean'],
+      [
+        {header: [1, 2, 3, false]},
+        {color: []},
+        {background: []},
+        {align: []},
+      ],
     ],
     handlers: {},
   },
