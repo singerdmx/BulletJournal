@@ -64,7 +64,7 @@ function saveChanges(editor, isAutoSave) {
     fetch(url, {headers: headers, method: 'PATCH', body: patchBody}).then(res => {
         if (res.ok) {
             if (isAutoSave) {
-                setTimeout(saveChanges, 60000, editor);
+                setTimeout(saveChanges, 60000, editor,true);
             }else{
                 showSuccess("Successfully saved the content");
             }
