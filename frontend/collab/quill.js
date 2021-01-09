@@ -150,12 +150,6 @@ window.addEventListener('load', () => {
             syntax: {highlight: text => hljs.highlightAuto(text).value,},
             cursors: true,
             toolbar: [
-                [
-                    {header: [1, 2, 3, false]},
-                    {color: []},
-                    {background: []},
-                    {align: []},
-                ],
                 ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block'],
                 [
                     {list: 'ordered'},
@@ -163,10 +157,14 @@ window.addEventListener('load', () => {
                     {indent: '-1'},
                     {indent: '+1'},
                 ],
-
                 ['link'],
-
                 ['clean'],
+                [
+                    {header: [1, 2, 3, false]},
+                    {color: []},
+                    {background: []},
+                    {align: []},
+                ],
             ],
             history: {
                 delay: 500,
@@ -328,19 +326,22 @@ const noAccessWarning = (contentType) => {
 
 
 const setToolTips = (editor)=>{
-    var toolbar = editor.container.previousSibling;
+    const toolbar = editor.container.previousSibling;
+    toolbar.querySelector('span.ql-color').setAttribute('title', 'Text color');
+    toolbar.querySelector('span.ql-background').setAttribute('title', 'Background color');
+    toolbar.querySelector('span.ql-align').setAttribute('title', 'Align');
     toolbar.querySelector('button.ql-bold').setAttribute('title', 'Bold');
     toolbar.querySelector('button.ql-italic').setAttribute('title', 'Italic');
     toolbar.querySelector('button.ql-underline').setAttribute('title', 'Underline');
     toolbar.querySelector('button.ql-strike').setAttribute('title', 'Strikethrough');
-    toolbar.querySelector('button.ql-blockquote').setAttribute('title', 'Blockquote');
-    toolbar.querySelector('button.ql-code-block').setAttribute('title', 'Code Block');
+    toolbar.querySelector('button.ql-blockquote').setAttribute('title', 'Quote');
+    toolbar.querySelector('button.ql-code-block').setAttribute('title', 'Code');
 
-    toolbar.querySelector('button.ql-list[value=ordered]').setAttribute('title', 'Order List');
-    toolbar.querySelector('button.ql-list[value=bullet]').setAttribute('title', 'Bullet List');
-    toolbar.querySelector('button.ql-indent[value="-1"]').setAttribute('title', 'Backward Indent');
-    toolbar.querySelector('button.ql-indent[value="+1"]').setAttribute('title', 'Forward Indent');
+    toolbar.querySelector('button.ql-list[value=ordered]').setAttribute('title', 'Numbered list');
+    toolbar.querySelector('button.ql-list[value=bullet]').setAttribute('title', 'Bulleted list');
+    toolbar.querySelector('button.ql-indent[value="-1"]').setAttribute('title', 'Indent less');
+    toolbar.querySelector('button.ql-indent[value="+1"]').setAttribute('title', 'Indent more');
 
-    toolbar.querySelector('button.ql-link').setAttribute('title', 'Link');
-    toolbar.querySelector('button.ql-clean').setAttribute('title', 'Clear Formatting');
+    toolbar.querySelector('button.ql-link').setAttribute('title', 'Insert link');
+    toolbar.querySelector('button.ql-clean').setAttribute('title', 'Remove formatting');
 };
