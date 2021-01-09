@@ -33,12 +33,9 @@ public class ProjectSettingDaoJpa {
         this.authorizationService.checkAuthorizedToOperateOnContent(
                 project.getOwner(), requester, ContentType.PROJECT, Operation.UPDATE, project.getId());
         ProjectSetting setting = this.projectSettingRepository.findById(project.getId())
-                .orElse(null);
-        if (setting == null) {
-            setting = new ProjectSetting();
-            setting.setId(project.getId());
-            setting.setProject(project);
-        }
+                .orElse(new ProjectSetting());
+        setting.setId(project.getId());
+        setting.setProject(project);
         setting.setAutoDelete(autoDelete);
         setting.setColor(color);
         this.projectSettingRepository.save(setting);

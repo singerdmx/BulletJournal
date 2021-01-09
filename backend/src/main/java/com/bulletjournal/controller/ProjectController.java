@@ -13,6 +13,7 @@ import com.bulletjournal.repository.AuditableDaoJpa;
 import com.bulletjournal.repository.ProjectDaoJpa;
 import com.bulletjournal.controller.models.ProjectSetting;
 import com.bulletjournal.repository.ProjectSettingDaoJpa;
+import com.bulletjournal.repository.ProjectSettingRepository;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +29,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
@@ -59,16 +57,23 @@ public class ProjectController {
     @Autowired
     private ProjectSettingDaoJpa projectSettingDaoJpa;
 
+    @Autowired
+    private ProjectSettingRepository projectSettingRepository;
+
     @GetMapping(PROJECTS_ROUTE)
     public ResponseEntity<Projects> getProjects() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        Projects projects = this.projectDaoJpa.getProjects(username);
+        List<com.bulletjournal.repository.models.Project> projectsForSetting = new ArrayList<>();
+        Projects projects = this.projectDaoJpa.getProjects(username, projectsForSetting);
+//        this.projectSettingRepository.findByProjectIn(projectsForSetting)
+//                .stream().filter(Objects::nonNull).collect(Collectors.toList());
 
         String ownedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE, projects.getOwned());
 
         String sharedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE, projects.getShared());
+
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.setETag(ownedProjectsEtag + "|" + sharedProjectsEtag);
         return ResponseEntity.ok().headers(responseHeader).body(Projects.addOwnerAvatar(projects, this.userClient));

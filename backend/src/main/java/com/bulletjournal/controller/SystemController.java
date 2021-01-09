@@ -124,7 +124,7 @@ public class SystemController {
         List<Etag> cachingEtags = new ArrayList<>();
 
         if (targetEtags == null || targetEtags.contains("projectsEtag")) {
-            Projects projects = this.projectDaoJpa.getProjects(username);
+            Projects projects = this.projectDaoJpa.getProjects(username, null);
             ownedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                     EtagGenerator.HashType.TO_HASHCODE,
                     projects.getOwned());
