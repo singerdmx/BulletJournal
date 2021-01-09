@@ -7,6 +7,7 @@ import Quill, {DeltaStatic} from 'quill';
 import 'react-quill/dist/quill.core.css';
 import 'react-quill/dist/quill.bubble.css';
 import 'react-quill/dist/quill.snow.css';
+import 'highlight.js/styles/stackoverflow-dark.css'
 import {formats, modules} from './content-editor-toolbar';
 import {createContent as createNoteContent, patchContent as patchNoteContent,} from '../../features/notes/actions';
 import {

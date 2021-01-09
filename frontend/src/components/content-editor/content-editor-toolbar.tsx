@@ -5,10 +5,13 @@ import 'react-quill/dist/quill.snow.css';
 import ImageResize from '../../utils/image-resize/ImageResize';
 import ImageFormat from '../../utils/image-resize/ImageFormat';
 import ImageDropAndPaste from '../../utils/image-drop-and-paste/quill-image-drop-and-paste';
+import hljs from 'highlight.js'
 
 Quill.register('modules/imageResize', ImageResize);
 Quill.register('modules/imageDropAndPaste', ImageDropAndPaste);
 Quill.register(ImageFormat, true);
+
+hljs.initHighlightingOnLoad();
 
 // Custom Undo button çicon component for Quill editor. You can import it directly
 // from 'quill/assets/icons/undo.svg' but I found that a number of loaders do not
@@ -87,6 +90,9 @@ icons["redo"] = `<svg viewbox="0 0 18 18">
 export const modules = {
   imageResize:{
     displaySize: true
+  },
+  syntax: {
+    highlight: (text: string) => hljs.highlightAuto(text).value,
   },
   toolbar: {
     container: [
