@@ -91,6 +91,8 @@ public class ProjectControllerTest {
         Project p1 = TestHelpers.createProject(requestParams, expectedOwner, projectName, group, ProjectType.TODO);
         p1 = updateProject(p1);
 
+        p1 = addProjectSetting(p1);
+
         // create other projects
         Project p2 = TestHelpers.createProject(requestParams, expectedOwner, "P2", group, ProjectType.LEDGER);
         Project p3 = TestHelpers.createProject(requestParams, expectedOwner, "P3", group, ProjectType.NOTE);
@@ -1215,6 +1217,23 @@ public class ProjectControllerTest {
         assertNotEquals(sharedProjectsEtag, eTags[1]);
     }
 
+    private ProjectDetails addProjectSetting(Project project) {
+        ProjectSetting projectSetting = new ProjectSetting("red", true);
+        ResponseEntity<ProjectDetails> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECT_SETTINGS_ROUTE,
+                HttpMethod.PUT,
+                new HttpEntity<>(projectSetting),
+                ProjectDetails.class,
+                project.getId());
+        ProjectDetails p = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(p.getProjectSetting());
+        assertEquals("red", p.getProjectSetting().getColor());
+        assertEquals(true, p.getProjectSetting().isAutoDelete());
+        return p;
+
+    }
+
     private Project updateProject(Project p1) {
         // update project name from "P0" to "P1"
         String projectNewName = "P1";
@@ -1222,11 +1241,11 @@ public class ProjectControllerTest {
         updateProjectParams.setName(projectNewName);
         updateProjectParams.setDescription("d2");
 
-        ResponseEntity<Project> response = this.restTemplate.exchange(
+        ResponseEntity<ProjectDetails> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECT_ROUTE,
                 HttpMethod.PATCH,
                 new HttpEntity<>(updateProjectParams),
-                Project.class,
+                ProjectDetails.class,
                 p1.getId());
         p1 = response.getBody();
         assertEquals(HttpStatus.OK, response.getStatusCode());

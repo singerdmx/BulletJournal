@@ -12,6 +12,7 @@ import com.bulletjournal.notifications.informed.RemoveProjectEvent;
 import com.bulletjournal.repository.AuditableDaoJpa;
 import com.bulletjournal.repository.ProjectDaoJpa;
 import com.bulletjournal.controller.models.ProjectSetting;
+import com.bulletjournal.repository.ProjectSettingDaoJpa;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +56,9 @@ public class ProjectController {
     @Autowired
     private UserClient userClient;
 
+    @Autowired
+    private ProjectSettingDaoJpa projectSettingDaoJpa;
+
     @GetMapping(PROJECTS_ROUTE)
     public ResponseEntity<Projects> getProjects() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -65,7 +69,6 @@ public class ProjectController {
 
         String sharedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE, projects.getShared());
-
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.setETag(ownedProjectsEtag + "|" + sharedProjectsEtag);
         return ResponseEntity.ok().headers(responseHeader).body(Projects.addOwnerAvatar(projects, this.userClient));
@@ -76,16 +79,20 @@ public class ProjectController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Project project = this.projectDaoJpa.getProject(projectId, username).toVerbosePresentationModel();
         ProjectDetails projectDetails = new ProjectDetails(Project.addOwnerAvatar(project, this.userClient));
-        // projectDetails.setProjectSetting();
+        ProjectSetting projectSetting = this.projectSettingDaoJpa.getProjectSetting(projectId);
+        projectDetails.setProjectSetting(projectSetting);
         return projectDetails;
     }
 
     @PutMapping(PROJECT_SETTINGS_ROUTE)
-    public void setProjectSettings(@NotNull @PathVariable Long projectId,
+    public ProjectDetails setProjectSettings(@NotNull @PathVariable Long projectId,
                                    @NotNull @Valid @RequestBody ProjectSetting setting) {
-        // set project color if exist and autoDelete
         String projectColor = setting.getColor();
         boolean autoDelete = setting.isAutoDelete();
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.projectSettingDaoJpa.setProjectSetting(username,
+                this.projectDaoJpa.getProject(projectId, username), projectColor, autoDelete);
+        return getProject(projectId);
     }
 
     @PostMapping(PROJECTS_ROUTE)

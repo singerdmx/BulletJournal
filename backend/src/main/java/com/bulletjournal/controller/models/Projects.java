@@ -4,7 +4,9 @@ import com.bulletjournal.clients.UserClient;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Projects {
 
@@ -13,6 +15,16 @@ public class Projects {
 
     @NotNull
     private List<ProjectsWithOwner> shared = new ArrayList<>();
+
+    private Map<Project, ProjectSetting> settings = new HashMap<>();
+
+    public Map<Project, ProjectSetting> getSettings() {
+        return settings;
+    }
+
+    public void setSettings(Map<Project, ProjectSetting> settings) {
+        this.settings = settings;
+    }
 
     public static Projects addOwnerAvatar(Projects projects, UserClient userClient) {
         projects.owned.forEach(p -> Project.addOwnerAvatar(p, userClient));

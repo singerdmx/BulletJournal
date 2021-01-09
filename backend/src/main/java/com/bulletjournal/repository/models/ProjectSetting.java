@@ -20,6 +20,16 @@ public class ProjectSetting {
     @Column(name = "auto_delete")
     private boolean autoDelete;
 
+    public ProjectSetting() {
+    }
+
+    public ProjectSetting(Long id, Project project, String color, boolean autoDelete) {
+        this.id = id;
+        this.project = project;
+        this.color = color;
+        this.autoDelete = autoDelete;
+    }
+
     public Long getId() {
         return id;
     }
@@ -50,5 +60,9 @@ public class ProjectSetting {
 
     public void setAutoDelete(boolean autoDelete) {
         this.autoDelete = autoDelete;
+    }
+
+    public com.bulletjournal.controller.models.ProjectSetting toPresentationModel() {
+        return new com.bulletjournal.controller.models.ProjectSetting(this.color, this.autoDelete);
     }
 }
