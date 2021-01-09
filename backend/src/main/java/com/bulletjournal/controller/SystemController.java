@@ -56,9 +56,6 @@ public class SystemController {
     private static final Logger LOGGER = LoggerFactory.getLogger(SystemController.class);
 
     @Autowired
-    private AuthorizationService authorizationService;
-
-    @Autowired
     private ProjectDaoJpa projectDaoJpa;
 
     @Autowired

@@ -51,8 +51,6 @@ public class ProjectDaoJpa {
     private ProjectNotesRepository projectNotesRepository;
     @Autowired
     private ProjectTasksRepository projectTasksRepository;
-    @Autowired
-    private ProjectSettingDaoJpa projectSettingDaoJpa;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Projects getProjects(String owner) {
