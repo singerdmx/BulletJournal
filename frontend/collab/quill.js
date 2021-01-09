@@ -177,7 +177,7 @@ window.addEventListener('load', () => {
         placeholder: 'Start collaborating...',
         theme: 'snow' // or 'bubble'
     });
-
+    setToolTips(editor);
     registerSaveButton(editor);
 
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
@@ -326,3 +326,21 @@ const noAccessWarning = (contentType) => {
     return "Please note that your change is not being saved in the server and your change will be lost once you leave this page. <br>You can either keep a copy of your change before you leave or ask the owner of this " + contentType + " to grant you access by either <br>inviting you to join its BuJo or use the share button to share it with you."
 };
 
+
+const setToolTips = (editor)=>{
+    var toolbar = editor.container.previousSibling;
+    toolbar.querySelector('button.ql-bold').setAttribute('title', 'Bold');
+    toolbar.querySelector('button.ql-italic').setAttribute('title', 'Italic');
+    toolbar.querySelector('button.ql-underline').setAttribute('title', 'Underline');
+    toolbar.querySelector('button.ql-strike').setAttribute('title', 'Strikethrough');
+    toolbar.querySelector('button.ql-blockquote').setAttribute('title', 'Blockquote');
+    toolbar.querySelector('button.ql-code-block').setAttribute('title', 'Code Block');
+
+    toolbar.querySelector('button.ql-list[value=ordered]').setAttribute('title', 'Order List');
+    toolbar.querySelector('button.ql-list[value=bullet]').setAttribute('title', 'Bullet List');
+    toolbar.querySelector('button.ql-indent[value="-1"]').setAttribute('title', 'Backward Indent');
+    toolbar.querySelector('button.ql-indent[value="+1"]').setAttribute('title', 'Forward Indent');
+
+    toolbar.querySelector('button.ql-link').setAttribute('title', 'Link');
+    toolbar.querySelector('button.ql-clean').setAttribute('title', 'Clear Formatting');
+};
