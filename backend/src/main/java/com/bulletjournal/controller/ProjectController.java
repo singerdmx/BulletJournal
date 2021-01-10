@@ -67,8 +67,13 @@ public class ProjectController {
         Projects projects = this.projectDaoJpa.getProjects(username, projectsForSetting);
         List<Long> ids = projectsForSetting.stream().map(com.bulletjournal.repository.models.Project::getId)
                 .collect(Collectors.toList());
-        this.projectSettingRepository.findByIdIn(ids)
-                .stream().filter(Objects::nonNull).collect(Collectors.toList());
+        List<com.bulletjournal.repository.models.ProjectSetting> projectSettings = this.projectSettingRepository
+                .findByIdIn(ids).stream().filter(Objects::nonNull).collect(Collectors.toList());
+        Map<Long, ProjectSetting> settings = new HashMap<>();
+        for (com.bulletjournal.repository.models.ProjectSetting p : projectSettings)
+            settings.put(p.getId(), p.toPresentationModel());
+
+        projects.setSettings(settings);
 
         String ownedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE, projects.getOwned());
