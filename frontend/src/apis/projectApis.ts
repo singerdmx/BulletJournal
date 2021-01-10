@@ -97,3 +97,15 @@ export const GetProjectHistory = (
       throw Error(err.message);
     });
 };
+
+export const updateProjectSettings = (projectId: number, autoDelete: boolean, color: string | undefined) => {
+  const putBody = JSON.stringify({
+    autoDelete: autoDelete,
+    color: color,
+  });
+  return doPut(`/api/projects/${projectId}/settings`, putBody)
+    .then((res) => res)
+    .catch((err) => {
+      throw Error(err.message);
+    });
+};

@@ -23,11 +23,11 @@ import {User} from '../../features/group/interface';
 import {useHistory} from 'react-router-dom';
 import AddTask from '../../components/modals/add-task.component';
 import {ProjectItemUIType} from "../../features/project/constants";
-import ProjectSetting from "../../components/modals/project-setting.component";
 import TasksByOrder from "../../components/modals/tasks-by-order.component";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 import {ProjectOutlined} from "@ant-design/icons/lib";
 import {includeProjectItem} from "../../utils/Util";
+import ProjectSettingDialog from "../../components/modals/project-setting.component";
 
 type TasksProps = {
   completeTasksShown: boolean;
@@ -397,7 +397,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
       <div>
         {createContent()}
         <div>
-          <ProjectSetting
+          <ProjectSettingDialog
               visible={projectSettingShown}
               onCancel={() => {
                 setProjectSettingShown(false)

@@ -9,4 +9,3 @@ auth-proxy/.idea
 *.pb.gw.go
 *.swagger.json
 node_modules
-package-lock.json

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import CSS from 'csstype';
 import {
   Checkbox,
   Modal,
@@ -8,23 +7,30 @@ import { RGBColor, SwatchesPicker } from 'react-color';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import './modals.styles.less';
-import { Project } from '../../features/project/interface';
+import {Project, ProjectSetting} from '../../features/project/interface';
 import { BgColorsOutlined } from '@ant-design/icons';
-
+import {updateProjectSettings} from '../../features/project/actions';
 
 type ProjectSettingProps = {
   project: Project | undefined;
+  projectSetting: ProjectSetting;
   visible: boolean;
   onCancel: () => void;
+  updateProjectSettings: (
+    projectId: number,
+    autoDelete: boolean,
+    color: string,
+  ) => void;
 };
 
-const ProjectSetting: React.FC<ProjectSettingProps> = (props) => {
+const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
   const {
     project,
+    projectSetting,
     visible,
+    updateProjectSettings,
   } = props;
 
-  const [displayColorIcon, setDisplayColorIcon] = useState(false);
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
   const [bgColor, setBgColor] = useState({
     r: '255',
@@ -34,7 +40,7 @@ const ProjectSetting: React.FC<ProjectSettingProps> = (props) => {
   })
 
   const onCheckColorIcon = (e: any) => {
-    setDisplayColorIcon(!displayColorIcon);
+    setDisplayColorPicker(!displayColorPicker);
     if (!e.target.check) {
       setBgColor({
           r: '255',
@@ -45,26 +51,12 @@ const ProjectSetting: React.FC<ProjectSettingProps> = (props) => {
     }
 }
 
-  const handleClickSetColorIcon = () => {
-      setDisplayColorPicker(!displayColorPicker);
-  };
-
   const handleColorChange = (c : any , event : any) => {
+    if (project) {
+      updateProjectSettings(project.id, projectSetting.autoDelete, c.rgb);
+    }
     setBgColor(c.rgb);
   };  
-
-  const popover : CSS.Properties = {
-    position: 'absolute', 
-    zIndex: 2
-  }
-
-  const cover : CSS.Properties = {
-    position: 'fixed', 
-    top: '0px', 
-    right: '0px', 
-    bottom: '0px', 
-    left: '0px'
-  }
 
   const color : RGBColor = {
     r: Number(bgColor.r),
@@ -82,18 +74,18 @@ const ProjectSetting: React.FC<ProjectSettingProps> = (props) => {
     >
       <div>
         <Checkbox
-            style={{ marginRight: '0.5rem', marginTop: '-0.5em' }}
+            style={{ marginTop: '-0.5em' }}
             onChange={onCheckColorIcon}
         >
-            Set Bujo Background Color
+            Set Background Color
         </Checkbox>
 
-        {displayColorIcon ? <BgColorsOutlined onClick={handleClickSetColorIcon}/> : null}
+        <BgColorsOutlined />
 
         <div>
-            { displayColorPicker ? <div style={ popover }>
-            <div style={ cover } onClick={ handleClickSetColorIcon }/>
-            <SwatchesPicker color={color}  onChange={ handleColorChange } />
+            { displayColorPicker ? 
+            <div>
+              <SwatchesPicker color={color}  onChange={ handleColorChange } />
             </div> : null }
         </div>
       </div>
@@ -110,6 +102,9 @@ const ProjectSetting: React.FC<ProjectSettingProps> = (props) => {
 
 const mapStateToProps = (state: IState) => ({
   project: state.project.project,
+  projectSetting: state.project.settings
 });
 
-export default connect(mapStateToProps, {})(ProjectSetting);
+export default connect(mapStateToProps, {
+  updateProjectSettings
+})(ProjectSettingDialog);

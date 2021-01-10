@@ -11,6 +11,7 @@ import {
   UpdateProjects,
   UpdateSharedProjectsOrderAction,
   GetProjectHistoryAction,
+  UpdateProjectSettingsAction
 } from './reducer';
 import { actions as groupsActions } from '../group/reducer';
 import { actions as tasksActions } from '../tasks/reducer';
@@ -24,6 +25,7 @@ import {
   updateProjectRelations,
   updateSharedProjectsOrder,
   GetProjectHistory,
+  updateProjectSettings,
 } from '../../apis/projectApis';
 import { IState } from '../../store';
 import { Project, Activity } from './interface';
@@ -152,6 +154,9 @@ function* getUserProject(action: PayloadAction<GetProjectAction>) {
     const { projectId } = action.payload;
     const data: Project = yield call(getProject, projectId);
     yield put(projectActions.projectReceived({ project: data }));
+    if (data.projectSetting) {
+      yield put(projectActions.projectSettingReceived({ projectSetting: data.projectSetting }));
+    }
     yield put(groupsActions.getGroup({ groupId: data.group.id }));
     yield put(tasksActions.updateCompletedTaskPageNo({completedTaskPageNo: 0}));
   } catch (error) {
@@ -238,6 +243,41 @@ function* putProjectRelations(
   }
 }
 
+function* putProjectSettings(
+  action: PayloadAction<UpdateProjectSettingsAction>
+) {
+  try {
+    const { projectId, autoDelete, color } = action.payload;
+    
+    const data : Project = yield call(
+      updateProjectSettings,
+      projectId,
+      autoDelete,
+      color,
+    );
+
+    yield put(projectActions.projectReceived({ project: data }));
+    if (data.projectSetting) {
+      yield put(projectActions.projectSettingReceived({ projectSetting: data.projectSetting }));
+    }
+
+    const state: IState = yield select();
+    // state.project.owned
+    yield put(
+        projectActions.projectsReceived({
+          owned: state.project.owned,
+          shared: state.project.shared,
+        })
+    );
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Update Project Settings Fail: ${error}`);
+    }
+  }
+}
+
 function* getProjectHistory(action: PayloadAction<GetProjectHistoryAction>) {
   try {
     const {
@@ -288,5 +328,9 @@ export default function* projectSagas() {
       putProjectRelations
     ),
     yield takeLatest(projectActions.getProjectHistory.type, getProjectHistory),
+    yield takeLatest(
+      projectActions.updateProjectSettings.type,
+      putProjectSettings
+    ),
   ]);
 }
