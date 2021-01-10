@@ -72,11 +72,6 @@ public class ProjectController {
         Map<Long, ProjectSetting> settings = projectSettings.stream()
                 .collect(Collectors.toMap(com.bulletjournal.repository.models.ProjectSetting::getId,
                         com.bulletjournal.repository.models.ProjectSetting::toPresentationModel));
-
-        for (com.bulletjournal.repository.models.ProjectSetting p : projectSettings) {
-            settings.put(p.getId(), p.toPresentationModel());
-        }
-
         projects.setSettings(settings);
 
         String ownedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
