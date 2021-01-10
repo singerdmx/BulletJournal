@@ -107,7 +107,7 @@ public class ProjectControllerTest {
         // test get setting for projects
         Group tempG = TestHelpers.createGroup(requestParams, sampleUsers[2], "tempG");
         Project p9 = TestHelpers.createProject(requestParams, sampleUsers[2], "P9", tempG, ProjectType.TODO);
-        List<Project> projects = new ArrayList<>(Arrays.asList(p2, p9));
+        List<Project> projects = new ArrayList<>(Arrays.asList(p2, p3, p9));
         testGetProjectSettingsMultiple(projects);
 
         // test notification for adding and removing users
@@ -1275,24 +1275,46 @@ public class ProjectControllerTest {
                 new HttpEntity<>(projectSetting),
                 ProjectDetails.class,
                 projects.get(0).getId());
+        ProjectDetails p = response.getBody();
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("red", p.getProjectSetting().getColor());
+        assertTrue(p.getProjectSetting().isAutoDelete());
 
-        projectSetting = new ProjectSetting("yellow", true);
+        projectSetting = new ProjectSetting("blue", false);
+        response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECT_SETTINGS_ROUTE,
+                HttpMethod.PUT,
+                new HttpEntity<>(projectSetting),
+                ProjectDetails.class,
+                projects.get(1).getId());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        p = response.getBody();
+        assertEquals("blue", p.getProjectSetting().getColor());
+        assertFalse(p.getProjectSetting().isAutoDelete());
+
+        projectSetting = new ProjectSetting("green", true);
         response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECT_SETTINGS_ROUTE,
                 HttpMethod.PUT,
                 TestHelpers.actAsOtherUser(projectSetting, sampleUsers[2]),
                 ProjectDetails.class,
-                projects.get(1).getId());
+                projects.get(2).getId());
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        p = response.getBody();
+        assertEquals("green", p.getProjectSetting().getColor());
+        assertTrue(p.getProjectSetting().isAutoDelete());
 
-        // get setting for first user, should only return for p1, p2
+        // get setting for first user, should only return for p2, p3
         ResponseEntity<Projects> response1 = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
                 HttpMethod.GET,
                 null,
                 Projects.class);
         assertEquals(HttpStatus.OK, response1.getStatusCode());
+        Projects projects1 = response1.getBody();
+        assertEquals(2, projects1.getSettings().size());
+        assertEquals("red", projects1.getSettings().get(projects.get(0).getId()).getColor());
+        assertEquals("blue", projects1.getSettings().get(projects.get(1).getId()).getColor());
 
     }
 
