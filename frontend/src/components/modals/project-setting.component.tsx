@@ -71,10 +71,10 @@ const ProjectSetting: React.FC<ProjectSettingProps> = (props) => {
     >
       <div>
         <Checkbox
-            style={{ marginRight: '0.5rem', marginTop: '-0.5em' }}
+            style={{ marginTop: '-0.5em' }}
             onChange={onCheckColorIcon}
         >
-            Set Bujo Background Color
+            Set Background Color
         </Checkbox>
 
         <BgColorsOutlined />
