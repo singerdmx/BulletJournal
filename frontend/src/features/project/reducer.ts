@@ -40,6 +40,12 @@ export type UpdateProjectRelationsAction = {
   projects: Project[];
 };
 
+export type UpdateProjectSettingsAction = {
+  projectId: number;
+  autoDelete: boolean;
+  color: string;
+};
+
 export type DeleteProjectAction = {
   projectId: number;
   name: string;
@@ -108,6 +114,10 @@ const slice = createSlice({
     updateProjectRelations: (
       state,
       action: PayloadAction<UpdateProjectRelationsAction>
+    ) => state,
+    updateProjectSettings: (
+      state,
+      action: PayloadAction<UpdateProjectSettingsAction>
     ) => state,
   },
 });

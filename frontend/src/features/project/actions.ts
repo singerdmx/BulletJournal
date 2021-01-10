@@ -41,6 +41,16 @@ export const updateProject = (
   });
 export const updateProjectRelations = (projects: Project[]) =>
   actions.updateProjectRelations({ projects: projects });
+export const updateProjectSettings = (
+  projectId: number,
+  autoDelete: boolean,
+  color: string
+) =>
+  actions.updateProjectSettings({ 
+    projectId: projectId,
+    autoDelete: autoDelete,
+    color: color,
+  });
 export const getProjectHistory = (
   projectId: number,
   timezone: string,

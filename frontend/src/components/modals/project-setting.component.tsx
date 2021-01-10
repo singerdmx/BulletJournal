@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import CSS from 'csstype';
 import {
   Checkbox,
   Modal,
@@ -10,12 +9,19 @@ import { connect } from 'react-redux';
 import './modals.styles.less';
 import { Project } from '../../features/project/interface';
 import { BgColorsOutlined } from '@ant-design/icons';
+import { updateProjectSettings } from '../../features/project/actions';
+ 
 
 
 type ProjectSettingProps = {
   project: Project | undefined;
   visible: boolean;
   onCancel: () => void;
+  updateProjectSettings: (
+    projectId: number,
+    autoDelete: boolean,
+    color: string,
+  ) => void;
 };
 
 const ProjectSetting: React.FC<ProjectSettingProps> = (props) => {
@@ -45,16 +51,11 @@ const ProjectSetting: React.FC<ProjectSettingProps> = (props) => {
 }
 
   const handleColorChange = (c : any , event : any) => {
+    if (project) {
+      updateProjectSettings(project.id, false, c.rgb);
+    }
     setBgColor(c.rgb);
   };  
-
-  const cover : CSS.Properties = {
-    position: 'fixed', 
-    top: '0px', 
-    right: '0px', 
-    bottom: '0px', 
-    left: '0px'
-  }
 
   const color : RGBColor = {
     r: Number(bgColor.r),
@@ -81,9 +82,9 @@ const ProjectSetting: React.FC<ProjectSettingProps> = (props) => {
         <BgColorsOutlined />
 
         <div>
-            { displayColorPicker ? <div>
-            <div style={ cover } />
-            <SwatchesPicker color={color}  onChange={ handleColorChange } />
+            { displayColorPicker ? 
+            <div>
+              <SwatchesPicker color={color}  onChange={ handleColorChange } />
             </div> : null }
         </div>
       </div>

@@ -1,7 +1,6 @@
 import { doFetch, doPost, doDelete, doPatch, doPut } from './api-helper';
 import { Project } from '../features/project/interface';
 import { ContentAction } from '../features/project/constants';
-import { stringToRGB } from '../features/label/interface';
 
 export const fetchProjects = () => {
   return doFetch('/api/projects')
@@ -99,7 +98,7 @@ export const GetProjectHistory = (
     });
 };
 
-export const updateProjectSettings = (projectId: number, color: string, autoDelete: boolean) => {
+export const updateProjectSettings = (projectId: number, autoDelete: boolean, color: string) => {
   const putBody = JSON.stringify({
     autoDelete: autoDelete,
     color: color,
