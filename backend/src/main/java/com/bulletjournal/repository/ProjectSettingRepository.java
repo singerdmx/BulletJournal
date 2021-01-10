@@ -1,6 +1,5 @@
 package com.bulletjournal.repository;
 
-import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.ProjectSetting;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
