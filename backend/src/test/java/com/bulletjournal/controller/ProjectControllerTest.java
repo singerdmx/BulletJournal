@@ -1094,12 +1094,6 @@ public class ProjectControllerTest {
     }
 
     private void updateProjectRelations(Project p1, Project p2, Project p3, Project p4, Project p5, Project p6) {
-        ResponseEntity<Object> r = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
-                HttpMethod.GET,
-                null,
-                Object.class);
-
         ResponseEntity<Projects> getProjectsResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
                 HttpMethod.GET,
