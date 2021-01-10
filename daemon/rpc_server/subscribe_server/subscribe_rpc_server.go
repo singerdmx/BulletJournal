@@ -222,7 +222,7 @@ func (s *SubscribeRpcServer) StartDispatcher() {
 					s.handleDispatchingError(session, msg)
 				}
 			case consts.SAMPLE_TASK_SERVICE_NAME:
-				if err := s.sendInvestmentServiceNotification(session, msg); err != nil {
+				if err := s.sendSampleTaskServiceNotification(session, msg); err != nil {
 					s.handleDispatchingError(session, msg)
 				}
 			case consts.REMINDER_SERVICE_NAME:
@@ -259,7 +259,7 @@ func (s *SubscribeRpcServer) Stop() {
 	s.sessionProvider.terminateAllSessions()
 }
 
-func (s *SubscribeRpcServer) sendInvestmentServiceNotification(
+func (s *SubscribeRpcServer) sendSampleTaskServiceNotification(
 	handle *streamHandle,
 	msg *daemon.StreamingMessage,
 ) error {
