@@ -104,6 +104,12 @@ public class ProjectControllerTest {
         Project p7 = TestHelpers.createProject(requestParams, expectedOwner, "P7", group, ProjectType.TODO);
         updateProjectRelations(p5, p6, p7);
 
+        // test get setting for projects
+        Group tempG = TestHelpers.createGroup(requestParams, sampleUsers[2], "tempG");
+        Project p9 = TestHelpers.createProject(requestParams, sampleUsers[2], "P9", tempG, ProjectType.TODO);
+        List<Project> projects = new ArrayList<>(Arrays.asList(p2, p9));
+        testGetProjectSettingsMultiple(projects);
+
         // test notification for adding and removing users
         Project p8 = TestHelpers.createProject(requestParams, expectedOwner, "P8", group, ProjectType.TODO);
         p8 = updateProjectGroup(p8, groups.get(0).getGroups().get(0).getId());
@@ -1258,6 +1264,35 @@ public class ProjectControllerTest {
 
 
         return p;
+
+    }
+
+    private void testGetProjectSettingsMultiple(List<Project> projects) {
+        ProjectSetting projectSetting = new ProjectSetting("red", true);
+        ResponseEntity<ProjectDetails> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECT_SETTINGS_ROUTE,
+                HttpMethod.PUT,
+                new HttpEntity<>(projectSetting),
+                ProjectDetails.class,
+                projects.get(0).getId());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        projectSetting = new ProjectSetting("yellow", true);
+        response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECT_SETTINGS_ROUTE,
+                HttpMethod.PUT,
+                TestHelpers.actAsOtherUser(projectSetting, sampleUsers[2]),
+                ProjectDetails.class,
+                projects.get(1).getId());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        // get setting for first user, should only return for p1, p2
+        ResponseEntity<Projects> response1 = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Projects.class);
+        assertEquals(HttpStatus.OK, response1.getStatusCode());
 
     }
 

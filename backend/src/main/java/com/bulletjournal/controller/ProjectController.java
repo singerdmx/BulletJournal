@@ -65,8 +65,10 @@ public class ProjectController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<com.bulletjournal.repository.models.Project> projectsForSetting = new ArrayList<>();
         Projects projects = this.projectDaoJpa.getProjects(username, projectsForSetting);
-//        this.projectSettingRepository.findByProjectIn(projectsForSetting)
-//                .stream().filter(Objects::nonNull).collect(Collectors.toList());
+        List<Long> ids = projectsForSetting.stream().map(com.bulletjournal.repository.models.Project::getId)
+                .collect(Collectors.toList());
+        this.projectSettingRepository.findByIdIn(ids)
+                .stream().filter(Objects::nonNull).collect(Collectors.toList());
 
         String ownedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE, projects.getOwned());
