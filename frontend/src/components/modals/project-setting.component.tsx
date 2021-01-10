@@ -24,7 +24,6 @@ const ProjectSetting: React.FC<ProjectSettingProps> = (props) => {
     visible,
   } = props;
 
-  const [displayColorIcon, setDisplayColorIcon] = useState(false);
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
   const [bgColor, setBgColor] = useState({
     r: '255',
@@ -34,7 +33,7 @@ const ProjectSetting: React.FC<ProjectSettingProps> = (props) => {
   })
 
   const onCheckColorIcon = (e: any) => {
-    setDisplayColorIcon(!displayColorIcon);
+    setDisplayColorPicker(!displayColorPicker);
     if (!e.target.check) {
       setBgColor({
           r: '255',
@@ -45,18 +44,9 @@ const ProjectSetting: React.FC<ProjectSettingProps> = (props) => {
     }
 }
 
-  const handleClickSetColorIcon = () => {
-      setDisplayColorPicker(!displayColorPicker);
-  };
-
   const handleColorChange = (c : any , event : any) => {
     setBgColor(c.rgb);
   };  
-
-  const popover : CSS.Properties = {
-    position: 'absolute', 
-    zIndex: 2
-  }
 
   const cover : CSS.Properties = {
     position: 'fixed', 
@@ -88,11 +78,11 @@ const ProjectSetting: React.FC<ProjectSettingProps> = (props) => {
             Set Bujo Background Color
         </Checkbox>
 
-        {displayColorIcon ? <BgColorsOutlined onClick={handleClickSetColorIcon}/> : null}
+        <BgColorsOutlined />
 
         <div>
-            { displayColorPicker ? <div style={ popover }>
-            <div style={ cover } onClick={ handleClickSetColorIcon }/>
+            { displayColorPicker ? <div>
+            <div style={ cover } />
             <SwatchesPicker color={color}  onChange={ handleColorChange } />
             </div> : null }
         </div>
