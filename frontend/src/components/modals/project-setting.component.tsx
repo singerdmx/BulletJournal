@@ -7,12 +7,13 @@ import { RGBColor, SwatchesPicker } from 'react-color';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import './modals.styles.less';
-import { Project } from '../../features/project/interface';
+import {Project, ProjectSetting} from '../../features/project/interface';
 import { BgColorsOutlined } from '@ant-design/icons';
-import { updateProjectSettings } from '../../features/project/actions';
- 
+import {updateProjectSettings} from '../../features/project/actions';
+
 type ProjectSettingProps = {
   project: Project | undefined;
+  projectSetting: ProjectSetting;
   visible: boolean;
   onCancel: () => void;
   updateProjectSettings: (
@@ -22,10 +23,12 @@ type ProjectSettingProps = {
   ) => void;
 };
 
-const ProjectSetting: React.FC<ProjectSettingProps> = (props) => {
+const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
   const {
     project,
+    projectSetting,
     visible,
+    updateProjectSettings,
   } = props;
 
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
@@ -50,7 +53,7 @@ const ProjectSetting: React.FC<ProjectSettingProps> = (props) => {
 
   const handleColorChange = (c : any , event : any) => {
     if (project) {
-      updateProjectSettings(project.id, false, c.rgb);
+      updateProjectSettings(project.id, projectSetting.autoDelete, c.rgb);
     }
     setBgColor(c.rgb);
   };  
@@ -99,6 +102,9 @@ const ProjectSetting: React.FC<ProjectSettingProps> = (props) => {
 
 const mapStateToProps = (state: IState) => ({
   project: state.project.project,
+  projectSetting: state.project.settings
 });
 
-export default connect(mapStateToProps, {})(ProjectSetting);
+export default connect(mapStateToProps, {
+  updateProjectSettings
+})(ProjectSettingDialog);

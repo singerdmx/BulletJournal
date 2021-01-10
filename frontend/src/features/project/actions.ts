@@ -44,7 +44,7 @@ export const updateProjectRelations = (projects: Project[]) =>
 export const updateProjectSettings = (
   projectId: number,
   autoDelete: boolean,
-  color: string
+  color: string | undefined
 ) =>
   actions.updateProjectSettings({ 
     projectId: projectId,

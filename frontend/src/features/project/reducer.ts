@@ -1,7 +1,7 @@
-import { createSlice, PayloadAction } from 'redux-starter-kit';
-import { ProjectType, ContentAction } from './constants';
-import { Project, ProjectsWithOwner, Activity } from './interface';
-import { History } from 'history';
+import {createSlice, PayloadAction} from 'redux-starter-kit';
+import {ContentAction, ProjectType} from './constants';
+import {Activity, Project, ProjectSetting, ProjectsWithOwner} from './interface';
+import {History} from 'history';
 
 export type ProjectApiErrorAction = {
   error: string;
@@ -9,6 +9,10 @@ export type ProjectApiErrorAction = {
 
 export type ProjectAction = {
   project?: Project;
+};
+
+export type ProjectSettingAction = {
+  projectSetting: ProjectSetting;
 };
 
 export type GetProjectAction = {
@@ -43,7 +47,7 @@ export type UpdateProjectRelationsAction = {
 export type UpdateProjectSettingsAction = {
   projectId: number;
   autoDelete: boolean;
-  color: string;
+  color: string | undefined;
 };
 
 export type DeleteProjectAction = {
@@ -74,6 +78,7 @@ let initialState = {
   owned: [] as Project[],
   shared: [] as ProjectsWithOwner[],
   project: undefined as Project | undefined,
+  settings: {color: undefined, autoDelete: false} as ProjectSetting,
   projectHistory: [] as Activity[],
 };
 
@@ -104,6 +109,10 @@ const slice = createSlice({
     projectReceived: (state, action: PayloadAction<ProjectAction>) => {
       const { project } = action.payload;
       state.project = project;
+    },
+    projectSettingReceived: (state, action: PayloadAction<ProjectSettingAction>) => {
+      const { projectSetting } = action.payload;
+      state.settings = projectSetting;
     },
     updateSharedProjectsOrder: (
       state,

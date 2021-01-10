@@ -154,6 +154,9 @@ function* getUserProject(action: PayloadAction<GetProjectAction>) {
     const { projectId } = action.payload;
     const data: Project = yield call(getProject, projectId);
     yield put(projectActions.projectReceived({ project: data }));
+    if (data.projectSetting) {
+      yield put(projectActions.projectSettingReceived({ projectSetting: data.projectSetting }));
+    }
     yield put(groupsActions.getGroup({ groupId: data.group.id }));
     yield put(tasksActions.updateCompletedTaskPageNo({completedTaskPageNo: 0}));
   } catch (error) {
@@ -246,7 +249,7 @@ function* putProjectSettings(
   try {
     const { projectId, autoDelete, color } = action.payload;
     
-    const data = yield call(
+    const data : Project = yield call(
       updateProjectSettings,
       projectId,
       autoDelete,
@@ -254,8 +257,18 @@ function* putProjectSettings(
     );
 
     yield put(projectActions.projectReceived({ project: data }));
-    yield put(projectActions.projectsUpdate({}));
-    
+    if (data.projectSetting) {
+      yield put(projectActions.projectSettingReceived({ projectSetting: data.projectSetting }));
+    }
+
+    const state: IState = yield select();
+    // state.project.owned
+    yield put(
+        projectActions.projectsReceived({
+          owned: state.project.owned,
+          shared: state.project.shared,
+        })
+    );
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));

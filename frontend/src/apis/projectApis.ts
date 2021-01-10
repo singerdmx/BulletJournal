@@ -98,7 +98,7 @@ export const GetProjectHistory = (
     });
 };
 
-export const updateProjectSettings = (projectId: number, autoDelete: boolean, color: string) => {
+export const updateProjectSettings = (projectId: number, autoDelete: boolean, color: string | undefined) => {
   const putBody = JSON.stringify({
     autoDelete: autoDelete,
     color: color,
