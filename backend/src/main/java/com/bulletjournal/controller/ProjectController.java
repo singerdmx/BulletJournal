@@ -69,9 +69,13 @@ public class ProjectController {
                 .collect(Collectors.toList());
         List<com.bulletjournal.repository.models.ProjectSetting> projectSettings = this.projectSettingRepository
                 .findByIdIn(ids).stream().filter(Objects::nonNull).collect(Collectors.toList());
-        Map<Long, ProjectSetting> settings = new HashMap<>();
-        for (com.bulletjournal.repository.models.ProjectSetting p : projectSettings)
+        Map<Long, ProjectSetting> settings = projectSettings.stream()
+                .collect(Collectors.toMap(com.bulletjournal.repository.models.ProjectSetting::getId,
+                        com.bulletjournal.repository.models.ProjectSetting::toPresentationModel));
+
+        for (com.bulletjournal.repository.models.ProjectSetting p : projectSettings) {
             settings.put(p.getId(), p.toPresentationModel());
+        }
 
         projects.setSettings(settings);
 
