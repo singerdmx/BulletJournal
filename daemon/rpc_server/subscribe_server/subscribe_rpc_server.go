@@ -221,7 +221,7 @@ func (s *SubscribeRpcServer) StartDispatcher() {
 				if err := s.sendCleanerServiceNotification(session, msg); err != nil {
 					s.handleDispatchingError(session, msg)
 				}
-			case consts.INVESTMENT_SERVICE_NAME:
+			case consts.SAMPLE_TASK_SERVICE_NAME:
 				if err := s.sendInvestmentServiceNotification(session, msg); err != nil {
 					s.handleDispatchingError(session, msg)
 				}
