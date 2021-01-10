@@ -4,6 +4,7 @@ import {Task} from '../../features/tasks/interface';
 import TreeItem from '../../components/project-item/task-item.component';
 import {TreeNodeNormal} from 'antd/lib/tree/Tree';
 import ReactLoading from 'react-loading';
+import {updateProjectSettings} from '../../features/project/actions';
 import {getTasksByOrder, putTask, updateCompletedTasks, updateTasks} from '../../features/tasks/actions';
 import {connect} from 'react-redux';
 import {IState} from '../../store';
@@ -402,6 +403,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
               onCancel={() => {
                 setProjectSettingShown(false)
               }}
+              updateProjectSettings={updateProjectSettings}
           />
         </div>
         <div>

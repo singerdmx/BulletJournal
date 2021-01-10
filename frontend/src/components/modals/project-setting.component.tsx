@@ -11,8 +11,6 @@ import { Project } from '../../features/project/interface';
 import { BgColorsOutlined } from '@ant-design/icons';
 import { updateProjectSettings } from '../../features/project/actions';
  
-
-
 type ProjectSettingProps = {
   project: Project | undefined;
   visible: boolean;
