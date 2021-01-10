@@ -4,11 +4,12 @@ import {
   Checkbox,
   Modal,
 } from 'antd';
-import { CompactPicker, RGBColor } from 'react-color';
+import { RGBColor, SwatchesPicker } from 'react-color';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import './modals.styles.less';
 import { Project } from '../../features/project/interface';
+import { BgColorsOutlined } from '@ant-design/icons';
 
 
 type ProjectSettingProps = {
@@ -23,18 +24,8 @@ const ProjectSetting: React.FC<ProjectSettingProps> = (props) => {
     visible,
   } = props;
 
-  
-  const onCheck = (e: any) => console.log(e.target.checked);
+  const [displayColorIcon, setDisplayColorIcon] = useState(false);
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
-
-  const handleClickSetColor = () => {
-      setDisplayColorPicker(!displayColorPicker);
-  };
-
-  const handleChange = (c : any , event : any) => {
-    setBgColor(c.rgb);
-  };
-
   const [bgColor, setBgColor] = useState({
     r: '255',
     g: '255',
@@ -42,14 +33,25 @@ const ProjectSetting: React.FC<ProjectSettingProps> = (props) => {
     a: '100',
   })
 
-  const swatch : CSS.Properties = {
-    padding: '5px',
-    borderRadius: '1px',
-    boxShadow: '0 0 0 1px rgba(0,0,0,.1)',
-    display: 'inline-block',
-    cursor: 'pointer',
-    background: `rgba(${ bgColor.r }, ${ bgColor.g }, ${ bgColor.b }, ${ bgColor.a })`,
-  }
+  const onCheckColorIcon = (e: any) => {
+    setDisplayColorIcon(!displayColorIcon);
+    if (!e.target.check) {
+      setBgColor({
+          r: '255',
+          g: '255',
+          b: '255',
+          a: '100',
+      });
+    }
+}
+
+  const handleClickSetColorIcon = () => {
+      setDisplayColorPicker(!displayColorPicker);
+  };
+
+  const handleColorChange = (c : any , event : any) => {
+    setBgColor(c.rgb);
+  };  
 
   const popover : CSS.Properties = {
     position: 'absolute', 
@@ -79,24 +81,29 @@ const ProjectSetting: React.FC<ProjectSettingProps> = (props) => {
       footer={false}
     >
       <div>
-          
         <Checkbox
+            style={{ marginRight: '0.5rem', marginTop: '-0.5em' }}
+            onChange={onCheckColorIcon}
+        >
+            Set Bujo Background Color
+        </Checkbox>
+
+        {displayColorIcon ? <BgColorsOutlined onClick={handleClickSetColorIcon}/> : null}
+
+        <div>
+            { displayColorPicker ? <div style={ popover }>
+            <div style={ cover } onClick={ handleClickSetColorIcon }/>
+            <SwatchesPicker color={color}  onChange={ handleColorChange } />
+            </div> : null }
+        </div>
+      </div>
+
+      {/* <Checkbox
             style={{ marginRight: '0.5rem', marginTop: '-0.5em' }}
             onChange={onCheck}
         >
             Auto Delete
-        </Checkbox>
-
-        <div>
-            <div style={ swatch } onClick={ handleClickSetColor }> select color 
-            </div> 
-            { displayColorPicker ? <div style={ popover }>
-            <div style={ cover } onClick={ handleClickSetColor }/>
-            <CompactPicker color={color}  onChange={ handleChange } />
-            </div> : null }
-
-        </div>
-      </div>
+        </Checkbox> */}
     </Modal>
   );
 };

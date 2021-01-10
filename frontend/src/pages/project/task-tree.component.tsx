@@ -330,7 +330,6 @@ const TaskTree: React.FC<TasksProps> = (props) => {
   };
 
   const handleSettings = () => {
-    console.log('we are changing settings.');
     setProjectSettingShown(true);
   };
 
