@@ -93,11 +93,13 @@ func (c * Cleaner) CleanOutdatedTasks() {
 	sess, err := postgresql.Open(c.Settings)
 	if err != nil {
 		log.Fatal(err)
+		return
 	}
 	defer sess.Close()
 	rows, err := sess.Query("select project_id from project_settings where auto_delete=true")
 	if err != nil {
 		log.Error(err)
+		return
 	}
 	defer rows.Close()
 
@@ -105,7 +107,8 @@ func (c * Cleaner) CleanOutdatedTasks() {
 	for rows.Next() {
 		var projectId int64
 		if err := rows.Scan(&projectId); err != nil {
-			log.Fatal(err)
+			log.Error(err)
+			return
 		}
 		projectIdList = append(projectIdList, projectId)
 	}
