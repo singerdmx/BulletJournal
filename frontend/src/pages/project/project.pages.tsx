@@ -1,6 +1,6 @@
 import React from 'react';
 import {RouteComponentProps} from 'react-router';
-import {Project} from '../../features/project/interface';
+import {Project, ProjectSetting} from '../../features/project/interface';
 import {IState} from '../../store';
 import {connect} from 'react-redux';
 import {GroupsWithOwner, User} from '../../features/group/interface';
@@ -39,6 +39,9 @@ import {CheckSquareTwoTone, CloseCircleTwoTone, CopyOutlined, MenuOutlined, Stop
 import {RadioChangeEvent} from "antd/lib/radio";
 import {getCookie} from "../../index";
 
+import CSS from 'csstype';
+import projectSettingComponent from '../../components/modals/project-setting.component';
+
 type ProjectPathParams = {
   projectId: string;
 };
@@ -71,6 +74,7 @@ type ProjectPageProps = {
   timezone: string;
   history: History<History.PoorMansUnknown>;
   project: Project | undefined;
+  projectSetting: ProjectSetting;
   transactionTimezone: string;
   transactionFrequencyType: FrequencyType;
   transactionStartDate: string;
@@ -365,7 +369,7 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
   };
 
   render() {
-    const {project, myself, history} = this.props;
+    const {projectSetting, project, myself, history} = this.props;
 
     if (!project) {
       return null;
@@ -595,11 +599,19 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
       </Popover>
     }
 
+    const bgColorSetting = projectSetting.color ? JSON.parse(projectSetting.color) : undefined;
+    const bgColor : CSS.Properties = {
+      background: bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined
+    } 
+
+    console.log(projectSetting);
     return (
         <div
             className={`project ${
                 project.projectType === ProjectType.LEDGER && 'ledger'
             }`}
+
+            style={bgColor}
         >
           <Tooltip
               placement="top"
@@ -646,6 +658,7 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
 
 const mapStateToProps = (state: IState) => ({
   project: state.project.project,
+  projectSetting: state.project.setting,
   groups: state.group.groups,
   myself: state.myself.username,
   theme: state.myself.theme,

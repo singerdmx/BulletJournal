@@ -82,7 +82,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
         <div>
             { displayColorPicker ? 
             <div>
-              <SwatchesPicker color={color}  onChange={ handleColorChange } />
+              <SwatchesPicker color={color}  onChange={ handleColorChange } width={380} height={450}/>
             </div> : null }
         </div>
       </div>
