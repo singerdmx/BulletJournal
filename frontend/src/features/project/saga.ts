@@ -71,6 +71,12 @@ function* projectsUpdate(action: PayloadAction<UpdateProjects>) {
       })
     );
 
+    yield put(
+      projectActions.projectSettingsReceived({
+        projectSettings: projects.settings,
+      })
+    )
+
     const selectedProject = state.project.project;
 
     if (selectedProject) {

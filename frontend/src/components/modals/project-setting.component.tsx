@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Checkbox,
   Modal,
@@ -30,15 +30,24 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
     visible,
     updateProjectSetting,
   } = props;
-
-  const [displayColorPicker, setDisplayColorPicker] = useState(!!projectSetting.color);
   
-  const [bgColor, setBgColor] = useState(projectSetting.color ? JSON.parse(projectSetting.color) : {
+  const [displayColorPicker, setDisplayColorPicker] = useState(false);
+  const [bgColor, setBgColor] = useState({
+    r: '0',
+    g: '0',
+    b: '0',
+    a: '0',
+  });
+
+  useEffect(() => {
+    setDisplayColorPicker(!!projectSetting.color);
+    setBgColor(projectSetting.color ? JSON.parse(projectSetting.color) : {
       r: '0',
       g: '0',
       b: '0',
       a: '0',
     })
+  }, [projectSetting]);
 
   const onCheckColorIcon = (e: any) => {
     setDisplayColorPicker(!displayColorPicker);
