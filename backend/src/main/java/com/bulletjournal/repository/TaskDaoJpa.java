@@ -32,6 +32,7 @@ import org.dmfs.rfc5545.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -85,6 +86,10 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
     @Autowired
     private SearchIndexDaoJpa searchIndexDaoJpa;
+
+    @Lazy
+    @Autowired
+    private UserDaoJpa userDaoJpa;
 
     @Override
     public JpaRepository getJpaRepository() {
@@ -214,7 +219,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     public Pair<Task, List<Event>> setTaskStatus(TaskStatus taskStatus, Long taskId, String requester) {
         Task task = this.getProjectItem(taskId, requester);
         task.setStatus(taskStatus == null ? null : taskStatus.getValue());
-        this.taskRepository.save(task);
+        this.taskRepository.save(selfAdjustTask(task, requester));
         return Pair.of(task, generateEvents(task, requester, task.getProject()));
     }
 
@@ -466,7 +471,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             throw new BadRequestException("Project Type expected to be TODO while request is " + project.getType());
         }
         Task task = generateTask(owner, project, createTaskParams);
-        return this.taskRepository.saveAndFlush(task);
+        return this.taskRepository.saveAndFlush(selfAdjustTask(task, owner));
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -664,7 +669,14 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             task.setLocation(updateTaskParams.getLocation());
         }
 
-        return this.taskRepository.save(task);
+        return this.taskRepository.save(selfAdjustTask(task, requester));
+    }
+
+    private Task selfAdjustTask(Task task, String requester) {
+        if (StringUtils.isBlank(task.getTimezone())) {
+            task.setTimezone(this.userDaoJpa.getByName(requester).getTimezone());
+        }
+        return task;
     }
 
     /**
