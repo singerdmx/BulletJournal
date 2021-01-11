@@ -40,7 +40,6 @@ import {RadioChangeEvent} from "antd/lib/radio";
 import {getCookie} from "../../index";
 
 import CSS from 'csstype';
-import projectSettingComponent from '../../components/modals/project-setting.component';
 
 type ProjectPathParams = {
   projectId: string;
@@ -603,14 +602,12 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
     const bgColor : CSS.Properties = {
       background: bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined
     } 
-
-    console.log(projectSetting);
+    
     return (
         <div
             className={`project ${
                 project.projectType === ProjectType.LEDGER && 'ledger'
             }`}
-
             style={bgColor}
         >
           <Tooltip

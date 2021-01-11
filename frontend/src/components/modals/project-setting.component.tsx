@@ -44,6 +44,12 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
     setDisplayColorPicker(!displayColorPicker);
     if (!e.target.checked && project) {
       updateProjectSetting(project.id, projectSetting.autoDelete, undefined);
+      setBgColor({
+        r: '0',
+        g: '0',
+        b: '0',
+        a: '0',
+      })
     } 
   }
 
