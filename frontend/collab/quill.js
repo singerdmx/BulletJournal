@@ -173,7 +173,8 @@ window.addEventListener('load', () => {
             },
         },
         placeholder: 'Start collaborating...',
-        theme: 'snow' // or 'bubble'
+        theme: 'snow', // or 'bubble'
+        bounds:editorContainer
     });
     setToolTips(editor);
     registerSaveButton(editor);
