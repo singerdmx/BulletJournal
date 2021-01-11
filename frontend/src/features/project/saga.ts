@@ -160,9 +160,7 @@ function* getUserProject(action: PayloadAction<GetProjectAction>) {
     const { projectId } = action.payload;
     const data: Project = yield call(getProject, projectId);
     yield put(projectActions.projectReceived({ project: data }));
-    if (data.projectSetting) {
-      yield put(projectActions.projectSettingReceived({ projectSetting: data.projectSetting }));
-    }
+    yield put(projectActions.projectSettingReceived({ projectSetting: data.projectSetting }));
     yield put(groupsActions.getGroup({ groupId: data.group.id }));
     yield put(tasksActions.updateCompletedTaskPageNo({completedTaskPageNo: 0}));
   } catch (error) {
