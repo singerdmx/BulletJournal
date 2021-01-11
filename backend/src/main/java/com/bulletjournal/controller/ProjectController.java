@@ -96,7 +96,7 @@ public class ProjectController {
     }
 
     @PutMapping(PROJECT_SETTINGS_ROUTE)
-    public ProjectDetails setProjectSettings(@NotNull @PathVariable Long projectId,
+    public ProjectDetails setProjectSetting(@NotNull @PathVariable Long projectId,
                                    @NotNull @Valid @RequestBody ProjectSetting setting) {
         String projectColor = setting.getColor();
         boolean autoDelete = setting.isAutoDelete();
