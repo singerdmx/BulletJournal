@@ -66,12 +66,11 @@ public class TaskControllerTest {
         requestParams = new RequestParams(restTemplate, randomServerPort);
     }
 
-
     private String generateUpdateContent(String num) {
-        String content = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content TEMPLATE\\\\n\\\"}]},\\\"###html###\\\":\\\"<p>Test Content TEMPLATE</p>\\\"}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"TEMPLATE\\\"},{\\\"delete\\\":1}]}\"}";
+        String content = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content TEMPLATE\\\\n\\\"}]}}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"TEMPLATE\\\"},{\\\"delete\\\":1}]}\"}";
         return content.replace("TEMPLATE", num);
-
     }
+
     /**
      * Get Groups, use first group
      * Create project
