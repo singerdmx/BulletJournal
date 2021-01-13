@@ -107,6 +107,7 @@ export const modules = {
       [
         {list: 'ordered'},
         {list: 'bullet'},
+        {list: 'check'},
         {indent: '-1'},
         {indent: '+1'},
       ],
