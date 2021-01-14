@@ -385,6 +385,11 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
     let projectItemsByUser = null;
     let projectItemsByOrder = null;
 
+    const bgColorSetting = projectSetting.color ? JSON.parse(projectSetting.color) : undefined;
+    const bgColor : CSS.Properties = {
+      background: bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined
+    } 
+
     switch (project.projectType) {
       case ProjectType.NOTE:
         createContent = null; // NOTE has createContent in note-tree.component.tsx
@@ -597,11 +602,6 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
         {projectHeader}
       </Popover>
     }
-
-    const bgColorSetting = projectSetting.color ? JSON.parse(projectSetting.color) : undefined;
-    const bgColor : CSS.Properties = {
-      background: bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined
-    } 
     
     return (
         <div

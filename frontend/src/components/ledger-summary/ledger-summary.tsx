@@ -3,6 +3,9 @@ import { Statistic, Card, Tag } from 'antd';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
 import './ledger-summary.styles.less';
+import { ProjectSetting } from '../../features/project/interface';
+import CSS from 'csstype';
+
 
 const LocaleCurrency = require('locale-currency');
 
@@ -14,11 +17,15 @@ type LedgerSummaryProps = {
   expense: number;
   startDate: string;
   endDate: string;
+  projectSetting: ProjectSetting;
 };
 
 const LedgerSummary: React.FC<LedgerSummaryProps> = (props) => {
-  const { title, balance, income, expense, startDate, endDate } = props;
-
+  const { title, balance, income, expense, startDate, endDate, projectSetting } = props;
+  const bgColorSetting = projectSetting.color ? JSON.parse(projectSetting.color) : undefined;
+  const bgColor : CSS.Properties = {
+    background: bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined
+  } 
   return (
     <div className="ledger-summary">
       <div className="ledger-selection">
@@ -32,20 +39,20 @@ const LedgerSummary: React.FC<LedgerSummaryProps> = (props) => {
         </span>
       </div>
       <div className="ledger-static">
-        <Card bordered={false}>
+        <Card bordered={false} style={bgColor}>
           <Statistic
             title={`Balance (${LocaleCurrency.getCurrency(props.currency)})`}
             value={balance}
           />
         </Card>
 
-        <Card bordered={false}>
+        <Card bordered={false}  style={bgColor}>
           <Statistic
             title={`Income (${LocaleCurrency.getCurrency(props.currency)})`}
             value={income}
           />
         </Card>
-        <Card bordered={false}>
+        <Card bordered={false} style={bgColor}>
           <Statistic
             title={`Expense (${LocaleCurrency.getCurrency(props.currency)})`}
             value={expense}
@@ -58,6 +65,7 @@ const LedgerSummary: React.FC<LedgerSummaryProps> = (props) => {
 
 const mapStateToProps = (state: IState) => ({
   currency: state.myself.currency,
+  projectSetting: state.project.setting,
 });
 
 export default connect(mapStateToProps, {})(LedgerSummary);
