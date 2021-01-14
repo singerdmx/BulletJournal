@@ -91,7 +91,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
         <Checkbox
             style={{marginTop: '-0.5em'}}
             onChange={handleAutoDeleteChange}
-            defaultChecked={projectSetting.autoDelete}
+            checked={projectSetting.autoDelete}
         >
           Automatically delete past due tasks
         </Checkbox>
@@ -100,7 +100,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
       <div>
         <Checkbox
             style={{ marginTop: '-0.5em' }}
-            defaultChecked={displayColorPicker}
+            checked={displayColorPicker}
             onChange={onCheckColorIcon}
         >
             Set background color
