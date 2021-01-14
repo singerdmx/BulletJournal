@@ -7,6 +7,7 @@ import './modals.styles.less';
 import {Project, ProjectSetting} from '../../features/project/interface';
 import {BgColorsOutlined, FileExcelOutlined} from '@ant-design/icons';
 import {updateProjectSetting} from '../../features/project/actions';
+import {ProjectType} from "../../features/project/constants";
 
 type ProjectSettingProps = {
   project: Project | undefined;
@@ -86,7 +87,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
       onCancel={props.onCancel}
       footer={false}
     >
-      {project?.projectType === 'TODO' && <div>
+      {project?.projectType === ProjectType.TODO && <div>
         <Checkbox
             style={{marginTop: '-0.5em'}}
             onChange={handleAutoDeleteChange}
