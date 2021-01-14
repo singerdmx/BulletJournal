@@ -22,4 +22,7 @@ public interface TaskContentRepository extends JpaRepository<TaskContent, Long> 
     List<Long> findAllByTaskIds(List<Long> taskIds);
 
     List<TaskContent> findByTaskIn(List<Task> tasks);
+
+    @Query("SELECT taskContent FROM TaskContent taskContent WHERE taskContent.task.id IN (:taskIds) AND taskContent.owner = :username")
+    List<TaskContent> findAllByTaskIdAndOwner(@Param("taskIds") List<Long> taskIds, @Param("username") String username);
 }

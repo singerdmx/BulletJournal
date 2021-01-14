@@ -13,4 +13,7 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
 
     @Query("SELECT g FROM Group g WHERE g.owner = ?1 AND g.defaultGroup = TRUE")
     List<Group> findDefaultGroup(String owner);
+
+    @Query("SELECT group.owner FROM Group group WHERE group.name = ?1")
+    List<String>  findAllOwnerByName(String groupName);
 }
