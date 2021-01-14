@@ -5,6 +5,7 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.models.NoteContent;
 import com.bulletjournal.repository.models.TaskContent;
+import com.bulletjournal.repository.models.TransactionContent;
 import com.bulletjournal.repository.models.User;
 import com.google.common.collect.ImmutableList;
 
@@ -20,6 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
+/**
+ * TODO: need to test && cover some edge cases
+ */
 public class EmailContentDaoJpa {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmailContentDaoJpa.class);
@@ -36,13 +40,14 @@ public class EmailContentDaoJpa {
     private NoteContentRepository noteContentRepository;
 
     @Autowired
-    private NoteDaoJpa noteDaoJpa;
-
-    @Autowired
     private TaskContentRepository taskContentRepository;
 
     @Autowired
+    private TransactionContentRepository transactionContentRepository;
+
+    @Autowired
     private GroupRepository groupRepository;
+
 
     /**
      * Send content by given usernames
@@ -123,7 +128,14 @@ public class EmailContentDaoJpa {
                 baseTexts = noteContents.stream().map(NoteContent::getBaseText).collect(Collectors.toList());
                 break;
             case CONTENT_TYPE_TRANSACTION:
-                System.out.println("?!");
+                List<TransactionContent> transactionContents = transactionContentRepository
+                        .findAllByTransactionIdAndOwner(ImmutableList.of(contentParentId), requester);
+                if (transactionContents.size() == 0) {
+                    LOGGER.error("Unable to find out the transaction Id " + contentParentId + " under user: " + requester);
+                    throw new ResourceNotFoundException("Unable to find out the transaction Id "
+                            + contentParentId + " under user: " + requester);
+                }
+                baseTexts = transactionContents.stream().map(TransactionContent::getBaseText).collect(Collectors.toList());
                 break;
             default:
                 break;
@@ -142,8 +154,7 @@ public class EmailContentDaoJpa {
      *
      * @param htmlContents content in html format
      * @param targetEmails target emails
-     *
-     * @TODO complete send email part
+     * TODO: complete send email part
      */
     public void emailContentByTargetEmails(List<String> htmlContents, List<String> targetEmails) {
         if (htmlContents.size() == 0) {
@@ -201,7 +212,7 @@ public class EmailContentDaoJpa {
     /**
      * Get HTML format content out of base Text
      *
-     * @param baseTexts
+     * @param baseTexts base text column info in content table
      * @return HTML format contents
      */
     public List<String> getHtmlContentFromBaseText(List<String> baseTexts) {
