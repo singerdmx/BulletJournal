@@ -1,14 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Checkbox,
-  Modal,
-} from 'antd';
-import { RGBColor, SwatchesPicker } from 'react-color';
-import { IState } from '../../store';
-import { connect } from 'react-redux';
+import React, {useEffect, useState} from 'react';
+import {Checkbox, Modal,} from 'antd';
+import {RGBColor, SwatchesPicker} from 'react-color';
+import {IState} from '../../store';
+import {connect} from 'react-redux';
 import './modals.styles.less';
 import {Project, ProjectSetting} from '../../features/project/interface';
-import { BgColorsOutlined, FileExcelOutlined } from '@ant-design/icons';
+import {BgColorsOutlined, FileExcelOutlined} from '@ant-design/icons';
 import {updateProjectSetting} from '../../features/project/actions';
 
 type ProjectSettingProps = {
@@ -89,16 +86,16 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
       onCancel={props.onCancel}
       footer={false}
     >
-      <div>
-        {project?.projectType === 'TODO' && <Checkbox
-            style={{ marginTop: '-0.5em' }}
+      {project?.projectType === 'TODO' && <div>
+        <Checkbox
+            style={{marginTop: '-0.5em'}}
             onChange={handleAutoDeleteChange}
             defaultChecked={projectSetting.autoDelete}
         >
-            Automatically delete past due tasks
-        </Checkbox>}
-        <FileExcelOutlined />
-      </div>
+          Automatically delete past due tasks
+        </Checkbox>
+        <FileExcelOutlined/>
+      </div>}
       <div>
         <Checkbox
             style={{ marginTop: '-0.5em' }}
