@@ -247,7 +247,7 @@ function* putProjectRelations(
   }
 }
 
-function* putProjectSettings(
+function* putProjectSetting(
   action: PayloadAction<UpdateProjectSettingAction>
 ) {
   try {
@@ -260,21 +260,13 @@ function* putProjectSettings(
       color,
     );
 
-    console.log(data);
-
     yield put(projectActions.projectReceived({ project: data }));
     if (data.projectSetting) {
       yield put(projectActions.projectSettingReceived({ projectSetting: data.projectSetting }));
     }
 
-    // const state: IState = yield select();
-    // state.project.owned
-    // yield put(
-    //     projectActions.projectsReceived({
-    //       owned: state.project.owned,
-    //       shared: state.project.shared,
-    //     })
-    // );
+    const state = yield select();
+    yield put(projectActions.projectSettingsReceived({projectSettings: {...state.project.settings, [projectId]: data.projectSetting}}))
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
@@ -336,7 +328,7 @@ export default function* projectSagas() {
     yield takeLatest(projectActions.getProjectHistory.type, getProjectHistory),
     yield takeLatest(
       projectActions.updateProjectSetting.type,
-      putProjectSettings
+      putProjectSetting
     ),
   ]);
 }
