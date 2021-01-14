@@ -40,7 +40,6 @@ const getTree = (
         const bgColorSetting = projectSetting ? projectSetting.color ? JSON.parse(projectSetting.color) : undefined : undefined;
         const bgColor = bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined
         
-
         node.title = (
             <>
                 <MenuProvider id={`project${item.id}`} style={{background: bgColor}}>
@@ -51,12 +50,13 @@ const getTree = (
 
                 <Menu id={`project${item.id}`}
                       theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
-                      animation={animation.zoom}>
+                      animation={animation.zoom}
+                      style={{background: bgColor}}>
                     <CopyToClipboard
                         text={`${item.name} ${window.location.origin.toString()}/#/projects/${item.id}`}
                         onCopy={() => message.success('Link Copied to Clipboard')}
                     >
-                        <Item>
+                        <Item style={{background: bgColor}}>
                             <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><CopyOutlined/></IconFont>
                             <span>Copy Link Address</span>
                         </Item>
