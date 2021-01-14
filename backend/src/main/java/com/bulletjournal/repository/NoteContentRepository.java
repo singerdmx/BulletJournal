@@ -21,4 +21,7 @@ public interface NoteContentRepository extends JpaRepository<NoteContent, Long> 
 
     @Query(nativeQuery = true, value = "SELECT id FROM note_contents WHERE note_contents.note_id IN (:noteIds)")
     List<Long> findAllByNoteIds(List<Long> noteIds);
+
+    @Query("SELECT noteContent FROM NoteContent noteContent WHERE noteContent.note.id IN (?1) AND noteContent.owner = ?2")
+    List<NoteContent> findAllByNoteIdAndOwner(List<Long> taskIds, String username);
 }

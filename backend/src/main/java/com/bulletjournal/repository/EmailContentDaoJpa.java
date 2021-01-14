@@ -1,7 +1,9 @@
 package com.bulletjournal.repository;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.repository.models.NoteContent;
 import com.bulletjournal.repository.models.TaskContent;
 import com.bulletjournal.repository.models.User;
 import com.google.common.collect.ImmutableList;
@@ -26,8 +28,6 @@ public class EmailContentDaoJpa {
     private static final String CONTENT_TYPE_TASK = "task";
     private static final String CONTENT_TYPE_NOTE = "note";
     private static final String CONTENT_TYPE_TRANSACTION = "transaction";
-//    private static final Pattern EMAIL_PATTERN = Pattern
-//            .compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$", Pattern.CASE_INSENSITIVE);
 
     @Autowired
     private UserDaoJpa userDaoJpa;
@@ -113,7 +113,14 @@ public class EmailContentDaoJpa {
                 baseTexts = taskContents.stream().map(TaskContent::getBaseText).collect(Collectors.toList());
                 break;
             case CONTENT_TYPE_NOTE:
-                System.out.println("?");
+                List<NoteContent> noteContents = noteContentRepository
+                        .findAllByNoteIdAndOwner(ImmutableList.of(contentParentId), requester);
+                if (noteContents.size() == 0) {
+                    LOGGER.error("Unable to find out the note Id " + contentParentId + " under user: " + requester);
+                    throw new ResourceNotFoundException("Unable to find out the note Id "
+                            + contentParentId + " under user: " + requester);
+                }
+                baseTexts = noteContents.stream().map(NoteContent::getBaseText).collect(Collectors.toList());
                 break;
             case CONTENT_TYPE_TRANSACTION:
                 System.out.println("?!");
@@ -135,6 +142,8 @@ public class EmailContentDaoJpa {
      *
      * @param htmlContents content in html format
      * @param targetEmails target emails
+     *
+     * @TODO complete send email part
      */
     public void emailContentByTargetEmails(List<String> htmlContents, List<String> targetEmails) {
         if (htmlContents.size() == 0) {
