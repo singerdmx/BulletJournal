@@ -26,6 +26,7 @@ type ProjectsProps = {
     ownedProjects: Project[];
     sharedProjects: ProjectsWithOwner[];
     updateProjects: () => void;
+    projectSettings: Object;
 };
 // props of groups
 type GroupsProps = {
@@ -79,7 +80,7 @@ export const getGroupByProject = (
 };
 
 const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> = props => {
-    const {groups, theme, ownedProjects, sharedProjects, updateGroups, updateProjects} = props;
+    const {groups, theme, ownedProjects, sharedProjects, updateGroups, updateProjects, projectSettings} = props;
 
     useEffect(() => {
         const loginCookie = getCookie('__discourse_proxy');
@@ -96,6 +97,11 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
 
     const getProject = (project: Project) => {
         const group = getGroupByProject(groups, project);
+        const getKeyValue = (key: number) => (obj: Record<number, any>) => obj[key];
+        const projectSetting = getKeyValue(project.id)(projectSettings);
+        const bgColorSetting = projectSetting ? projectSetting.color ? JSON.parse(projectSetting.color) : undefined : undefined;
+        const bgColor = bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined
+        
         let popContent = null;
         if (group) {
             popContent = <div>
@@ -105,7 +111,7 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
         return (
             <List.Item
                 key={project.id}
-                style={{cursor: 'pointer'}}
+                style={{cursor: 'pointer', background: bgColor}}
                 onClick={e => handleClick(project.id)}
                 actions={[
                     <Popover
@@ -201,7 +207,8 @@ const mapStateToProps = (state: IState) => ({
     groups: state.group.groups,
     theme: state.myself.theme,
     ownedProjects: state.project.owned,
-    sharedProjects: state.project.shared
+    sharedProjects: state.project.shared,
+    projectSettings: state.project.settings
 });
 
 export default connect(mapStateToProps, {updateGroups, updateProjects})(withRouter(ProjectsPage));
