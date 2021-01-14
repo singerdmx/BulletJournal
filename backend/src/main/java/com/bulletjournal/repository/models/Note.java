@@ -23,12 +23,23 @@ public class Note extends ProjectItemModel<com.bulletjournal.controller.models.N
     )
     private Long id;
 
+    @Column
+    private String color;
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 
     @Override
@@ -49,7 +60,8 @@ public class Note extends ProjectItemModel<com.bulletjournal.controller.models.N
                 labels,
                 this.getCreatedAt().getTime(),
                 this.getUpdatedAt().getTime(),
-                this.getLocation());
+                this.getLocation(),
+                this.getColor());
         note.setShared(this.isShared());
         return note;
     }

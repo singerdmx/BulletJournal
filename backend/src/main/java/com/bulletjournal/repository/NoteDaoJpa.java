@@ -313,4 +313,14 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
 
         return deleteESDocumentIds;
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void setColor(String requester, Long noteId, String color) {
+        Note note = this.getProjectItem(noteId, requester);
+
+        this.authorizationService.checkAuthorizedToOperateOnContent(note.getOwner(), requester, ContentType.NOTE,
+                Operation.UPDATE, noteId, note.getProject().getOwner());
+        note.setColor(color);
+        this.noteRepository.save(note);
+    }
 }

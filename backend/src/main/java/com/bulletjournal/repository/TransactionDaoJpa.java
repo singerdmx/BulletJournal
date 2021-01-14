@@ -350,4 +350,13 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
         return deleteESDocumentIds;
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void setColor(String requester, Long transactionId, String color) {
+        Transaction transaction = this.getProjectItem(transactionId, requester);
+        this.authorizationService.checkAuthorizedToOperateOnContent(transaction.getOwner(), requester,
+                ContentType.TRANSACTION, Operation.UPDATE, transactionId, transaction.getProject().getOwner());
+        transaction.setColor(color);
+        this.transactionRepository.save(transaction);
+    }
 }

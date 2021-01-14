@@ -40,6 +40,7 @@ public class NoteController {
     protected static final String NOTES_ROUTE = "/api/projects/{projectId}/notes";
     protected static final String NOTE_ROUTE = "/api/notes/{noteId}";
     protected static final String NOTE_SET_LABELS_ROUTE = "/api/notes/{noteId}/setLabels";
+    protected static final String NOTE_SET_COLOR_ROUTE = "/api/notes/{noteId}/setColor";
     protected static final String MOVE_NOTE_ROUTE = "/api/notes/{noteId}/move";
     protected static final String SHARE_NOTE_ROUTE = "/api/notes/{noteId}/share";
     protected static final String GET_SHARABLES_ROUTE = "/api/notes/{noteId}/sharables";
@@ -205,6 +206,13 @@ public class NoteController {
     public Note setLabels(@NotNull @PathVariable Long noteId, @NotNull @RequestBody List<Long> labels) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.notificationService.inform(this.noteDaoJpa.setLabels(username, noteId, labels));
+        return getNote(noteId);
+    }
+
+    @PutMapping(NOTE_SET_COLOR_ROUTE)
+    public Note setColor(@NotNull @PathVariable Long noteId, @RequestBody String color) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.noteDaoJpa.setColor(username, noteId, color);
         return getNote(noteId);
     }
 
