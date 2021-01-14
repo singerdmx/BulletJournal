@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {AutoComplete, Avatar, Button, DatePicker, Form, Input, Modal, Radio, Select, TimePicker, Tooltip,} from 'antd';
 import {useHistory, useParams} from 'react-router-dom';
-import {CheckSquareTwoTone, CloseSquareTwoTone, PlusOutlined,} from '@ant-design/icons';
+import {CheckSquareTwoTone, CloseSquareTwoTone, PlusOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import {connect} from 'react-redux';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {createTask, updateTaskVisible} from '../../features/tasks/actions';
@@ -21,7 +21,8 @@ import {Label} from '../../features/label/interface';
 import {getIcon} from '../draggable-labels/draggable-label-list.component';
 import {onFilterAssignees, onFilterLabel} from '../../utils/Util';
 import {Button as FloatButton, darkColors, lightColors} from "react-floating-action-button";
-import {PlusCircleTwoTone} from "@ant-design/icons/lib";
+import {PlusCircleTwoTone } from "@ant-design/icons/lib";
+import SearchBar from '../map-search-bar/search-bar.component';
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -56,6 +57,7 @@ interface TaskCreateFormProps {
     duration: number,
     reminderSetting: ReminderSetting,
     recurrenceRule: string,
+    location: string,
     timezone: string,
     labels: number[]
   ) => void;
@@ -83,6 +85,7 @@ const AddTask: React.FC<
   const [reminderType, setReminderType] = useState('remindBefore');
   const [reminderTimeVisible, setReminderTimeVisible] = useState(false);
   const [remindButton, setRemindButton] = useState('remindBefore');
+  const [location, setLocation] = useState('');
   const { projectId } = useParams();
 
   useEffect(() => {
@@ -139,6 +142,7 @@ const AddTask: React.FC<
         duration,
         reminderSetting,
         recurrence,
+        location,
         timezone,
         values.labels
       );
@@ -429,7 +433,9 @@ const AddTask: React.FC<
               )}
             </div>
           </div>
-
+          <Form.Item label={<div><EnvironmentOutlined/><span style={{ padding: '0 4px'}}>Location</span></div>}>
+                <SearchBar setLocation={setLocation} location={location}/>
+          </Form.Item>
           {/* label */}
           <div>
             <Form.Item name="labels" label={

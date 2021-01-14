@@ -115,7 +115,8 @@ export const createTask = (
   dueTime?: string,
   duration?: number,
   recurrenceRule?: string,
-  labels?: number[]
+  labels?: number[],
+  location?: string,
 ) => {
   const postBody = JSON.stringify({
     name: name,
@@ -127,6 +128,7 @@ export const createTask = (
     recurrenceRule: recurrenceRule,
     timezone: timezone,
     labels: labels,
+    location: location,
   });
   return doPost(`/api/projects/${projectId}/tasks`, postBody)
     .then((res) => res.json())
@@ -153,6 +155,7 @@ export const updateTask = (
   duration?: number,
   timezone?: string,
   reminderSetting?: ReminderSetting,
+  location?: string,
   recurrenceRule?: string,
   labels?: number[]
 ) => {
@@ -164,6 +167,7 @@ export const updateTask = (
     duration: duration,
     timezone: timezone,
     reminderSetting: reminderSetting,
+    location: location,
     recurrenceRule: recurrenceRule,
     labels: labels,
   });

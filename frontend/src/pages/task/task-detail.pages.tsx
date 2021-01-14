@@ -6,7 +6,7 @@ import React, {useEffect, useState} from 'react';
 import {getReminderSettingString, getTaskBackgroundColor, Task, TaskStatus,} from '../../features/tasks/interface';
 // antd imports
 import {Avatar, BackTop, Divider, message, Select, Tag, Tooltip} from 'antd';
-import {AlertOutlined, ClockCircleOutlined} from '@ant-design/icons';
+import { AlertOutlined, ClockCircleOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import './task-page.styles.less';
 import 'braft-editor/dist/index.css';
 import {ProjectItemUIType, ProjectType} from '../../features/project/constants';
@@ -66,6 +66,18 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
       setInputStatus(task.status);
     }
   }, [task]);
+
+  const getLocation = (task: Task) => {
+    if(!task.location){
+        return null;
+    }
+    const taskLocation = `Location: ${task.location}`
+    return (
+        <Tooltip title={taskLocation}>
+            <Tag icon={<EnvironmentOutlined />}>{task.location}</Tag>
+        </Tooltip>
+    );
+  };
 
   const getDueDateTime = (task: Task) => {
     if (task.recurrenceRule) {
@@ -175,6 +187,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
         >
             {getDueDateTime(task)}
             {getReminder(task)}
+            {getLocation(task)}
             {getTaskStatusDropdown(task)}
         </div>;
     };

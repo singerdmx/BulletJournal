@@ -19,6 +19,7 @@ export interface Task extends ProjectItem {
   recurrenceRule: string;
   status: TaskStatus;
   reminderDateTime?: number;
+  location?: string;
 }
 
 export interface TaskView extends Task {

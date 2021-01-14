@@ -16,6 +16,7 @@ export const createTask = (
   duration: number,
   reminderSetting: ReminderSetting,
   recurrenceRule: string,
+  location: string,
   timezone: string,
   labels: number[]
 ) =>
@@ -28,6 +29,7 @@ export const createTask = (
     duration: duration,
     reminderSetting: reminderSetting,
     recurrenceRule: recurrenceRule,
+    location: location,
     timezone: timezone,
     labels: labels,
   });
@@ -66,6 +68,7 @@ export const patchTask = (
   dueTime?: string,
   duration?: number,
   reminderSetting?: ReminderSetting,
+  location?: string,
   recurrenceRule?: string,
   labels?: number[]
 ) =>
@@ -79,6 +82,7 @@ export const patchTask = (
     dueTime: dueTime,
     duration: duration,
     reminderSetting: reminderSetting,
+    location: location,
     recurrenceRule: recurrenceRule,
     labels: labels,
   });
