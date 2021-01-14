@@ -153,7 +153,7 @@ public class TestHelpers {
     }
 
     public static String generateDeltaContent(String contentStr) {
-        String content = "{\"delta\":{\"ops\":[{\"insert\":\"TEMPLATE\\n\"}]},\"###html###\":\"<p>TEMPLATE</p><p><br></p>\"}";
+        String content = "{\"delta\":{\"ops\":[{\"insert\":\"TEMPLATE\\n\"}]}}";
         return content.replace("TEMPLATE", contentStr);
     }
 

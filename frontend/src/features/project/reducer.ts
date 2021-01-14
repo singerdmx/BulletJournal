@@ -15,6 +15,10 @@ export type ProjectSettingAction = {
   projectSetting: ProjectSetting;
 };
 
+export type ProjectSettingsAction = {
+  projectSettings: Object;
+};
+
 export type GetProjectAction = {
   projectId: number;
 };
@@ -44,7 +48,7 @@ export type UpdateProjectRelationsAction = {
   projects: Project[];
 };
 
-export type UpdateProjectSettingsAction = {
+export type UpdateProjectSettingAction = {
   projectId: number;
   autoDelete: boolean;
   color: string | undefined;
@@ -78,7 +82,8 @@ let initialState = {
   owned: [] as Project[],
   shared: [] as ProjectsWithOwner[],
   project: undefined as Project | undefined,
-  settings: {color: undefined, autoDelete: false} as ProjectSetting,
+  setting: {color: undefined, autoDelete: false} as ProjectSetting,
+  settings: {},
   projectHistory: [] as Activity[],
 };
 
@@ -112,7 +117,11 @@ const slice = createSlice({
     },
     projectSettingReceived: (state, action: PayloadAction<ProjectSettingAction>) => {
       const { projectSetting } = action.payload;
-      state.settings = projectSetting;
+      state.setting = projectSetting;
+    },
+    projectSettingsReceived: (state, action: PayloadAction<ProjectSettingsAction>) => {
+      const { projectSettings } = action.payload;
+      state.settings = projectSettings;
     },
     updateSharedProjectsOrder: (
       state,
@@ -124,9 +133,9 @@ const slice = createSlice({
       state,
       action: PayloadAction<UpdateProjectRelationsAction>
     ) => state,
-    updateProjectSettings: (
+    updateProjectSetting: (
       state,
-      action: PayloadAction<UpdateProjectSettingsAction>
+      action: PayloadAction<UpdateProjectSettingAction>
     ) => state,
   },
 });

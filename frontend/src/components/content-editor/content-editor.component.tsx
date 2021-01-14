@@ -323,6 +323,7 @@ const setToolTips = () => {
     toolbar.querySelector('button.ql-redo')!.setAttribute('title', 'Redo');
     toolbar.querySelector('button.ql-list[value=ordered]')!.setAttribute('title', 'Numbered list');
     toolbar.querySelector('button.ql-list[value=bullet]')!.setAttribute('title', 'Bulleted list');
+    toolbar.querySelector('button.ql-list[value=check]')!.setAttribute('title', 'Checkbox list');
     toolbar.querySelector('button.ql-indent[value="-1"]')!.setAttribute('title', 'Indent less');
     toolbar.querySelector('button.ql-indent[value="+1"]')!.setAttribute('title', 'Indent more');
 

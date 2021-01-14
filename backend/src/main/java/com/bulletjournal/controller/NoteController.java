@@ -280,8 +280,9 @@ public class NoteController {
     @GetMapping(CONTENTS_ROUTE)
     public List<Content> getContents(@NotNull @PathVariable Long noteId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return Content.addOwnerAvatar(this.noteDaoJpa.getContents(noteId, username).stream()
+        List<Content> contents = Content.addOwnerAvatar(this.noteDaoJpa.getContents(noteId, username).stream()
                 .map(t -> t.toPresentationModel()).collect(Collectors.toList()), this.userClient);
+        return contents;
     }
 
     @DeleteMapping(CONTENT_ROUTE)

@@ -154,6 +154,7 @@ window.addEventListener('load', () => {
                 [
                     {list: 'ordered'},
                     {list: 'bullet'},
+                    {list: 'check'},
                     {indent: '-1'},
                     {indent: '+1'},
                 ],
@@ -173,7 +174,8 @@ window.addEventListener('load', () => {
             },
         },
         placeholder: 'Start collaborating...',
-        theme: 'snow' // or 'bubble'
+        theme: 'snow', // or 'bubble'
+        bounds:editorContainer
     });
     setToolTips(editor);
     registerSaveButton(editor);
@@ -339,6 +341,7 @@ const setToolTips = (editor)=>{
 
     toolbar.querySelector('button.ql-list[value=ordered]').setAttribute('title', 'Numbered list');
     toolbar.querySelector('button.ql-list[value=bullet]').setAttribute('title', 'Bulleted list');
+    toolbar.querySelector('button.ql-list[value=check]').setAttribute('title', 'Checkbox list');
     toolbar.querySelector('button.ql-indent[value="-1"]').setAttribute('title', 'Indent less');
     toolbar.querySelector('button.ql-indent[value="+1"]').setAttribute('title', 'Indent more');
 
