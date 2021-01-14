@@ -8,7 +8,7 @@ import { IState } from '../../store';
 import { connect } from 'react-redux';
 import './modals.styles.less';
 import {Project, ProjectSetting} from '../../features/project/interface';
-import { BgColorsOutlined } from '@ant-design/icons';
+import { BgColorsOutlined, FileExcelOutlined } from '@ant-design/icons';
 import {updateProjectSetting} from '../../features/project/actions';
 
 type ProjectSettingProps = {
@@ -84,14 +84,21 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
       footer={false}
     >
       <div>
+        {project?.projectType === 'TODO' && <Checkbox
+            style={{ marginTop: '-0.5em' }}
+        >
+            Automatically delete past due tasks
+        </Checkbox>}
+        <FileExcelOutlined />
+      </div>
+      <div>
         <Checkbox
             style={{ marginTop: '-0.5em' }}
             defaultChecked={displayColorPicker}
             onChange={onCheckColorIcon}
         >
-            Set Background Color
+            Set background color
         </Checkbox>
-
         <BgColorsOutlined />
 
         <div>
@@ -102,12 +109,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
         </div>
       </div>
 
-      {/* <Checkbox
-            style={{ marginRight: '0.5rem', marginTop: '-0.5em' }}
-            onChange={onCheck}
-        >
-            Auto Delete
-        </Checkbox> */}
+      
     </Modal>
   );
 };
