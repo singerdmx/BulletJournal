@@ -8,7 +8,7 @@ import {getNotesByOrder, putNote, updateNotes} from '../../features/notes/action
 import {Note} from '../../features/notes/interface';
 import {IState} from '../../store';
 import './note-tree.component.styles.less';
-import {Project} from '../../features/project/interface';
+import {Project, ProjectSetting} from '../../features/project/interface';
 import {User} from '../../features/group/interface';
 import {FieldTimeOutlined, FileAddOutlined, SettingOutlined} from '@ant-design/icons';
 import AddNote from "../modals/add-note.component";
@@ -30,6 +30,7 @@ type NotesProps = {
     showOrderModal?: () => void;
     labelsToKeep: number[];
     labelsToRemove: number[];
+    projectSetting: ProjectSetting;
     getNotesByOrder: (
         projectId: number,
         timezone: string,
@@ -172,7 +173,8 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
         getNotesByOrder,
         labelsToKeep,
         labelsToRemove,
-        myself
+        myself,
+        projectSetting,
     } = props;
     useEffect(() => {
         if (project) {
@@ -182,6 +184,9 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
     const [notesByOrderShown, setNotesByOrderShown] = useState(false);
     const [projectSettingShown, setProjectSettingShown] = useState(false);
 
+    const bgColorSetting = projectSetting.color ? JSON.parse(projectSetting.color) : undefined;
+    const bgColor = bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined;
+  
     if (!project) {
         return null;
     }
@@ -258,6 +263,7 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
                     className='ant-tree'
                     draggable
                     blockNode
+                    style={{background: bgColor}}
                     onDragEnter={onDragEnter}
                     onDrop={onDrop(notes, putNote, project.id)}
                     treeData={treeNote}
@@ -269,6 +275,7 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
 
 const mapStateToProps = (state: IState) => ({
     project: state.project.project,
+    projectSetting: state.project.setting,
     notes: state.note.notes,
     myself: state.myself.username,
 });
