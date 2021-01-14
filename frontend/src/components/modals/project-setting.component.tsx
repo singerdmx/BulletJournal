@@ -69,6 +69,12 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
     setBgColor(c.rgb);
   };  
 
+  const handleAutoDeleteChange = (e: any) => {
+    if (project) {
+      updateProjectSetting(project.id, e.target.checked, projectSetting.color);
+    }
+  };  
+
   const color : RGBColor = {
     r: Number(bgColor.r),
     g: Number(bgColor.g),
@@ -86,6 +92,8 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
       <div>
         {project?.projectType === 'TODO' && <Checkbox
             style={{ marginTop: '-0.5em' }}
+            onChange={handleAutoDeleteChange}
+            defaultChecked={projectSetting.autoDelete}
         >
             Automatically delete past due tasks
         </Checkbox>}
@@ -107,9 +115,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
               <SwatchesPicker color={color}  onChange={ handleColorChange } width={380} height={450}/>
             </div> : null }
         </div>
-      </div>
-
-      
+      </div>      
     </Modal>
   );
 };
