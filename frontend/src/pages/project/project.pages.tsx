@@ -39,8 +39,6 @@ import {CheckSquareTwoTone, CloseCircleTwoTone, CopyOutlined, MenuOutlined, Stop
 import {RadioChangeEvent} from "antd/lib/radio";
 import {getCookie} from "../../index";
 
-import CSS from 'csstype';
-
 type ProjectPathParams = {
   projectId: string;
 };
@@ -386,9 +384,7 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
     let projectItemsByOrder = null;
 
     const bgColorSetting = projectSetting.color ? JSON.parse(projectSetting.color) : undefined;
-    const bgColor : CSS.Properties = {
-      background: bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined
-    } 
+    const bgColor = bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined;
 
     switch (project.projectType) {
       case ProjectType.NOTE:
@@ -608,7 +604,7 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
             className={`project ${
                 project.projectType === ProjectType.LEDGER && 'ledger'
             }`}
-            style={bgColor}
+            style={{background: bgColor}}
         >
           <Tooltip
               placement="top"

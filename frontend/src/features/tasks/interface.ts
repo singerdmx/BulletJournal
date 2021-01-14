@@ -73,8 +73,6 @@ export const getTaskBackgroundColor = (
   taskStatus: TaskStatus,
   theme: string
 ) => {
-  if (!taskStatus) return {};
-
   switch (theme) {
     case 'LIGHT':
     case 'PINK':
@@ -99,8 +97,11 @@ export const getTaskBackgroundColor = (
             backgroundColor: '#e6ffe6',
           };
         }
+        default: 
+          return {
+            backgroundColor: '#FFFFFF',
+        };
       }
-      break;
     case 'DARK':
       switch (taskStatus) {
         case TaskStatus.IN_PROGRESS: {
@@ -123,6 +124,10 @@ export const getTaskBackgroundColor = (
             backgroundColor: '#001a00',
           };
         }
+        default: 
+          return {
+            backgroundColor: '#000000',
+        };
       }
   }
 };

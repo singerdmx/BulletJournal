@@ -7,7 +7,7 @@ import ReactLoading from 'react-loading';
 import {getTasksByOrder, putTask, updateCompletedTasks, updateTasks} from '../../features/tasks/actions';
 import {connect} from 'react-redux';
 import {IState} from '../../store';
-import {Project} from '../../features/project/interface';
+import {Project, ProjectSetting} from '../../features/project/interface';
 import {
   CarryOutOutlined,
   CheckCircleOutlined,
@@ -42,6 +42,7 @@ type TasksProps = {
   nextCompletedTasks: Task[];
   labelsToKeep: number[];
   labelsToRemove: number[];
+  projectSetting: ProjectSetting;
   updateTasks: (projectId: number) => void;
   updateCompletedTasks: (projectId: number) => void;
   putTask: (projectId: number, tasks: Task[]) => void;
@@ -210,6 +211,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     showCompletedTask,
     labelsToKeep,
     labelsToRemove,
+    projectSetting,
   } = props;
 
   useEffect(() => {
@@ -223,7 +225,9 @@ const TaskTree: React.FC<TasksProps> = (props) => {
   const [tasksByOrderShown, setTasksByOrderShown] = useState(false);
   const [projectSettingShown, setProjectSettingShown] = useState(false);
 
-
+  const bgColorSetting = projectSetting.color ? JSON.parse(projectSetting.color) : undefined;
+  const bgColor = bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined;
+  
   const handleLoadMore = () => {
     if (project) {
       updateCompletedTasks(project.id);
@@ -419,6 +423,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
               className='ant-tree'
               draggable
               blockNode
+              style={{background: bgColor}}
               onDragEnter={onDragEnter}
               onDrop={onDrop(tasks, putTask, project.id)}
               treeData={treeTask}
@@ -432,6 +437,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
 const mapStateToProps = (state: IState) => ({
   completedTaskPageNo: state.task.completedTaskPageNo,
   project: state.project.project,
+  projectSetting: state.project.setting,
   tasks: state.task.tasks,
   completedTasks: state.task.completedTasks,
   loadingCompletedTask: state.task.loadingCompletedTask,
