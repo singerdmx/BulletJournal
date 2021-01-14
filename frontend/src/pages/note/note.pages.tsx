@@ -12,7 +12,7 @@ import {IState} from '../../store';
 import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
 // antd imports
 import {Popconfirm, Tooltip} from 'antd';
-import {DeleteTwoTone, PlusOutlined, SyncOutlined, UpSquareOutlined, SettingOutlined,} from '@ant-design/icons';
+import {DeleteTwoTone, PlusOutlined, SyncOutlined, UpSquareOutlined,} from '@ant-design/icons';
 // modals import
 import EditNote from '../../components/modals/edit-note.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
@@ -29,7 +29,6 @@ import {setDisplayMore, setDisplayRevision} from "../../features/content/actions
 import {Content, ProjectItem} from "../../features/myBuJo/interface";
 import {getProject} from "../../features/project/actions";
 import {Project} from "../../features/project/interface";
-import ProjectSettingDialog from "../../components/modals/project-setting.component";
 
 interface NotePageHandler {
     myself: string;
@@ -71,7 +70,6 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
     // state control drawer displaying
     const [showEditor, setEditorShow] = useState(false);
     const [labelEditable, setLabelEditable] = useState(false);
-    const [projectSettingShown, setProjectSettingShown] = useState(false);
 
     // listening on the empty state working as componentDidmount
     useEffect(() => {
@@ -122,19 +120,8 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
         deleteContent(note.id, content.id);
     };
 
-    const handleSettings = () => {
-        setProjectSettingShown(true);
-    };
-
     const createContentElem = (
         <Container>
-            {project && project.owner.name === myself && <FloatButton
-                tooltip="Settings"
-                onClick={handleSettings}
-                styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
-            >
-                <SettingOutlined />
-            </FloatButton>}
             <FloatButton
                 tooltip="Go to Parent BuJo"
                 onClick={() => history.push(`/projects/${note.projectId}`)}
@@ -230,24 +217,14 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
     };
 
     return (
-        <div>
-            <div>
-                <ProjectSettingDialog
-                    visible={projectSettingShown}
-                    onCancel={() => {
-                    setProjectSettingShown(false)
-                }}
-            />
-            </div>
-            <NoteDetailPage
-                note={note}
-                labelEditable={labelEditable}
-                noteOperation={noteOperation}
-                createContentElem={createContentElem}
-                noteEditorElem={noteEditorElem}
-                contents={contents}
-            />
-        </div>
+        <NoteDetailPage
+            note={note}
+            labelEditable={labelEditable}
+            noteOperation={noteOperation}
+            createContentElem={createContentElem}
+            noteEditorElem={noteEditorElem}
+            contents={contents}
+        />
     );
 };
 
