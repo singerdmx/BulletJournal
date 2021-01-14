@@ -10,18 +10,20 @@ import {IState} from '../../store';
 import './note-tree.component.styles.less';
 import {Project} from '../../features/project/interface';
 import {User} from '../../features/group/interface';
-import {FieldTimeOutlined, FileAddOutlined} from '@ant-design/icons';
+import {FieldTimeOutlined, FileAddOutlined, SettingOutlined} from '@ant-design/icons';
 import AddNote from "../modals/add-note.component";
 import {ProjectItemUIType} from "../../features/project/constants";
 import {includeProjectItem} from "../../utils/Util";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 import NotesByOrder from "../modals/notes-by-order.component";
+import ProjectSettingDialog from "../../components/modals/project-setting.component";
 
 type NotesProps = {
     timezone: string;
     notes: Note[];
     readOnly: boolean;
     project: Project | undefined;
+    myself: string;
     updateNotes: (projectId: number) => void;
     putNote: (projectId: number, notes: Note[]) => void;
     showModal?: (user: User) => void;
@@ -169,7 +171,8 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
         showOrderModal,
         getNotesByOrder,
         labelsToKeep,
-        labelsToRemove
+        labelsToRemove,
+        myself
     } = props;
     useEffect(() => {
         if (project) {
@@ -177,6 +180,7 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
         }
     }, [project]);
     const [notesByOrderShown, setNotesByOrderShown] = useState(false);
+    const [projectSettingShown, setProjectSettingShown] = useState(false);
 
     if (!project) {
         return null;
@@ -202,11 +206,22 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
         setNotesByOrderShown(true);
     };
 
+    const handleSettings = () => {
+        setProjectSettingShown(true);
+    };
+
     const createContent = () => {
         if (project.shared) {
             return null;
         }
         return <Container>
+            {project.owner.name === myself && <FloatButton
+                tooltip="Settings"
+                onClick={handleSettings}
+                styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
+            >
+                <SettingOutlined />
+            </FloatButton>}
             {notes.length > 0 && <FloatButton
                 tooltip="Note(s) Ordered by Update Time"
                 onClick={handleShowNotesOrdered}
@@ -221,6 +236,14 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
     return (
         <div>
             {createContent()}
+            <div>
+                <ProjectSettingDialog
+                    visible={projectSettingShown}
+                    onCancel={() => {
+                        setProjectSettingShown(false)
+                    }}
+                />
+            </div>
             <div>
                 <NotesByOrder
                     projectId={project.id}
@@ -247,6 +270,7 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
 const mapStateToProps = (state: IState) => ({
     project: state.project.project,
     notes: state.note.notes,
+    myself: state.myself.username,
 });
 
 export default connect(mapStateToProps, {
