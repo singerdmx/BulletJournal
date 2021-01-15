@@ -17,6 +17,13 @@ let targetContentId = null;
 let projectItem = null;
 let uid = null;
 let ydocClientID = null;
+let Font = Quill.import('formats/font');
+Font.whitelist = ["sans-serif", "serif", "monospace"];
+let Size = Quill.import('formats/size');
+Size.whitelist = ['small',  'large', 'huge'] ;
+
+console.log("---------------import--------");
+console.log("import",Quill.imports);
 
 Quill.register('modules/cursors', QuillCursors);
 hljs.initHighlightingOnLoad();
@@ -162,6 +169,8 @@ window.addEventListener('load', () => {
                 ['clean'],
                 [
                     {header: [1, 2, 3, false]},
+                    {font: ["sans-serif", "serif", "monospace"] },
+                    {size: ['small',  'large', 'huge'] },
                     {color: []},
                     {background: []},
                     {align: []},
