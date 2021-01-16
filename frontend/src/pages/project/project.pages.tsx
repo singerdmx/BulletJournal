@@ -7,7 +7,7 @@ import {GroupsWithOwner, User} from '../../features/group/interface';
 import {Avatar, BackTop, Badge, message, Popconfirm, Popover, Radio, Tag, Tooltip} from 'antd';
 import {deleteProject, getProject} from '../../features/project/actions';
 import {iconMapper} from '../../components/side-menu/side-menu.component';
-import {DeleteOutlined, DownOutlined, TeamOutlined, UpOutlined,} from '@ant-design/icons';
+import {DeleteOutlined, DownOutlined, TeamOutlined, UpOutlined, SettingOutlined,} from '@ant-design/icons';
 import EditProject from '../../components/modals/edit-project.component';
 import AddTransaction from '../../components/modals/add-transaction.component';
 import {ProjectType} from '../../features/project/constants';
@@ -47,6 +47,7 @@ type ModalState = {
   isShow: boolean;
   hideLabel: boolean;
   groupName: string;
+  settingShown: boolean;
   completeTasksShown: boolean;
   tasksByUsersShown: boolean;
   notesByUsersShown: boolean;
@@ -123,6 +124,7 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
     hideLabel: false,
     groupName: '',
     completeTasksShown: false,
+    settingShown: false,
     //used for tasks by assignee modal
     tasksByUsersShown: false,
     notesByUsersShown: false,
@@ -241,6 +243,14 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
         undefined
     );
   };
+
+  getBgColor = () => {
+    const {projectSetting} = this.props;
+    if (!projectSetting) return undefined;
+    const bgColorSetting = projectSetting.color ? JSON.parse(projectSetting.color) : undefined;
+    const bgColor = bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined;
+    return bgColor;
+  }
 
   handleGetProjectItemsByUserCall: { [key in ProjectType]: Function } = {
     [ProjectType.NOTE]: this.handleGetNotesByOwner,
@@ -366,7 +376,7 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
   };
 
   render() {
-    const {projectSetting, project, myself, history} = this.props;
+    const {project, myself, history} = this.props;
 
     if (!project) {
       return null;
@@ -382,9 +392,6 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
     let projectContent = null;
     let projectItemsByUser = null;
     let projectItemsByOrder = null;
-
-    const bgColorSetting = projectSetting.color ? JSON.parse(projectSetting.color) : undefined;
-    const bgColor = bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined;
 
     switch (project.projectType) {
       case ProjectType.NOTE:
@@ -435,6 +442,9 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
                 showOrderModal={() => {
                   handleGetProjectItemsByOrder();
                 }}
+                settingShown={this.state.settingShown}
+                hideSettingModal={() => this.setState({settingShown: false})}
+                showSettingModal={() => this.setState({settingShown: true})}
                 completeTasksShown={this.state.completeTasksShown}
                 hideCompletedTask={() =>
                     this.setState({completeTasksShown: false})
@@ -599,12 +609,13 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
       </Popover>
     }
     
+
     return (
         <div
             className={`project ${
                 project.projectType === ProjectType.LEDGER && 'ledger'
             }`}
-            style={{background: bgColor}}
+            style={{background: this.getBgColor()}}
         >
           <Tooltip
               placement="top"
@@ -631,7 +642,7 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
           &nbsp;{project.name}
         </span>
       </MenuProvider>
-      <Menu id={`pr${project.id}`}
+      <Menu id={`pr${project.id}`} style={{background: this.getBgColor()}}
             theme={this.props.theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
             animation={animation.zoom}>
         <CopyToClipboard
@@ -644,6 +655,10 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
             <span>Copy Link Address</span>
           </Item>
         </CopyToClipboard>
+        <Item onClick={() => this.setState({settingShown: true})}>
+            <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><SettingOutlined/></IconFont>
+            <span>Change Bujo Settings</span>
+        </Item>
       </Menu>
     </>
   }

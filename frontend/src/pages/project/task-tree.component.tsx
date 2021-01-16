@@ -30,6 +30,7 @@ import {includeProjectItem} from "../../utils/Util";
 import ProjectSettingDialog from "../../components/modals/project-setting.component";
 
 type TasksProps = {
+  settingShown: boolean,
   completeTasksShown: boolean;
   completedTaskPageNo: number;
   timezone: string;
@@ -48,6 +49,8 @@ type TasksProps = {
   putTask: (projectId: number, tasks: Task[]) => void;
   showModal?: (user: User) => void;
   showOrderModal?: () => void;
+  hideSettingModal:() => void;
+  showSettingModal: () => void;
   hideCompletedTask: () => void;
   showCompletedTask: () => void;
   getTasksByOrder: (
@@ -212,6 +215,9 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     labelsToKeep,
     labelsToRemove,
     projectSetting,
+    showSettingModal,
+    hideSettingModal,
+    settingShown,
   } = props;
 
   useEffect(() => {
@@ -223,7 +229,6 @@ const TaskTree: React.FC<TasksProps> = (props) => {
   const history = useHistory();
 
   const [tasksByOrderShown, setTasksByOrderShown] = useState(false);
-  const [projectSettingShown, setProjectSettingShown] = useState(false);
 
   const bgColorSetting = projectSetting.color ? JSON.parse(projectSetting.color) : undefined;
   const bgColor = bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined;
@@ -334,7 +339,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
   };
 
   const handleSettings = () => {
-    setProjectSettingShown(true);
+    showSettingModal();
   };
 
   const createContent = () => {
@@ -402,9 +407,9 @@ const TaskTree: React.FC<TasksProps> = (props) => {
         {createContent()}
         <div>
           <ProjectSettingDialog
-              visible={projectSettingShown}
+              visible={settingShown}
               onCancel={() => {
-                setProjectSettingShown(false)
+                hideSettingModal()
               }}
           />
         </div>
