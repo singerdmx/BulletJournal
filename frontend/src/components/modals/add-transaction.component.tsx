@@ -12,7 +12,7 @@ import {
   TimePicker,
   Tooltip,
 } from 'antd';
-import { PlusOutlined, SettingOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { RouteComponentProps, withRouter, useParams } from 'react-router';
 import {
@@ -118,7 +118,6 @@ const AddTransaction: React.FC<
     props.updateTransactionVisible(true);
   };
 
-  const [projectSettingShown, setProjectSettingShown] = useState(false);
   useEffect(() => {
     props.updateExpandedMyself(true);
   }, []);
@@ -303,20 +302,10 @@ const AddTransaction: React.FC<
     );
   }
 
-  const handleSettings = () => {
-    setProjectSettingShown(true);
-  };
-
   return (
     <div>
       <Container>
-        {props.project && props.project.owner.name === props.myself && <FloatButton
-          tooltip="Settings"
-          onClick={handleSettings}
-          styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
-      >
-        <SettingOutlined />
-      </FloatButton>}
+        {props.project && props.project.owner.name === props.myself && <ProjectSettingDialog />}
         <FloatButton
             tooltip="Add New Transaction"
             onClick={openModal}
@@ -326,15 +315,6 @@ const AddTransaction: React.FC<
         </FloatButton>
         {getModal()}
       </Container>
-
-      <div>
-        <ProjectSettingDialog
-            visible={projectSettingShown}
-            onCancel={() => {
-              setProjectSettingShown(false)
-            }}
-        />
-      </div>
     </div>
   );
 };

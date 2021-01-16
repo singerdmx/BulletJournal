@@ -5,7 +5,7 @@ import {IState} from '../../store';
 import {connect} from 'react-redux';
 import {GroupsWithOwner, User} from '../../features/group/interface';
 import {Avatar, BackTop, Badge, message, Popconfirm, Popover, Radio, Tag, Tooltip} from 'antd';
-import {deleteProject, getProject} from '../../features/project/actions';
+import {deleteProject, getProject, updateSettingShown} from '../../features/project/actions';
 import {iconMapper} from '../../components/side-menu/side-menu.component';
 import {DeleteOutlined, DownOutlined, TeamOutlined, UpOutlined, SettingOutlined,} from '@ant-design/icons';
 import EditProject from '../../components/modals/edit-project.component';
@@ -111,6 +111,7 @@ type ProjectPageProps = {
   updateExpandedMyself: (updateSettings: boolean) => void;
   projectLabelsUpdate: (projectId: number, projectShared: boolean) => void;
   setSelectedLabel: (label: Label) => void;
+  updateSettingShown: (visible: boolean) => void;
 };
 
 type MyselfProps = {
@@ -442,9 +443,6 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
                 showOrderModal={() => {
                   handleGetProjectItemsByOrder();
                 }}
-                settingShown={this.state.settingShown}
-                hideSettingModal={() => this.setState({settingShown: false})}
-                showSettingModal={() => this.setState({settingShown: true})}
                 completeTasksShown={this.state.completeTasksShown}
                 hideCompletedTask={() =>
                     this.setState({completeTasksShown: false})
@@ -609,7 +607,6 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
       </Popover>
     }
     
-
     return (
         <div
             className={`project ${
@@ -655,9 +652,9 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
             <span>Copy Link Address</span>
           </Item>
         </CopyToClipboard>
-        <Item onClick={() => this.setState({settingShown: true})}>
+        <Item onClick={() => this.props.updateSettingShown(true)}>
             <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><SettingOutlined/></IconFont>
-            <span>Change Bujo Settings</span>
+            <span>Change Settings</span>
         </Item>
       </Menu>
     </>
@@ -690,4 +687,5 @@ export default connect(mapStateToProps, {
   updateExpandedMyself,
   projectLabelsUpdate,
   setSelectedLabel,
+  updateSettingShown,
 })(ProjectPage);

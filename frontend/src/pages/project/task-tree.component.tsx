@@ -16,7 +16,6 @@ import {
   FieldTimeOutlined,
   SearchOutlined,
   UnorderedListOutlined,
-  SettingOutlined,
 } from '@ant-design/icons';
 import './task.styles.less';
 import {User} from '../../features/group/interface';
@@ -30,7 +29,6 @@ import {includeProjectItem} from "../../utils/Util";
 import ProjectSettingDialog from "../../components/modals/project-setting.component";
 
 type TasksProps = {
-  settingShown: boolean,
   completeTasksShown: boolean;
   completedTaskPageNo: number;
   timezone: string;
@@ -49,8 +47,6 @@ type TasksProps = {
   putTask: (projectId: number, tasks: Task[]) => void;
   showModal?: (user: User) => void;
   showOrderModal?: () => void;
-  hideSettingModal:() => void;
-  showSettingModal: () => void;
   hideCompletedTask: () => void;
   showCompletedTask: () => void;
   getTasksByOrder: (
@@ -215,9 +211,6 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     labelsToKeep,
     labelsToRemove,
     projectSetting,
-    showSettingModal,
-    hideSettingModal,
-    settingShown,
   } = props;
 
   useEffect(() => {
@@ -338,22 +331,12 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     }, 300);
   };
 
-  const handleSettings = () => {
-    showSettingModal();
-  };
-
   const createContent = () => {
     if (project.shared) {
       return null;
     }
     return <Container>
-      {project.owner.name === myself && <FloatButton
-          tooltip="Settings"
-          onClick={handleSettings}
-          styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
-      >
-        <SettingOutlined />
-      </FloatButton>}
+      {project.owner.name === myself && <ProjectSettingDialog />}
       {completeTasksShown ? <FloatButton
           tooltip="Hide Completed Tasks"
           onClick={hideCompletedTask}
@@ -405,14 +388,6 @@ const TaskTree: React.FC<TasksProps> = (props) => {
   return (
       <div>
         {createContent()}
-        <div>
-          <ProjectSettingDialog
-              visible={settingShown}
-              onCancel={() => {
-                hideSettingModal()
-              }}
-          />
-        </div>
         <div>
           <TasksByOrder
               visible={tasksByOrderShown}

@@ -5,19 +5,23 @@ import {IState} from '../../store';
 import {connect} from 'react-redux';
 import './modals.styles.less';
 import {Project, ProjectSetting} from '../../features/project/interface';
-import {BgColorsOutlined, FileExcelOutlined} from '@ant-design/icons';
-import {updateProjectSetting} from '../../features/project/actions';
+import {BgColorsOutlined, FileExcelOutlined, SettingOutlined} from '@ant-design/icons';
+import {updateProjectSetting, updateSettingShown} from '../../features/project/actions';
 import {ProjectType} from "../../features/project/constants";
+import {Button as FloatButton, darkColors, lightColors} from "react-floating-action-button";
+
 
 type ProjectSettingProps = {
   project: Project | undefined;
   projectSetting: ProjectSetting;
-  visible: boolean;
-  onCancel: () => void;
+  settingShown: boolean;
   updateProjectSetting: (
     projectId: number,
     autoDelete: boolean,
     color: string | undefined,
+  ) => void;
+  updateSettingShown: (
+    visible: boolean
   ) => void;
 };
 
@@ -25,8 +29,9 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
   const {
     project,
     projectSetting,
-    visible,
+    settingShown,
     updateProjectSetting,
+    updateSettingShown,
   } = props;
   
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
@@ -80,11 +85,14 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
     a: Number(bgColor.a),
   }
 
-  return (
+  const openModal = () => updateSettingShown(true);
+  const closeModal = () => updateSettingShown(false);
+
+  const getModal = () => (
     <Modal
       title={'BuJo Settings'}
-      visible={visible}
-      onCancel={props.onCancel}
+      visible={settingShown}
+      onCancel={closeModal}
       footer={false}
     >
       {project?.projectType === ProjectType.TODO && <div>
@@ -129,13 +137,28 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
       </div>      
     </Modal>
   );
+
+  return (
+      <>
+        <FloatButton
+            tooltip="Settings"
+            onClick={openModal}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
+        >
+          <SettingOutlined />
+        </FloatButton>
+        {getModal()}
+      </>
+  );
 };
 
 const mapStateToProps = (state: IState) => ({
   project: state.project.project,
-  projectSetting: state.project.setting
+  projectSetting: state.project.setting,
+  settingShown: state.project.settingShown,
 });
 
 export default connect(mapStateToProps, {
-  updateProjectSetting
+  updateProjectSetting,
+  updateSettingShown,
 })(ProjectSettingDialog);

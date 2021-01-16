@@ -70,3 +70,6 @@ export const getProjectHistory = (
 
 export const historyReceived = (activities: Activity[]) =>
   actions.historyReceived({projectHistory: activities});
+
+export const updateSettingShown = (visible: boolean) =>
+  actions.updateSettingShown({settingShown: visible});

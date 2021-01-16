@@ -78,7 +78,12 @@ export type GetProjectHistoryAction = {
   username: string;
 };
 
+export type UpdateSettingShown = {
+  settingShown: boolean;
+};
+
 let initialState = {
+  settingShown: false,
   owned: [] as Project[],
   shared: [] as ProjectsWithOwner[],
   project: undefined as Project | undefined,
@@ -137,6 +142,13 @@ const slice = createSlice({
       state,
       action: PayloadAction<UpdateProjectSettingAction>
     ) => state,
+    updateSettingShown: (
+      state,
+      action: PayloadAction<UpdateSettingShown>
+    ) => {
+      const { settingShown } = action.payload;
+      state.settingShown = settingShown;
+    },
   },
 });
 

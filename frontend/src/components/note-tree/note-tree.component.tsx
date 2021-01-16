@@ -10,7 +10,7 @@ import {IState} from '../../store';
 import './note-tree.component.styles.less';
 import {Project, ProjectSetting} from '../../features/project/interface';
 import {User} from '../../features/group/interface';
-import {FieldTimeOutlined, FileAddOutlined, SettingOutlined} from '@ant-design/icons';
+import {FieldTimeOutlined, FileAddOutlined} from '@ant-design/icons';
 import AddNote from "../modals/add-note.component";
 import {ProjectItemUIType} from "../../features/project/constants";
 import {includeProjectItem} from "../../utils/Util";
@@ -182,7 +182,6 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
         }
     }, [project]);
     const [notesByOrderShown, setNotesByOrderShown] = useState(false);
-    const [projectSettingShown, setProjectSettingShown] = useState(false);
 
     const bgColorSetting = projectSetting.color ? JSON.parse(projectSetting.color) : undefined;
     const bgColor = bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined;
@@ -211,22 +210,12 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
         setNotesByOrderShown(true);
     };
 
-    const handleSettings = () => {
-        setProjectSettingShown(true);
-    };
-
     const createContent = () => {
         if (project.shared) {
             return null;
         }
         return <Container>
-            {project.owner.name === myself && <FloatButton
-                tooltip="Settings"
-                onClick={handleSettings}
-                styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
-            >
-                <SettingOutlined />
-            </FloatButton>}
+            {project.owner.name === myself && <ProjectSettingDialog />}
             {notes.length > 0 && <FloatButton
                 tooltip="Note(s) Ordered by Update Time"
                 onClick={handleShowNotesOrdered}
@@ -241,14 +230,6 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
     return (
         <div>
             {createContent()}
-            <div>
-                <ProjectSettingDialog
-                    visible={projectSettingShown}
-                    onCancel={() => {
-                        setProjectSettingShown(false)
-                    }}
-                />
-            </div>
             <div>
                 <NotesByOrder
                     projectId={project.id}
