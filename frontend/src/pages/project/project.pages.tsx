@@ -47,7 +47,6 @@ type ModalState = {
   isShow: boolean;
   hideLabel: boolean;
   groupName: string;
-  settingShown: boolean;
   completeTasksShown: boolean;
   tasksByUsersShown: boolean;
   notesByUsersShown: boolean;
@@ -125,7 +124,6 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
     hideLabel: false,
     groupName: '',
     completeTasksShown: false,
-    settingShown: false,
     //used for tasks by assignee modal
     tasksByUsersShown: false,
     notesByUsersShown: false,

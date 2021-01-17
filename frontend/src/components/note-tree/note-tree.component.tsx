@@ -194,15 +194,6 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
         return <Empty/>
     }
 
-    if (notes.length === 0) {
-        return <div className='add-note-button'>
-            <Result
-                icon={<FileAddOutlined/>}
-                extra={<AddNote mode='button'/>}
-            />
-        </div>
-    }
-
     const treeNote = getTree(!project.shared, notes, readOnly, labelsToKeep, labelsToRemove, showModal, showOrderModal);
 
     const handleShowNotesOrdered = () => {
@@ -226,6 +217,22 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
             <AddNote mode="icon"/>
         </Container>
     };
+
+    if (notes.length === 0) {
+        return (
+        <div>
+            <div className='add-note-button'>
+                <Result
+                    icon={<FileAddOutlined/>}
+                    extra={<AddNote mode='button'/>}
+                />
+            </div>
+            <div>
+                {createContent()}
+            </div>
+        </div>
+        )
+    }
 
     return (
         <div>

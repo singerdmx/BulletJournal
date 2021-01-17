@@ -2,8 +2,8 @@ import React from 'react';
 import {Empty, message, Tree} from 'antd';
 import {TreeNodeNormal} from 'antd/lib/tree/Tree';
 import {Project} from '../../features/project/interface';
-import {updateProjectRelations} from '../../features/project/actions';
-import {CreditCardOutlined, CarryOutOutlined, FileTextOutlined} from '@ant-design/icons';
+import {updateProjectRelations, updateSettingShown} from '../../features/project/actions';
+import {CreditCardOutlined, CarryOutOutlined, FileTextOutlined, SettingOutlined} from '@ant-design/icons';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {connect} from 'react-redux';
 import {clearCompletedTasks} from "../../features/tasks/actions";
@@ -25,12 +25,13 @@ const getTree = (
     theme: string,
     onClick: Function,
     projectSettings: Object,
+    handleClickChangeSetting: Function,
 ): TreeNodeNormal[] => {
     let res = [] as TreeNodeNormal[];
     data.forEach((item: Project) => {
         const node = {} as TreeNodeNormal;
         if (item.subProjects && item.subProjects.length) {
-            node.children = getTree(item.subProjects, index, theme, onClick, projectSettings);
+            node.children = getTree(item.subProjects, index, theme, onClick, projectSettings, handleClickChangeSetting);
         } else {
             node.children = [] as TreeNodeNormal[];
         }
@@ -61,6 +62,10 @@ const getTree = (
                             <span>Copy Link Address</span>
                         </Item>
                     </CopyToClipboard>
+                    <Item onClick={(e) => handleClickChangeSetting(item.id)}>
+                        <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><SettingOutlined/></IconFont>
+                        <span>Change Settings</span>
+                    </Item>
                 </Menu>
             </>
         );
@@ -76,6 +81,7 @@ type ProjectProps = {
     ownProjects: Project[];
     projectSettings: Object;
     updateProjectRelations: (Projects: Project[]) => void;
+    updateSettingShown: (visible: boolean) => void;
     clearCompletedTasks: () => void;
 };
 
@@ -154,12 +160,17 @@ const onDrop = (projects: Project[], updateProject: Function) => (info: any) => 
 };
 
 const OwnProject: React.FC<RouteComponentProps & ProjectProps> = props => {
-    const {ownProjects, history, id, updateProjectRelations, theme, projectSettings} = props;
+    const {ownProjects, history, id, updateProjectRelations, theme, projectSettings, updateSettingShown} = props;
+
+    const handleClickChangeSetting = (itemId: number) => {
+        updateSettingShown(true);
+        history.push(`/projects/${itemId}`);
+    }
 
     const treeNode = getTree(ownProjects, id, theme, (itemId: number) => {
         clearCompletedTasks();
         history.push(`/projects/${itemId}`);
-    }, projectSettings);
+    }, projectSettings, handleClickChangeSetting);
 
     if (ownProjects.length === 0) {
         return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/>;
@@ -181,6 +192,10 @@ const mapStateToProps = (state: IState) => ({
     projectSettings: state.project.settings,
 });
 
-export default connect(mapStateToProps, {updateProjectRelations, clearCompletedTasks})(
+export default connect(mapStateToProps, {
+    updateProjectRelations, 
+    clearCompletedTasks,
+    updateSettingShown,
+})(
     withRouter(OwnProject)
 );
