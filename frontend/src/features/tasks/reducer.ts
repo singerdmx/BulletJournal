@@ -48,6 +48,7 @@ export type CreateTask = {
   dueTime?: string;
   duration?: number;
   recurrenceRule?: string;
+  location?: string;
   labels?: number[];
 };
 
@@ -151,6 +152,7 @@ export type PatchTask = {
   dueTime?: string;
   duration?: number;
   reminderSetting?: ReminderSetting;
+  location?: string;
   recurrenceRule?: string;
   labels?: number[];
 };

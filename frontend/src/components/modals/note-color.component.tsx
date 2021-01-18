@@ -4,34 +4,30 @@ import {RGBColor, SwatchesPicker} from 'react-color';
 import {IState} from '../../store';
 import {connect} from 'react-redux';
 import './modals.styles.less';
-import {Project, ProjectSetting} from '../../features/project/interface';
-import {BgColorsOutlined, FileExcelOutlined, SettingOutlined} from '@ant-design/icons';
-import {updateProjectSetting, updateSettingShown} from '../../features/project/actions';
-import {ProjectType} from "../../features/project/constants";
+import {BgColorsOutlined} from '@ant-design/icons';
+import {updateColorSettingShown, updateNoteColor} from '../../features/notes/actions';
 import {Button as FloatButton, darkColors, lightColors} from "react-floating-action-button";
+import {Note} from '../../features/notes/interface';
 
 
-type ProjectSettingProps = {
-  project: Project | undefined;
-  projectSetting: ProjectSetting;
-  settingShown: boolean;
-  updateProjectSetting: (
-    projectId: number,
-    autoDelete: boolean,
+type NoteColorSettingProps = {
+  note: Note | undefined;
+  colorSettingShown: boolean;
+  updateNoteColor: (
+    noteId: number,
     color: string | undefined,
   ) => void;
-  updateSettingShown: (
+  updateColorSettingShown: (
     visible: boolean
   ) => void;
 };
 
-const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
+const NoteColorSettingDialog: React.FC<NoteColorSettingProps> = (props) => {
   const {
-    project,
-    projectSetting,
-    settingShown,
-    updateProjectSetting,
-    updateSettingShown,
+    note,
+    colorSettingShown,
+    updateColorSettingShown,
+    updateNoteColor,
   } = props;
   
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
@@ -43,19 +39,23 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
   });
 
   useEffect(() => {
-    setDisplayColorPicker(!!projectSetting.color);
-    setBgColor(projectSetting.color ? JSON.parse(projectSetting.color) : {
+    let show : boolean = !!note?.color
+    if (note?.color === ' ') {
+        show = false;
+    }
+    setDisplayColorPicker(show);
+    setBgColor(show && note?.color ? JSON.parse(note.color) : {
       r: '0',
       g: '0',
       b: '0',
       a: '0',
     })
-  }, [projectSetting]);
+  }, [note]);
 
   const onCheckColorIcon = (e: any) => {
     setDisplayColorPicker(!displayColorPicker);
-    if (!e.target.checked && project) {
-      updateProjectSetting(project.id, projectSetting.autoDelete, undefined);
+    if (!e.target.checked && note) {
+      updateNoteColor(note.id, ' ');
       setBgColor({
         r: '0',
         g: '0',
@@ -66,16 +66,10 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
   }
 
   const handleColorChange = (c : any , event : any) => {
-    if (project) {
-      updateProjectSetting(project.id, projectSetting.autoDelete, JSON.stringify(c.rgb));
+    if (note) {
+      updateNoteColor(note.id, JSON.stringify(c.rgb));
     }
-    setBgColor(c.rgb);
-  };  
-
-  const handleAutoDeleteChange = (e: any) => {
-    if (project) {
-      updateProjectSetting(project.id, e.target.checked, projectSetting.color);
-    }
+    setBgColor(c.rgb);    
   };  
 
   const color : RGBColor = {
@@ -85,29 +79,19 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
     a: Number(bgColor.a),
   }
 
-  const openModal = () => updateSettingShown(true);
-  const closeModal = () => updateSettingShown(false);
+  const openModal = () => updateColorSettingShown(true);
+  const closeModal = () => updateColorSettingShown(false);
 
   const getModal = () => (
     <Modal
-      title={'BuJo Settings'}
-      visible={settingShown}
+      title={'Set Background Color'}
+      visible={colorSettingShown}
       onCancel={closeModal}
       footer={false}
     >
-      {project?.projectType === ProjectType.TODO && <div>
-        <Checkbox
-            style={{marginTop: '-0.5em'}}
-            onChange={handleAutoDeleteChange}
-            checked={projectSetting.autoDelete}
-        >
-          Automatically delete past due tasks
-        </Checkbox>
-        <FileExcelOutlined/>
-      </div>}
       <div>
         <Checkbox
-            style={{ marginTop: '-0.5em' }}
+            style={{marginTop: '-0.5em'}}
             checked={displayColorPicker}
             onChange={onCheckColorIcon}
         >
@@ -120,9 +104,9 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
             <div>
               <SwatchesPicker
               color={color}
-              onChange={ handleColorChange }
+              onChange={handleColorChange}
               width={420} 
-              height={150}
+              height={130}
               colors={[['#FCE9DA', '#FFCEC7', '#FFD0A6', '#E098AE'], 
                       ['#EFEFF1', '#ECD4D4', '#CCDBE2', '#C9CBE0'], 
                       ['#E9E1D4', '#F5DDAD', '#F1BCAE', '#C9DECF'], 
@@ -141,11 +125,11 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
   return (
       <>
         <FloatButton
-            tooltip="Settings"
+            tooltip="Set Background Color"
             onClick={openModal}
             styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
         >
-          <SettingOutlined />
+          <BgColorsOutlined />
         </FloatButton>
         {getModal()}
       </>
@@ -153,12 +137,11 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
 };
 
 const mapStateToProps = (state: IState) => ({
-  project: state.project.project,
-  projectSetting: state.project.setting,
-  settingShown: state.project.settingShown,
+  note: state.note.note,
+  colorSettingShown: state.note.colorSettingShown,
 });
 
 export default connect(mapStateToProps, {
-  updateProjectSetting,
-  updateSettingShown,
-})(ProjectSettingDialog);
+  updateColorSettingShown,
+  updateNoteColor,
+})(NoteColorSettingDialog);

@@ -106,3 +106,15 @@ export const getNotesByOrder = (
   });
 
 export const noteReceived = (note: Note | undefined) => actions.noteReceived({note: note});
+
+export const updateColorSettingShown = (visible: boolean) =>
+  actions.updateColorSettingShown({colorSettingShown: visible});
+
+export const updateNoteColor = (
+  noteId: number,
+  color: string | undefined
+) =>
+  actions.updateNoteColor({ 
+    noteId: noteId,
+    color: color,
+  });

@@ -61,19 +61,12 @@ Quill.register(
 
 // Add sizes to whitelist and register them
 const Size = Quill.import('formats/size');
-Size.whitelist = ['extra-small', 'small', 'medium', 'large'];
+Size.whitelist = ['small',  'large', 'huge'] ;
 Quill.register(Size, true);
 
 // Add fonts to whitelist and register them
 const Font = Quill.import('formats/font');
-Font.whitelist = [
-  'arial',
-  'comic-sans',
-  'courier-new',
-  'georgia',
-  'helvetica',
-  'lucida',
-];
+Font.whitelist = ["sans-serif", "serif", "monospace"];
 Quill.register(Font, true);
 
 const icons = Quill.import("ui/icons");
@@ -107,6 +100,7 @@ export const modules = {
       [
         {list: 'ordered'},
         {list: 'bullet'},
+        {list: 'check'},
         {indent: '-1'},
         {indent: '+1'},
       ],
@@ -116,6 +110,8 @@ export const modules = {
       ['clean'],
       [
         {header: [1, 2, 3, false]},
+        {font: ["sans-serif", "serif", "monospace"] },
+        {size: ['small',  'large', 'huge'] },
         {color: []},
         {background: []},
         {align: []},
@@ -154,7 +150,10 @@ export const formats = [
   'width',
   'style',
   'height',
-  'alt'
+  'alt',
+  'font',
+  'size'
+
 ];
 
 // // Quill Toolbar component

@@ -10,7 +10,10 @@ import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
-import com.bulletjournal.notifications.*;
+import com.bulletjournal.notifications.Auditable;
+import com.bulletjournal.notifications.ContentBatch;
+import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.informed.RevokeSharableEvent;
 import com.bulletjournal.notifications.informed.SetLabelEvent;
 import com.bulletjournal.notifications.informed.ShareProjectItemEvent;
@@ -254,16 +257,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             String requester, UpdateContentParams updateContentParams,
             T projectItem, K content, String oldText) {
 
-        String diff = updateContentParams.getDiff();
-        if (diff == null) {
-            // from new mobile version
-            LOGGER.info("from new mobile version " + updateContentParams.getText());
-            content.setText(updateContentParams.getText());
-        } else {
-            // diff != null, from web
-            DeltaContent newContent = new DeltaContent(updateContentParams.getText());
-            content.setText(newContent.toJSON());
-        }
+        DeltaContent newContent = new DeltaContent(updateContentParams.getText());
+        content.setText(newContent.toJSON());
 
         updateRevision(content, requester, content.getText(), oldText);
         this.getContentJpaRepository().save(content);

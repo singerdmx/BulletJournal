@@ -60,6 +60,9 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
     @Column(name = "end_time", nullable = false)
     private Timestamp endTime;
 
+    @Column
+    private String color;
+
     public Long getId() {
         return id;
     }
@@ -132,6 +135,14 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
         this.endTime = endTime;
     }
 
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
     @Override
     public com.bulletjournal.controller.models.Transaction toPresentationModel() {
         return this.toPresentationModel(this.getLabels().stream()
@@ -155,7 +166,8 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
                 this.getCreatedAt().getTime(),
                 this.getUpdatedAt().getTime(),
                 labels,
-                this.getLocation());
+                this.getLocation(),
+                this.getColor());
     }
 
     @Override

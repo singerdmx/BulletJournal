@@ -17,6 +17,8 @@ public class Note extends ProjectItem {
     @Valid
     private List<Note> subNotes = new ArrayList<>();
 
+    private String color;
+
     public Note() {
     }
 
@@ -27,8 +29,10 @@ public class Note extends ProjectItem {
                 List<Label> labels,
                 Long createdAt,
                 Long updatedAt,
-                String location) {
+                String location,
+                String color) {
         super(id, name, owner, project, labels, location);
+        this.color = color;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -36,6 +40,14 @@ public class Note extends ProjectItem {
     @Override
     public ContentType getContentType() {
         return ContentType.NOTE;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 
     public List<Note> getSubNotes() {

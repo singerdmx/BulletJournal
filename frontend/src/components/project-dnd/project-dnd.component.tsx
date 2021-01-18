@@ -26,20 +26,27 @@ const getTree = (
   owner: User,
   index: number,
   theme: string,
-  onClick: Function
+  onClick: Function,
+  projectSettings: Object,
 ): TreeNodeNormal[] => {
   let res = [] as TreeNodeNormal[];
   data.forEach((item: Project) => {
     const node = {} as TreeNodeNormal;
     if (item.subProjects && item.subProjects.length) {
-      node.children = getTree(item.subProjects, owner, index, theme, onClick);
+      node.children = getTree(item.subProjects, owner, index, theme, onClick, projectSettings);
     } else {
       node.children = [] as TreeNodeNormal[];
     }
+
+    const getKeyValue = (key: number) => (obj: Record<number, any>) => obj[key];
+    const projectSetting = getKeyValue(item.id)(projectSettings);
+    const bgColorSetting = projectSetting ? projectSetting.color ? JSON.parse(projectSetting.color) : undefined : undefined;
+    const bgColor = bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined
+
     if (item.owner) {
       node.title = (
           <>
-            <MenuProvider id={`project${item.id}`}>
+            <MenuProvider id={`project${item.id}`} style={{background: bgColor}}>
               <Tooltip placement="right" title={`Owner: ${item.owner.alias}`}>
                 <span
                     onClick={e => onClick(item.id)}>
@@ -50,7 +57,8 @@ const getTree = (
 
             <Menu id={`project${item.id}`}
                   theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
-                  animation={animation.zoom}>
+                  animation={animation.zoom}
+                  style={{background: bgColor}}>
               <CopyToClipboard
                   text={`${item.name} ${window.location.origin.toString()}/#/projects/${item.id}`}
                   onCopy={() => message.success('Link Copied to Clipboard')}
@@ -94,6 +102,7 @@ const reorder = (
 type ProjectProps = {
   theme: string;
   sharedProjects: ProjectsWithOwner[];
+  projectSettings: Object;
   updateSharedProjectsOrder: (projectOwners: string[]) => void;
   clearCompletedTasks: () => void;
 };
@@ -127,7 +136,8 @@ class ProjectDnd extends React.Component<ProjectProps & RouteComponentProps> {
                     (itemId: number) => {
                       clearCompletedTasks();
                       this.props.history.push(`/projects/${itemId}`);
-                    }
+                    },
+                    this.props.projectSettings,
                   );
                   return (
                     <Draggable
@@ -163,6 +173,7 @@ class ProjectDnd extends React.Component<ProjectProps & RouteComponentProps> {
 
 const mapStateToProps = (state: IState) => ({
   theme: state.myself.theme,
+  projectSettings: state.project.settings,
 });
 
 export default connect(mapStateToProps, { updateSharedProjectsOrder, clearCompletedTasks })(

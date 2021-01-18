@@ -7,7 +7,7 @@ import ReactLoading from 'react-loading';
 import {getTasksByOrder, putTask, updateCompletedTasks, updateTasks} from '../../features/tasks/actions';
 import {connect} from 'react-redux';
 import {IState} from '../../store';
-import {Project} from '../../features/project/interface';
+import {Project, ProjectSetting} from '../../features/project/interface';
 import {
   CarryOutOutlined,
   CheckCircleOutlined,
@@ -16,18 +16,17 @@ import {
   FieldTimeOutlined,
   SearchOutlined,
   UnorderedListOutlined,
-  SettingOutlined,
 } from '@ant-design/icons';
 import './task.styles.less';
 import {User} from '../../features/group/interface';
 import {useHistory} from 'react-router-dom';
 import AddTask from '../../components/modals/add-task.component';
 import {ProjectItemUIType} from "../../features/project/constants";
-import ProjectSetting from "../../components/modals/project-setting.component";
 import TasksByOrder from "../../components/modals/tasks-by-order.component";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 import {ProjectOutlined} from "@ant-design/icons/lib";
 import {includeProjectItem} from "../../utils/Util";
+import ProjectSettingDialog from "../../components/modals/project-setting.component";
 
 type TasksProps = {
   completeTasksShown: boolean;
@@ -42,6 +41,7 @@ type TasksProps = {
   nextCompletedTasks: Task[];
   labelsToKeep: number[];
   labelsToRemove: number[];
+  projectSetting: ProjectSetting;
   updateTasks: (projectId: number) => void;
   updateCompletedTasks: (projectId: number) => void;
   putTask: (projectId: number, tasks: Task[]) => void;
@@ -210,6 +210,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     showCompletedTask,
     labelsToKeep,
     labelsToRemove,
+    projectSetting,
   } = props;
 
   useEffect(() => {
@@ -221,9 +222,10 @@ const TaskTree: React.FC<TasksProps> = (props) => {
   const history = useHistory();
 
   const [tasksByOrderShown, setTasksByOrderShown] = useState(false);
-  const [projectSettingShown, setProjectSettingShown] = useState(false);
 
-
+  const bgColorSetting = projectSetting.color ? JSON.parse(projectSetting.color) : undefined;
+  const bgColor = bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined;
+  
   const handleLoadMore = () => {
     if (project) {
       updateCompletedTasks(project.id);
@@ -329,22 +331,12 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     }, 300);
   };
 
-  const handleSettings = () => {
-    setProjectSettingShown(true);
-  };
-
   const createContent = () => {
     if (project.shared) {
       return null;
     }
     return <Container>
-      {project.owner.name === myself && <FloatButton
-          tooltip="Settings"
-          onClick={handleSettings}
-          styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
-      >
-        <SettingOutlined />
-      </FloatButton>}
+      {project.owner.name === myself && <ProjectSettingDialog />}
       {completeTasksShown ? <FloatButton
           tooltip="Hide Completed Tasks"
           onClick={hideCompletedTask}
@@ -397,14 +389,6 @@ const TaskTree: React.FC<TasksProps> = (props) => {
       <div>
         {createContent()}
         <div>
-          <ProjectSetting
-              visible={projectSettingShown}
-              onCancel={() => {
-                setProjectSettingShown(false)
-              }}
-          />
-        </div>
-        <div>
           <TasksByOrder
               visible={tasksByOrderShown}
               onCancel={() => {
@@ -419,6 +403,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
               className='ant-tree'
               draggable
               blockNode
+              style={{background: bgColor}}
               onDragEnter={onDragEnter}
               onDrop={onDrop(tasks, putTask, project.id)}
               treeData={treeTask}
@@ -432,6 +417,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
 const mapStateToProps = (state: IState) => ({
   completedTaskPageNo: state.task.completedTaskPageNo,
   project: state.project.project,
+  projectSetting: state.project.setting,
   tasks: state.task.tasks,
   completedTasks: state.task.completedTasks,
   loadingCompletedTask: state.task.loadingCompletedTask,

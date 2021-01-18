@@ -29,19 +29,4 @@ public class DeltaConverterTest {
         System.out.println(codePoint);
     }
 
-    @Test
-    public void testUpdateParams() {
-        String testUpdateContent3 = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 2\\\\n\\\"}]},\\\"###html###\\\":\\\"<p>Test Content 2</p>\\\"}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"2\\\"},{\\\"delete\\\":1}]}\"}";
-        LinkedHashMap e = GSON.fromJson(testUpdateContent3, LinkedHashMap.class);
-
-        System.out.println(testUpdateContent3);
-    }
-
-    @Test
-    public void testDeltaContent() {
-        DeltaContent deltaContent = new DeltaContent(
-                "{\"delta\":{\"ops\":[{\"insert\":\"Test1\\nTest2\\n\\n\"}]},\"###html###\":\"<p>Test1</p><p>Test2</p><p><br></p>\"}");
-        deltaContent.getDeltaMap();
-    }
-
 }

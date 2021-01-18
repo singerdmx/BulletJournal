@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/singerdmx/BulletJournal/daemon/consts"
 	"github.com/singerdmx/BulletJournal/daemon/persistence"
+	"strconv"
 	"time"
 
 	"github.com/singerdmx/BulletJournal/daemon/logging"
@@ -87,6 +88,52 @@ func (c *Cleaner) renewExpiringGoogleCalendarWatch() {
 	}
 }
 
+// Clean all outdated tasks for projects who have setting auto_delete is true
+func (c * Cleaner) CleanOutdatedTasks() {
+	sess, err := postgresql.Open(c.Settings)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	defer sess.Close()
+	rows, err := sess.Query("select project_id from project_settings where auto_delete=true")
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	defer rows.Close()
+
+	var projectIdList []int64
+	for rows.Next() {
+		var projectId int64
+		if err := rows.Scan(&projectId); err != nil {
+			log.Error(err)
+			return
+		}
+		projectIdList = append(projectIdList, projectId)
+	}
+	if len(projectIdList) == 0 {
+		return
+	}
+	projectIdListString := "("
+	for _, projectId := range projectIdList {
+		projectIdListString = projectIdListString + strconv.FormatInt(projectId, 10) + ","
+	}
+	projectIdListString = projectIdListString[ : len(projectIdListString) - 1] + ")"
+
+	// construct timestamp as now - 1 day
+	targetTime := time.Now().AddDate(0, 0, -1).Format("2006-01-02 15:04:05")
+	queryString := "delete from tasks where project_id in " + projectIdListString +
+		" and end_time is not null and end_time < timestamp '" + targetTime + "'"
+	res, err := sess.Exec(queryString)
+	if err != nil {
+		log.Errorf("Failed to clean up outdated tasks, err: %v", err)
+	} else if res != nil {
+		num, _ := res.RowsAffected()
+		log.Infof("Cleaned %v outdated tasks for projects %v before %v", num, projectIdListString, targetTime)
+	}
+}
+
 //CountForTable ...Helper method used for testing
 func (c *Cleaner) CountForTable(tableName string) *uint64 {
 	sess, err := postgresql.Open(c.Settings)
@@ -118,4 +165,5 @@ func (c *Cleaner) Clean(maxRetentionTimeInDays int) {
 	c.deleteByExpirationTimeBefore("public_project_items")
 	c.deleteByAvailableBefore(`template.sample_tasks`)
 	c.renewExpiringGoogleCalendarWatch()
+	c.CleanOutdatedTasks()
 }

@@ -1,7 +1,7 @@
-import { createSlice, PayloadAction } from 'redux-starter-kit';
-import { ProjectType, ContentAction } from './constants';
-import { Project, ProjectsWithOwner, Activity } from './interface';
-import { History } from 'history';
+import {createSlice, PayloadAction} from 'redux-starter-kit';
+import {ContentAction, ProjectType} from './constants';
+import {Activity, Project, ProjectSetting, ProjectsWithOwner} from './interface';
+import {History} from 'history';
 
 export type ProjectApiErrorAction = {
   error: string;
@@ -9,6 +9,14 @@ export type ProjectApiErrorAction = {
 
 export type ProjectAction = {
   project?: Project;
+};
+
+export type ProjectSettingAction = {
+  projectSetting: ProjectSetting;
+};
+
+export type ProjectSettingsAction = {
+  projectSettings: Object;
 };
 
 export type GetProjectAction = {
@@ -40,6 +48,12 @@ export type UpdateProjectRelationsAction = {
   projects: Project[];
 };
 
+export type UpdateProjectSettingAction = {
+  projectId: number;
+  autoDelete: boolean;
+  color: string | undefined;
+};
+
 export type DeleteProjectAction = {
   projectId: number;
   name: string;
@@ -64,10 +78,17 @@ export type GetProjectHistoryAction = {
   username: string;
 };
 
+export type UpdateSettingShownAction = {
+  settingShown: boolean;
+};
+
 let initialState = {
+  settingShown: false,
   owned: [] as Project[],
   shared: [] as ProjectsWithOwner[],
   project: undefined as Project | undefined,
+  setting: {color: undefined, autoDelete: false} as ProjectSetting,
+  settings: {},
   projectHistory: [] as Activity[],
 };
 
@@ -99,6 +120,14 @@ const slice = createSlice({
       const { project } = action.payload;
       state.project = project;
     },
+    projectSettingReceived: (state, action: PayloadAction<ProjectSettingAction>) => {
+      const { projectSetting } = action.payload;
+      state.setting = projectSetting;
+    },
+    projectSettingsReceived: (state, action: PayloadAction<ProjectSettingsAction>) => {
+      const { projectSettings } = action.payload;
+      state.settings = projectSettings;
+    },
     updateSharedProjectsOrder: (
       state,
       action: PayloadAction<UpdateSharedProjectsOrderAction>
@@ -109,6 +138,17 @@ const slice = createSlice({
       state,
       action: PayloadAction<UpdateProjectRelationsAction>
     ) => state,
+    updateProjectSetting: (
+      state,
+      action: PayloadAction<UpdateProjectSettingAction>
+    ) => state,
+    updateSettingShown: (
+      state,
+      action: PayloadAction<UpdateSettingShownAction>
+    ) => {
+      const { settingShown } = action.payload;
+      state.settingShown = settingShown;
+    },
   },
 });
 

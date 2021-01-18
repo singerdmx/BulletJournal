@@ -41,6 +41,16 @@ export const updateProject = (
   });
 export const updateProjectRelations = (projects: Project[]) =>
   actions.updateProjectRelations({ projects: projects });
+export const updateProjectSetting = (
+  projectId: number,
+  autoDelete: boolean,
+  color: string | undefined
+) =>
+  actions.updateProjectSetting({ 
+    projectId: projectId,
+    autoDelete: autoDelete,
+    color: color,
+  });
 export const getProjectHistory = (
   projectId: number,
   timezone: string,
@@ -60,3 +70,6 @@ export const getProjectHistory = (
 
 export const historyReceived = (activities: Activity[]) =>
   actions.historyReceived({projectHistory: activities});
+
+export const updateSettingShown = (visible: boolean) =>
+  actions.updateSettingShown({settingShown: visible});

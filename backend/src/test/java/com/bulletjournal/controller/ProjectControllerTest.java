@@ -104,6 +104,12 @@ public class ProjectControllerTest {
         Project p7 = TestHelpers.createProject(requestParams, expectedOwner, "P7", group, ProjectType.TODO);
         updateProjectRelations(p5, p6, p7);
 
+        // test get setting for projects
+        Group tempG = TestHelpers.createGroup(requestParams, sampleUsers[2], "tempG");
+        Project p9 = TestHelpers.createProject(requestParams, sampleUsers[2], "P9", tempG, ProjectType.TODO);
+        List<Project> projects = new ArrayList<>(Arrays.asList(p2, p3, p9));
+        testGetProjectSettingsMultiple(projects);
+
         // test notification for adding and removing users
         Project p8 = TestHelpers.createProject(requestParams, expectedOwner, "P8", group, ProjectType.TODO);
         p8 = updateProjectGroup(p8, groups.get(0).getGroups().get(0).getId());
@@ -1218,7 +1224,7 @@ public class ProjectControllerTest {
     }
 
     private ProjectDetails testProjectSetting(Project project) {
-        ProjectSetting projectSetting = new ProjectSetting("red", true);
+        ProjectSetting projectSetting = new ProjectSetting("{\"r\":255,\"g\":224,\"b\":178,\"a\":1}", true);
         ResponseEntity<ProjectDetails> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECT_SETTINGS_ROUTE,
                 HttpMethod.PUT,
@@ -1228,10 +1234,10 @@ public class ProjectControllerTest {
         ProjectDetails p = response.getBody();
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(p.getProjectSetting());
-        assertEquals("red", p.getProjectSetting().getColor());
+        assertEquals("{\"r\":255,\"g\":224,\"b\":178,\"a\":1}", p.getProjectSetting().getColor());
         assertTrue(p.getProjectSetting().isAutoDelete());
 
-        projectSetting = new ProjectSetting("blue", false);
+        projectSetting = new ProjectSetting("{\"r\":209,\"g\":196,\"b\":233,\"a\":1}", false);
         response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECT_SETTINGS_ROUTE,
                 HttpMethod.PUT,
@@ -1241,24 +1247,60 @@ public class ProjectControllerTest {
         p = response.getBody();
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(p.getProjectSetting());
-        assertEquals("blue", p.getProjectSetting().getColor());
+        assertEquals("{\"r\":209,\"g\":196,\"b\":233,\"a\":1}", p.getProjectSetting().getColor());
         assertFalse(p.getProjectSetting().isAutoDelete());
-
-        ResponseEntity<ProjectDetails> response1 = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + ProjectController.PROJECT_ROUTE,
-                HttpMethod.GET,
-                null,
-                ProjectDetails.class,
-                project.getId());
-        p = response.getBody();
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(p.getProjectSetting());
-        assertEquals("blue", p.getProjectSetting().getColor());
-        assertFalse(p.getProjectSetting().isAutoDelete());
-
 
         return p;
+    }
 
+    private void testGetProjectSettingsMultiple(List<Project> projects) {
+        ProjectSetting projectSetting = new ProjectSetting("{\"r\":255,\"g\":224,\"b\":178,\"a\":1}", true);
+        ResponseEntity<ProjectDetails> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECT_SETTINGS_ROUTE,
+                HttpMethod.PUT,
+                new HttpEntity<>(projectSetting),
+                ProjectDetails.class,
+                projects.get(0).getId());
+        ProjectDetails p = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("{\"r\":255,\"g\":224,\"b\":178,\"a\":1}", p.getProjectSetting().getColor());
+        assertTrue(p.getProjectSetting().isAutoDelete());
+
+        projectSetting = new ProjectSetting("{\"r\":209,\"g\":196,\"b\":233,\"a\":1}", false);
+        response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECT_SETTINGS_ROUTE,
+                HttpMethod.PUT,
+                new HttpEntity<>(projectSetting),
+                ProjectDetails.class,
+                projects.get(1).getId());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        p = response.getBody();
+        assertEquals("{\"r\":209,\"g\":196,\"b\":233,\"a\":1}", p.getProjectSetting().getColor());
+        assertFalse(p.getProjectSetting().isAutoDelete());
+
+        projectSetting = new ProjectSetting("{\"r\":220,\"g\":231,\"b\":117,\"a\":1}", true);
+        response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECT_SETTINGS_ROUTE,
+                HttpMethod.PUT,
+                TestHelpers.actAsOtherUser(projectSetting, sampleUsers[2]),
+                ProjectDetails.class,
+                projects.get(2).getId());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        p = response.getBody();
+        assertEquals("{\"r\":220,\"g\":231,\"b\":117,\"a\":1}", p.getProjectSetting().getColor());
+        assertTrue(p.getProjectSetting().isAutoDelete());
+
+        // get setting for first user, should only return for p2, p3
+        ResponseEntity<Projects> response1 = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECTS_ROUTE,
+                HttpMethod.GET,
+                null,
+                Projects.class);
+        assertEquals(HttpStatus.OK, response1.getStatusCode());
+        Projects projects1 = response1.getBody();
+        assertEquals(2, projects1.getSettings().size());
+        assertEquals("{\"r\":255,\"g\":224,\"b\":178,\"a\":1}", projects1.getSettings().get(projects.get(0).getId()).getColor());
+        assertEquals("{\"r\":209,\"g\":196,\"b\":233,\"a\":1}", projects1.getSettings().get(projects.get(1).getId()).getColor());
     }
 
     private Project updateProject(Project p1) {

@@ -65,8 +65,14 @@ public class ProjectController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<com.bulletjournal.repository.models.Project> projectsForSetting = new ArrayList<>();
         Projects projects = this.projectDaoJpa.getProjects(username, projectsForSetting);
-//        this.projectSettingRepository.findByProjectIn(projectsForSetting)
-//                .stream().filter(Objects::nonNull).collect(Collectors.toList());
+        List<Long> ids = projectsForSetting.stream().map(com.bulletjournal.repository.models.Project::getId)
+                .collect(Collectors.toList());
+        List<com.bulletjournal.repository.models.ProjectSetting> projectSettings = this.projectSettingRepository
+                .findByIdIn(ids).stream().filter(Objects::nonNull).collect(Collectors.toList());
+        Map<Long, ProjectSetting> settings = projectSettings.stream()
+                .collect(Collectors.toMap(com.bulletjournal.repository.models.ProjectSetting::getId,
+                        com.bulletjournal.repository.models.ProjectSetting::toPresentationModel));
+        projects.setSettings(settings);
 
         String ownedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE, projects.getOwned());
@@ -90,7 +96,7 @@ public class ProjectController {
     }
 
     @PutMapping(PROJECT_SETTINGS_ROUTE)
-    public ProjectDetails setProjectSettings(@NotNull @PathVariable Long projectId,
+    public ProjectDetails setProjectSetting(@NotNull @PathVariable Long projectId,
                                    @NotNull @Valid @RequestBody ProjectSetting setting) {
         String projectColor = setting.getColor();
         boolean autoDelete = setting.isAutoDelete();

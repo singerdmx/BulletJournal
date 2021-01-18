@@ -49,6 +49,7 @@ public class TransactionController {
     protected static final String TRANSACTIONS_ROUTE = "/api/projects/{projectId}/transactions";
     protected static final String TRANSACTION_ROUTE = "/api/transactions/{transactionId}";
     protected static final String TRANSACTION_SET_LABELS_ROUTE = "/api/transactions/{transactionId}/setLabels";
+    protected static final String TRANSACTION_SET_COLOR_ROUTE = "/api/transactions/{transactionId}/setColor";
     protected static final String MOVE_TRANSACTION_ROUTE = "/api/transactions/{transactionId}/move";
     protected static final String SHARE_TRANSACTION_ROUTE = "/api/transactions/{transactionId}/share";
     protected static final String ADD_CONTENT_ROUTE = "/api/transactions/{transactionId}/addContent";
@@ -250,6 +251,13 @@ public class TransactionController {
                                  @NotNull @RequestBody List<Long> labels) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.notificationService.inform(this.transactionDaoJpa.setLabels(username, transactionId, labels));
+        return getTransaction(transactionId);
+    }
+
+    @PutMapping(TRANSACTION_SET_COLOR_ROUTE)
+    public Transaction setColor(@NotNull @PathVariable Long transactionId, @RequestBody String color) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.transactionDaoJpa.setColor(username, transactionId, color);
         return getTransaction(transactionId);
     }
 

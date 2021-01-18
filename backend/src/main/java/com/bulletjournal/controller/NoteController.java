@@ -40,6 +40,7 @@ public class NoteController {
     protected static final String NOTES_ROUTE = "/api/projects/{projectId}/notes";
     protected static final String NOTE_ROUTE = "/api/notes/{noteId}";
     protected static final String NOTE_SET_LABELS_ROUTE = "/api/notes/{noteId}/setLabels";
+    protected static final String NOTE_SET_COLOR_ROUTE = "/api/notes/{noteId}/setColor";
     protected static final String MOVE_NOTE_ROUTE = "/api/notes/{noteId}/move";
     protected static final String SHARE_NOTE_ROUTE = "/api/notes/{noteId}/share";
     protected static final String GET_SHARABLES_ROUTE = "/api/notes/{noteId}/sharables";
@@ -208,6 +209,13 @@ public class NoteController {
         return getNote(noteId);
     }
 
+    @PutMapping(NOTE_SET_COLOR_ROUTE)
+    public Note setColor(@NotNull @PathVariable Long noteId, @RequestBody String color) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.noteDaoJpa.setColor(username, noteId, color);
+        return getNote(noteId);
+    }
+
     @PostMapping(MOVE_NOTE_ROUTE)
     public void moveNote(@NotNull @PathVariable Long noteId,
             @NotNull @RequestBody MoveProjectItemParams moveProjectItemParams) {
@@ -280,8 +288,9 @@ public class NoteController {
     @GetMapping(CONTENTS_ROUTE)
     public List<Content> getContents(@NotNull @PathVariable Long noteId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return Content.addOwnerAvatar(this.noteDaoJpa.getContents(noteId, username).stream()
+        List<Content> contents = Content.addOwnerAvatar(this.noteDaoJpa.getContents(noteId, username).stream()
                 .map(t -> t.toPresentationModel()).collect(Collectors.toList()), this.userClient);
+        return contents;
     }
 
     @DeleteMapping(CONTENT_ROUTE)

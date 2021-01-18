@@ -57,7 +57,7 @@ func (i *Investment) retrieveData(templateClient investment.Extractor) {
 		logger.Printf("Created Sample Task %d", sampleTaskId)
 		set[sampleTaskId] = member
 		time.Sleep(30 * time.Second)
-		i.StreamChannel <- &StreamingMessage{Message: sampleTaskId, ServiceName: consts.INVESTMENT_SERVICE_NAME}
+		i.StreamChannel <- &StreamingMessage{Message: sampleTaskId, ServiceName: consts.SAMPLE_TASK_SERVICE_NAME}
 	}
 	for _, sampleTaskId := range *modified {
 		if _, exists := set[sampleTaskId]; exists {
@@ -66,6 +66,6 @@ func (i *Investment) retrieveData(templateClient investment.Extractor) {
 		logger.Printf("Modified Sample Task %d", sampleTaskId)
 		set[sampleTaskId] = member
 		time.Sleep(30 * time.Second)
-		i.StreamChannel <- &StreamingMessage{Message: sampleTaskId, ServiceName: consts.INVESTMENT_SERVICE_NAME}
+		i.StreamChannel <- &StreamingMessage{Message: sampleTaskId, ServiceName: consts.SAMPLE_TASK_SERVICE_NAME}
 	}
 }

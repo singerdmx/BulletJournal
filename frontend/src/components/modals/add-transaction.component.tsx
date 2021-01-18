@@ -33,6 +33,8 @@ import {onFilterLabel} from "../../utils/Util";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 import {useHistory} from "react-router-dom";
 import {PlusCircleTwoTone} from "@ant-design/icons/lib";
+import ProjectSettingDialog from "../../components/modals/project-setting.component";
+
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -56,6 +58,7 @@ const LocaleCurrency = require('locale-currency'); //currency code
 type TransactionProps = {
   project: Project | undefined;
   group: Group | undefined;
+  myself: string;
 };
 
 interface TransactionCreateFormProps {
@@ -300,7 +303,9 @@ const AddTransaction: React.FC<
   }
 
   return (
+    <div>
       <Container>
+        {props.project && props.project.owner.name === props.myself && <ProjectSettingDialog />}
         <FloatButton
             tooltip="Add New Transaction"
             onClick={openModal}
@@ -310,6 +315,7 @@ const AddTransaction: React.FC<
         </FloatButton>
         {getModal()}
       </Container>
+    </div>
   );
 };
 

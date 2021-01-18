@@ -40,6 +40,7 @@ public class Transaction extends ProjectItem {
 
     private Long paymentTime;
 
+    private String color;
 
     public Transaction() {
     }
@@ -57,7 +58,8 @@ public class Transaction extends ProjectItem {
                        @NotNull Long createdAt,
                        @NotNull Long updatedAt,
                        List<Label> labels,
-                       String location) {
+                       String location,
+                       String color) {
         super(id, name, owner, project, labels, location);
         this.payer = payer;
         this.amount = amount;
@@ -67,6 +69,7 @@ public class Transaction extends ProjectItem {
         this.transactionType = transactionType;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.color = color;
         getView(this);
     }
 
@@ -141,6 +144,15 @@ public class Transaction extends ProjectItem {
 
     public String getYearMonth() {
         return this.date.substring(0, 7);
+    }
+
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 
     public String getReadableYearMonth() {

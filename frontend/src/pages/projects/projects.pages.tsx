@@ -6,9 +6,9 @@ import {IState} from "../../store";
 import {Group, GroupsWithOwner} from "../../features/group/interface";
 import {updateGroups} from "../../features/group/actions";
 import {Project, ProjectsWithOwner} from "../../features/project/interface";
-import {updateProjects} from "../../features/project/actions";
+import {updateProjects, updateSettingShown} from "../../features/project/actions";
 import {iconMapper} from "../../components/side-menu/side-menu.component";
-import {TeamOutlined} from "@ant-design/icons";
+import {TeamOutlined, SettingOutlined} from "@ant-design/icons";
 
 import './projects.styles.less';
 import AddProject from "../../components/modals/add-project.component";
@@ -22,10 +22,13 @@ const {Panel} = Collapse;
 
 // props of projects
 type ProjectsProps = {
+    myself: string,
     theme: string;
     ownedProjects: Project[];
     sharedProjects: ProjectsWithOwner[];
     updateProjects: () => void;
+    updateSettingShown: (visible: boolean) => void;
+    projectSettings: Object;
 };
 // props of groups
 type GroupsProps = {
@@ -79,7 +82,7 @@ export const getGroupByProject = (
 };
 
 const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> = props => {
-    const {groups, theme, ownedProjects, sharedProjects, updateGroups, updateProjects} = props;
+    const {myself, history, groups, theme, ownedProjects, sharedProjects, updateGroups, updateProjects, projectSettings, updateSettingShown} = props;
 
     useEffect(() => {
         const loginCookie = getCookie('__discourse_proxy');
@@ -90,12 +93,22 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
         document.title = 'Bullet Journal - Journals';
     }, []);
 
+    const handleClickChangeSetting = (itemId: number) => {
+        history.push(`/projects/${itemId}`);
+        updateSettingShown(true);
+    }
+
     const handleClick = (projectId: number) => {
         props.history.push(`/projects/${projectId}`);
     };
 
     const getProject = (project: Project) => {
         const group = getGroupByProject(groups, project);
+        const getKeyValue = (key: number) => (obj: Record<number, any>) => obj[key];
+        const projectSetting = getKeyValue(project.id)(projectSettings);
+        const bgColorSetting = projectSetting ? projectSetting.color ? JSON.parse(projectSetting.color) : undefined : undefined;
+        const bgColor = bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined
+        
         let popContent = null;
         if (group) {
             popContent = <div>
@@ -105,7 +118,7 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
         return (
             <List.Item
                 key={project.id}
-                style={{cursor: 'pointer'}}
+                style={{cursor: 'pointer', background: bgColor}}
                 onClick={e => handleClick(project.id)}
                 actions={[
                     <Popover
@@ -137,7 +150,8 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
 
                             <Menu id={`p${project.id}`}
                                   theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
-                                  animation={animation.zoom}>
+                                  animation={animation.zoom}
+                                  style={{background: bgColor}}>
                                 <CopyToClipboard
                                     text={`${project.name} ${window.location.origin.toString()}/#/projects/${project.id}`}
                                     onCopy={() => message.success('Link Copied to Clipboard')}
@@ -148,6 +162,10 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
                                         <span>Copy Link Address</span>
                                     </Item>
                                 </CopyToClipboard>
+                                {project.owner.name === myself ? <Item onClick={(e) => handleClickChangeSetting(project.id)}>
+                                    <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><SettingOutlined/></IconFont>
+                                    <span>Change Settings</span>
+                                </Item> : null}
                             </Menu>
                         </>
                     }
@@ -198,10 +216,12 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
 };
 
 const mapStateToProps = (state: IState) => ({
+    myself: state.myself.username,
     groups: state.group.groups,
     theme: state.myself.theme,
     ownedProjects: state.project.owned,
-    sharedProjects: state.project.shared
+    sharedProjects: state.project.shared,
+    projectSettings: state.project.settings
 });
 
-export default connect(mapStateToProps, {updateGroups, updateProjects})(withRouter(ProjectsPage));
+export default connect(mapStateToProps, {updateGroups, updateProjects, updateSettingShown})(withRouter(ProjectsPage));

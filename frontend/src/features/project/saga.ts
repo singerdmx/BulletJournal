@@ -11,6 +11,7 @@ import {
   UpdateProjects,
   UpdateSharedProjectsOrderAction,
   GetProjectHistoryAction,
+  UpdateProjectSettingAction
 } from './reducer';
 import { actions as groupsActions } from '../group/reducer';
 import { actions as tasksActions } from '../tasks/reducer';
@@ -24,6 +25,7 @@ import {
   updateProjectRelations,
   updateSharedProjectsOrder,
   GetProjectHistory,
+  updateProjectSetting,
 } from '../../apis/projectApis';
 import { IState } from '../../store';
 import { Project, Activity } from './interface';
@@ -68,6 +70,12 @@ function* projectsUpdate(action: PayloadAction<UpdateProjects>) {
         shared: projects.shared,
       })
     );
+
+    yield put(
+      projectActions.projectSettingsReceived({
+        projectSettings: projects.settings,
+      })
+    )
 
     const selectedProject = state.project.project;
 
@@ -152,6 +160,7 @@ function* getUserProject(action: PayloadAction<GetProjectAction>) {
     const { projectId } = action.payload;
     const data: Project = yield call(getProject, projectId);
     yield put(projectActions.projectReceived({ project: data }));
+    yield put(projectActions.projectSettingReceived({ projectSetting: data.projectSetting }));
     yield put(groupsActions.getGroup({ groupId: data.group.id }));
     yield put(tasksActions.updateCompletedTaskPageNo({completedTaskPageNo: 0}));
   } catch (error) {
@@ -238,6 +247,38 @@ function* putProjectRelations(
   }
 }
 
+function* putProjectSetting(
+  action: PayloadAction<UpdateProjectSettingAction>
+) {
+  try {
+    const { projectId, autoDelete, color } = action.payload;
+    
+    const data : Project = yield call(
+      updateProjectSetting,
+      projectId,
+      autoDelete,
+      color,
+    );
+
+    yield put(projectActions.projectReceived({project: data}));
+    yield put(projectActions.projectSettingReceived({projectSetting: data.projectSetting}));
+
+    const state = yield select();
+    yield put(projectActions.projectSettingsReceived({
+      projectSettings: {
+        ...state.project.settings,
+        [projectId]: data.projectSetting
+      }
+    }));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Update Project Settings Fail: ${error}`);
+    }
+  }
+}
+
 function* getProjectHistory(action: PayloadAction<GetProjectHistoryAction>) {
   try {
     const {
@@ -288,5 +329,9 @@ export default function* projectSagas() {
       putProjectRelations
     ),
     yield takeLatest(projectActions.getProjectHistory.type, getProjectHistory),
+    yield takeLatest(
+      projectActions.updateProjectSetting.type,
+      putProjectSetting
+    ),
   ]);
 }

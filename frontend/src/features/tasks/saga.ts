@@ -200,6 +200,7 @@ function* taskCreate(action: PayloadAction<CreateTask>) {
       reminderSetting,
       recurrenceRule,
       timezone,
+      location,
       labels,
     } = action.payload;
     yield call(
@@ -213,7 +214,8 @@ function* taskCreate(action: PayloadAction<CreateTask>) {
         dueTime,
         duration,
         recurrenceRule,
-        labels
+        labels,
+        location,
     );
     yield put(updateTasks(projectId));
     const state: IState = yield select();
@@ -332,6 +334,7 @@ function* patchTask(action: PayloadAction<PatchTask>) {
       duration,
       timezone,
       reminderSetting,
+      location,
       recurrenceRule,
       labels,
     } = action.payload;
@@ -346,6 +349,7 @@ function* patchTask(action: PayloadAction<PatchTask>) {
         duration,
         timezone,
         reminderSetting,
+        location,
         recurrenceRule,
         labels
     );

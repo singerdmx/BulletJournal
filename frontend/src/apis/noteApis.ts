@@ -222,3 +222,12 @@ export const getContentRevision = (
       throw Error(err.message);
     });
 };
+
+export const putNoteColor = (noteId: number, color: string | undefined) => {
+  const putBody = !color ? ' ' : color;
+  return doPut(`/api/notes/${noteId}/setColor`, putBody)
+    .then((res) => res.json())
+    .catch((err) => {
+      throw Error(err.message);
+    });
+};
