@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
-import { connect } from 'react-redux';
-import { Upload, message, Button } from 'antd';
-import { RcFile } from 'antd/lib/upload';
-import { IState } from '../../store';
-import { UploadOutlined } from '@ant-design/icons';
+import React, {useState} from 'react';
+import {Button, message, Upload} from 'antd';
+import {RcFile} from 'antd/lib/upload';
+import {UploadOutlined} from '@ant-design/icons';
 import Axios from 'axios';
 
 const INITIAL_STATE = {
@@ -12,11 +10,9 @@ const INITIAL_STATE = {
   file: (null as unknown) as RcFile,
 };
 
-type uploadeProps = {
-  avatar: string;
-};
+type uploadProps = {};
 
-const AvatarUploader: React.FC<uploadeProps> = ({ avatar }) => {
+const AvatarUploader: React.FC<uploadProps> = () => {
   const [state, setAState] = useState(INITIAL_STATE);
 
   const beforeUpload = (file: RcFile) => {
@@ -34,7 +30,7 @@ const AvatarUploader: React.FC<uploadeProps> = ({ avatar }) => {
     reader.readAsDataURL(file);
     reader.onload = (e) => {
       let thumbUrl = e.target ? (e.target.result as string) : '';
-      setAState({ ...state, prevUrl: thumbUrl, file: file });
+      setAState({...state, prevUrl: thumbUrl, file: file});
     };
     // prevent auto upload behaviour by return false
     return false;
@@ -47,41 +43,38 @@ const AvatarUploader: React.FC<uploadeProps> = ({ avatar }) => {
     }
     let formData = new FormData();
     formData.append('file', file);
-    setAState({ ...state, uploading: true });
+    setAState({...state, uploading: true});
     Axios.post('/api/uploadAvatar', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: {'Content-Type': 'multipart/form-data'},
     })
-      .then((res) => {
-        setAState({ ...state, uploading: false });
-      })
-      .catch((e) => message.error('Problem while uploading'));
+        .then((res) => {
+          setAState({...state, uploading: false});
+        })
+        .catch((e) => message.error('Problem while uploading'));
   };
 
   return (
-    <div className="upload-container">
-      <Upload
-        listType="picture-card"
-        showUploadList={false}
-        beforeUpload={beforeUpload}
-      >
-        <img
-          src={state.prevUrl.length > 0 ? state.prevUrl : avatar}
-          alt="avatar"
-          style={{ width: '100%' }}
-        />
-      </Upload>
-      <Button
-        onClick={() => handleUpload(state.file)}
-        loading={state.uploading}
-      >
-        <UploadOutlined /> Upload&nbsp;
-      </Button>
-    </div>
+      <div className="upload-container">
+        <Upload
+            listType="picture-card"
+            showUploadList={false}
+            beforeUpload={beforeUpload}
+        >
+          <img
+              src={state.prevUrl.length > 0 ? state.prevUrl : 'https://user-images.githubusercontent.com/122956/103820529-62671e00-5021-11eb-8d36-16dd6e32328f.png'}
+              alt="avatar"
+              style={{width: '100%'}}
+          />
+
+        </Upload>
+        <Button
+            onClick={() => handleUpload(state.file)}
+            loading={state.uploading}
+        >
+          <UploadOutlined/> Upload&nbsp;
+        </Button>
+      </div>
   );
 };
 
-const mapStateToProps = (state: IState) => ({
-  avatar: state.myself.avatar,
-});
-
-export default connect(mapStateToProps, {})(AvatarUploader);
+export default AvatarUploader;

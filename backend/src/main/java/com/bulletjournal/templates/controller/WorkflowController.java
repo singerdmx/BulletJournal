@@ -18,10 +18,11 @@ import com.bulletjournal.templates.repository.model.*;
 import com.bulletjournal.templates.workflow.engine.RuleEngine;
 import com.bulletjournal.templates.workflow.models.RuleExpression;
 import com.bulletjournal.util.DeltaContent;
-import com.bulletjournal.util.DeltaConverter;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -51,6 +52,7 @@ public class WorkflowController {
     public static final String REMOVE_USER_SAMPLE_TASKS_ROUTE = "/api/userSampleTasks/remove";
     public static final String REMOVE_USER_SAMPLE_TASK_ROUTE = "/api/userSampleTasks/{sampleTaskId}";
     public static final String SAMPLE_TASK_ROUTE = "/api/sampleTasks/{sampleTaskId}";
+    private static final Logger LOGGER = LoggerFactory.getLogger(WorkflowController.class);
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
@@ -81,7 +83,6 @@ public class WorkflowController {
 
     @Autowired
     private UserSampleTaskDaoJpa userSampleTaskDaoJpa;
-
 
     private static final Gson GSON = new Gson();
 
@@ -122,6 +123,7 @@ public class WorkflowController {
                     this.ruleEngine.getSampleTasksForFinalStep(
                             nextStep.getStep().getId(), selections, prevSelections))
                     .stream().map(e -> e.toSimplePresentationModel()).collect(Collectors.toList());
+            sampleTasks = RuleEngine.sortSampleTasks(sampleTasks);
             // store in redis and generate scrollId
             // setSampleTasks with the first 10 tasks
             if (sampleTasks.size() <= 10) {
@@ -256,6 +258,10 @@ public class WorkflowController {
 
     @PostMapping(SAMPLE_TASKS_IMPORT_ROUTE)
     public List<SampleTask> importSampleTasks(@Valid @RequestBody ImportTasksParams importTasksParams) {
+        LOGGER.info("importSampleTasks {}", importTasksParams.getSampleTasks().size());
+        if (importTasksParams.getSampleTasks().isEmpty()) {
+            return Collections.emptyList();
+        }
         String username = MDC.get(UserClient.USER_NAME_KEY);
         String scrollId = importTasksParams.getScrollId();
         if (StringUtils.isNotBlank(scrollId)) {
@@ -320,7 +326,6 @@ public class WorkflowController {
         if (StringUtils.isBlank(content)) {
             content = DeltaContent.EMPTY_CONTENT;
         }
-        content = DeltaConverter.supplementContentText(content, false);
         return new Content(this.userDaoJpa.isAdmin(requester) ? sampleTaskId : 0L,
                 user, content, content,
                 System.currentTimeMillis(), System.currentTimeMillis(), "");

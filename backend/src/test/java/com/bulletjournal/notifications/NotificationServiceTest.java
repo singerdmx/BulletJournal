@@ -1,6 +1,9 @@
 package com.bulletjournal.notifications;
 
 import com.bulletjournal.controller.models.Notification;
+import com.bulletjournal.notifications.informed.DeleteGroupEvent;
+import com.bulletjournal.notifications.informed.JoinGroupEvent;
+import com.bulletjournal.notifications.informed.MockedNotificationDaoJpa;
 import org.junit.Assert;
 import org.junit.Test;
 

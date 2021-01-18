@@ -6,7 +6,7 @@ type FeedbackProps = {};
 
 const handleFeedback = (title: String, content: String) => {
     contactSupport(109, title, content).then((res) => {
-        window.location.href = res.headers.get('Location')!;
+        window.open(res.headers.get('Location')!, '_blank');
     });
 };
 

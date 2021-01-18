@@ -9,7 +9,6 @@ import com.bulletjournal.ledger.FrequencyType;
 import com.bulletjournal.ledger.LedgerSummary;
 import com.bulletjournal.ledger.LedgerSummaryType;
 import com.bulletjournal.notifications.Action;
-import com.bulletjournal.util.DeltaConverter;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
@@ -92,6 +91,8 @@ public class ProjectControllerTest {
         Project p1 = TestHelpers.createProject(requestParams, expectedOwner, projectName, group, ProjectType.TODO);
         p1 = updateProject(p1);
 
+        ProjectDetails p1Detail = testProjectSetting(p1);
+
         // create other projects
         Project p2 = TestHelpers.createProject(requestParams, expectedOwner, "P2", group, ProjectType.LEDGER);
         Project p3 = TestHelpers.createProject(requestParams, expectedOwner, "P3", group, ProjectType.NOTE);
@@ -126,11 +127,11 @@ public class ProjectControllerTest {
     private Project updateProjectGroup(Project p8, Long id) {
         UpdateProjectParams updateProjectParams = new UpdateProjectParams();
         updateProjectParams.setGroupId(id);
-        ResponseEntity<Project> response = this.restTemplate.exchange(
+        ResponseEntity<ProjectDetails> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECT_ROUTE,
                 HttpMethod.PATCH,
                 new HttpEntity<>(updateProjectParams),
-                Project.class,
+                ProjectDetails.class,
                 p8.getId());
         p8 = response.getBody();
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -909,7 +910,7 @@ public class ProjectControllerTest {
     }
 
     private Content createTaskContent(Task task) {
-        String text = DeltaConverter.generateDeltaContent("TEXT1");
+        String text = TestHelpers.generateDeltaContent("TEXT1");
         CreateContentParams createContentParams = new CreateContentParams(text);
         ResponseEntity<Content> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.ADD_CONTENT_ROUTE,
@@ -921,14 +922,14 @@ public class ProjectControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         Content content = response.getBody();
         assertEquals(expectedOwner, content.getOwner().getName());
-        assertEquals(DeltaConverter.supplementContentText(text), content.getText());
+        assertEquals(text, content.getText());
         assertNotNull(content.getId());
         getTaskContents(task, ImmutableList.of(content), text);
 
-        text = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 2\\\\n\\\"}]},\\\"###html###\\\":\\\"<p>Test Content 2</p>\\\"}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"2\\\"},{\\\"delete\\\":1}]}\"}";
-        String expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 2\\n\"}]},\"mdelta\":[{\"insert\":\"TEXT1\\n\"}],\"###html###\":\"<p>Test Content 2</p>\",\"mdiff\":[[{\"retain\":13},{\"insert\":\"2\"},{\"delete\":1}]]}";
+        text = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 2\\\\n\\\"}]}}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"2\\\"},{\\\"delete\\\":1}]}\"}";
+        String expected = "{\"delta\":{\"ops\":[{\"insert\":\"Test Content 2\\n\"}]}}";
         Long contentId = content.getId();
-        UpdateContentParams updateContentParams = DeltaConverter.strToUpdateContentParams(text);
+        UpdateContentParams updateContentParams = TestHelpers.strToUpdateContentParams(text);
         ResponseEntity<Content[]> updateResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.CONTENT_ROUTE,
                 HttpMethod.PATCH,
@@ -1216,6 +1217,50 @@ public class ProjectControllerTest {
         assertNotEquals(sharedProjectsEtag, eTags[1]);
     }
 
+    private ProjectDetails testProjectSetting(Project project) {
+        ProjectSetting projectSetting = new ProjectSetting("red", true);
+        ResponseEntity<ProjectDetails> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECT_SETTINGS_ROUTE,
+                HttpMethod.PUT,
+                new HttpEntity<>(projectSetting),
+                ProjectDetails.class,
+                project.getId());
+        ProjectDetails p = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(p.getProjectSetting());
+        assertEquals("red", p.getProjectSetting().getColor());
+        assertTrue(p.getProjectSetting().isAutoDelete());
+
+        projectSetting = new ProjectSetting("blue", false);
+        response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECT_SETTINGS_ROUTE,
+                HttpMethod.PUT,
+                new HttpEntity<>(projectSetting),
+                ProjectDetails.class,
+                project.getId());
+        p = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(p.getProjectSetting());
+        assertEquals("blue", p.getProjectSetting().getColor());
+        assertFalse(p.getProjectSetting().isAutoDelete());
+
+        ResponseEntity<ProjectDetails> response1 = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + ProjectController.PROJECT_ROUTE,
+                HttpMethod.GET,
+                null,
+                ProjectDetails.class,
+                project.getId());
+        p = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(p.getProjectSetting());
+        assertEquals("blue", p.getProjectSetting().getColor());
+        assertFalse(p.getProjectSetting().isAutoDelete());
+
+
+        return p;
+
+    }
+
     private Project updateProject(Project p1) {
         // update project name from "P0" to "P1"
         String projectNewName = "P1";
@@ -1223,11 +1268,11 @@ public class ProjectControllerTest {
         updateProjectParams.setName(projectNewName);
         updateProjectParams.setDescription("d2");
 
-        ResponseEntity<Project> response = this.restTemplate.exchange(
+        ResponseEntity<ProjectDetails> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECT_ROUTE,
                 HttpMethod.PATCH,
                 new HttpEntity<>(updateProjectParams),
-                Project.class,
+                ProjectDetails.class,
                 p1.getId());
         p1 = response.getBody();
         assertEquals(HttpStatus.OK, response.getStatusCode());

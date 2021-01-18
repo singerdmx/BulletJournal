@@ -43,7 +43,7 @@ const Feedback: React.FC<FeedbackProps> = (
         }
 
         contactSupport(forumId, title, content).then((res) => {
-            window.location.href = res.headers.get('Location')!;
+            window.open(res.headers.get('Location')!, '_blank');
         });
         hideShowFeedbackCard();
     };

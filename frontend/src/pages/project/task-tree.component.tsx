@@ -15,13 +15,15 @@ import {
   CloudSyncOutlined,
   FieldTimeOutlined,
   SearchOutlined,
-  UnorderedListOutlined
+  UnorderedListOutlined,
+  SettingOutlined,
 } from '@ant-design/icons';
 import './task.styles.less';
 import {User} from '../../features/group/interface';
 import {useHistory} from 'react-router-dom';
 import AddTask from '../../components/modals/add-task.component';
 import {ProjectItemUIType} from "../../features/project/constants";
+import ProjectSetting from "../../components/modals/project-setting.component";
 import TasksByOrder from "../../components/modals/tasks-by-order.component";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 import {ProjectOutlined} from "@ant-design/icons/lib";
@@ -32,6 +34,7 @@ type TasksProps = {
   completedTaskPageNo: number;
   timezone: string;
   readOnly: boolean;
+  myself: string;
   project: Project | undefined;
   tasks: Task[];
   completedTasks: Task[];
@@ -190,6 +193,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     project,
     readOnly,
     tasks,
+    myself,
     completedTasks,
     updateTasks,
     updateCompletedTasks,
@@ -217,6 +221,8 @@ const TaskTree: React.FC<TasksProps> = (props) => {
   const history = useHistory();
 
   const [tasksByOrderShown, setTasksByOrderShown] = useState(false);
+  const [projectSettingShown, setProjectSettingShown] = useState(false);
+
 
   const handleLoadMore = () => {
     if (project) {
@@ -323,42 +329,53 @@ const TaskTree: React.FC<TasksProps> = (props) => {
     }, 300);
   };
 
+  const handleSettings = () => {
+    setProjectSettingShown(true);
+  };
+
   const createContent = () => {
     if (project.shared) {
       return null;
     }
     return <Container>
+      {project.owner.name === myself && <FloatButton
+          tooltip="Settings"
+          onClick={handleSettings}
+          styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
+      >
+        <SettingOutlined />
+      </FloatButton>}
       {completeTasksShown ? <FloatButton
           tooltip="Hide Completed Tasks"
           onClick={hideCompletedTask}
-          styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+          styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
       >
         <CloseCircleOutlined/>
       </FloatButton> : <FloatButton
           tooltip="Show Completed Tasks"
           onClick={handleClickShowCompletedTasksButton}
-          styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+          styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
       >
         <CheckCircleOutlined/>
       </FloatButton>}
       {tasks.length > 0 && <FloatButton
           tooltip="Task(s) Ordered by Due Date"
           onClick={handleShowTasksOrdered}
-          styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+          styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
       >
         <FieldTimeOutlined/>
       </FloatButton>}
       {tasks.length > 0 && <FloatButton
           tooltip="Statistics"
           onClick={() => history.push(`/projects/${project.id}/statistics`)}
-          styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+          styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
       >
         <ProjectOutlined/>
       </FloatButton>}
       {tasks.length > 0 && <FloatButton
           tooltip="Tasks by Status"
           onClick={() => history.push(`/projects/${project.id}/taskStatus`)}
-          styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+          styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
       >
         <UnorderedListOutlined/>
       </FloatButton>}
@@ -379,6 +396,14 @@ const TaskTree: React.FC<TasksProps> = (props) => {
   return (
       <div>
         {createContent()}
+        <div>
+          <ProjectSetting
+              visible={projectSettingShown}
+              onCancel={() => {
+                setProjectSettingShown(false)
+              }}
+          />
+        </div>
         <div>
           <TasksByOrder
               visible={tasksByOrderShown}
@@ -411,6 +436,7 @@ const mapStateToProps = (state: IState) => ({
   completedTasks: state.task.completedTasks,
   loadingCompletedTask: state.task.loadingCompletedTask,
   nextCompletedTasks: state.task.nextCompletedTasks,
+  myself: state.myself.username
 });
 
 export default connect(mapStateToProps, {

@@ -3,7 +3,7 @@ import React from 'react';
 import {
   AlertOutlined,
   ContactsOutlined,
-  DeleteOutlined,
+  DeleteOutlined, EditOutlined,
   EyeOutlined,
   InfoCircleOutlined,
   PlusSquareOutlined,
@@ -43,6 +43,7 @@ const TitleAvatar = ({source, type, originator}: titleAvatarProps) => {
       icon = <DeleteOutlined/>;
       break;
     case EventType.JoinGroupResponseEvent:
+    case EventType.RequestProjectItemWriteAccessResponseEvent:
       icon = <InfoCircleOutlined/>;
       break;
     case EventType.UpdateTaskAssigneeEvent:
@@ -52,6 +53,9 @@ const TitleAvatar = ({source, type, originator}: titleAvatarProps) => {
       break;
     case EventType.CreateProjectEvent:
       icon = <PlusSquareOutlined/>;
+      break;
+    case EventType.RequestProjectItemWriteAccessEvent:
+      icon = <EditOutlined />;
       break;
     case EventType.JoinProjectEvent:
       icon = <ContactsOutlined/>;

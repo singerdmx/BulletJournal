@@ -210,14 +210,6 @@ export const setTaskStatus = (taskId: number, taskStatus: TaskStatus, type: Proj
     type: type
   });
 
-export const patchTaskRevisionContents = (
-    taskId: number,
-    contentId: number,
-    revisionContents: string[],
-    etag: string
-) => actions.TaskPatchRevisionContents({
-    taskId: taskId, contentId: contentId, revisionContents: revisionContents, etag: etag});
-
 export const taskReceived = (task: Task | undefined) => actions.taskReceived({task: task});
 
 export const getTaskStatistics = (

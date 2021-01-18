@@ -1,0 +1,46 @@
+version: '2.1'
+services:
+  collab:
+    image: mwangxx/bulletjournal-collab:1.1.1
+    container_name: collab
+    ports:
+    - "4444:4444"
+
+  controller:
+    image: mwangxx/bulletjournal-backend:1.1.202012292058
+    container_name: springboot_app
+    ports:
+      - "8080:8080"
+    environment:
+      spring_profiles_active: dev
+    volumes:
+      - $HOME/docker/volumes/log:/var/log
+    depends_on:
+      database:
+        condition: service_healthy
+
+  cache:
+    image: redis
+    container_name: cache
+    ports:
+      - "127.0.0.1:6379:6379"
+
+  database:
+    image: mwangxx/postgres:12.2-2
+    container_name: db
+    hostname: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: postgres
+    volumes:
+      - $HOME/docker/volumes/postgres:/var/lib/postgresql/data
+      - $HOME/docker/volumes/db_backup:/var/db_backup
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

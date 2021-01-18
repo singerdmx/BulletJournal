@@ -16,7 +16,7 @@ import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.TaskRelationsProcessor;
 import com.bulletjournal.notifications.ContentBatch;
 import com.bulletjournal.notifications.Event;
-import com.bulletjournal.notifications.UpdateTaskAssigneeEvent;
+import com.bulletjournal.notifications.informed.UpdateTaskAssigneeEvent;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.UserGroup;
@@ -409,6 +409,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return reminderRecordTaskMap;
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> createTaskFromSampleTask(
             Long projectId,
             String owner,
@@ -420,17 +421,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     ) {
         Preconditions.checkNotNull(assignees);
 
-        List<CreateTaskParams> createTaskParams = new ArrayList<>();
-        sampleTasks.forEach(sampleTask -> createTaskParams.add(sampleTaskToCreateTaskParams(
-                sampleTask,
-                reminderBeforeTask,
-                assignees,
-                labels)
-        ));
-
         List<Task> tasks;
         try {
-            tasks = create(projectId, owner, createTaskParams);
+            tasks = create(projectId, owner, sampleTasks, repoSampleTasks, reminderBeforeTask, assignees, labels);
         } catch (Exception ex) {
             LOGGER.info("createTaskFromSampleTask failed", ex);
             return Collections.emptyList();
@@ -441,16 +434,11 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         List<Task> tasksForContents = new ArrayList<>();
         for (int i = 0; i < sampleTasks.size(); i++) {
             if (sampleTasks.get(i).isRefreshable()) {
-                long sampleTaskId = sampleTasks.get(i).getId();
-                tasks.get(i).setSampleTask(
-                        repoSampleTasks.stream().filter(s -> sampleTaskId == s.getId()).findFirst().get());
                 continue;
             }
             sampleTasksForContents.add(sampleTasks.get(i));
             tasksForContents.add(tasks.get(i));
         }
-
-        this.saveAll(tasks);
 
         if (!sampleTasksForContents.isEmpty()) {
             this.notificationService.addContentBatch(new ContentBatch(
@@ -481,13 +469,40 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return this.taskRepository.saveAndFlush(task);
     }
 
-    public List<Task> create(Long projectId, String owner, List<CreateTaskParams> createTaskParamsList) {
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Task> create(Long projectId, String owner,
+                             List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasks,
+                             List<SampleTask> repoSampleTasks,
+                             Integer reminderBeforeTask,
+                             List<String> assignees,
+                             List<Long> labels) {
         Project project = this.projectDaoJpa.getProject(projectId, owner);
         if (!ProjectType.TODO.equals(ProjectType.getType(project.getType()))) {
             throw new BadRequestException("Project Type expected to be TODO while request is " + project.getType());
         }
-        List<Task> tasks = createTaskParamsList.stream()
-                .map(createTaskParams -> generateTask(owner, project, createTaskParams)).collect(Collectors.toList());
+
+        List<Task> tasks = new ArrayList<>();
+        for (int i = 0; i < sampleTasks.size(); i++) {
+            SampleTask referredSampleTask = null;
+            if (sampleTasks.get(i).isRefreshable()) {
+                long sampleTaskId = sampleTasks.get(i).getId();
+                referredSampleTask =
+                        repoSampleTasks.stream().filter(s -> sampleTaskId == s.getId()).findFirst().get();
+            }
+
+            com.bulletjournal.templates.controller.model.SampleTask sampleTask = sampleTasks.get(i);
+            CreateTaskParams createTaskParams = sampleTaskToCreateTaskParams(
+                    sampleTask,
+                    reminderBeforeTask,
+                    assignees,
+                    labels);
+            tasks.add(generateTask(owner, project, createTaskParams, referredSampleTask));
+        }
+
+        LOGGER.info("create batch of {} tasks", tasks.size());
+        if (tasks.size() <= 200) {
+            return this.taskRepository.saveAll(tasks);
+        }
 
         List<Task> batch = new ArrayList<>();
         List<Task> result = new ArrayList<>();
@@ -495,7 +510,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             batch.add(task);
             if (batch.size() == 200) {
                 result.addAll(this.taskRepository.saveAll(batch));
-                batch.clear();
+                batch = new ArrayList<>();
                 entityManager.flush();
                 entityManager.clear();
             }
@@ -509,6 +524,11 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     public static Task generateTask(String owner, Project project, CreateTaskParams createTaskParams) {
+        return generateTask(owner, project, createTaskParams, null);
+    }
+
+    public static Task generateTask(String owner, Project project, CreateTaskParams createTaskParams,
+                                    SampleTask sampleTask) {
         createTaskParams.selfClean();
 
         Task task = new Task();
@@ -535,6 +555,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 createTaskParams.getRecurrenceRule(), createTaskParams.getReminderSetting());
         task.setReminderSetting(reminderSetting);
         task.setLocation(createTaskParams.getLocation());
+        task.setSampleTask(sampleTask);
         return task;
     }
 
@@ -697,6 +718,42 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         }
         task.setAssignees(updateTaskParams.getAssignees());
         return events;
+    }
+
+    /**
+     * Set all tasks to complete
+     * <p>
+     * 1. Get tasks from task table
+     * 2. Delete tasks and its sub tasks from task table
+     * 3. Add tasks and its sub tasks to complete task table
+     *
+     * @param taskList  the tasks
+     * @return List<CompleteTask> - a list of repository model complete task objects
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<CompletedTask> completeInBatch(List<Task> taskList) {
+        LOGGER.info("Start findByTaskIn {}", taskList.size());
+        List<TaskContent> allTaskContents = this.taskContentRepository.findByTaskIn(taskList);
+        LOGGER.info("Finish findByTaskIn {}", taskList.size());
+
+        final Map<Task, List<TaskContent>> taskToTaskContentsMap = new HashMap<>();
+        taskList.forEach(task -> taskToTaskContentsMap.put(task, new ArrayList<>()));
+        allTaskContents.forEach(taskContent -> taskToTaskContentsMap.get(taskContent.getTask()).add(taskContent));
+
+        final List<CompletedTask> completedTaskList = new LinkedList<>();
+
+        taskToTaskContentsMap.forEach((task, taskContentList) -> {
+            //clone task contents
+            String contents = GSON_ALLOW_EXPOSE_ONLY
+                    .toJson(taskContentList.stream().collect(Collectors.toList()));
+
+            completedTaskList.add(new CompletedTask(task, contents));
+        });
+
+        LOGGER.info("Start deleteInBatch {}", taskList.size());
+        this.taskRepository.deleteInBatch(taskList);
+        LOGGER.info("Finish deleteInBatch {}", taskList.size());
+        return completedTaskList;
     }
 
     /**
@@ -962,7 +1019,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     @Override
-    TaskContent newContent(String text) {
+    public TaskContent newContent(String text) {
         return new TaskContent(text);
     }
 

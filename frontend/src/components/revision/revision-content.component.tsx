@@ -1,13 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
-import {
-  patchContent as patchNoteContent,
-  updateNoteContentRevision,
-} from '../../features/notes/actions';
-import {
-  patchContent as patchTaskContent,
-  updateTaskContentRevision,
-} from '../../features/tasks/actions';
+import React, {useEffect, useState} from 'react';
+import {connect} from 'react-redux';
+import {patchContent as patchNoteContent, updateNoteContentRevision,} from '../../features/notes/actions';
+import {patchContent as patchTaskContent, updateTaskContentRevision,} from '../../features/tasks/actions';
 import {
   patchContent as patchTransactionContent,
   updateTransactionContentRevision,
@@ -15,19 +9,17 @@ import {
 // import ReactDiffViewer from 'react-diff-viewer';
 import moment from 'moment';
 import './revision.styles.less';
-import {
-  Content,
-  ProjectItem,
-  Revision,
-} from '../../features/myBuJo/interface';
-import { Avatar, Button, message, Tooltip } from 'antd';
-import { RollbackOutlined } from '@ant-design/icons';
-import { IState } from '../../store';
-import { Project } from '../../features/project/interface';
-import { ContentType } from '../../features/myBuJo/constants';
-import { isContentEditable } from '../content/content-item.component';
+import {Content, ProjectItem, Revision,} from '../../features/myBuJo/interface';
+import {Avatar, Button, message, Tooltip} from 'antd';
+import {EyeInvisibleOutlined, EyeOutlined, RollbackOutlined} from '@ant-design/icons';
+import {IState} from '../../store';
+import {Project} from '../../features/project/interface';
+import {ContentType} from '../../features/myBuJo/constants';
+import {createHTML, isContentEditable} from '../content/content-item.component';
 import Quill from "quill";
 import {getProject} from "../../features/project/actions";
+import {getHtmlDiff} from "../../utils/htmldiff/htmldiff";
+
 const Delta = Quill.import('delta');
 
 type RevisionProps = {
@@ -112,6 +104,8 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
   const patchContentFunction = patchProjectContent[projectItem.contentType];
 
   const [history, setHistory] = useState<string | undefined>('');
+  const [hideDiff, setHideDiff] = useState(false);
+
   const historyContent = revisions[revisionIndex - 1].content;
 
   useEffect(() => {
@@ -149,6 +143,22 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
     handleClose();
   };
 
+  const getHideDiffButton = () => {
+    return (
+        <Tooltip title={hideDiff ? 'Show difference' : 'Do not show difference' }>
+          <Button
+              onClick={() => setHideDiff(!hideDiff)}
+              size="small"
+              shape="circle"
+              type="primary"
+              style={{marginRight: '0.5rem'}}
+          >
+            {hideDiff ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+          </Button>
+        </Tooltip>
+    );
+  };
+
   const getRollbackButton = () => {
     if (project && isContentEditable(project, projectItem, content, myself)) {
       return (
@@ -169,6 +179,9 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
     return null;
   };
 
+  const previousRevisionHtmlBody = history ? createHTML(new Delta(JSON.parse(history)['delta'])) : '<p></p>';
+  const currentVersionHtmlBody = createHTML(new Delta(JSON.parse(content.text)['delta']));
+  const diff = getHtmlDiff(previousRevisionHtmlBody, currentVersionHtmlBody);
   return (
     <div className="revision-container">
       <div className="revision-content">
@@ -189,12 +202,12 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
             {moment(revisions[revisionIndex - 1].createdAt).fromNow()}
           </span>
         </div>
-        <div dangerouslySetInnerHTML={{ __html: history && JSON.parse(history)['###html###'] }}></div>
+        <div dangerouslySetInnerHTML={{ __html: previousRevisionHtmlBody }}></div>
       </div>
       <div className="revision-content">
         <div className="revision-header">
           <div>
-            Current version{' '}
+            {getHideDiffButton()} Current Version{' '}
             <Tooltip title={`Edited by ${content.owner.alias}`}>
               <Avatar
                 src={content.owner.avatar}
@@ -205,7 +218,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
           </div>
           <span>{moment(content.updatedAt).fromNow()}</span>
         </div>
-        <div dangerouslySetInnerHTML={{ __html: JSON.parse(content.text)['###html###'] }}></div>
+        <div dangerouslySetInnerHTML={{ __html: hideDiff ? currentVersionHtmlBody : diff}}></div>
       </div>
     </div>
   );

@@ -27,6 +27,8 @@ public abstract class ProjectItem {
     @NotNull
     protected User owner;
 
+    private String location;
+
     protected List<Label> labels;
 
     protected Long updatedAt;
@@ -39,10 +41,11 @@ public abstract class ProjectItem {
     }
 
     public ProjectItem(Long id, @NotBlank @Size(min = 1, max = 100) String name, @NotNull User owner,
-                       @NotNull Project project, List<Label> labels) {
+                       @NotNull Project project, List<Label> labels, String location) {
         this.id = id;
         this.name = name;
         this.owner = owner;
+        this.location = location;
         if (project != null) {
             this.projectId = project.getId();
         }
@@ -144,6 +147,14 @@ public abstract class ProjectItem {
 
     public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public boolean isShared() {

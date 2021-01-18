@@ -262,7 +262,7 @@ const ProjectStatisticsPage: React.FC<ProjectStatisticsProps> = (
                     <FloatButton
                         onClick={() => history.push(`/projects/${projectId}`)}
                         tooltip="Go to BuJo"
-                        styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+                        styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
                     >
                         <UpSquareOutlined/>
                     </FloatButton>
@@ -273,7 +273,7 @@ const ProjectStatisticsPage: React.FC<ProjectStatisticsProps> = (
                             return;
                         }}
                         tooltip="Refresh"
-                        styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+                        styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
                     >
                         <SyncOutlined/>
                     </FloatButton>

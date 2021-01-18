@@ -57,6 +57,6 @@ public class UserSampleTaskDaoJpa {
 
     List<UserSampleTask> userSampleTasks = this.userSampleTaskRepository.findAllById(userSampleTaskKeys)
             .stream().filter(Objects::nonNull).collect(Collectors.toList());
-    this.userSampleTaskRepository.deleteAll(userSampleTasks);
+    this.userSampleTaskRepository.deleteInBatch(userSampleTasks);
   }
 }

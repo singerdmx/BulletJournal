@@ -56,8 +56,9 @@ public class Transaction extends ProjectItem {
                        @NotNull Integer transactionType,
                        @NotNull Long createdAt,
                        @NotNull Long updatedAt,
-                       List<Label> labels) {
-        super(id, name, owner, project, labels);
+                       List<Label> labels,
+                       String location) {
+        super(id, name, owner, project, labels, location);
         this.payer = payer;
         this.amount = amount;
         this.date = date;

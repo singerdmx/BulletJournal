@@ -232,19 +232,3 @@ export const getContentRevision = (
       throw Error(err.message);
     });
 };
-
-export const patchRevisionContents = (
-    transactionId: number,
-    contentId: number,
-    revisionContents: string[],
-    etag: string,
-) => {
-  const patchBody = JSON.stringify({
-    revisionContents: revisionContents,
-  });
-  return doPost(`/api/transactions/${transactionId}/contents/${contentId}/patchRevisionContents`, patchBody, etag)
-      .then((res) => res.json())
-      .catch((err) => {
-        throw Error(err);
-      });
-};

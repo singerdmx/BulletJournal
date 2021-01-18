@@ -7,6 +7,8 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.es.ESUtil;
 import com.bulletjournal.notifications.*;
+import com.bulletjournal.notifications.informed.Informed;
+import com.bulletjournal.notifications.informed.RemoveNoteEvent;
 import com.bulletjournal.repository.NoteDaoJpa;
 import com.bulletjournal.repository.NoteRepository;
 import com.bulletjournal.repository.ProjectDaoJpa;
@@ -47,7 +49,6 @@ public class NoteController {
     protected static final String CONTENT_ROUTE = "/api/notes/{noteId}/contents/{contentId}";
     protected static final String CONTENTS_ROUTE = "/api/notes/{noteId}/contents";
     protected static final String CONTENT_REVISIONS_ROUTE = "/api/notes/{noteId}/contents/{contentId}/revisions/{revisionId}";
-    protected static final String REVISION_CONTENT_ROUTE = "/api/notes/{noteId}/contents/{contentId}/patchRevisionContents";
 
     @Autowired
     private NoteDaoJpa noteDaoJpa;
@@ -317,16 +318,5 @@ public class NoteController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Revision revision = this.noteDaoJpa.getContentRevision(username, noteId, contentId, revisionId);
         return Revision.addAvatar(revision, this.userClient);
-    }
-
-    @PostMapping(REVISION_CONTENT_ROUTE)
-    public Content patchRevisionContents(@NotNull @PathVariable Long noteId,
-                                      @NotNull @PathVariable Long contentId,
-                                      @NotNull @RequestBody  RevisionContentsParams revisionContentsParams,
-                                      @RequestHeader(IF_NONE_MATCH) String etag) {
-        String username = MDC.get(UserClient.USER_NAME_KEY);
-        NoteContent content = this.noteDaoJpa.patchRevisionContentHistory(
-            contentId, noteId, username, revisionContentsParams.getRevisionContents(), etag);
-        return content == null ? new Content() : content.toPresentationModel();
     }
 }

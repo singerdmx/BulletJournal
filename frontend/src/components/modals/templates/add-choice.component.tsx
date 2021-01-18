@@ -67,7 +67,7 @@ const AddChoice: React.FC<AddChoiceProps> = (props) => {
             <FloatButton
                 tooltip="Add New Choice"
                 onClick={openModal}
-                styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+                styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
             >
                 <PlusOutlined/>
             </FloatButton>

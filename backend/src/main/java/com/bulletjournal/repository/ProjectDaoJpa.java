@@ -53,7 +53,7 @@ public class ProjectDaoJpa {
     private ProjectTasksRepository projectTasksRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Projects getProjects(String owner) {
+    public Projects getProjects(String owner, List<Project> projects) {
         Projects result = new Projects();
         Optional<UserProjects> userProjectsOptional = this.userProjectsRepository.findById(owner);
         UserProjects userProjects;
@@ -67,7 +67,12 @@ public class ProjectDaoJpa {
         result.setOwned(getOwnerProjects(userProjects, owner));
 
         // projects that are shared with owner
-        result.setShared(getSharedProjects(userProjects, owner));
+        Pair<List<ProjectsWithOwner>, List<Project>> sharedProjects = getSharedProjects(userProjects, owner);
+        result.setShared(sharedProjects.getLeft());
+
+        if (projects != null) {
+            projects.addAll(sharedProjects.getRight());
+        }
 
         return result;
     }
@@ -80,10 +85,12 @@ public class ProjectDaoJpa {
         return project;
     }
 
-    private List<ProjectsWithOwner> getSharedProjects(final UserProjects userProjects, final String owner) {
+    private Pair<List<ProjectsWithOwner>, List<Project>> getSharedProjects(
+            final UserProjects userProjects, final String owner) {
         // project owner -> project ids
         Map<String, Set<Long>> projectIds = new HashMap<>();
-        this.getUserProjects(owner).forEach(project -> {
+        List<Project> projects = this.getUserProjects(owner);
+        projects.forEach(project -> {
             String projectOwner = project.getOwner();
             if (!Objects.equals(owner, projectOwner)) {
                 // skip projects owned by me
@@ -106,7 +113,7 @@ public class ProjectDaoJpa {
             addProjectsByOwner(projectOwner, entry.getValue(), result);
         }
 
-        return result;
+        return Pair.of(result, projects);
     }
 
     private void addProjectsByOwner(String o, Set<Long> projectsByOwner,

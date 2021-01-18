@@ -74,6 +74,7 @@ const backgroundImages = [
   'https://user-images.githubusercontent.com/122956/86585241-fa812f00-bf3a-11ea-8bdd-40c3d64ce5c1.jpg',
   'https://user-images.githubusercontent.com/122956/86585242-fa812f00-bf3a-11ea-8420-2d33fe16de39.jpg',
   'https://user-images.githubusercontent.com/122956/86585244-fb19c580-bf3a-11ea-97c7-62b3dd75a124.jpg',
+  'https://user-images.githubusercontent.com/122956/103475552-d45e0f80-4d62-11eb-8fe0-7dcf0b15bb3a.jpg',
 ];
 
 export const getRandomBackgroundImage = () => {

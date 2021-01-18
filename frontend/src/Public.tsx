@@ -7,7 +7,7 @@ import {Task} from './features/tasks/interface';
 import {ContentType} from './features/myBuJo/constants';
 import {Content} from './features/myBuJo/interface';
 import {getPublicItem} from './features/system/actions';
-import {CloseCircleOutlined, UpSquareOutlined} from '@ant-design/icons';
+import {CloseCircleOutlined, FileSyncOutlined, UpSquareOutlined} from '@ant-design/icons';
 
 import './styles/main.less';
 import './Public.styles.less';
@@ -19,6 +19,7 @@ import {removeSharedNote} from './features/notes/actions';
 import LabelManagement from './pages/project/label-management.compoent';
 import {getRandomBackgroundImage} from './assets/background';
 import {inPublicPage} from "./index";
+import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 
 type PageProps = {
   note: Note | undefined;
@@ -26,6 +27,7 @@ type PageProps = {
   projectId: number | undefined;
   contentType: ContentType | undefined;
   contents: Content[];
+  content: Content | undefined;
   getPublicItem: (itemId: string) => void;
   removeSharedTask: (taskId: number) => void;
   removeSharedNote: (noteId: number) => void;
@@ -37,6 +39,7 @@ const PublicPage: React.FC<PageProps> = (props) => {
     task,
     contentType,
     contents,
+    content,
     getPublicItem,
     projectId,
     removeSharedTask,
@@ -105,6 +108,26 @@ const PublicPage: React.FC<PageProps> = (props) => {
     );
   };
 
+  const isMobilePage = () => {
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    return userAgent.includes('mobile') && !userAgent.includes('ipad');
+  };
+
+  const collabButton = () => {
+    if (!content || isMobilePage() || !inPublicPage() || !itemId) {
+        return null;
+    }
+    return <Container>
+        <FloatButton
+            onClick={() => window.open(`${window.location.protocol}//${window.location.host}/collab/?uid=${itemId + content.id}`)}
+            tooltip="Collaborative Real-Time Editing"
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
+        >
+            <FileSyncOutlined/>
+        </FloatButton>
+    </Container>
+  }
+
   const fullHeight = global.window.innerHeight;
 
   if (contentType === ContentType.TASK) {
@@ -125,6 +148,7 @@ const PublicPage: React.FC<PageProps> = (props) => {
               taskEditorElem={null}
               isPublic
           />
+          {collabButton()}
         </div>
     );
   }
@@ -147,6 +171,7 @@ const PublicPage: React.FC<PageProps> = (props) => {
               contents={contents}
               isPublic
           />
+          {collabButton()}
         </div>
     );
   }
@@ -160,6 +185,7 @@ const mapStateToProps = (state: IState) => ({
   projectId: state.system.publicItemProjectId,
   contentType: state.system.contentType,
   contents: state.system.contents,
+  content: state.content.content,
 });
 
 export default connect(mapStateToProps, {

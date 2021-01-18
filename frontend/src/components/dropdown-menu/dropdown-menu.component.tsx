@@ -70,7 +70,7 @@ const DropdownMenu = ({
         <Menu.Item
             className='modified-item'
             onClick={() =>
-                (window.location.href = `https://1o24bbs.com/u/${username}/messages`)
+                window.open(`https://1o24bbs.com/u/${username}/messages`, '_blank')
             }
         >
             <MailOutlined/>
@@ -89,7 +89,7 @@ const DropdownMenu = ({
         <Menu.Item
             className='modified-item'
             onClick={() =>
-                (window.location.href = 'https://play.google.com/store/apps/details?id=us.bullet_journal')
+                window.open('https://play.google.com/store/apps/details?id=us.bullet_journal', '_blank')
             }
         >
             <AndroidOutlined />
@@ -98,7 +98,7 @@ const DropdownMenu = ({
         <Menu.Item
             className='modified-item'
             onClick={() =>
-                (window.location.href = 'https://apps.apple.com/us/app/id1529692136')
+                window.open('https://apps.apple.com/us/app/id1529692136', '_blank')
             }
         >
             <AppleOutlined />

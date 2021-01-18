@@ -5,8 +5,15 @@ import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.notifications.*;
+import com.bulletjournal.notifications.informed.CreateProjectEvent;
+import com.bulletjournal.notifications.informed.JoinProjectEvent;
+import com.bulletjournal.notifications.informed.RemoveFromProjectEvent;
+import com.bulletjournal.notifications.informed.RemoveProjectEvent;
 import com.bulletjournal.repository.AuditableDaoJpa;
 import com.bulletjournal.repository.ProjectDaoJpa;
+import com.bulletjournal.controller.models.ProjectSetting;
+import com.bulletjournal.repository.ProjectSettingDaoJpa;
+import com.bulletjournal.repository.ProjectSettingRepository;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +29,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
@@ -34,6 +38,7 @@ import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 public class ProjectController {
     protected static final String PROJECTS_ROUTE = "/api/projects";
     protected static final String PROJECT_ROUTE = "/api/projects/{projectId}";
+    protected static final String PROJECT_SETTINGS_ROUTE = "/api/projects/{projectId}/settings";
     protected static final String PROJECT_HISTORY_ROUTE = "/api/projects/{projectId}/history";
     protected static final String UPDATE_SHARED_PROJECTS_ORDER_ROUTE = "/api/updateSharedProjectsOrder";
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectController.class);
@@ -49,10 +54,19 @@ public class ProjectController {
     @Autowired
     private UserClient userClient;
 
+    @Autowired
+    private ProjectSettingDaoJpa projectSettingDaoJpa;
+
+    @Autowired
+    private ProjectSettingRepository projectSettingRepository;
+
     @GetMapping(PROJECTS_ROUTE)
     public ResponseEntity<Projects> getProjects() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        Projects projects = this.projectDaoJpa.getProjects(username);
+        List<com.bulletjournal.repository.models.Project> projectsForSetting = new ArrayList<>();
+        Projects projects = this.projectDaoJpa.getProjects(username, projectsForSetting);
+//        this.projectSettingRepository.findByProjectIn(projectsForSetting)
+//                .stream().filter(Objects::nonNull).collect(Collectors.toList());
 
         String ownedProjectsEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                 EtagGenerator.HashType.TO_HASHCODE, projects.getOwned());
@@ -66,10 +80,24 @@ public class ProjectController {
     }
 
     @GetMapping(PROJECT_ROUTE)
-    public Project getProject(@NotNull @PathVariable Long projectId) {
+    public ProjectDetails getProject(@NotNull @PathVariable Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Project project = this.projectDaoJpa.getProject(projectId, username).toVerbosePresentationModel();
-        return Project.addOwnerAvatar(project, this.userClient);
+        ProjectDetails projectDetails = new ProjectDetails(Project.addOwnerAvatar(project, this.userClient));
+        ProjectSetting projectSetting = this.projectSettingDaoJpa.getProjectSetting(projectId);
+        projectDetails.setProjectSetting(projectSetting);
+        return projectDetails;
+    }
+
+    @PutMapping(PROJECT_SETTINGS_ROUTE)
+    public ProjectDetails setProjectSettings(@NotNull @PathVariable Long projectId,
+                                   @NotNull @Valid @RequestBody ProjectSetting setting) {
+        String projectColor = setting.getColor();
+        boolean autoDelete = setting.isAutoDelete();
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.projectSettingDaoJpa.setProjectSetting(username,
+                this.projectDaoJpa.getProject(projectId, username), projectColor, autoDelete);
+        return getProject(projectId);
     }
 
     @PostMapping(PROJECTS_ROUTE)
@@ -88,7 +116,7 @@ public class ProjectController {
     }
 
     @PatchMapping(PROJECT_ROUTE)
-    public Project updateProject(@NotNull @PathVariable Long projectId,
+    public ProjectDetails updateProject(@NotNull @PathVariable Long projectId,
             @Valid @RequestBody UpdateProjectParams updateProjectParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Event> joined = new ArrayList<>();
@@ -100,7 +128,7 @@ public class ProjectController {
         if (!removed.isEmpty()) {
             this.notificationService.inform(new RemoveFromProjectEvent(removed, username));
         }
-        Project project = getProject(projectId);
+        ProjectDetails project = getProject(projectId);
         this.notificationService.trackActivity(new Auditable(projectId, "updated BuJo ##" + project.getName() + "##",
                 username, null, Timestamp.from(Instant.now()), ContentAction.UPDATE_PROJECT));
         return project;

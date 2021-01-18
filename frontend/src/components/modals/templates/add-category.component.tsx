@@ -133,7 +133,7 @@ const AddCategory: React.FC<AddCategoryProps> = (props) => {
             <FloatButton
                 tooltip="Add New Category"
                 onClick={openModal}
-                styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+                styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
             >
                 <PlusOutlined/>
             </FloatButton>

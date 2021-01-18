@@ -7,6 +7,7 @@ import Quill, {DeltaStatic} from 'quill';
 import 'react-quill/dist/quill.core.css';
 import 'react-quill/dist/quill.bubble.css';
 import 'react-quill/dist/quill.snow.css';
+import 'highlight.js/styles/stackoverflow-dark.css'
 import {formats, modules} from './content-editor-toolbar';
 import {createContent as createNoteContent, patchContent as patchNoteContent,} from '../../features/notes/actions';
 import {
@@ -84,7 +85,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = (
     }) => {
     const isEdit = !!delta;
     const [editorContent, setEditorContent] = useState(
-        delta ? {delta: delta, '###html###': ''} : {delta: {}, '###html###': ''}
+        delta ? {delta: delta} : {delta: {}}
     );
     const quillRef = useRef<ReactQuill>(null);
     const [error, setError] = useState('');
@@ -92,6 +93,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = (
     const oldContents = delta;
 
     useEffect(() => {
+        setToolTips();
         if (error.length < 1) return;
         message.error(error);
         return () => {
@@ -145,7 +147,21 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = (
             }
         };
     };
-    modules.toolbar.handlers = {image: imageUploader};
+    const undoHistory = () => {
+        if (!quillRef) return;
+        const editor = quillRef.current!.getEditor();
+        editor.getModule('history').undo();
+    }
+    const redoHistory = () => {
+        if (!quillRef) return;
+        const editor = quillRef.current!.getEditor();
+        editor.getModule('history').redo();
+    }
+    modules.toolbar.handlers = {
+        image: imageUploader,
+        undo: undoHistory,
+        redo: redoHistory
+    };
 
     /**
      * Do something to our dropped or pasted image
@@ -232,7 +248,7 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = (
         },
         [ContentType.SAMPLE_TASK]: patchSampleTaskContent,
     };
-    let patchContentFunction = patchContentCall[contentType];
+    const patchContentFunction = patchContentCall[contentType];
 
     const handleFormSubmit = () => {
         if (!isEdit) {
@@ -263,7 +279,6 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = (
     ) => {
         setEditorContent({
             delta: editor.getContents(),
-            '###html###': content,
         });
     };
     return (
@@ -289,6 +304,33 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = (
 const mapStateToProps = (state: IState) => ({
     content: state.content.content
 });
+
+const setToolTips = () => {
+    const toolbar = document.querySelector("div.ql-toolbar.ql-snow");
+    if (!toolbar) {
+        return;
+    }
+    toolbar.querySelector('span.ql-color')!.setAttribute('title', 'Text color');
+    toolbar.querySelector('span.ql-background')!.setAttribute('title', 'Background color');
+    toolbar.querySelector('span.ql-align')!.setAttribute('title', 'Align');
+    toolbar.querySelector('button.ql-bold')!.setAttribute('title', 'Bold');
+    toolbar.querySelector('button.ql-italic')!.setAttribute('title', 'Italic');
+    toolbar.querySelector('button.ql-underline')!.setAttribute('title', 'Underline');
+    toolbar.querySelector('button.ql-strike')!.setAttribute('title', 'Strikethrough');
+    toolbar.querySelector('button.ql-blockquote')!.setAttribute('title', 'Quote');
+    toolbar.querySelector('button.ql-code-block')!.setAttribute('title', 'Code');
+    toolbar.querySelector('button.ql-undo')!.setAttribute('title', 'Undo');
+    toolbar.querySelector('button.ql-redo')!.setAttribute('title', 'Redo');
+    toolbar.querySelector('button.ql-list[value=ordered]')!.setAttribute('title', 'Numbered list');
+    toolbar.querySelector('button.ql-list[value=bullet]')!.setAttribute('title', 'Bulleted list');
+    toolbar.querySelector('button.ql-indent[value="-1"]')!.setAttribute('title', 'Indent less');
+    toolbar.querySelector('button.ql-indent[value="+1"]')!.setAttribute('title', 'Indent more');
+
+    toolbar.querySelector('button.ql-link')!.setAttribute('title', 'Insert link');
+    toolbar.querySelector('button.ql-image')!.setAttribute('title', 'Insert Image');
+    toolbar.querySelector('button.ql-emoji')!.setAttribute('title', 'Insert Emoji');
+    toolbar.querySelector('button.ql-clean')!.setAttribute('title', 'Remove formatting');
+};
 
 export default connect(mapStateToProps, {
     createNoteContent,

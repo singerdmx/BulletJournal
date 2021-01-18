@@ -53,6 +53,9 @@ public abstract class ProjectItemModel<T extends ProjectItem> extends AuditModel
     )
     private Long[] labels;
 
+    @Column(name = "location")
+    private String location;
+
     @Transient
     private Long[] sharedItemLabels;
 
@@ -115,6 +118,14 @@ public abstract class ProjectItemModel<T extends ProjectItem> extends AuditModel
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public abstract T toPresentationModel();

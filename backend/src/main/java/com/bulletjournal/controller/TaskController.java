@@ -8,6 +8,10 @@ import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.es.ESUtil;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.notifications.*;
+import com.bulletjournal.notifications.informed.Informed;
+import com.bulletjournal.notifications.informed.RemoveTaskEvent;
+import com.bulletjournal.notifications.informed.SetTaskStatusEvent;
+import com.bulletjournal.notifications.informed.UpdateTaskAssigneeEvent;
 import com.bulletjournal.repository.ProjectDaoJpa;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.TaskRepository;
@@ -17,6 +21,8 @@ import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.TaskContent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -37,6 +43,7 @@ import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 @RestController
 public class TaskController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskController.class);
     public static final String TASKS_ROUTE = "/api/projects/{projectId}/tasks";
     protected static final String TASK_ROUTE = "/api/tasks/{taskId}";
     protected static final String SET_TASK_STATUS_ROUTE = "/api/tasks/{taskId}/setStatus";
@@ -57,7 +64,6 @@ public class TaskController {
     protected static final String COMPLETED_TASK_CONTENTS_ROUTE = "/api/completedTasks/{taskId}/contents";
     protected static final String CONTENT_REVISIONS_ROUTE = "/api/tasks/{taskId}/contents/{contentId}/revisions/{revisionId}";
     protected static final String TASK_STATISTICS_ROUTE = "/api/taskStatistics";
-    protected static final String REVISION_CONTENT_ROUTE = "/api/tasks/{taskId}/contents/{contentId}/patchRevisionContents";
 
     @Autowired
     private TaskDaoJpa taskDaoJpa;
@@ -188,14 +194,36 @@ public class TaskController {
 
     @PostMapping(COMPLETE_TASKS_ROUTE)
     public ResponseEntity<List<Task>> completeTasks(@NotNull @PathVariable Long projectId,
-            @RequestParam List<Long> tasks) {
+                                                    @RequestParam List<Long> tasks) {
 
-        tasks.forEach(t -> {
-            if (this.taskRepository.existsById(t)) {
-                this.completeSingleTask(t, null);
-            }
-        });
+        if (tasks.isEmpty()) {
+            return getTasks(projectId, null, null, null, null, null);
+        }
 
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        com.bulletjournal.repository.models.Project project = this.projectDaoJpa.getProject(projectId, username);
+        List<com.bulletjournal.repository.models.Task> taskList =
+                this.taskDaoJpa.findAllById(tasks, project).stream()
+                        .filter(Objects::nonNull)
+                        .map(t -> (com.bulletjournal.repository.models.Task) t)
+                        .collect(Collectors.toList());
+        if (taskList.isEmpty()) {
+            return getTasks(projectId, null, null, null, null, null);
+        }
+        List<CompletedTask> completedTaskList = this.taskDaoJpa.completeInBatch(taskList);
+
+        List<String> deleteESDocumentIds = ESUtil.getProjectItemSearchIndexIds(tasks, ContentType.TASK);
+        this.notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(deleteESDocumentIds));
+
+        this.notificationService.saveCompleteTasks(new SaveCompleteTasksEvent(completedTaskList));
+
+        for (com.bulletjournal.repository.models.Task task : taskList) {
+            this.notificationService.trackActivity(new Auditable(task.getProject().getId(),
+                    "completed Task ##" + task.getName() + "## in BuJo ##" + task.getProject().getName() + "##", username,
+                    task.getId(), Timestamp.from(Instant.now()), ContentAction.COMPLETE_TASK));
+        }
+
+        LOGGER.info("completeTasks done");
         return getTasks(projectId, null, null, null, null, null);
     }
 
@@ -515,14 +543,4 @@ public class TaskController {
         return taskStatistics;
     }
 
-    @PostMapping(REVISION_CONTENT_ROUTE)
-    public Content patchRevisionContents(@NotNull @PathVariable Long taskId,
-                                      @NotNull @PathVariable Long contentId,
-                                      @NotNull @RequestBody  RevisionContentsParams revisionContentsParams,
-                                      @RequestHeader(IF_NONE_MATCH) String etag) {
-        String username = MDC.get(UserClient.USER_NAME_KEY);
-        TaskContent content = this.taskDaoJpa.patchRevisionContentHistory(
-                contentId, taskId, username, revisionContentsParams.getRevisionContents(), etag);
-        return content == null ? new Content() : content.toPresentationModel();
-    }
 }

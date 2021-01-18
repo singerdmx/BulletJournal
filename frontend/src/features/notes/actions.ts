@@ -105,12 +105,4 @@ export const getNotesByOrder = (
     endDate: endDate,
   });
 
-export const patchNoteRevisionContents = (
-    noteId: number,
-    contentId: number,
-    revisionContents: string[],
-    etag: string
-) => actions.NotePatchRevisionContents({
-    noteId: noteId, contentId: contentId, revisionContents: revisionContents, etag: etag});
-
 export const noteReceived = (note: Note | undefined) => actions.noteReceived({note: note});

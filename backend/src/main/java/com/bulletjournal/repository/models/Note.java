@@ -48,7 +48,8 @@ public class Note extends ProjectItemModel<com.bulletjournal.controller.models.N
                 this.getProject(),
                 labels,
                 this.getCreatedAt().getTime(),
-                this.getUpdatedAt().getTime());
+                this.getUpdatedAt().getTime(),
+                this.getLocation());
         note.setShared(this.isShared());
         return note;
     }

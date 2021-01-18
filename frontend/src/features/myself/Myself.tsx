@@ -1,6 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {SyncOutlined} from '@ant-design/icons';
+import {FileSyncOutlined, SyncOutlined} from '@ant-design/icons';
 import {Avatar, Button, Drawer, Input, Popover, Tooltip} from 'antd';
 import {RouteComponentProps, withRouter} from 'react-router';
 import DropdownMenu from '../../components/dropdown-menu/dropdown-menu.component';
@@ -23,6 +23,7 @@ import {Transaction} from "../transactions/interface";
 import {History} from "history";
 import {getCookie} from "../../index";
 import {sendInvitation} from '../../apis/userApis';
+import {randomString} from "../../utils/Util";
 
 type MyselfProps = {
     username: string;
@@ -122,6 +123,11 @@ class Myself extends React.Component<MyselfProps & PathProps, ModalState> {
         }
         return (
             <div className='myselfContainer'>
+                <Tooltip placement='bottom' title='Collaborative Real-Time Editor'>
+                    <FileSyncOutlined
+                        onClick={() => window.open(`${window.location.protocol}//${window.location.host}/collab/?uid=${randomString(8)}`)}
+                    />
+                </Tooltip>
                 <span id='createNewBuJo'>{plusIcon}</span>
                 <Tooltip placement='bottom' title='Refresh'>
                     <SyncOutlined

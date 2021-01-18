@@ -137,6 +137,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         transaction.setDate(createTransaction.getDate());
         transaction.setTime(createTransaction.getTime());
         transaction.setTimezone(createTransaction.getTimezone());
+        transaction.setLocation(createTransaction.getLocation());
         transaction.setTransactionType(TransactionType.getType(createTransaction.getTransactionType()));
         if (createTransaction.getLabels() != null && !createTransaction.getLabels().isEmpty()) {
             transaction.setLabels(createTransaction.getLabels());
@@ -198,6 +199,9 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
         DaoHelper.updateIfPresent(updateTransactionParams.hasTimezone(), updateTransactionParams.getTimezone(),
                 transaction::setTimezone);
+
+        DaoHelper.updateIfPresent(updateTransactionParams.hasLocation(), updateTransactionParams.getLocation(),
+                transaction::setLocation);
 
         String date = updateTransactionParams.getOrDefaultDate(transaction.getDate());
         String time = updateTransactionParams.getOrDefaultTime(transaction.getTime());
@@ -292,7 +296,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     }
 
     @Override
-    TransactionContent newContent(String text) {
+    public TransactionContent newContent(String text) {
         return new TransactionContent(text);
     }
 

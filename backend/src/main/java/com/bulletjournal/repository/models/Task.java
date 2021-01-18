@@ -82,7 +82,6 @@ public class Task extends TaskModel {
         if (this.status != null) {
             task.setStatus(TaskStatus.getType(this.status));
         }
-        task.setLocation(this.getLocation());
         return task;
     }
 
@@ -93,7 +92,6 @@ public class Task extends TaskModel {
         if (this.status != null) {
             task.setStatus(TaskStatus.getType(this.status));
         }
-        task.setLocation(this.getLocation());
         return task;
     }
 

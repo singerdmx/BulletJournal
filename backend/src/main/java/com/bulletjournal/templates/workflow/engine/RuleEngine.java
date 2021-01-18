@@ -1,6 +1,8 @@
 package com.bulletjournal.templates.workflow.engine;
 
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
+import com.bulletjournal.notifications.ImportSampleTasksEvent;
+import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.User;
@@ -14,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +28,7 @@ import java.util.stream.Collectors;
 @Service
 public class RuleEngine {
     private static final Logger LOGGER = LoggerFactory.getLogger(RuleEngine.class);
+    private static final Comparator<String> NATURAL_ORDER_COMPARATOR = Comparator.naturalOrder();
 
     @Autowired
     private SampleTaskDaoJpa sampleTaskDaoJpa;
@@ -50,13 +54,31 @@ public class RuleEngine {
     @Autowired
     private SelectionMetadataKeywordDaoJpa selectionMetadataKeywordDaoJpa;
 
+    @Lazy
+    @Autowired
+    private NotificationService notificationService;
+
+    public static List<com.bulletjournal.templates.controller.model.SampleTask> sortSampleTasks(
+            List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasks) {
+        if (sampleTasks.stream().allMatch(t -> StringUtils.isNotBlank(t.getName()))) {
+            sampleTasks.stream()
+                    .sorted((a, b) -> NATURAL_ORDER_COMPARATOR.compare(a.getName(), b.getName()))
+                    .collect(Collectors.toList());
+        }
+        return sampleTasks.stream()
+                .sorted(Comparator.comparing(com.bulletjournal.templates.controller.model.SampleTask::getId))
+                .collect(Collectors.toList());
+    }
+
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.templates.controller.model.SampleTask> importTasks(
             String requester, RemoveUserSampleTasksParams importTasksParams, int frequency) {
         List<SampleTask> repoSampleTasks = sampleTaskDaoJpa
-                .findAllById(importTasksParams.getSampleTasks());
+                .findAllById(importTasksParams.getSampleTasks()
+                        .stream().filter(Objects::nonNull).distinct().collect(Collectors.toList()));
         List<com.bulletjournal.templates.controller.model.SampleTask> sampleTasks = repoSampleTasks
                 .stream().map(SampleTask::toPresentationModel).collect(Collectors.toList());
+        sampleTasks = sortSampleTasks(sampleTasks);
         // if there is any sample task that does not have due date, we need to set due date for it
         List<com.bulletjournal.templates.controller.model.SampleTask> tasksNeedTimingArrangement = sampleTasks.stream()
                 .filter(t -> StringUtils.isBlank(t.getDueDate())).collect(Collectors.toList());
@@ -102,14 +124,8 @@ public class RuleEngine {
         sampleTasks.sort(
                 Comparator.comparing(s -> (s.getDueDate() + (StringUtils.isBlank(s.getDueTime()) ? "00:00" : s.getDueTime()))));
 
-        this.taskDaoJpa.createTaskFromSampleTask(
-                importTasksParams.getProjectId(),
-                requester,
-                sampleTasks,
-                repoSampleTasks,
-                importTasksParams.getReminderBefore(),
-                importTasksParams.getAssignees(),
-                importTasksParams.getLabels());
+        this.notificationService.handleImportSampleTasksEvent(
+                new ImportSampleTasksEvent(importTasksParams, requester, sampleTasks, repoSampleTasks));
         return sampleTasks;
     }
 

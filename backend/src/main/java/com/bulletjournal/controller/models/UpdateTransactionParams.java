@@ -22,6 +22,8 @@ public class UpdateTransactionParams {
 
     private List<Long> labels;
 
+    private String location;
+
     public UpdateTransactionParams() {
     }
 
@@ -147,4 +149,14 @@ public class UpdateTransactionParams {
     public boolean hasLabels() {
         return this.labels != null;
     }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public boolean hasLocation() { return this.location != null; }
 }

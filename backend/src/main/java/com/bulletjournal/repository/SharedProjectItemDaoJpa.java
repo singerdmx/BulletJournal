@@ -4,7 +4,7 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.Event;
-import com.bulletjournal.notifications.ShareProjectItemEvent;
+import com.bulletjournal.notifications.informed.ShareProjectItemEvent;
 import com.bulletjournal.repository.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

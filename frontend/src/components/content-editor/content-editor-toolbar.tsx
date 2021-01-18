@@ -5,10 +5,13 @@ import 'react-quill/dist/quill.snow.css';
 import ImageResize from '../../utils/image-resize/ImageResize';
 import ImageFormat from '../../utils/image-resize/ImageFormat';
 import ImageDropAndPaste from '../../utils/image-drop-and-paste/quill-image-drop-and-paste';
+import hljs from 'highlight.js'
 
 Quill.register('modules/imageResize', ImageResize);
 Quill.register('modules/imageDropAndPaste', ImageDropAndPaste);
 Quill.register(ImageFormat, true);
+
+hljs.initHighlightingOnLoad();
 
 // Custom Undo button çicon component for Quill editor. You can import it directly
 // from 'quill/assets/icons/undo.svg' but I found that a number of loaders do not
@@ -73,30 +76,50 @@ Font.whitelist = [
 ];
 Quill.register(Font, true);
 
+const icons = Quill.import("ui/icons");
+icons["undo"] = `<svg viewbox="0 0 18 18">
+    <polygon class="ql-fill ql-stroke" points="6 10 4 12 2 10 6 10"></polygon>
+    <path class="ql-stroke" d="M8.09,13.91A4.6,4.6,0,0,0,9,14,5,5,0,1,0,4,9"></path>
+  </svg>`;
+icons["redo"] = `<svg viewbox="0 0 18 18">
+    <polygon class="ql-fill ql-stroke" points="12 10 14 12 16 10 12 10"></polygon>
+    <path class="ql-stroke" d="M9.91,13.91A4.6,4.6,0,0,1,9,14a5,5,0,1,1,5-5"></path>
+  </svg>`;
+
+export const readOnlyModules = {
+  syntax: {
+    highlight: (text: string) => hljs.highlightAuto(text).value,
+  },
+  toolbar: false
+}
+
 // Modules object for setting up the Quill editor
 export const modules = {
   imageResize:{
     displaySize: true
   },
+  syntax: {
+    highlight: (text: string) => hljs.highlightAuto(text).value,
+  },
   toolbar: {
     container: [
+      ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block', 'undo', 'redo'],
       [
-        { header: [1, 2, false] },
-        { color: [] },
-        { background: [] },
-        { align: [] },
-      ],
-      ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block'],
-      [
-        { list: 'ordered' },
-        { list: 'bullet' },
-        { indent: '-1' },
-        { indent: '+1' },
+        {list: 'ordered'},
+        {list: 'bullet'},
+        {indent: '-1'},
+        {indent: '+1'},
       ],
 
       ['link', 'image', 'emoji'],
 
       ['clean'],
+      [
+        {header: [1, 2, 3, false]},
+        {color: []},
+        {background: []},
+        {align: []},
+      ],
     ],
     handlers: {},
   },

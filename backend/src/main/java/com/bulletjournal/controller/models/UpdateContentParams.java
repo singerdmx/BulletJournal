@@ -7,8 +7,6 @@ public class UpdateContentParams {
     @NotBlank
     private String text;
 
-    private String mdiff;
-
     private String diff;
 
     public UpdateContentParams() {
@@ -24,14 +22,6 @@ public class UpdateContentParams {
 
     public void setText(String text) {
         this.text = text;
-    }
-
-    public String getMdiff() {
-        return mdiff;
-    }
-
-    public void setMdiff(String mdiff) {
-        this.mdiff = mdiff;
     }
 
     public String getDiff() {

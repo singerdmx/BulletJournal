@@ -40,6 +40,10 @@ public class Project extends OwnedModel {
     @Column(nullable = false, columnDefinition = "Boolean default 'false'")
     private boolean shared;
 
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "project")
+    @PrimaryKeyJoinColumn
+    private ProjectSetting projectSetting;
+
     public Project() {
     }
 
@@ -109,6 +113,14 @@ public class Project extends OwnedModel {
                 this.getGroup().toVerbosePresentationModel(),
                 this.getDescription(),
                 this.isShared());
+    }
+
+    public ProjectSetting getProjectSetting() {
+        return projectSetting;
+    }
+
+    public void setProjectSetting(ProjectSetting projectSetting) {
+        this.projectSetting = projectSetting;
     }
 
     @Override

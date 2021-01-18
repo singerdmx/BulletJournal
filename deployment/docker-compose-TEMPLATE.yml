@@ -1,7 +1,7 @@
 version: '2.1'
 services:
   auth-proxy:
-    image: xcode1024/auth-proxy:v73
+    image: xcode1024/auth-proxy:v75
     container_name: auth-proxy
     ports:
       - "80:80"
@@ -13,6 +13,12 @@ services:
       - $HOME/docker/auth_proxy/log:/var/log
     depends_on:
       - frontend
+
+  collab:
+    image: mwangxx/bulletjournal-collab:1.1.202101041234
+    container_name: collab
+    ports:
+    - "4444:4444"
 
   frontend:
     image: mwangxx/bulletjournal-frontend:BULLETJOURNAL_VERSION
@@ -62,6 +68,7 @@ services:
       SENDER_NAME: "${SENDER_NAME}"
       POLYGON_API_KEY: "${POLYGON_API_KEY}"
       RPC_CLIENT_ID: "${RPC_CLIENT_ID}"
+      GOOGLE_MAPS_API_KEY: "${GOOGLE_MAPS_API_KEY}"
     volumes:
       - $HOME/docker/volumes/log:/var/log
       - $HOME/docker/volumes/etc/key:/etc/key

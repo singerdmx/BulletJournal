@@ -12,6 +12,8 @@ public class CreateNoteParams {
     private String name;
     private List<Long> labels;
 
+    private String location;
+
     public CreateNoteParams() {
     }
 
@@ -33,5 +35,13 @@ public class CreateNoteParams {
 
     public void setLabels(List<Long> labels) {
         this.labels = labels;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }

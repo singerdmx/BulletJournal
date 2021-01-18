@@ -18,7 +18,6 @@ import {
   GetTaskStatisticsAction,
   MoveTask,
   PatchContent,
-  PatchRevisionContents,
   PatchTask,
   PutTask,
   RemoveShared,
@@ -53,7 +52,6 @@ import {
   getTaskById,
   getTaskStatistics,
   moveToTargetProject,
-  patchRevisionContents,
   putTasks,
   removeShared,
   revokeSharable,
@@ -1280,38 +1278,6 @@ function* getSearchCompletedTasks(
   }
 }
 
-function* patchTaskRevisionContents(action: PayloadAction<PatchRevisionContents>) {
-  try {
-    const {taskId, contentId, revisionContents, etag} = action.payload;
-    const data : Content = yield call(patchRevisionContents, taskId, contentId, revisionContents, etag);
-    const state: IState = yield select();
-    console.log("data", data);
-    if (data && state.content.content && data.id === state.content.content.id) {
-      console.log("updateTargetContent");
-      yield put(updateTargetContent(data));
-    }
-
-    if (data && data.id) {
-      const contents : Content[] = [];
-      state.task.contents.forEach(c => {
-        if (c.id === data.id) {
-          contents.push(data);
-        } else {
-          contents.push(c);
-        }
-      });
-      console.log("update contents", contents);
-      yield put(
-          tasksActions.taskContentsReceived({
-            contents: contents,
-          })
-      );
-    }
-  } catch (error) {
-    yield put(reloadReceived(true));
-  }
-}
-
 function* fetchTaskStatistics(action: PayloadAction<GetTaskStatisticsAction>) {
   try {
     const {projectIds, timezone, startDate, endDate} = action.payload;
@@ -1382,7 +1348,6 @@ export default function* taskSagas() {
     yield takeLatest(tasksActions.TasksDelete.type, deleteTasks),
     yield takeLatest(tasksActions.TasksComplete.type, completeTasks),
     yield takeLatest(tasksActions.TaskStatusSet.type, setTaskStatus),
-    yield takeLatest(tasksActions.TaskPatchRevisionContents.type, patchTaskRevisionContents),
     yield takeLatest(tasksActions.GetTaskStatistics.type, fetchTaskStatistics),
   ]);
 }

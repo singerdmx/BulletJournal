@@ -67,7 +67,7 @@ const AddStep: React.FC<AddStepProps> = (props) => {
             <FloatButton
                 tooltip="Add New Step"
                 onClick={openModal}
-                styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+                styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
             >
                 <PlusOutlined/>
             </FloatButton>

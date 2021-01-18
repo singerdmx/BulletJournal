@@ -11,15 +11,15 @@ import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.notifications.*;
-import com.bulletjournal.redis.RedisCachedContentRepository;
-import com.bulletjournal.redis.models.CachedContent;
+import com.bulletjournal.notifications.informed.RevokeSharableEvent;
+import com.bulletjournal.notifications.informed.SetLabelEvent;
+import com.bulletjournal.notifications.informed.ShareProjectItemEvent;
 import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.util.ContentDiffTool;
 import com.bulletjournal.util.DeltaContent;
-import com.bulletjournal.util.DeltaConverter;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +31,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -63,10 +62,6 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     private ProjectRepository projectRepository;
     @Autowired
     protected NotificationService notificationService;
-    @Autowired
-    private RedisCachedContentRepository redisCachedContentRepository;
-    @Autowired
-    private EntityManager entityManager;
 
     abstract <T extends ProjectItemModel> JpaRepository<T, Long> getJpaRepository();
 
@@ -74,7 +69,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     abstract <T extends ProjectItemModel> List<K> findContents(T projectItem);
 
-    abstract K newContent(String text);
+    public abstract K newContent(String text);
 
     abstract List<Long> findItemLabelsByProject(com.bulletjournal.repository.models.Project project);
 
@@ -180,7 +175,6 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             T projectItem = projectItems.get(i);
             content.setProjectItem(projectItem);
             content.setOwner(owner);
-            content.setText(DeltaConverter.supplementContentText(content.getText(), false));
             batch.add(content);
         }
         if (!batch.isEmpty()) {
@@ -210,7 +204,6 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     private <T extends ProjectItemModel> void populateContent(String owner, K content, T projectItem) {
         content.setProjectItem(projectItem);
         content.setOwner(owner);
-        content.setText(DeltaConverter.supplementContentText(content.getText()));
         updateRevision(content, owner, content.getText(), content.getText());
     }
 
@@ -233,45 +226,6 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public K patchRevisionContentHistory(Long contentId, Long projectItemId,
-                                         String requester, List<String> revisionContents,
-                                         String etag) {
-        LOGGER.info(GSON.toJson(revisionContents));
-
-        getProjectItem(projectItemId, requester); // permission check
-        int n = revisionContents.size();
-        String lastRevisionContent = revisionContents.get(n - 1);
-        K content;
-        synchronized (this) {
-            content = getContent(contentId, requester);
-            if (redisCachedContentRepository.existsById(contentId)) {
-                return content;
-            }
-            // read etag from DB content text column
-            String noteEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
-                    EtagGenerator.HashType.TO_HASHCODE, content.getText());
-            LOGGER.info("web etag =" + etag + " and db etag =" + noteEtag);
-            if (!Objects.equals(etag, noteEtag)) {
-                throw new BadRequestException("Invalid etag");
-            }
-            content.setText(DeltaConverter.mergeContentText(lastRevisionContent, content.getText()) );
-            content = this.getContentJpaRepository().saveAndFlush(content);
-            redisCachedContentRepository.save(new CachedContent(contentId));
-        }
-
-        // iterate pairs
-        for (int i = 0; i < n - 1; ++i) {
-            String first = revisionContents.get(i);
-            String second = revisionContents.get(i + 1);
-            LOGGER.info("first=" + first + "\t second=" + second);
-            updateRevision(content, requester, second, first);
-        }
-        content = this.getContentJpaRepository().saveAndFlush(content);
-        LOGGER.info("patchRevisionContentHistory return {}", content);
-        return content;
-    }
-
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> Pair<K, T> updateContent(Long contentId, Long projectItemId, String requester,
                                                                  UpdateContentParams updateContentParams, Optional<String> etag) {
         T projectItem = getProjectItem(projectItemId, requester);
@@ -281,12 +235,6 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         this.authorizationService.checkAuthorizedToOperateOnContent(content.getOwner(), requester, ContentType.CONTENT,
                 Operation.UPDATE, content.getId(), projectItem.getOwner(), projectItem.getProject().getOwner(),
                 projectItem);
-        String mdiff = updateContentParams.getMdiff();
-        String diff = updateContentParams.getDiff();
-        if (mdiff != null && diff != null) {
-            LOGGER.error("Cannot have both diff and mdiff");
-            throw new BadRequestException("Cannot have both diff and mdiff");
-        }
 
         String oldText = content.getText();
 
@@ -299,51 +247,22 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
                         projectItemId, requester, this.newContent(updateContentParams.getText()));
             }
         }
+        return updateContent(requester, updateContentParams, projectItem, content, oldText);
+    }
 
-        if (diff != null) {
-            // from web: {delta: YYYYY2, ###html###:ZZZZZZ2}, diff
-            Map diffMap = GSON.fromJson(diff, LinkedHashMap.class);
-            DeltaContent oldContent = new DeltaContent(oldText);
+    private <T extends ProjectItemModel> Pair<K, T> updateContent(
+            String requester, UpdateContentParams updateContentParams,
+            T projectItem, K content, String oldText) {
 
-            // web delta and html
-            DeltaContent newContent = new DeltaContent(updateContentParams.getText());
-
-            // mobile mdelta
-            newContent.setMdeltaList(oldContent.getMdeltaList());
-
-            // mobile mdiff
-            List<LinkedHashMap> newMdiff = DeltaConverter.diffToMdiff(diffMap);
-            List<Object> oldMdiffList = oldContent.getMdiffOrDefault(new ArrayList<>());
-            oldMdiffList.add(newMdiff);
-            newContent.setMdiff(oldMdiffList);
-
-            LOGGER.info("web -> mobile, the content = " + newContent.toJSON());
-            content.setText(newContent.toJSON());
-            // save to db: {delta: YYYYY2, ###html###:ZZZZZZ2, mdelta:XXXXXX, mdiff: [d1] }
-        } else if (mdiff != null) {
-            List mdiffList = GSON.fromJson(mdiff, List.class);
-            // from mobile: {mdelta:XXXXXX }, mdiff
-            // mdiff: [{"retain":5,"attributes":{"b":true}}],mdelta: [{"insert":"hello","attributes":{"b":true}},{"insert":"\n"}]
-            DeltaContent oldContent = new DeltaContent(oldText);
-
-            // mobile mdelta
-            DeltaContent newContent = new DeltaContent(updateContentParams.getText());
-
-            // web delta
-            newContent.setDeltaMap(oldContent.getDeltaMap());
-
-            // web diff
-            List<Object> oldDiffList = oldContent.getDiffOrDefault(new ArrayList<>());
-            Map newDiff = DeltaConverter.mdiffToDiff(mdiffList);
-            oldDiffList.add(newDiff);
-            newContent.setDiff(oldDiffList);
-
-            LOGGER.info("mobile -> web, the content = " + newContent.toJSON());
-            content.setText(newContent.toJSON());
-            // save to db: {delta: YYYYY, mdelta:XXXXXX2, diff: [d2] }
+        String diff = updateContentParams.getDiff();
+        if (diff == null) {
+            // from new mobile version
+            LOGGER.info("from new mobile version " + updateContentParams.getText());
+            content.setText(updateContentParams.getText());
         } else {
-            LOGGER.error("Cannot have null in both diff and mdiff");
-            throw new BadRequestException("Cannot have null in both diff and mdiff");
+            // diff != null, from web
+            DeltaContent newContent = new DeltaContent(updateContentParams.getText());
+            content.setText(newContent.toJSON());
         }
 
         updateRevision(content, requester, content.getText(), oldText);
@@ -425,10 +344,6 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     }
 
     private void updateRevision(K content, String requester, String newText, String oldText) {
-        if (!newText.contains(DeltaContent.HTML_TAG)) {
-            LOGGER.info("{} does not contain {}", newText, DeltaContent.HTML_TAG);
-            return;
-        }
         String revisionsJson = content.getRevisions();
         if (revisionsJson == null) {
             revisionsJson = "[]";

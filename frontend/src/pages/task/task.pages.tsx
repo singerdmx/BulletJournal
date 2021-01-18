@@ -148,42 +148,42 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
         <FloatButton
             tooltip="Go to Parent BuJo"
             onClick={() => history.push(`/projects/${task.projectId}`)}
-            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
         >
           <UpSquareOutlined/>
         </FloatButton>
         <FloatButton
             tooltip="Refresh Contents"
             onClick={handleRefresh}
-            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
         >
           <SyncOutlined/>
         </FloatButton>
         {contentEditable(myself, content, task, project) && <FloatButton
             tooltip="Delete Content"
             onClick={handleDelete}
-            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
         >
           <DeleteOutlined/>
         </FloatButton>}
         {content && content.revisions.length > 1 && contentEditable(myself, content, task, project) && <FloatButton
             tooltip={`View Revision History (${content.revisions.length - 1})`}
             onClick={handleOpenRevisions}
-            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
         >
           <HighlightOutlined/>
         </FloatButton>}
         {contentEditable(myself, content, task, project) && <FloatButton
             tooltip="Edit Content"
             onClick={handleEdit}
-            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
         >
           <EditOutlined/>
         </FloatButton>}
         <FloatButton
             tooltip="Add Content"
             onClick={createHandler}
-            styles={{backgroundColor: darkColors.grey, color: lightColors.white}}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
         >
           <PlusOutlined/>
         </FloatButton>

@@ -81,7 +81,7 @@ const ShareProjectItemManagement: React.FC<ProjectItemProps> = (props) => {
       return sharedLinks.map((l, index) => (
         <div key={index} className="row-item-has-space">
           <div className="row-item-left">
-            <a onClick={() => window.location.href = getSharableLink(l.link)}>
+            <a onClick={() => window.open(getSharableLink(l.link), '_blank')}>
               {' '}
               {getSharableLink(l.link)}{' '}
             </a>

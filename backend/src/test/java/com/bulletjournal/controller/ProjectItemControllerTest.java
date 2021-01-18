@@ -2,7 +2,6 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.TestHelpers;
-import com.bulletjournal.util.DeltaConverter;
 import com.google.common.collect.ImmutableList;
 import org.junit.After;
 import org.junit.Before;
@@ -463,8 +462,8 @@ public class ProjectItemControllerTest {
         createRecentTaskLabels().stream().forEach(label -> labels.add(label.getId()));
         Task t1 = createRecentTask(p, "T1", "2020-05-28", labels);
         Task t2 = createRecentTask(p, "T2", "2020-05-29", labels);
-        addRecentTaskContents(t1, DeltaConverter.generateDeltaContent("a"));
-        addRecentTaskContents(t1, DeltaConverter.generateDeltaContent("b"));
+        addRecentTaskContents(t1, TestHelpers.generateDeltaContent("a"));
+        addRecentTaskContents(t1, TestHelpers.generateDeltaContent("b"));
 
         List<ProjectType> types = getTypes(ProjectType.TODO); // Added a task project type
         List<LinkedHashMap> projectItems = getRecentProjectItems(
@@ -517,7 +516,7 @@ public class ProjectItemControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         Content content = response.getBody();
         assertEquals(USER_0518, content.getOwner().getName());
-        assertEquals(DeltaConverter.supplementContentText(params.getText()), content.getText());
+        assertEquals(params.getText(), content.getText());
         assertNotNull(content.getId());
         return content;
     }
