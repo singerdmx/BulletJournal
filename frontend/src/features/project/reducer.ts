@@ -78,7 +78,7 @@ export type GetProjectHistoryAction = {
   username: string;
 };
 
-export type UpdateSettingShown = {
+export type UpdateSettingShownAction = {
   settingShown: boolean;
 };
 
@@ -144,7 +144,7 @@ const slice = createSlice({
     ) => state,
     updateSettingShown: (
       state,
-      action: PayloadAction<UpdateSettingShown>
+      action: PayloadAction<UpdateSettingShownAction>
     ) => {
       const { settingShown } = action.payload;
       state.settingShown = settingShown;

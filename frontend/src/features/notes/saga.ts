@@ -23,6 +23,7 @@ import {
   UpdateNoteContentRevision,
   UpdateNoteContents,
   UpdateNotes,
+  UpdateNoteColorAction,
 } from './reducer';
 import {PayloadAction} from 'redux-starter-kit';
 import {
@@ -43,7 +44,8 @@ import {
   setNoteLabels,
   shareNoteWithOther,
   updateContent,
-  updateNote
+  updateNote,
+  putNoteColor,
 } from '../../apis/noteApis';
 import {IState} from '../../store';
 import {updateNoteContents, updateNotes} from './actions';
@@ -631,6 +633,27 @@ function* removeSharedNote(action: PayloadAction<RemoveShared>) {
   }
 }
 
+function* updateNoteColor(
+  action: PayloadAction<UpdateNoteColorAction>
+) {
+  try {
+    const {noteId, color} = action.payload;
+    const data : Note = yield call(
+      putNoteColor,
+      noteId,
+      color,
+    );
+
+    yield put(notesActions.noteReceived({note: data}));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Set Note Color Fail: ${error}`);
+    }
+  }
+}
+
 export default function* noteSagas() {
   yield all([
     yield takeLatest(
@@ -660,5 +683,6 @@ export default function* noteSagas() {
     yield takeLatest(notesActions.getNotesByOwner.type, getNotesByOwner),
     yield takeLatest(notesActions.getNotesByOrder.type, getNotesByOrder),
     yield takeLatest(notesActions.NotesDelete.type, notesDelete),
+    yield takeLatest(notesActions.updateNoteColor.type, updateNoteColor),
   ]);
 }

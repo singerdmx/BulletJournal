@@ -52,8 +52,12 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
     }
   }, [note]);
   if (!note) return null;
+
+  const bgColorSetting = note.color ? JSON.parse(note.color) : undefined;
+  const bgColor = bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined;
+
   return (
-    <div className={`note-page ${inPublicPage() ? 'publicPage' : ''} ${isPublic ? 'sharedItem' : ''}`}>
+    <div className={`note-page ${inPublicPage() ? 'publicPage' : ''} ${isPublic ? 'sharedItem' : ''}`} style={{background: bgColor}}>
       <Tooltip
         placement="top"
         title={`${note.owner.alias}`}

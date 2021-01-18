@@ -147,8 +147,18 @@ export type NotesByOrderAction = {
   notesByOrder: Array<Note>;
 };
 
+export type UpdateColorSettingShownAction = {
+  colorSettingShown: boolean;
+};
+
+export type UpdateNoteColorAction = {
+  noteId: number;
+  color: string | undefined;
+};
+
 let initialState = {
   note: undefined as Note | undefined,
+  colorSettingShown: false,
   contents: [] as Array<Content>,
   notes: [] as Array<Note>,
   addNoteVisible: false,
@@ -238,6 +248,17 @@ const slice = createSlice({
     NoteSharablesGet: (state, action: PayloadAction<GetSharables>) => state,
     NoteRevokeSharable: (state, action: PayloadAction<RevokeSharable>) => state,
     NoteRemoveShared: (state, action: PayloadAction<RemoveShared>) => state,
+    updateColorSettingShown: (
+      state,
+      action: PayloadAction<UpdateColorSettingShownAction>
+    ) => {
+      const { colorSettingShown } = action.payload;
+      state.colorSettingShown = colorSettingShown;
+    },
+    updateNoteColor: (
+      state,
+      action: PayloadAction<UpdateNoteColorAction>
+    ) => state,
   },
 });
 
