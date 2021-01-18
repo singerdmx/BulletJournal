@@ -190,6 +190,12 @@ public abstract class ProjectItem {
         this.setOwner(projectItem.getOwner());
         this.setUpdatedAt(projectItem.getUpdatedAt());
         this.setCreatedAt(projectItem.getCreatedAt());
+        if (projectItem instanceof Note) {
+            ((Note) this).setColor(((Note) projectItem).getColor());
+        }
+        if (projectItem instanceof Transaction) {
+            ((Transaction) this).setColor(((Transaction) projectItem).getColor());
+        }
     }
 
     @Override
