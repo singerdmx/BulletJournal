@@ -39,8 +39,12 @@ const NoteColorSettingDialog: React.FC<NoteColorSettingProps> = (props) => {
   });
 
   useEffect(() => {
-    setDisplayColorPicker(!!note?.color);
-    setBgColor(note?.color ? JSON.parse(note.color) : {
+    let show : boolean = !!note?.color
+    if (note?.color === ' ') {
+        show = false;
+    }
+    setDisplayColorPicker(show);
+    setBgColor(show && note?.color ? JSON.parse(note.color) : {
       r: '0',
       g: '0',
       b: '0',
@@ -51,7 +55,7 @@ const NoteColorSettingDialog: React.FC<NoteColorSettingProps> = (props) => {
   const onCheckColorIcon = (e: any) => {
     setDisplayColorPicker(!displayColorPicker);
     if (!e.target.checked && note) {
-      updateNoteColor(note.id, undefined);
+      updateNoteColor(note.id, ' ');
       setBgColor({
         r: '0',
         g: '0',
@@ -121,7 +125,7 @@ const NoteColorSettingDialog: React.FC<NoteColorSettingProps> = (props) => {
   return (
       <>
         <FloatButton
-            tooltip="Set Background color"
+            tooltip="Set Background Color"
             onClick={openModal}
             styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
         >

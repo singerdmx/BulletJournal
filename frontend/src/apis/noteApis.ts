@@ -224,7 +224,7 @@ export const getContentRevision = (
 };
 
 export const putNoteColor = (noteId: number, color: string | undefined) => {
-  const putBody = !color ? '' : color;
+  const putBody = !color ? ' ' : color;
   return doPut(`/api/notes/${noteId}/setColor`, putBody)
     .then((res) => res.json())
     .catch((err) => {
