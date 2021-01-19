@@ -4,8 +4,6 @@ import com.bulletjournal.controller.models.EmailContentByEmailAddressesParams;
 import com.bulletjournal.controller.models.EmailContentByGroupParams;
 import com.bulletjournal.controller.models.EmailContentByUsernamesParams;
 import com.bulletjournal.repository.EmailContentDaoJpa;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,22 +25,37 @@ public class EmailContentController {
     @PostMapping(EMAIL_CONTENT_BY_USERNAMES_ROUTE)
     public void emailContentByUsernames(
             @PathVariable String contentType,
-            @RequestBody @Valid EmailContentByUsernamesParams params) {
-        emailContentDaoJpa.sendContentsByUsernames(contentType, params.getContentParentId(), params.getUsernames());
+            @Valid @RequestBody EmailContentByUsernamesParams params) {
+        emailContentDaoJpa.sendContentsByUsernames(
+                contentType,
+                params.getContentParentId(),
+                params.getHtmlContent(),
+                params.getUsernames()
+        );
     }
 
     @PostMapping(path = EMAIL_CONTENT_BY_GROUP_ROUTE)
     public void setEmailContentByGroup(
             @PathVariable String contentType,
-            @RequestBody @Valid EmailContentByGroupParams params) {
-        emailContentDaoJpa.sendContentsByGroupName(contentType, params.getContentParentId(), params.getGroupName());
+            @Valid @RequestBody EmailContentByGroupParams params) {
+        emailContentDaoJpa.sendContentsByGroupName(
+                contentType,
+                params.getContentParentId(),
+                params.getHtmlContent(),
+                params.getGroupName()
+        );
     }
 
     @PostMapping(path = EMAIL_CONTENT_BY_EMAIL_ROUTE)
     public void setEmailContentByEmails(
             @PathVariable String contentType,
-            @RequestBody @Valid EmailContentByEmailAddressesParams params) {
-        emailContentDaoJpa.sendContentsByEmails(contentType, params.getContentParentId(), params.getEmailAddresses());
+            @Valid @RequestBody EmailContentByEmailAddressesParams params) {
+        emailContentDaoJpa.sendContentsByEmails(
+                contentType,
+                params.getContentParentId(),
+                params.getHtmlContent(),
+                params.getEmailAddresses()
+        );
     }
 }
 

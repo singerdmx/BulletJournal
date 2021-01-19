@@ -29,4 +29,6 @@ public interface NoteRepository extends JpaRepository<Note, Long>, NoteRepositor
     List<Note> findNotesBetween(@Param("startTime") Timestamp startTime,
                                 @Param("endTime") Timestamp endTime,
                                 @Param("projects") List<Project> projects);
+
+    Note findByIdAndOwner(Long id, String owner);
 }

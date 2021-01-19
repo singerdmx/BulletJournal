@@ -1,6 +1,5 @@
 package com.bulletjournal.repository;
 
-import com.bulletjournal.repository.models.TaskContent;
 import com.bulletjournal.repository.models.Transaction;
 import com.bulletjournal.repository.models.TransactionContent;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,8 +17,4 @@ public interface TransactionContentRepository extends JpaRepository<TransactionC
     @Query("SELECT transactionContent FROM TransactionContent transactionContent WHERE transactionContent.updatedAt >= :startTime AND transactionContent.updatedAt <= :endTime")
     List<TransactionContent> findRecentTransactionContentsBetween(@Param("startTime") Timestamp startTime,
                                                                   @Param("endTime") Timestamp endTime);
-
-
-    @Query("SELECT transContent FROM TransactionContent transContent WHERE transContent.transaction.id IN (?1) AND transContent.owner = ?2")
-    List<TransactionContent> findAllByTransactionIdAndOwner(List<Long> transactionIds, String username);
 }

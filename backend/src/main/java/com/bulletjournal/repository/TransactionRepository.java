@@ -41,4 +41,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     List<Transaction> findTransactionsBetween(@Param("startTime") Timestamp startTime,
                                               @Param("endTime") Timestamp endTime,
                                               @Param("projects") List<Project> projects);
+
+    Transaction findByIdAndOwner(Long id, String owner);
 }

@@ -1,8 +1,6 @@
 package com.bulletjournal.controller.models;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.util.List;
 
 public class EmailContentByGroupParams {
 
@@ -10,7 +8,17 @@ public class EmailContentByGroupParams {
     private Long contentParentId;
 
     @NotBlank
+    private String htmlContent;
+
+    @NotBlank
     private String groupName;
+
+    public EmailContentByGroupParams(@NotBlank Long contentParentId, @NotBlank String htmlContent,
+                                     @NotBlank String groupName) {
+        this.contentParentId = contentParentId;
+        this.htmlContent = htmlContent;
+        this.groupName = groupName;
+    }
 
     public Long getContentParentId() {
         return contentParentId;
@@ -27,4 +35,8 @@ public class EmailContentByGroupParams {
     public void setGroupName(String groupName) {
         this.groupName = groupName;
     }
+
+    public String getHtmlContent() { return htmlContent; }
+
+    public void setHtmlContent(String htmlContent) { this.htmlContent = htmlContent; }
 }

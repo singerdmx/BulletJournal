@@ -10,8 +10,18 @@ public class EmailContentByUsernamesParams {
     @NotBlank
     private Long contentParentId;
 
+    @NotBlank
+    private String htmlContent;
+
     @NotNull
     private List<@NotBlank String> usernames;
+
+    public EmailContentByUsernamesParams(@NotBlank Long contentParentId, @NotBlank String htmlContent,
+                                         @NotNull List<@NotBlank String> usernames) {
+        this.contentParentId = contentParentId;
+        this.htmlContent = htmlContent;
+        this.usernames = usernames;
+    }
 
     public Long getContentParentId() {
         return contentParentId;
@@ -27,5 +37,13 @@ public class EmailContentByUsernamesParams {
 
     public void setUsernames(List<String> usernames) {
         this.usernames = usernames;
+    }
+
+    public String getHtmlContent() {
+        return htmlContent;
+    }
+
+    public void setHtmlContent(String htmlContent) {
+        this.htmlContent = htmlContent;
     }
 }

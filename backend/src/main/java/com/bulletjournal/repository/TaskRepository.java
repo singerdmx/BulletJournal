@@ -77,4 +77,6 @@ public interface TaskRepository extends JpaRepository<Task, Long>, TaskRepositor
 
     @Query(value = "SELECT * FROM tasks WHERE tasks.project_id in :projectIds", nativeQuery = true)
     List<Task> findTaskWithProjectId(List<Long> projectIds);
+
+    Task findByIdAndOwner(Long id, String owner);
 }
