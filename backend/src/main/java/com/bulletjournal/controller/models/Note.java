@@ -68,11 +68,12 @@ public class Note extends ProjectItem {
         if (!(o instanceof Note)) return false;
         if (!super.equals(o)) return false;
         Note note = (Note) o;
-        return Objects.equals(getSubNotes(), note.getSubNotes());
+        return Objects.equals(getSubNotes(), note.getSubNotes()) &&
+                Objects.equals(getColor(), note.getColor());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getSubNotes());
+        return Objects.hash(super.hashCode(), getSubNotes(), getColor());
     }
 }

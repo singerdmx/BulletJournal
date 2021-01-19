@@ -200,12 +200,15 @@ public class Transaction extends ProjectItem {
                 Objects.equals(getDate(), that.getDate()) &&
                 Objects.equals(getTransactionType(), that.getTransactionType()) &&
                 Objects.equals(getTime(), that.getTime()) &&
-                Objects.equals(getTimezone(), that.getTimezone());
+                Objects.equals(getTimezone(), that.getTimezone()) &&
+                Objects.equals(getColor(), that.getColor());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getPayer(), getAmount(), getDate(), getTransactionType(), getTime(), getTimezone());
+        return Objects.hash(super.hashCode(), getPayer(),
+                getAmount(), getDate(), getTransactionType(),
+                getTime(), getTimezone(), getColor());
     }
 
     public static Transaction getView(Transaction transaction) {
