@@ -13,6 +13,7 @@ import {
   deleteTransaction, deleteContent,
   getTransaction,
   updateTransactionContents,
+  updateTransactionColorSettingShown
 } from '../../features/transactions/actions';
 import { dateFormat } from '../../features/myBuJo/constants';
 // modals import
@@ -37,6 +38,7 @@ import {
   SyncOutlined,
   UpSquareOutlined,
   PlusOutlined,
+  BgColorsOutlined,
 } from '@ant-design/icons';
 import moment from 'moment';
 import DraggableLabelsList from '../../components/draggable-labels/draggable-label-list.component';
@@ -73,6 +75,9 @@ type TransactionProps = {
   deleteTransaction: (transactionId: number, type: ProjectItemUIType) => void;
   updateTransactionContents: (transactionId: number, updateDisplayMore?: boolean) => void;
   getProject: (projectId: number) => void;
+  updateTransactionColorSettingShown: (
+    visible: boolean
+  ) => void;
 };
 
 interface TransactionPageHandler {
@@ -101,7 +106,8 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
     setDisplayMore,
     setDisplayRevision,
     deleteContent,
-    getProject
+    getProject,
+    updateTransactionColorSettingShown,
   } = props;
 
   // get id of Transaction from router
@@ -255,7 +261,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
               <span>{transaction.name}</span>
             </MenuProvider>
 
-            <Menu id={`transaction${transaction.id}`}
+            <Menu id={`transaction${transaction.id}`} style={{background:bgColor}}
                   theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
                   animation={animation.zoom}>
               <CopyToClipboard
@@ -267,6 +273,10 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
                   <span>Copy Link Address</span>
                 </Item>
               </CopyToClipboard>
+              <Item onClick={() => updateTransactionColorSettingShown(true)}>
+                  <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><BgColorsOutlined/></IconFont>
+                  <span>Set Background Color</span>
+              </Item>
             </Menu>
           </>
           <DraggableLabelsList
@@ -368,5 +378,6 @@ export default connect(mapStateToProps, {
   deleteContent,
   setDisplayMore,
   setDisplayRevision,
-  getProject
+  getProject,
+  updateTransactionColorSettingShown,
 })(TransactionPage);
