@@ -151,6 +151,10 @@ export type TransactionsByPayerAction = {
   transactionsByPayer: Array<Transaction>;
 };
 
+export type UpdateTransactionColorSettingShownAction = {
+  TransactionColorSettingShown: boolean;
+};
+
 let initialState = {
   contents: [] as Array<Content>,
   transaction: undefined as Transaction | undefined,
@@ -163,6 +167,7 @@ let initialState = {
   ledgerSummaryType: LedgerSummaryType.DEFAULT,
   timezone: '',
   transactionsByPayer: [] as Array<Transaction>,
+  transactionColorSettingShown: false,
 };
 
 const slice = createSlice({
@@ -262,6 +267,13 @@ const slice = createSlice({
       if (timezone) {
         state.timezone = timezone;
       }
+    },
+    updateTransactionColorSettingShown: (
+      state,
+      action: PayloadAction<UpdateTransactionColorSettingShownAction>
+    ) => {
+      const { TransactionColorSettingShown } = action.payload;
+      state.transactionColorSettingShown = TransactionColorSettingShown;
     },
   },
 });

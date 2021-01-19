@@ -189,3 +189,6 @@ export const getTransactionsByPayer = (
 
 export const transactionReceived = (transaction: Transaction | undefined) =>
     actions.transactionReceived({transaction: transaction});
+
+export const updateTransactionColorSettingShown = (visible: boolean) =>
+    actions.updateTransactionColorSettingShown({TransactionColorSettingShown: visible});

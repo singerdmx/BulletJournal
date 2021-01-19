@@ -8,6 +8,7 @@ export interface Transaction extends ProjectItem {
   time: string;
   timezone: string;
   transactionType: number;
+  color: string | undefined;
 }
 
 export interface TransactionView extends Transaction {
