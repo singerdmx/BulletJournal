@@ -39,6 +39,9 @@ type ProjectProps = {
 type NoteProps = {
   inProject: boolean;
   setSelectedLabel: (label: Label) => void;
+  updateColorSettingShown: (
+    visible: boolean
+  ) => void;
 };
 
 type NoteManageProps = {
@@ -46,9 +49,6 @@ type NoteManageProps = {
   inModal?: boolean;
   type: ProjectItemUIType;
   deleteNote: (noteId: number, type: ProjectItemUIType) => void;
-  updateColorSettingShown: (
-    visible: boolean
-  ) => void;
 };
 
 const ManageNote: React.FC<NoteManageProps> = (props) => {
@@ -254,9 +254,9 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
                     </Item>
                 </CopyToClipboard>
                 <Item onClick={() => handleClickChangeBgColor(note.id)}>
-                  <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><BgColorsOutlined/></IconFont>
-                  <span>Set Background Color</span>
-              </Item>
+                    <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><BgColorsOutlined/></IconFont>
+                    <span>Set Background Color</span>
+                </Item>
             </Menu>
         </>
     }
