@@ -256,9 +256,9 @@ public class TransactionController {
     }
 
     @PutMapping(TRANSACTION_SET_COLOR_ROUTE)
-    public Transaction setColor(@NotNull @PathVariable Long transactionId, @RequestBody String color) {
+    public Transaction setColor(@NotNull @PathVariable Long transactionId, @RequestBody Optional<String> color) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.transactionDaoJpa.setColor(username, transactionId, color);
+        this.transactionDaoJpa.setColor(username, transactionId, color.orElse(null));
         return getTransaction(transactionId);
     }
 

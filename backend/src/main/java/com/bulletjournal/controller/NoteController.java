@@ -211,9 +211,9 @@ public class NoteController {
     }
 
     @PutMapping(NOTE_SET_COLOR_ROUTE)
-    public Note setColor(@NotNull @PathVariable Long noteId, @RequestBody String color) {
+    public Note setColor(@NotNull @PathVariable Long noteId, @RequestBody Optional<String> color) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.noteDaoJpa.setColor(username, noteId, color);
+        this.noteDaoJpa.setColor(username, noteId, color.orElse(null));
         return getNote(noteId);
     }
 

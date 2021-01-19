@@ -77,7 +77,7 @@ export function doDelete(endpoint: string, returnError = false) {
   });
 }
 
-export function doPut(endpoint: string, body: string, etag?: string) {
+export function doPut(endpoint: string, body: string | undefined, etag?: string) {
   if (process.env.DEBUG_MODE === 'DEBUG') {
     console.log(endpoint);
   }

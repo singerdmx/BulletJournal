@@ -40,10 +40,7 @@ const NoteColorSettingDialog: React.FC<NoteColorSettingProps> = (props) => {
   });
 
   useEffect(() => {
-    let show : boolean = !!note?.color
-    if (note?.color === ' ') {
-        show = false;
-    }
+    const show = !!note && !!note.color;
     setDisplayColorPicker(show);
     setBgColor(show && note?.color ? JSON.parse(note.color) : {
       r: '0',
@@ -52,14 +49,14 @@ const NoteColorSettingDialog: React.FC<NoteColorSettingProps> = (props) => {
       a: '0',
     });
     if (note) {
-      updateNotes(note?.projectId)
+      updateNotes(note.projectId);
     }
   }, [note]);
 
   const onCheckColorIcon = (e: any) => {
     setDisplayColorPicker(!displayColorPicker);
     if (!e.target.checked && note) {
-      updateNoteColor(note.id, ' ');
+      updateNoteColor(note.id, undefined);
       setBgColor({
         r: '0',
         g: '0',
