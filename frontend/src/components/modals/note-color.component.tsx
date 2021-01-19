@@ -5,7 +5,7 @@ import {IState} from '../../store';
 import {connect} from 'react-redux';
 import './modals.styles.less';
 import {BgColorsOutlined} from '@ant-design/icons';
-import {updateColorSettingShown, updateNoteColor, updateNotes} from '../../features/notes/actions';
+import {updateColorSettingShown, updateNoteColor} from '../../features/notes/actions';
 import {Button as FloatButton, darkColors, lightColors} from "react-floating-action-button";
 import {Note} from '../../features/notes/interface';
 
@@ -19,7 +19,6 @@ type NoteColorSettingProps = {
   updateColorSettingShown: (
     visible: boolean
   ) => void;
-  updateNotes: (projectId: number) => void;
 };
 
 const NoteColorSettingDialog: React.FC<NoteColorSettingProps> = (props) => {
@@ -28,7 +27,6 @@ const NoteColorSettingDialog: React.FC<NoteColorSettingProps> = (props) => {
     colorSettingShown,
     updateColorSettingShown,
     updateNoteColor,
-    updateNotes
   } = props;
   
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
@@ -48,9 +46,6 @@ const NoteColorSettingDialog: React.FC<NoteColorSettingProps> = (props) => {
       b: '0',
       a: '0',
     });
-    if (note) {
-      updateNotes(note.projectId);
-    }
   }, [note]);
 
   const onCheckColorIcon = (e: any) => {
@@ -144,5 +139,4 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
   updateColorSettingShown,
   updateNoteColor,
-  updateNotes,
 })(NoteColorSettingDialog);

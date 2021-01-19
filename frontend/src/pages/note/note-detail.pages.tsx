@@ -12,18 +12,23 @@ import './note-page.styles.less';
 import 'braft-editor/dist/index.css';
 import { ProjectType } from '../../features/project/constants';
 import DraggableLabelsList from '../../components/draggable-labels/draggable-label-list.component';
-import { Content } from '../../features/myBuJo/interface';
-import { inPublicPage } from '../../index';
+import {Content} from '../../features/myBuJo/interface';
+import {inPublicPage} from '../../index';
 import {IState} from "../../store";
 import {connect} from "react-redux";
 import {animation, IconFont, Item, Menu, MenuProvider} from "react-contexify";
 import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
 import CopyToClipboard from "react-copy-to-clipboard";
-import {CopyOutlined} from "@ant-design/icons/lib";
+import {CopyOutlined, BgColorsOutlined} from "@ant-design/icons/lib";
+import {updateColorSettingShown} from '../../features/notes/actions';
+
 
 export type NoteProps = {
   note: Note | undefined;
   contents: Content[];
+  updateColorSettingShown: (
+    visible: boolean
+  ) => void;
 };
 
 type NoteDetailProps = {
@@ -45,6 +50,7 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
     createContentElem,
     contents,
     isPublic,
+    updateColorSettingShown,
   } = props;
   useEffect(() => {
     if (note) {
@@ -75,7 +81,7 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
               <span>{note.name}</span>
             </MenuProvider>
 
-            <Menu id={`note${note.id}`}
+            <Menu id={`note${note.id}`} style={{background:bgColor}}
                   theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
                   animation={animation.zoom}>
               <CopyToClipboard
@@ -87,6 +93,10 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
                   <span>Copy Link Address</span>
                 </Item>
               </CopyToClipboard>
+              <Item onClick={() => updateColorSettingShown(true)}>
+                  <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><BgColorsOutlined/></IconFont>
+                  <span>Set Background Color</span>
+              </Item>
             </Menu>
           </>
           <DraggableLabelsList
@@ -116,4 +126,4 @@ const mapStateToProps = (state: IState) => ({
   theme: state.myself.theme,
 });
 
-export default connect(mapStateToProps, {})(NoteDetailPage);
+export default connect(mapStateToProps, {updateColorSettingShown})(NoteDetailPage);
