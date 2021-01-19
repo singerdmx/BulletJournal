@@ -50,6 +50,7 @@ public class NoteController {
     protected static final String CONTENT_ROUTE = "/api/notes/{noteId}/contents/{contentId}";
     protected static final String CONTENTS_ROUTE = "/api/notes/{noteId}/contents";
     protected static final String CONTENT_REVISIONS_ROUTE = "/api/notes/{noteId}/contents/{contentId}/revisions/{revisionId}";
+    protected static final String NOTE_EXPORT_EMAIL_ROUTE = "/api/notes/{noteId}/exportEmail";
 
     @Autowired
     private NoteDaoJpa noteDaoJpa;
@@ -327,5 +328,12 @@ public class NoteController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Revision revision = this.noteDaoJpa.getContentRevision(username, noteId, contentId, revisionId);
         return Revision.addAvatar(revision, this.userClient);
+    }
+
+    @PostMapping(NOTE_EXPORT_EMAIL_ROUTE)
+    public void exportNoteAsEmail(
+            @NotNull @PathVariable Long noteId,
+            @NotNull @RequestBody ExportProjectItemAsEmailParams exportProjectItemAsEmailParams) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
     }
 }
