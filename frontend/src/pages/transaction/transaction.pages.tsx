@@ -215,7 +215,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
 
     return (
       <Col span={12}>
-        <Card>
+        <Card style={{background: bgColor}}>
           <Statistic
             title={moment(transaction.date, dateFormat).fromNow()}
             value={`${transaction.date} ${
@@ -232,8 +232,11 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
     setLabelEditable((labelEditable) => !labelEditable);
   };
 
+  const bgColorSetting = transaction.color ? JSON.parse(transaction.color) : undefined;
+  const bgColor = bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined;
+
   return (
-    <div className="tran-page">
+    <div className="tran-page" style={{background: bgColor}}>
       <BackTop />
 
       <Tooltip
@@ -310,11 +313,11 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
         </div>
       </div>
       <Divider />
-      <div className="transaction-statistic-card">
+      <div className="transaction-statistic-card" style={{background: bgColor}}>
         <Row gutter={10}>
           {getPaymentDateTime(transaction)}
           <Col span={12}>
-            <Card>
+            <Card style={{background: bgColor}}>
               <Statistic
                 title={
                   (transaction.transactionType === 0 ? 'Income' : 'Expense') +
