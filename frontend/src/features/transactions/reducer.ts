@@ -155,6 +155,11 @@ export type UpdateTransactionColorSettingShownAction = {
   TransactionColorSettingShown: boolean;
 };
 
+export type UpdateTransactionColorAction = {
+  transactionId: number;
+  color: string | undefined;
+};
+
 let initialState = {
   contents: [] as Array<Content>,
   transaction: undefined as Transaction | undefined,
@@ -275,6 +280,10 @@ const slice = createSlice({
       const { TransactionColorSettingShown } = action.payload;
       state.transactionColorSettingShown = TransactionColorSettingShown;
     },
+    updateTransactionColor: (
+      state,
+      action: PayloadAction<UpdateTransactionColorAction>
+    ) => state,
   },
 });
 

@@ -60,6 +60,7 @@ import CopyToClipboard from "react-copy-to-clipboard";
 import {getProject} from "../../features/project/actions";
 import {Project} from "../../features/project/interface";
 import {contentEditable} from "../note/note.pages";
+import TransactionColorSettingDialog from '../../components/modals/transaction-color.component';
 
 const LocaleCurrency = require('locale-currency');
 
@@ -167,6 +168,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
       >
         <UpSquareOutlined/>
       </FloatButton>
+      <TransactionColorSettingDialog />
       <FloatButton
           tooltip="Refresh Contents"
           onClick={handleRefresh}

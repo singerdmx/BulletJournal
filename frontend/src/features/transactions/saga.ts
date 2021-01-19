@@ -18,6 +18,7 @@ import {
   UpdateTransactionContentRevision,
   UpdateTransactionContents,
   UpdateTransactions,
+  UpdateTransactionColorAction,
 } from './reducer';
 import { IState } from '../../store';
 import { PayloadAction } from 'redux-starter-kit';
@@ -36,8 +37,9 @@ import {
   shareTransactionWithOther,
   updateContent,
   updateTransaction,
+  putTransactionColor,
 } from '../../apis/transactionApis';
-import { LedgerSummary } from './interface';
+import { LedgerSummary, Transaction } from './interface';
 import { getProjectItemsAfterUpdateSelect } from '../myBuJo/actions';
 import { updateTransactionContents } from './actions';
 import { Content, ProjectItems, Revision } from '../myBuJo/interface';
@@ -647,6 +649,27 @@ function* getTransactionsByPayer(
   }
 }
 
+function* updateTransactionColor(
+  action: PayloadAction<UpdateTransactionColorAction>
+) {
+  try {
+    const {transactionId, color} = action.payload;
+    const data : Transaction = yield call(
+      putTransactionColor,
+      transactionId,
+      color,
+    );
+
+    yield put(transactionsActions.transactionReceived({transaction: data}));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Set Transaction Color Fail: ${error}`);
+    }
+  }
+}
+
 export default function* transactionSagas() {
   yield all([
     yield takeLatest(
@@ -706,6 +729,10 @@ export default function* transactionSagas() {
     yield takeLatest(
       transactionsActions.getTransactionsByPayer.type,
       getTransactionsByPayer
+    ),
+    yield takeLatest(
+      transactionsActions.updateTransactionColor.type, 
+      updateTransactionColor
     ),
   ]);
 }

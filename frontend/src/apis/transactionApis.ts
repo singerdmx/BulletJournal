@@ -232,3 +232,12 @@ export const getContentRevision = (
       throw Error(err.message);
     });
 };
+
+export const putTransactionColor = (transactionId: number, color: string | undefined) => {
+  return doPut(`/api/transactions/${transactionId}/setColor`, color)
+    .then((res) => res.json())
+    .catch((err) => {
+      throw Error(err.message);
+    });
+};
+

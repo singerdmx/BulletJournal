@@ -5,7 +5,7 @@ import {IState} from '../../store';
 import {connect} from 'react-redux';
 import './modals.styles.less';
 import {BgColorsOutlined} from '@ant-design/icons';
-import {updateTransactionColorSettingShown} from '../../features/transactions/actions';
+import {updateTransactionColorSettingShown, updateTransactionColor} from '../../features/transactions/actions';
 import {Button as FloatButton, darkColors, lightColors} from "react-floating-action-button";
 import {Transaction} from '../../features/transactions/interface';
 
@@ -132,11 +132,11 @@ const TransactionColorSettingDialog: React.FC<TransactionColorSettingProps> = (p
 };
 
 const mapStateToProps = (state: IState) => ({
-  note: state.transaction.transaction,
-  colorSettingShown: state.transaction.transactionColorSettingShown,
+  transaction: state.transaction.transaction,
+  transactionColorSettingShown: state.transaction.transactionColorSettingShown,
 });
 
 export default connect(mapStateToProps, {
   updateTransactionColorSettingShown,
-  // updateTransactionColor,
+  updateTransactionColor,
 })(TransactionColorSettingDialog);

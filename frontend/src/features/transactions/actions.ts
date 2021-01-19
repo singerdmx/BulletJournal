@@ -192,3 +192,12 @@ export const transactionReceived = (transaction: Transaction | undefined) =>
 
 export const updateTransactionColorSettingShown = (visible: boolean) =>
     actions.updateTransactionColorSettingShown({TransactionColorSettingShown: visible});
+
+export const updateTransactionColor = (
+  transactionId: number,
+  color: string | undefined
+) =>
+  actions.updateTransactionColor({ 
+    transactionId: transactionId,
+    color: color,
+  });
