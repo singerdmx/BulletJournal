@@ -2,8 +2,8 @@ import React from 'react';
 import {Link, useHistory} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {Avatar, message, Popconfirm, Popover, Tag, Tooltip} from 'antd';
-import {CreditCardOutlined, DeleteTwoTone, DollarOutlined, MoreOutlined,} from '@ant-design/icons';
-import {deleteTransaction} from '../../features/transactions/actions';
+import {CreditCardOutlined, DeleteTwoTone, DollarOutlined, MoreOutlined, BgColorsOutlined,} from '@ant-design/icons';
+import {deleteTransaction, updateTransactionColorSettingShown} from '../../features/transactions/actions';
 import {Label, stringToRGB} from '../../features/label/interface';
 import {Transaction} from '../../features/transactions/interface';
 import './project-item.styles.less';
@@ -29,6 +29,9 @@ type TransactionProps = {
   theme: string;
   setSelectedLabel: (label: Label) => void;
   showModal?: (user: User) => void;
+  updateTransactionColorSettingShown: (
+    visible: boolean
+  ) => void;
 };
 
 type TransactionManageProps = {
@@ -87,7 +90,7 @@ const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
 };
 
 const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (props) => {
-  const { transaction, theme, deleteTransaction, inModal, inProject, showModal, type, setSelectedLabel } = props;
+  const { transaction, theme, deleteTransaction, inModal, inProject, showModal, type, setSelectedLabel, updateTransactionColorSettingShown } = props;
   // hook history in router
   const history = useHistory();
   // jump to label searching page by label click
@@ -201,6 +204,11 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
         </div>;
     }
 
+    const handleClickChangeBgColor = (noteId: number) => {
+      history.push(`/transaction/${noteId}`);
+      updateTransactionColorSettingShown(true);
+    }
+
     const getProjectItemContentWithMenu = () => {
         if (inModal === true) {
             return getProjectItemContentDiv()
@@ -211,7 +219,7 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
                 {getProjectItemContentDiv()}
             </MenuProvider>
 
-            <Menu id={`transaction${transaction.id}`}
+            <Menu id={`transaction${transaction.id}`} style={{background:bgColor}}
                   theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
                   animation={animation.zoom}>
                 <CopyToClipboard
@@ -223,12 +231,19 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
                         <span>Copy Link Address</span>
                     </Item>
                 </CopyToClipboard>
+                <Item onClick={() => handleClickChangeBgColor(transaction.id)}>
+                    <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><BgColorsOutlined/></IconFont>
+                    <span>Set Background Color</span>
+                </Item>
             </Menu>
         </>;
     }
 
+    const bgColorSetting = transaction.color ? JSON.parse(transaction.color) : undefined;
+    const bgColor = bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined;
+
     return (
-        <div className='project-item'>
+        <div className='project-item' style={{background: bgColor}}>
             {getProjectItemContentWithMenu()}
             <div className='project-control'>
                 <div className='project-item-owner'>
@@ -272,4 +287,5 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
   deleteTransaction,
   setSelectedLabel,
+  updateTransactionColorSettingShown,
 })(TransactionItem);
