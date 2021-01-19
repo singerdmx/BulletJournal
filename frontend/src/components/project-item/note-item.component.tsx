@@ -247,8 +247,11 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
         </>
     }
 
+    const bgColorSetting = note.color && note.color != ' ' ? JSON.parse(note.color) : undefined;
+    const bgColor = bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined;
+
     return (
-        <div className="project-item">
+        <div className="project-item" style={{background: bgColor}}>
             {getProjectItemContentWithMenu()}
             <div className="project-control">
                 <div style={{marginLeft: '5px'}}>
