@@ -12,7 +12,7 @@ import {
   TimePicker,
   Tooltip,
 } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import {PlusOutlined, SyncOutlined} from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { RouteComponentProps, withRouter, useParams } from 'react-router';
 import {
@@ -305,6 +305,12 @@ const AddTransaction: React.FC<
   return (
     <div>
       <Container>
+        <FloatButton
+            tooltip="Manage Recurring Transactions"
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
+        >
+          <SyncOutlined spin />
+        </FloatButton>
         {props.project && props.project.owner.name === props.myself && <ProjectSettingDialog />}
         <FloatButton
             tooltip="Add New Transaction"
