@@ -63,6 +63,12 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
     @Column
     private String color;
 
+    @Column(name = "recurrence_rule")
+    private String recurrenceRule;
+
+    @Column(name = "deleted_slots", columnDefinition = "TEXT")
+    private String deletedSlots;
+
     public Long getId() {
         return id;
     }
@@ -143,6 +149,27 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
         this.color = color;
     }
 
+    public String getRecurrenceRule() {
+        return recurrenceRule;
+    }
+
+    public void setRecurrenceRule(String recurrenceRule) {
+        this.recurrenceRule = recurrenceRule;
+    }
+
+    public String getDeletedSlots() {
+        return deletedSlots;
+    }
+
+    public void setDeletedSlots(String deletedSlots) {
+        this.deletedSlots = deletedSlots;
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
     @Override
     public com.bulletjournal.controller.models.Transaction toPresentationModel() {
         return this.toPresentationModel(this.getLabels().stream()
@@ -167,7 +194,8 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
                 this.getUpdatedAt().getTime(),
                 labels,
                 this.getLocation(),
-                this.getColor());
+                this.getColor(),
+                this.getRecurrenceRule());
     }
 
     @Override

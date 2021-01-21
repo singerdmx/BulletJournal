@@ -42,6 +42,8 @@ public class Transaction extends ProjectItem {
 
     private String color;
 
+    private String recurrenceRule;
+
     public Transaction() {
     }
 
@@ -59,7 +61,8 @@ public class Transaction extends ProjectItem {
                        @NotNull Long updatedAt,
                        List<Label> labels,
                        String location,
-                       String color) {
+                       String color,
+                       String recurrenceRule) {
         super(id, name, owner, project, labels, location);
         this.payer = payer;
         this.amount = amount;
@@ -70,6 +73,7 @@ public class Transaction extends ProjectItem {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.color = color;
+        this.recurrenceRule = recurrenceRule;
         getView(this);
     }
 
@@ -155,6 +159,14 @@ public class Transaction extends ProjectItem {
         this.color = color;
     }
 
+    public String getRecurrenceRule() {
+        return recurrenceRule;
+    }
+
+    public void setRecurrenceRule(String recurrenceRule) {
+        this.recurrenceRule = recurrenceRule;
+    }
+
     public String getReadableYearMonth() {
         String month = Month.of(Integer.parseInt(this.getMonth())).name();
         return this.getYear() + " " + month;
@@ -201,7 +213,8 @@ public class Transaction extends ProjectItem {
                 Objects.equals(getTransactionType(), that.getTransactionType()) &&
                 Objects.equals(getTime(), that.getTime()) &&
                 Objects.equals(getTimezone(), that.getTimezone()) &&
-                Objects.equals(getColor(), that.getColor());
+                Objects.equals(getColor(), that.getColor()) &&
+                Objects.equals(getRecurrenceRule(), that.getRecurrenceRule());
     }
 
     @Override

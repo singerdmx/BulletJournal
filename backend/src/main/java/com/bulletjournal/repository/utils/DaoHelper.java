@@ -3,6 +3,7 @@ package com.bulletjournal.repository.utils;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.daemon.models.ReminderRecord;
 import com.bulletjournal.repository.models.Task;
+import com.bulletjournal.repository.models.Transaction;
 import com.bulletjournal.util.BuJoRecurrenceRule;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.StringUtils;
@@ -59,6 +60,45 @@ public class DaoHelper {
         return map;
     }
 
+    /**
+     * Fetch all recurring within [startTime, endTime] based on transaction's recurrence rule
+     *
+     * @param transaction the target transaction contains recurrence rule
+     * @param startTime the requested time range starting time
+     * @param endTime   the requested time range ending time
+     * @return List<Task> - a list of task based on recurrence rule
+     */
+    public static List<Transaction> getRecurringTransaction(Transaction transaction, ZonedDateTime startTime, ZonedDateTime endTime) {
+        try {
+            DateTime startDateTime = ZonedDateTimeHelper.getDateTime(startTime);
+            DateTime endDateTime = ZonedDateTimeHelper.getDateTime(endTime);
+
+            List<Transaction> recurringTransactionsBetween = new ArrayList<>();
+            String recurrenceRule = transaction.getRecurrenceRule();
+            String timezone = transaction.getTimezone();
+            Set<String> deletedSlots = ZonedDateTimeHelper.parseDateTimeSet(transaction.getDeletedSlots());
+
+            BuJoRecurrenceRule rule = new BuJoRecurrenceRule(recurrenceRule, timezone);
+            RecurrenceRuleIterator it = rule.getIterator();
+
+            while (it.hasNext()) {
+                DateTime currDateTime = it.nextDateTime();
+                if (currDateTime.after(endDateTime)) {
+                    break;
+                }
+                if (currDateTime.before(startDateTime) || deletedSlots.contains(currDateTime.toString())) {
+                    continue;
+                }
+                Transaction cloned = cloneTransactionWithDateTime(transaction, timezone, currDateTime);
+                recurringTransactionsBetween.add(cloned);
+            }
+            return recurringTransactionsBetween;
+        } catch (InvalidRecurrenceRuleException | NumberFormatException e) {
+            throw new IllegalArgumentException("Recurrence rule format invalid");
+        } catch (CloneNotSupportedException e) {
+            throw new IllegalStateException("Clone new Task failed");
+        }
+    }
 
     /**
      * Fetch all recurring within [startTime, endTime] based on task's recurrence rule
@@ -115,6 +155,42 @@ public class DaoHelper {
         } catch (CloneNotSupportedException e) {
             throw new IllegalStateException("Clone new Task failed");
         }
+    }
+
+    /**
+     * Clone a new transaction and set RFC 5545 DateTime as its [DueDate, DueTime] and [StartTime, EndTime]
+     * Only used for recurring transaction
+     * @param transaction  the target transaction needs to cloned
+     * @param timezone     the target timezone for cloned task's due date and due time
+     * @param currDateTime the RFC 5545 DateTime Object contains timing information
+     * @return Transaction a transaction cloned from original task with new Due DateTime and Timezone
+     * @throws CloneNotSupportedException
+     */
+    private static Transaction cloneTransactionWithDateTime(Transaction transaction, String timezone, DateTime currDateTime) throws CloneNotSupportedException {
+        if (StringUtils.isBlank(transaction.getRecurrenceRule())) {
+            LOGGER.error("Transaction {} does not have RecurrenceRule", transaction);
+            throw new IllegalArgumentException("Transaction " + transaction.getId() + " does not have RecurrenceRule");
+        }
+        Transaction cloned = (Transaction) transaction.clone();
+
+        String defaultDate = ZonedDateTimeHelper.getDate(currDateTime);
+        String defaultTime = ZonedDateTimeHelper.getTime(currDateTime);
+
+        // Shift to task's timezone
+        ZonedDateTime targetDate = ZonedDateTimeHelper.getStartTime(defaultDate, defaultTime, timezone);
+        ZonedDateTime targetTime = ZonedDateTimeHelper.getEndTime(defaultDate, defaultTime, timezone);
+
+        // Set due date and time
+        cloned.setDate(ZonedDateTimeHelper.getDate(targetDate));
+        cloned.setTime(ZonedDateTimeHelper.getTime(targetTime));
+
+        // Set start time and end time
+        cloned.setStartTime(Timestamp.from(targetDate.toInstant()));
+        cloned.setEndTime(Timestamp.from(targetTime.toInstant()));
+
+        // Set timezone
+        cloned.setTimezone(timezone);
+        return cloned;
     }
 
     /**

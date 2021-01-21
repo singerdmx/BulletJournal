@@ -41,4 +41,20 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     List<Transaction> findTransactionsBetween(@Param("startTime") Timestamp startTime,
                                               @Param("endTime") Timestamp endTime,
                                               @Param("projects") List<Project> projects);
+
+    @Query("SELECT transaction FROM Transaction transaction where transaction.project = :project AND "
+            + "transaction.recurrenceRule IS NOT NULL")
+    List<Transaction> findRecurringTransactionsByProject(@Param("project") Project project);
+
+    @Query(value = "SELECT transaction FROM Transaction transaction WHERE transaction.payer = :payer AND " +
+            "transaction.project IN (:projects) AND transaction.recurrenceRule IS NOT NULL")
+    List<Transaction> findRecurringTransactionsOfPayer(@Param("payer") String payer, @Param("projects") List<Project> projects);
+
+    @Query("SELECT transaction FROM Transaction transaction where transaction.project = :project AND transaction.payer = :payer AND "
+            + "transaction.recurrenceRule IS NOT NULL")
+    List<Transaction> findRecurringTransactionsInProjectByPayer(@Param("payer") String payer, @Param("project") Project project);
+
+    @Query(value = "SELECT transaction FROM Transaction transaction WHERE " +
+            "transaction.project IN (:projects) AND transaction.recurrenceRule IS NOT NULL")
+    List<Transaction> findRecurringTransactions(@Param("projects") List<Project> projects);
 }
