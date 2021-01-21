@@ -120,15 +120,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
             String payer, ZonedDateTime startTime, ZonedDateTime endTime, List<Project> projects) {
         List<Transaction> result = this.transactionRepository.findTransactionsOfPayerBetween(payer, Timestamp.from(startTime.toInstant()),
                 Timestamp.from(endTime.toInstant()), projects);
-        result.addAll(this.getRecurringTransactionsOfPayer(payer, projects, startTime, endTime));
+        result.addAll(this.getRecurringTransactions(startTime, endTime, projects, Optional.of(payer)));
         return result;
-    }
-
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Transaction> getRecurringTransactionsOfPayer(
-            String payer, List<Project> projects, ZonedDateTime startTime, ZonedDateTime endTime) {
-        List<Transaction> recurringTasks = this.transactionRepository.findRecurringTransactionsOfPayer(payer, projects);
-        return getRecurringTransactions(recurringTasks, startTime, endTime);
     }
 
     private List<Transaction> getRecurringTransactions(
@@ -175,15 +168,6 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<com.bulletjournal.controller.models.Transaction> getRecurringTransactionsByProjects(List<Project> projects) {
-        List<Transaction> transactions = this.transactionRepository.findRecurringTransactions(projects);
-        return transactions.stream().map(t -> {
-            List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
-            return t.toPresentationModel(labels);
-        }).collect(Collectors.toList());
-    }
-
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Transaction> getTransactionsByPayer(Long projectId,
                                                                                         String requester, String payer, ZonedDateTime startTime, ZonedDateTime endTime) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
@@ -211,17 +195,25 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Transaction> getRecurringTransactions(
             ZonedDateTime startTime, ZonedDateTime endTime, List<Project> projects, Optional<String> payer) {
+        List<Transaction> recurringTransactions;
         if (payer.isPresent()) {
-            return this.getRecurringTransactionsOfPayer(payer.get(), projects, startTime, endTime);
+            recurringTransactions = this.transactionRepository
+                    .findRecurringTransactionsOfPayer(payer.get(), projects);
+        } else {
+            recurringTransactions = this.transactionRepository.findRecurringTransactions(projects);
         }
-        return Collections.emptyList();
+        return getRecurringTransactions(recurringTransactions, startTime, endTime);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Transaction> getRecurringTransactions(
             String requester, Long projectId) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
-        return this.getRecurringTransactionsByProjects(Collections.singletonList(project));
+        List<Transaction> transactions = this.transactionRepository.findRecurringTransactionsByProject(project);
+        return transactions.stream().map(t -> {
+            List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
+            return t.toPresentationModel(labels);
+        }).collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
