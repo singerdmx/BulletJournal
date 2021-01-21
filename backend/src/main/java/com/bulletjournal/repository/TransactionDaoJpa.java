@@ -27,10 +27,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -167,6 +164,27 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
             List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
             return t.toPresentationModel(labels);
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * Get all recurrent transactions paid by payer (optional) in [startTime, endTime]
+     *
+     * @param payer  the payer of recurrent transaction
+     * @param startTime the requested range start time
+     * @param endTime   the requested range end time
+     * @return List<Transaction> - a list of recurrent transactions within the time range
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Transaction> getRecurringTransactions(
+            ZonedDateTime startTime, ZonedDateTime endTime, List<Project> projects, Optional<String> payer) {
+        return Collections.emptyList();
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<com.bulletjournal.controller.models.Transaction> getRecurringTransactions(
+            String requester, Long projectId) {
+        Project project = this.projectDaoJpa.getProject(projectId, requester);
+        return Collections.emptyList();
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

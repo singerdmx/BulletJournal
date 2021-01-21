@@ -79,7 +79,8 @@ public class TransactionController {
 
     @GetMapping(RECURRING_TRANSACTIONS_ROUTE)
     public List<Transaction> getRecurringTransactions(@NotNull @PathVariable Long projectId) {
-        return Collections.emptyList();
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return this.transactionDaoJpa.getRecurringTransactions(username, projectId);
     }
 
     @GetMapping(TRANSACTIONS_ROUTE)
