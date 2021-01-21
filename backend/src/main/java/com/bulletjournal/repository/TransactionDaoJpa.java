@@ -196,6 +196,9 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Transaction> getRecurringTransactions(
             ZonedDateTime startTime, ZonedDateTime endTime, List<Project> projects, Optional<String> payer) {
+        if (payer.isPresent()) {
+            return this.getRecurringTransactionsOfPayer(payer.get(), projects, startTime, endTime);
+        }
         return Collections.emptyList();
     }
 
