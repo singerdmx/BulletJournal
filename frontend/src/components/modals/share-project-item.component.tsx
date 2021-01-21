@@ -104,7 +104,7 @@ const ShareProjectItem: React.FC<ProjectItemProps> = (props) => {
                 projectItemId={props.projectItemId}
               />
             </TabPane>
-            <TabPane
+            {props.type === ProjectType.LEDGER ? null : <TabPane
               tab={
                 <Tooltip title='Link'>
                   <LinkOutlined className='large-icon' />
@@ -116,8 +116,8 @@ const ShareProjectItem: React.FC<ProjectItemProps> = (props) => {
                 type={props.type}
                 projectItemId={props.projectItemId}
               />
-            </TabPane>
-            <TabPane
+            </TabPane>}
+            {props.type === ProjectType.LEDGER ? null : <TabPane
               tab={
                 <Tooltip title='Manage'>
                   <ToolOutlined className='large-icon' />
@@ -129,7 +129,7 @@ const ShareProjectItem: React.FC<ProjectItemProps> = (props) => {
                 type={props.type}
                 projectItemId={props.projectItemId}
               />
-            </TabPane>
+            </TabPane>}
             <TabPane
               tab={
                 <Tooltip title={`Email ${getProjectItemType(props.type).toLocaleLowerCase()} to others`}>

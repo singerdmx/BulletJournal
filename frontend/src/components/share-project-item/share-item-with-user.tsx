@@ -43,7 +43,7 @@ const ShareProjectItemWithUser: React.FC<UserProps & ProjectItemProps> = (
   props
 ) => {
   const [form] = Form.useForm();
-  const { user } = props;
+  const { user, type } = props;
   const searchUser = (value: string) => {
     props.updateUser(value);
     props.clearUser();
@@ -90,7 +90,7 @@ const ShareProjectItemWithUser: React.FC<UserProps & ProjectItemProps> = (
           <List>
             <List.Item
               actions={[
-                <Button
+                type === ProjectType.LEDGER ? null : <Button style={{marginRight: '16px'}}
                   type="primary"
                   htmlType="submit"
                   onClick={() =>
@@ -103,6 +103,13 @@ const ShareProjectItemWithUser: React.FC<UserProps & ProjectItemProps> = (
                   }
                 >
                   Share
+                </Button>,
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  onClick={() => console.log('send email')}
+                >
+                  Send Email
                 </Button>,
               ]}
             >

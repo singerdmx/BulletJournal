@@ -11,6 +11,7 @@ import moment from 'moment-timezone';
 import {IState} from '../../store';
 import {ProjectItemUIType, ProjectType} from '../../features/project/constants';
 //import modal
+import ShareProjectItem from '../modals/share-project-item.component';
 import MoveProjectItem from '../modals/move-project-item.component';
 import EditTransaction from '../modals/edit-transaction.component';
 import {getIcon, getItemIcon,} from '../draggable-labels/draggable-label-list.component';
@@ -71,6 +72,11 @@ const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
         type={ProjectType.LEDGER}
         projectItemId={transaction.id}
         mode='div'
+      />
+      <ShareProjectItem
+        type={ProjectType.LEDGER}
+        projectItemId={transaction.id}
+        mode="div"
       />
       <Popconfirm
         title='Are you sure?'

@@ -100,7 +100,7 @@ const ShareProjectItemWithGroup: React.FC<GroupProps & ProjectItemProps> = (
             </Select>
           </Form.Item>
           <Form.Item>
-            <Button
+            {props.type === ProjectType.LEDGER ? null : <Button style={{marginRight: '16px'}}
               type="primary"
               htmlType="submit"
               onClick={() =>
@@ -113,6 +113,13 @@ const ShareProjectItemWithGroup: React.FC<GroupProps & ProjectItemProps> = (
               }
             >
               Share
+            </Button>}
+            <Button
+              type="primary"
+              htmlType="submit"
+              onClick={() => console.log('send email')}
+            >
+              Send Email
             </Button>
           </Form.Item>
         </Form>
