@@ -124,11 +124,11 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         return getRecurringTransactions(recurringTasks, startTime, endTime);
     }
 
-    public List<Transaction> getRecurringTransactions(List<Transaction> recurrentTransactions, ZonedDateTime startTime, ZonedDateTime endTime) {
+    public List<Transaction> getRecurringTransactions(List<Transaction> targetTransactions, ZonedDateTime startTime, ZonedDateTime endTime) {
         List<Transaction> recurringTransactionsBetween = new ArrayList<>();
 
-        for (Transaction t : recurrentTransactions) {
-            List<Transaction> recurringTransactions = DaoHelper.getRecurringTransaction(t, startTime, endTime);
+        for (Transaction transaction : targetTransactions) {
+            List<Transaction> recurringTransactions = DaoHelper.getRecurringTransaction(transaction, startTime, endTime);
             recurringTransactionsBetween.addAll(recurringTransactions);
         }
 
@@ -168,7 +168,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Transaction> getTransactionsByPayer(Long projectId,
-            String requester, String payer, ZonedDateTime startTime, ZonedDateTime endTime) {
+                                                                                        String requester, String payer, ZonedDateTime startTime, ZonedDateTime endTime) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
         if (project.isShared()) {
             return Collections.emptyList();
@@ -186,7 +186,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     /**
      * Get all recurrent transactions paid by payer (optional) in [startTime, endTime]
      *
-     * @param payer  the payer of recurrent transaction
+     * @param payer     the payer of recurrent transaction
      * @param startTime the requested range start time
      * @param endTime   the requested range end time
      * @return List<Transaction> - a list of recurrent transactions within the time range
@@ -206,7 +206,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Pair<List<Event>, Transaction> partialUpdate(String requester, Long transactionId,
-            UpdateTransactionParams updateTransactionParams) {
+                                                        UpdateTransactionParams updateTransactionParams) {
         Transaction transaction = this.getProjectItem(transactionId, requester);
 
         this.authorizationService.checkAuthorizedToOperateOnContent(transaction.getOwner(), requester,
@@ -259,7 +259,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     }
 
     private List<Event> updatePayer(String requester, Long transactionId,
-            UpdateTransactionParams updateTransactionParams, Transaction transaction) {
+                                    UpdateTransactionParams updateTransactionParams, Transaction transaction) {
         List<Event> events = new ArrayList<>();
 
         if (!updateTransactionParams.hasPayer())
