@@ -9,7 +9,7 @@ import {
 import { connect } from 'react-redux';
 import { IState } from '../../store';
 import { shareTask } from '../../features/tasks/actions';
-import { shareNote } from '../../features/notes/actions';
+import { shareNoteByEmail } from '../../features/notes/actions';
 import {
   getProjectItemType,
   ProjectType,
@@ -17,10 +17,19 @@ import {
 import { clearUser, updateUser } from '../../features/user/actions';
 import './share-item-modal.styles.less';
 import './share-item-by-email.styles.less'
+import { Content } from '../../features/myBuJo/interface';
 
 type ProjectItemProps = {
   type: ProjectType;
   projectItemId: number;
+  shareNoteByEmail: (
+    noteId: number,
+    content: Content | undefined,
+    targetUser?: string,
+    targetGroup?: number,
+    emails?: string[],
+  ) => void;
+  content: Content | undefined;
 };
 
 const ShareProjectItemByEmail: React.FC<ProjectItemProps> = (
@@ -57,7 +66,15 @@ const ShareProjectItemByEmail: React.FC<ProjectItemProps> = (
           </div>
           <div>
               <Tooltip title='Send email'>
-                  <SendOutlined onClick={()=> console.log('send')}/>
+                  <SendOutlined 
+                  onClick={()=> {
+                    props.shareNoteByEmail(
+                      props.projectItemId, 
+                      props.content,
+                      undefined,
+                      undefined,
+                      inputList);
+                  }} />
               </Tooltip>
           </div>
       </div>
@@ -96,11 +113,9 @@ const ShareProjectItemByEmail: React.FC<ProjectItemProps> = (
 
 const mapStateToProps = (state: IState) => ({
   user: state.user,
+  content: state.content.content
 });
 
 export default connect(mapStateToProps, {
-  shareTask,
-  shareNote,
-  updateUser,
-  clearUser,
+  shareNoteByEmail,
 })(ShareProjectItemByEmail);

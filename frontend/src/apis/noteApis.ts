@@ -1,5 +1,8 @@
 import {doDelete, doFetch, doPatch, doPost, doPut} from './api-helper';
 import {Note} from '../features/notes/interface';
+import {Content} from '../features/myBuJo/interface';
+import {createHTML} from '../components/content/content-item.component';
+import Quill from "quill";
 
 export const fetchNotes = (
   projectId: number,
@@ -228,5 +231,27 @@ export const putNoteColor = (noteId: number, color: string | undefined) => {
     .then((res) => res.json())
     .catch((err) => {
       throw Error(err.message);
+    });
+};
+
+export const shareNoteByEmail = (
+  noteId: number,
+  content?: Content,
+  targetUser?: string,
+  targetGroup?: number,
+  emails?: string[],
+) => {
+  const Delta = Quill.import('delta');
+  const contentHTML = content ? createHTML(new Delta(JSON.parse(content.text)['delta'])) : undefined;
+  const postBody = JSON.stringify({
+    targetUser: targetUser,
+    targetGroup: targetGroup,
+    emails: emails,
+    content: contentHTML,
+  });
+  return doPost(`/api/notes/${noteId}/exportEmail`, postBody)
+    .then((res) => (res))
+    .catch((err) => {
+      throw Error(err);
     });
 };
