@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
-import { Button, Input, Result } from 'antd';
-import { CloseOutlined, MailOutlined } from '@ant-design/icons';
+import {Input, Result, Tooltip} from 'antd';
+import {
+    CloseCircleOutlined,
+    ExportOutlined,
+    PlusCircleOutlined,
+    SendOutlined
+} from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
 import { shareTask } from '../../features/tasks/actions';
@@ -53,14 +58,16 @@ const ShareProjectItemByEmail: React.FC<ProjectItemProps> = (
   return (
     <div>
       <div className='button-drawer'>
-          <div className="add-drawer">
-              <Button onClick={() => handleAdd()}>
-                  Add More
-              </Button></div>
-          <div className="send-drawer">
-              <Button type="primary" onClick={()=> console.log('send')}>
-                  Send Email
-              </Button></div>
+          <div>
+              <Tooltip title='Add more recipients'>
+                  <PlusCircleOutlined onClick={() => handleAdd()}/>
+              </Tooltip>
+          </div>
+          <div>
+              <Tooltip title='Send email'>
+                  <SendOutlined onClick={()=> console.log('send')}/>
+              </Tooltip>
+          </div>
       </div>
       <div className='email-drawer'>
           {inputList.map((input, id) => {
@@ -69,15 +76,15 @@ const ShareProjectItemByEmail: React.FC<ProjectItemProps> = (
                       <div className="input-drawer">
                           <Input
                               type="text"
-                              placeholder=""
+                              placeholder="Recipient's email address"
                               value={input}
                               onChange={e => handleChange(id, e)}
                           />
                       </div>
                       <div className="remove-drawer">
-                          <Button onClick={() => handleRemove(id)}>
-                              <CloseOutlined />
-                          </Button>
+                          <Tooltip title='Remove this recipient'>
+                              <CloseCircleOutlined onClick={() => handleRemove(id)}/>
+                          </Tooltip>
                       </div>
                   </div>
               );
@@ -85,7 +92,7 @@ const ShareProjectItemByEmail: React.FC<ProjectItemProps> = (
       </div>
       <div className="share-info">
         <Result
-          icon={<MailOutlined />}
+          icon={<ExportOutlined />}
           title={`Share ${getProjectItemType(
             props.type
           ).toLocaleLowerCase()} by email`}

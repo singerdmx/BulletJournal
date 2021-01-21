@@ -132,7 +132,7 @@ const ShareProjectItem: React.FC<ProjectItemProps> = (props) => {
             </TabPane>
             <TabPane
               tab={
-                <Tooltip title='Email'>
+                <Tooltip title={`Email ${getProjectItemType(props.type).toLocaleLowerCase()} to others`}>
                   <MailOutlined className='large-icon' />
                 </Tooltip>
               }
