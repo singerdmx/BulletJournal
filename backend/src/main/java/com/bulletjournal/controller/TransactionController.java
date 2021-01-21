@@ -47,6 +47,7 @@ import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 @RestController
 public class TransactionController {
     protected static final String TRANSACTIONS_ROUTE = "/api/projects/{projectId}/transactions";
+    protected static final String RECURRING_TRANSACTIONS_ROUTE = "/api/projects/{projectId}/recurringTransactions";
     protected static final String TRANSACTION_ROUTE = "/api/transactions/{transactionId}";
     protected static final String TRANSACTION_SET_LABELS_ROUTE = "/api/transactions/{transactionId}/setLabels";
     protected static final String TRANSACTION_SET_COLOR_ROUTE = "/api/transactions/{transactionId}/setColor";
@@ -75,6 +76,11 @@ public class TransactionController {
 
     @Autowired
     private UserClient userClient;
+
+    @GetMapping(RECURRING_TRANSACTIONS_ROUTE)
+    public List<Transaction> getRecurringTransactions(@NotNull @PathVariable Long projectId) {
+        return Collections.emptyList();
+    }
 
     @GetMapping(TRANSACTIONS_ROUTE)
     public ResponseEntity<?> getTransactions(@NotNull @PathVariable Long projectId,
