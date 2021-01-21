@@ -206,7 +206,7 @@ public class TransactionController {
         List<String> deleteESDocumentIds = this.transactionDaoJpa.getDeleteESDocumentIdsForProjectItem(username, transactionId);
 
         Pair<List<Event>, com.bulletjournal.repository.models.Transaction> res = this.transactionDaoJpa
-                .delete(username, transactionId);
+                .delete(username, transactionId, dateTime.orElse(null));
         List<Event> events = res.getLeft();
         Long projectId = res.getRight().getProject().getId();
         String transactionName = res.getRight().getName();

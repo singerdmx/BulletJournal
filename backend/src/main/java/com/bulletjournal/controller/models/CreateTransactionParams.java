@@ -35,12 +35,14 @@ public class CreateTransactionParams {
 
     private String location;
 
+    private String recurrenceRule;
+
     public CreateTransactionParams() {
     }
 
     public CreateTransactionParams(@NotBlank @Size(min = 1, max = 100) String name, @NotBlank String payer,
             @NotNull Double amount, @NotBlank @Size(min = 10, max = 10) String date, String time,
-            @NotBlank String timezone, @NotNull Integer transactionType) {
+            @NotBlank String timezone, @NotNull Integer transactionType, String recurrenceRule) {
         this.name = name;
         this.payer = payer;
         this.amount = amount;
@@ -48,6 +50,7 @@ public class CreateTransactionParams {
         this.time = time;
         this.timezone = timezone;
         this.transactionType = transactionType;
+        this.recurrenceRule = recurrenceRule;
     }
 
     public String getName() {
@@ -120,5 +123,17 @@ public class CreateTransactionParams {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public String getRecurrenceRule() {
+        return recurrenceRule;
+    }
+
+    public void setRecurrenceRule(String recurrenceRule) {
+        this.recurrenceRule = recurrenceRule;
+    }
+
+    public boolean hasRecurrenceRule() {
+        return this.recurrenceRule != null;
     }
 }

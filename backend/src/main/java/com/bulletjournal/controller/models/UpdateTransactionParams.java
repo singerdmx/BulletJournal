@@ -24,11 +24,13 @@ public class UpdateTransactionParams {
 
     private String location;
 
+    private String recurrenceRule;
+
     public UpdateTransactionParams() {
     }
 
     public UpdateTransactionParams(String name, String payer, Double amount, String date, String time, String timezone,
-            Integer transactionType) {
+            Integer transactionType, String recurrenceRule) {
         this.name = name;
         this.payer = payer;
         this.amount = amount;
@@ -36,6 +38,7 @@ public class UpdateTransactionParams {
         this.time = time;
         this.timezone = timezone;
         this.transactionType = transactionType;
+        this.recurrenceRule = recurrenceRule;
     }
 
     public String getPayer() {
@@ -159,4 +162,16 @@ public class UpdateTransactionParams {
     }
 
     public boolean hasLocation() { return this.location != null; }
+
+    public String getRecurrenceRule() {
+        return recurrenceRule;
+    }
+
+    public void setRecurrenceRule(String recurrenceRule) {
+        this.recurrenceRule = recurrenceRule;
+    }
+
+    public boolean hasRecurrenceRule() {
+        return this.recurrenceRule != null;
+    }
 }

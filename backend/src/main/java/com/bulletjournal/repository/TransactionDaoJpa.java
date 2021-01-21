@@ -17,7 +17,9 @@ import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.google.common.collect.ImmutableList;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.dmfs.rfc5545.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -163,6 +165,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         String timezone = createTransaction.getTimezone();
         transaction.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
         transaction.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
+        transaction.setRecurrenceRule(createTransaction.getRecurrenceRule());
 
         return this.transactionRepository.save(transaction);
     }
@@ -262,6 +265,9 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
                 Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()),
                 transaction::setEndTime);
 
+        DaoHelper.updateIfPresent(updateTransactionParams.hasRecurrenceRule(),
+                updateTransactionParams.getRecurrenceRule(), transaction::setRecurrenceRule);
+
         if (updateTransactionParams.hasLabels()) {
             transaction.setLabels(updateTransactionParams.getLabels());
         }
@@ -293,7 +299,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Pair<List<Event>, Transaction> delete(String requester, Long transactionId) {
+    public Pair<List<Event>, Transaction> delete(String requester, Long transactionId, String dateTime) {
         Transaction transaction = this.getProjectItem(transactionId, requester);
         Project project = transaction.getProject();
         Long projectId = project.getId();
@@ -301,8 +307,28 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         this.authorizationService.checkAuthorizedToOperateOnContent(transaction.getOwner(), requester,
                 ContentType.TRANSACTION, Operation.DELETE, projectId, project.getOwner());
 
+        if (dateTime != null && StringUtils.isNotBlank(transaction.getRecurrenceRule())) {
+            deleteSingleRecurringTransaction(transaction, dateTime);
+        }
+
         this.transactionRepository.delete(transaction);
         return Pair.of(generateEvents(transaction, requester, project), transaction);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void deleteSingleRecurringTransaction(Transaction transaction, String dateTimeStr) {
+        Set<String> deletedSlotsSet = ZonedDateTimeHelper.parseDateTimeSet(transaction.getDeletedSlots());
+        String timezone = transaction.getTimezone();
+        DateTime dateTime = ZonedDateTimeHelper.getDateTime(ZonedDateTimeHelper.convertDateTime(dateTimeStr, timezone));
+
+        if (deletedSlotsSet.contains(dateTime.toString())) {
+            throw new IllegalArgumentException("Duplicated transaction deleted");
+        }
+
+        // update deleted slots and save
+        transaction.setDeletedSlots(transaction.getDeletedSlots() == null ? dateTime.toString()
+                : transaction.getDeletedSlots() + "," + dateTime.toString());
+        this.transactionRepository.save(transaction);
     }
 
     private List<Event> generateEvents(Transaction transaction, String requester, Project project) {
