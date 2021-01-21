@@ -25,6 +25,9 @@ public interface TaskRepository extends JpaRepository<Task, Long>, TaskRepositor
     @Query(value = "SELECT * FROM tasks WHERE :assignee = ANY(tasks.assignees) AND tasks.recurrence_rule IS NOT NULL", nativeQuery = true)
     List<Task> findTasksByAssigneeAndRecurrenceRuleNotNull(@Param("assignee") String assignee);
 
+    @Query(value = "SELECT * FROM tasks WHERE tasks.project_id IN :projectIds AND :assignee = ANY(tasks.assignees) AND tasks.recurrence_rule IS NOT NULL", nativeQuery = true)
+    List<Task> findTasksInProjectsByAssigneeAndRecurrenceRuleNotNull(@Param("assignee") String assignee, @Param("projectIds") List<Long> projectIds);
+
     List<Task> findTasksByRecurrenceRuleNotNull();
 
     List<Task> findTaskByProjectAndRecurrenceRuleNotNull(Project project);
