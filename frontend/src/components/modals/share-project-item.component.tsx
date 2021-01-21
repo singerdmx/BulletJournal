@@ -6,6 +6,7 @@ import {
   TeamOutlined,
   LinkOutlined,
   ToolOutlined,
+  MailOutlined,
 } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import './modals.styles.less';
@@ -17,6 +18,7 @@ import ShareProjectItemWithGroup from '../share-project-item/share-item-with-gro
 import ShareProjectItemWithUser from '../share-project-item/share-item-with-user';
 import ShareProjectItemGenerateLink from '../share-project-item/share-item-generate-link';
 import ShareProjectItemManagement from '../share-project-item/share-item-management';
+import ShareProjectItemByEmail from '../share-project-item/share-item-by-email';
 import { getTaskSharables } from '../../features/tasks/actions';
 import { getNoteSharables } from '../../features/notes/actions';
 
@@ -124,6 +126,19 @@ const ShareProjectItem: React.FC<ProjectItemProps> = (props) => {
               key='Manage'
             >
               <ShareProjectItemManagement
+                type={props.type}
+                projectItemId={props.projectItemId}
+              />
+            </TabPane>
+            <TabPane
+              tab={
+                <Tooltip title='Email'>
+                  <MailOutlined className='large-icon' />
+                </Tooltip>
+              }
+              key='Email'
+            >
+              <ShareProjectItemByEmail
                 type={props.type}
                 projectItemId={props.projectItemId}
               />
