@@ -16,6 +16,7 @@ import com.bulletjournal.ledger.TransactionType;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
+import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -70,9 +71,12 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
             String requester) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
 
-        return this.transactionRepository
+        List<Transaction> transactions = this.transactionRepository
                 .findTransactionsByProjectBetween(project, Timestamp.from(startTime.toInstant()),
-                        Timestamp.from(endTime.toInstant()))
+                        Timestamp.from(endTime.toInstant()));
+        transactions.addAll(
+                this.getRecurringTransactions(startTime, endTime, ImmutableList.of(project), Optional.empty()));
+        return transactions
                 .stream().sorted((a, b) -> {
                     if (Objects.equals(a.getStartTime(), b.getStartTime())) {
                         return Long.compare(a.getId(), b.getId());
@@ -114,8 +118,10 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
      */
     public List<Transaction> getTransactionsBetween(
             String payer, ZonedDateTime startTime, ZonedDateTime endTime, List<Project> projects) {
-        return this.transactionRepository.findTransactionsOfPayerBetween(payer, Timestamp.from(startTime.toInstant()),
+        List<Transaction> result = this.transactionRepository.findTransactionsOfPayerBetween(payer, Timestamp.from(startTime.toInstant()),
                 Timestamp.from(endTime.toInstant()), projects);
+        result.addAll(this.getRecurringTransactionsOfPayer(payer, projects, startTime, endTime));
+        return result;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

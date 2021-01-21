@@ -199,7 +199,8 @@ public class TransactionController {
     }
 
     @DeleteMapping(TRANSACTION_ROUTE)
-    public void deleteTransaction(@NotNull @PathVariable Long transactionId) {
+    public void deleteTransaction(@NotNull @PathVariable Long transactionId,
+                                  @RequestParam(required = false) Optional<String> dateTime) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
         List<String> deleteESDocumentIds = this.transactionDaoJpa.getDeleteESDocumentIdsForProjectItem(username, transactionId);
@@ -224,8 +225,6 @@ public class TransactionController {
         // curl -X DELETE
         // "http://localhost:8080/api/projects/11/transactions?transactions=12&transactions=11&transactions=13&transactions=14"
         // -H "accept: */*"
-        transactions.forEach(id -> this.deleteTransaction(id));
-
         if (transactions.isEmpty()) {
             return;
         }

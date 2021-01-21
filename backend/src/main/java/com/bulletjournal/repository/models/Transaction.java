@@ -157,6 +157,10 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
         this.recurrenceRule = recurrenceRule;
     }
 
+    public boolean hasRecurrenceRule() {
+        return this.recurrenceRule != null;
+    }
+
     public String getDeletedSlots() {
         return deletedSlots;
     }
