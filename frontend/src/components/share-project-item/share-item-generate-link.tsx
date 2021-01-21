@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
-import { AutoComplete, Button, Form, Input, Result, message } from 'antd';
-import { LinkOutlined, CopyOutlined } from '@ant-design/icons';
+import { AutoComplete, Button, Form, Input, Result, message, Tooltip } from 'antd';
+import { LinkOutlined, CopyOutlined, EyeOutlined, UserAddOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { shareTask } from '../../features/tasks/actions';
 import { shareNote } from '../../features/notes/actions';
@@ -90,38 +90,36 @@ const ShareProjectItemGenerateLink: React.FC<ProjectItemProps> = (props) => {
           </AutoComplete>
         </Form.Item>
         <Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-            onClick={() =>
-              form
-                .validateFields()
-                .then((values) => {
-                  setReadOnlyLink(true);
-                  shareProjectItem(values);
-                })
-                .catch((info) => console.log(info))
-            }
-          >
-            View Only
-          </Button>
+          <Tooltip title='View only'>
+            <EyeOutlined 
+              style={{color: '#00cae9', fontSize: '20px'}} 
+              onClick={() =>
+                form
+                  .validateFields()
+                  .then((values) => {
+                    setReadOnlyLink(true);
+                    shareProjectItem(values);
+                  })
+                  .catch((info) => console.log(info))
+              }
+            />
+          </Tooltip>
         </Form.Item>
         <Form.Item>
-          <Button
-              type="primary"
-              htmlType="submit"
+          <Tooltip title='Collaborative editing'>
+            <UserAddOutlined
+              style={{color: '#00cae9', fontSize: '20px'}} 
               onClick={() =>
-                  form
-                      .validateFields()
-                      .then((values) => {
-                        setReadOnlyLink(false);
-                        shareProjectItem(values);
-                      })
-                      .catch((info) => console.log(info))
+                form
+                  .validateFields()
+                  .then((values) => {
+                    setReadOnlyLink(false);
+                    shareProjectItem(values);
+                  })
+                  .catch((info) => console.log(info))
               }
-          >
-            Collaborative Editing
-          </Button>
+            />
+          </Tooltip>
         </Form.Item>
       </Form>
       <div className="share-info">
