@@ -119,12 +119,14 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Transaction> getRecurringTransactionsOfPayer(String payer, List<Project> projects, ZonedDateTime startTime, ZonedDateTime endTime) {
+    public List<Transaction> getRecurringTransactionsOfPayer(
+            String payer, List<Project> projects, ZonedDateTime startTime, ZonedDateTime endTime) {
         List<Transaction> recurringTasks = this.transactionRepository.findRecurringTransactionsOfPayer(payer, projects);
         return getRecurringTransactions(recurringTasks, startTime, endTime);
     }
 
-    public List<Transaction> getRecurringTransactions(List<Transaction> targetTransactions, ZonedDateTime startTime, ZonedDateTime endTime) {
+    private List<Transaction> getRecurringTransactions(
+            List<Transaction> targetTransactions, ZonedDateTime startTime, ZonedDateTime endTime) {
         List<Transaction> recurringTransactionsBetween = new ArrayList<>();
 
         for (Transaction transaction : targetTransactions) {

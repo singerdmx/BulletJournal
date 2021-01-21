@@ -2,7 +2,6 @@ package com.bulletjournal.repository.utils;
 
 import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.controller.utils.TestHelpers;
-import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.Transaction;
@@ -10,7 +9,6 @@ import org.junit.Test;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
