@@ -175,6 +175,15 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<com.bulletjournal.controller.models.Transaction> getRecurringTransactionsByProjects(List<Project> projects) {
+        List<Transaction> transactions = this.transactionRepository.findRecurringTransactions(projects);
+        return transactions.stream().map(t -> {
+            List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
+            return t.toPresentationModel(labels);
+        }).collect(Collectors.toList());
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Transaction> getTransactionsByPayer(Long projectId,
                                                                                         String requester, String payer, ZonedDateTime startTime, ZonedDateTime endTime) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
