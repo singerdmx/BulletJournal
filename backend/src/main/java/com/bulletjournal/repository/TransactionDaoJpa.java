@@ -152,6 +152,10 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         transaction.setPayer(createTransaction.getPayer());
         transaction.setAmount(createTransaction.getAmount());
         transaction.setDate(createTransaction.getDate());
+        transaction.setRecurrenceRule(createTransaction.getRecurrenceRule());
+        if (createTransaction.getRecurrenceRule() != null) {
+            transaction.setDate(null);
+        }
         transaction.setTime(createTransaction.getTime());
         transaction.setTimezone(createTransaction.getTimezone());
         transaction.setLocation(createTransaction.getLocation());
@@ -165,7 +169,6 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         String timezone = createTransaction.getTimezone();
         transaction.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
         transaction.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
-        transaction.setRecurrenceRule(createTransaction.getRecurrenceRule());
 
         return this.transactionRepository.save(transaction);
     }
@@ -265,8 +268,10 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
                 Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()),
                 transaction::setEndTime);
 
-        DaoHelper.updateIfPresent(updateTransactionParams.hasRecurrenceRule(),
-                updateTransactionParams.getRecurrenceRule(), transaction::setRecurrenceRule);
+        transaction.setRecurrenceRule(updateTransactionParams.getRecurrenceRule());
+        if (updateTransactionParams.hasRecurrenceRule()) {
+            transaction.setDate(null);
+        }
 
         if (updateTransactionParams.hasLabels()) {
             transaction.setLabels(updateTransactionParams.getLabels());
