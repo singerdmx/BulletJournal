@@ -661,17 +661,17 @@ function* shareNoteByEmails(action: PayloadAction<ShareNoteByEmailAction>) {
     const {
       noteId,
       contents,
+      emails,
       targetUser,
       targetGroup,
-      emails,
     } = action.payload;
     const data = yield call(
       shareNoteByEmail,
       noteId,
       contents,
+      emails,
       targetUser,
       targetGroup,
-      emails,
     );
     yield call(message.success, 'Note shared by email successfully');
   } catch (error) {

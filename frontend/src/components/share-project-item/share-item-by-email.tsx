@@ -25,9 +25,9 @@ type ProjectItemProps = {
   shareNoteByEmail: (
     noteId: number,
     contents: Content[],
+    emails: string[],
     targetUser?: string,
     targetGroup?: number,
-    emails?: string[],
   ) => void;
   contents: Content[];
 };
@@ -71,9 +71,8 @@ const ShareProjectItemByEmail: React.FC<ProjectItemProps> = (
                     props.shareNoteByEmail(
                       props.projectItemId, 
                       props.contents,
-                      undefined,
-                      undefined,
-                      inputList);
+                      inputList
+                      );
                   }} />
               </Tooltip>
           </div>

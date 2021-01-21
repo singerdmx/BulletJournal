@@ -159,9 +159,9 @@ export type UpdateNoteColorAction = {
 export type ShareNoteByEmailAction = {
   noteId: number,
   contents: Content[],
+  emails: string[],
   targetUser?: string,
   targetGroup?: number,
-  emails?: string[],
 };
 
 let initialState = {

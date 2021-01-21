@@ -237,9 +237,9 @@ export const putNoteColor = (noteId: number, color: string | undefined) => {
 export const shareNoteByEmail = (
   noteId: number,
   contents: Content[],
+  emails: string[],
   targetUser?: string,
   targetGroup?: number,
-  emails?: string[],
 ) => {
   const Delta = Quill.import('delta');
   let contentsHTML : Content[] = [];
