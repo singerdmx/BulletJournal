@@ -27,14 +27,6 @@ const ShareProjectItemByEmail: React.FC<ProjectItemProps> = (
   props
 ) => {
 
-  const shareProjectItemCall: { [key in ProjectType]: Function } = {
-    [ProjectType.NOTE]: () => {},
-    [ProjectType.TODO]: () => {},
-    [ProjectType.LEDGER]: () => {},
-  };
-
-  const shareFunction = shareProjectItemCall[props.type];
-
   const [inputList, setInputList] = useState([""]);
 
   const handleAdd = () => {

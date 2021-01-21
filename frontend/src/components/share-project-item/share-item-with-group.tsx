@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { Avatar, Button, Form, Result, Select } from 'antd';
-import { TeamOutlined } from '@ant-design/icons';
+import { Avatar, Form, Result, Select, Tooltip } from 'antd';
+import { TeamOutlined, SendOutlined, ShareAltOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { GroupsWithOwner } from '../../features/group/interface';
 import { updateGroups } from '../../features/group/actions';
@@ -100,27 +100,29 @@ const ShareProjectItemWithGroup: React.FC<GroupProps & ProjectItemProps> = (
             </Select>
           </Form.Item>
           <Form.Item>
-            {props.type === ProjectType.LEDGER ? null : <Button style={{marginRight: '16px'}}
-              type="primary"
-              htmlType="submit"
-              onClick={() =>
-                form
-                  .validateFields()
-                  .then((values) => {
-                    shareProjectItem(values);
-                  })
-                  .catch((info) => console.log(info))
-              }
-            >
-              Share
-            </Button>}
-            <Button
-              type="primary"
-              htmlType="submit"
-              onClick={() => console.log('send email')}
-            >
-              Send Email
-            </Button>
+            {props.type === ProjectType.LEDGER ? null : 
+            <Tooltip title='Share'>
+              <ShareAltOutlined 
+                style={{
+                  marginRight: '16px', 
+                  color: '#00cae9', 
+                  fontSize: '20px'}}
+                onClick={() =>
+                  form
+                    .validateFields()
+                    .then((values) => {
+                      shareProjectItem(values);
+                    })
+                    .catch((info) => console.log(info))
+                }
+              />
+            </Tooltip>},
+            <Tooltip title='Send email'>
+                <SendOutlined 
+                  onClick={()=> console.log('send')} 
+                  style={{color: '#00cae9', fontSize: '20px'}} 
+                />
+            </Tooltip>
           </Form.Item>
         </Form>
         <div className="share-info">

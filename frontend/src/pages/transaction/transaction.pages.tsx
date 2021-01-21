@@ -19,6 +19,7 @@ import { dateFormat } from '../../features/myBuJo/constants';
 // modals import
 import EditTransaction from '../../components/modals/edit-transaction.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
+import ShareProjectItem from '../../components/modals/share-project-item.component';
 // antd imports
 import {
   Avatar,
@@ -211,7 +212,6 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
         <PlusOutlined />
       </FloatButton>
     </Container>
-
   );
 
   const getPaymentDateTime = (transaction: Transaction) => {
@@ -301,6 +301,11 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
             type={ProjectType.LEDGER}
             projectItemId={transaction.id}
             mode="icon"
+          />
+          <ShareProjectItem
+              type={ProjectType.LEDGER}
+              projectItemId={transaction.id}
+              mode="icon"
           />
           <EditTransaction transaction={transaction} mode="icon" />
           <Tooltip title="Delete">

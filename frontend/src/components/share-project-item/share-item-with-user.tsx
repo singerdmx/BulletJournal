@@ -1,6 +1,6 @@
 import React from 'react';
-import { List, Button, Form, Input, Result, Avatar } from 'antd';
-import { SolutionOutlined, UserOutlined } from '@ant-design/icons';
+import { List, Form, Input, Result, Avatar, Tooltip } from 'antd';
+import { SolutionOutlined, UserOutlined, SendOutlined, ShareAltOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
 import { shareTask } from '../../features/tasks/actions';
@@ -90,27 +90,28 @@ const ShareProjectItemWithUser: React.FC<UserProps & ProjectItemProps> = (
           <List>
             <List.Item
               actions={[
-                type === ProjectType.LEDGER ? null : <Button style={{marginRight: '16px'}}
-                  type="primary"
-                  htmlType="submit"
-                  onClick={() =>
-                    form
-                      .validateFields()
-                      .then((values) => {
-                        shareProjectItem(values);
-                      })
-                      .catch((info) => console.log(info))
-                  }
-                >
-                  Share
-                </Button>,
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  onClick={() => console.log('send email')}
-                >
-                  Send Email
-                </Button>,
+                type === ProjectType.LEDGER ? null : 
+                <Tooltip title='Share'>
+                  <ShareAltOutlined 
+                    style={{
+                      marginRight: '16px', 
+                      color: '#00cae9', 
+                      fontSize: '20px'}}
+                    onClick={() =>
+                      form
+                        .validateFields()
+                        .then((values) => {
+                          shareProjectItem(values);
+                        })
+                        .catch((info) => console.log(info))
+                    }
+                  />
+                </Tooltip>,
+                <Tooltip title='Send email'>
+                    <SendOutlined 
+                    onClick={()=> console.log('send')} 
+                    style={{color: '#00cae9', fontSize: '20px'}} />
+                </Tooltip>
               ]}
             >
               <List.Item.Meta
