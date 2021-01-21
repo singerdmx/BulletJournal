@@ -172,6 +172,6 @@ public class UpdateTransactionParams {
     }
 
     public boolean hasRecurrenceRule() {
-        return this.recurrenceRule != null;
+        return StringUtils.isNotBlank(this.recurrenceRule );
     }
 }

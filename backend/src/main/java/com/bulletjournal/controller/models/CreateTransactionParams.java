@@ -1,5 +1,7 @@
 package com.bulletjournal.controller.models;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
 
 import javax.validation.constraints.NotBlank;
@@ -134,6 +136,6 @@ public class CreateTransactionParams {
     }
 
     public boolean hasRecurrenceRule() {
-        return this.recurrenceRule != null;
+        return StringUtils.isNotBlank(this.recurrenceRule);
     }
 }

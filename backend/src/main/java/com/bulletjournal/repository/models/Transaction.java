@@ -4,6 +4,7 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.User;
 import com.bulletjournal.ledger.TransactionType;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -158,7 +159,7 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
     }
 
     public boolean hasRecurrenceRule() {
-        return this.recurrenceRule != null;
+        return StringUtils.isNotBlank(this.recurrenceRule);
     }
 
     public String getDeletedSlots() {

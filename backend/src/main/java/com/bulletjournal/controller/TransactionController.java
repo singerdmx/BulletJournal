@@ -22,6 +22,7 @@ import com.bulletjournal.repository.TransactionRepository;
 import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.TransactionContent;
+import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.MDC;
@@ -208,15 +209,15 @@ public class TransactionController {
         Pair<List<Event>, com.bulletjournal.repository.models.Transaction> res = this.transactionDaoJpa
                 .delete(username, transactionId, dateTime.orElse(null));
         List<Event> events = res.getLeft();
-        Long projectId = res.getRight().getProject().getId();
-        String transactionName = res.getRight().getName();
         if (!events.isEmpty()) {
+            Long projectId = res.getRight().getProject().getId();
+            String transactionName = res.getRight().getName();
             this.notificationService.inform(new RemoveTransactionEvent(events, username));
+            this.notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(deleteESDocumentIds));
+            this.notificationService.trackActivity(new Auditable(projectId,
+                    "deleted Transaction ##" + transactionName + "##", username, transactionId,
+                    Timestamp.from(Instant.now()), ContentAction.DELETE_TRANSACTION));
         }
-        this.notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(deleteESDocumentIds));
-        this.notificationService.trackActivity(new Auditable(projectId,
-                "deleted Transaction ##" + transactionName + "##", username, transactionId,
-                Timestamp.from(Instant.now()), ContentAction.DELETE_TRANSACTION));
     }
 
     @DeleteMapping(TRANSACTIONS_ROUTE)

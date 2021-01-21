@@ -153,9 +153,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         transaction.setAmount(createTransaction.getAmount());
         transaction.setDate(createTransaction.getDate());
         transaction.setRecurrenceRule(createTransaction.getRecurrenceRule());
-        if (createTransaction.getRecurrenceRule() != null) {
-            transaction.setDate(null);
-        }
+
         transaction.setTime(createTransaction.getTime());
         transaction.setTimezone(createTransaction.getTimezone());
         transaction.setLocation(createTransaction.getLocation());
@@ -164,11 +162,16 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
             transaction.setLabels(createTransaction.getLabels());
         }
 
-        String date = createTransaction.getDate();
-        String time = createTransaction.getTime();
-        String timezone = createTransaction.getTimezone();
-        transaction.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
-        transaction.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
+        if (createTransaction.hasRecurrenceRule()) {
+            transaction.setDate(null);
+            transaction.setTime(null);
+        } else {
+            String date = createTransaction.getDate();
+            String time = createTransaction.getTime();
+            String timezone = createTransaction.getTimezone();
+            transaction.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
+            transaction.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
+        }
 
         return this.transactionRepository.save(transaction);
     }
@@ -183,6 +186,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
         List<Transaction> transactions = this.transactionRepository.findTransactionsInProjectByPayerBetween(payer,
                 project, Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()));
+        transactions.addAll(this.getRecurringTransactions(
+                startTime, endTime, ImmutableList.of(project), Optional.of(payer)));
         transactions.sort(ProjectItemsGrouper.TRANSACTION_COMPARATOR);
         return transactions.stream().map(t -> {
             List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
@@ -271,6 +276,9 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         transaction.setRecurrenceRule(updateTransactionParams.getRecurrenceRule());
         if (updateTransactionParams.hasRecurrenceRule()) {
             transaction.setDate(null);
+            transaction.setTime(null);
+            transaction.setStartTime(null);
+            transaction.setEndTime(null);
         }
 
         if (updateTransactionParams.hasLabels()) {
@@ -313,7 +321,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
                 ContentType.TRANSACTION, Operation.DELETE, projectId, project.getOwner());
 
         if (dateTime != null && StringUtils.isNotBlank(transaction.getRecurrenceRule())) {
-            deleteSingleRecurringTransaction(transaction, dateTime);
+            return deleteSingleRecurringTransaction(transaction, dateTime);
         }
 
         this.transactionRepository.delete(transaction);
@@ -321,7 +329,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void deleteSingleRecurringTransaction(Transaction transaction, String dateTimeStr) {
+    public Pair<List<Event>, Transaction> deleteSingleRecurringTransaction(Transaction transaction, String dateTimeStr) {
         Set<String> deletedSlotsSet = ZonedDateTimeHelper.parseDateTimeSet(transaction.getDeletedSlots());
         String timezone = transaction.getTimezone();
         DateTime dateTime = ZonedDateTimeHelper.getDateTime(ZonedDateTimeHelper.convertDateTime(dateTimeStr, timezone));
@@ -334,6 +342,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         transaction.setDeletedSlots(transaction.getDeletedSlots() == null ? dateTime.toString()
                 : transaction.getDeletedSlots() + "," + dateTime.toString());
         this.transactionRepository.save(transaction);
+        return Pair.of(Collections.emptyList(), transaction);
     }
 
     private List<Event> generateEvents(Transaction transaction, String requester, Project project) {
