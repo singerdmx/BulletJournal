@@ -122,14 +122,14 @@ export const updateNoteColor = (
 
 export const shareNoteByEmail = (
   noteId: number,
-  content?: Content,
+  contents: Content[],
   targetUser?: string,
   targetGroup?: number,
   emails?: string[],
 ) =>
   actions.NoteShareByEmail({
     noteId: noteId,
-    content: content,
+    contents: contents,
     targetUser: targetUser,
     targetGroup: targetGroup,
     emails: emails,

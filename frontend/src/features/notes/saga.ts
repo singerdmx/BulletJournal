@@ -660,7 +660,7 @@ function* shareNoteByEmails(action: PayloadAction<ShareNoteByEmailAction>) {
   try {
     const {
       noteId,
-      content,
+      contents,
       targetUser,
       targetGroup,
       emails,
@@ -668,7 +668,7 @@ function* shareNoteByEmails(action: PayloadAction<ShareNoteByEmailAction>) {
     const data = yield call(
       shareNoteByEmail,
       noteId,
-      content,
+      contents,
       targetUser,
       targetGroup,
       emails,

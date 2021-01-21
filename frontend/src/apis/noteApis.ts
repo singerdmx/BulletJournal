@@ -236,18 +236,25 @@ export const putNoteColor = (noteId: number, color: string | undefined) => {
 
 export const shareNoteByEmail = (
   noteId: number,
-  content?: Content,
+  contents: Content[],
   targetUser?: string,
   targetGroup?: number,
   emails?: string[],
 ) => {
   const Delta = Quill.import('delta');
-  const contentHTML = content ? createHTML(new Delta(JSON.parse(content.text)['delta'])) : undefined;
+  let contentsHTML : Content[] = [];
+
+  contents.forEach((content) => {
+    let contentHTML = {...content};
+    contentHTML['text'] = createHTML(new Delta(JSON.parse(content.text)['delta']));
+    contentsHTML.push(contentHTML);
+  })
+  
   const postBody = JSON.stringify({
     targetUser: targetUser,
     targetGroup: targetGroup,
     emails: emails,
-    content: contentHTML,
+    contents: contentsHTML,
   });
   return doPost(`/api/notes/${noteId}/exportEmail`, postBody)
     .then((res) => (res))

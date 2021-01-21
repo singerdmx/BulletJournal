@@ -24,12 +24,12 @@ type ProjectItemProps = {
   projectItemId: number;
   shareNoteByEmail: (
     noteId: number,
-    content: Content | undefined,
+    contents: Content[],
     targetUser?: string,
     targetGroup?: number,
     emails?: string[],
   ) => void;
-  content: Content | undefined;
+  contents: Content[];
 };
 
 const ShareProjectItemByEmail: React.FC<ProjectItemProps> = (
@@ -70,7 +70,7 @@ const ShareProjectItemByEmail: React.FC<ProjectItemProps> = (
                   onClick={()=> {
                     props.shareNoteByEmail(
                       props.projectItemId, 
-                      props.content,
+                      props.contents,
                       undefined,
                       undefined,
                       inputList);
@@ -113,7 +113,7 @@ const ShareProjectItemByEmail: React.FC<ProjectItemProps> = (
 
 const mapStateToProps = (state: IState) => ({
   user: state.user,
-  content: state.content.content
+  contents: state.note.contents
 });
 
 export default connect(mapStateToProps, {
