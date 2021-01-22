@@ -6,11 +6,12 @@ import {connect} from 'react-redux';
 import './modals.styles.less';
 import {Project, ProjectSetting} from '../../features/project/interface';
 import {BgColorsOutlined, FileExcelOutlined, SettingOutlined, CrownOutlined, CloseCircleOutlined, CheckCircleOutlined} from '@ant-design/icons';
-import {updateProjectSetting, updateSettingShown} from '../../features/project/actions';
+import {updateProjectSetting, updateSettingShown, setProjectOwner} from '../../features/project/actions';
 import {ProjectType} from "../../features/project/constants";
 import {Button as FloatButton, darkColors, lightColors} from "react-floating-action-button";
 import {getGroupByProject} from '../../pages/projects/projects.pages';
 import {GroupsWithOwner} from '../../features/group/interface';
+import {useHistory} from 'react-router-dom';
 
 type ProjectSettingProps = {
   project: Project | undefined;
@@ -23,6 +24,11 @@ type ProjectSettingProps = {
   ) => void;
   updateSettingShown: (
     visible: boolean
+  ) => void;
+  setProjectOwner: (
+    onSuccess: Function,
+    projectId: number,
+    owner: string,
   ) => void;
 };
 
@@ -38,6 +44,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
     settingShown,
     updateProjectSetting,
     updateSettingShown,
+    setProjectOwner,
   } = props;
   
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
@@ -47,7 +54,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
     b: '0',
     a: '0',
   });
-  const [currentOwner, setCurrentOwner] = useState(project?.owner.name);
+  const [currentOwner, setCurrentOwner] = useState("");
 
   useEffect(() => {
     setDisplayColorPicker(!!projectSetting.color);
@@ -58,6 +65,14 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
       a: '0',
     })
   }, [projectSetting]);
+
+  useEffect(() => {
+    if (project) {
+      setCurrentOwner(project?.owner.name);
+    }
+  }, [project]);
+
+  const history = useHistory();
 
   if (!project) {
     return null;
@@ -104,14 +119,20 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
 
   const handleSelectChange = (value: any) => {
     if (value.length === 0) return;
-    console.log('set project current owner ' + value);
     setCurrentOwner(value);
   }
 
   const handleSetOwner = (change : boolean) => {
-    change ? 
-    console.log('call set owner API') : 
-    console.log('reset');
+    if (change) {
+      setProjectOwner(
+        () => {history.push('/projects')},
+        project.id,
+        currentOwner
+      )
+    }
+    else {
+      setCurrentOwner(project.owner.name);
+    }
   }
 
   const getModal = () => (
@@ -128,6 +149,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
             style={{ width: '300px', marginLeft: '8px'}}
             defaultValue={project.owner.name}
             onChange={handleSelectChange}
+            value={currentOwner}
           >
             {group.users.map((u, index) => { 
               return (
@@ -146,7 +168,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
             } 
           </Select>
         </Tooltip>
-        <Tooltip placement="top" title="Save">
+        <Tooltip placement="top" title="Change BuJo Owner">
           <CheckCircleOutlined
             onClick={() => handleSetOwner(true)}
             style={{
@@ -243,4 +265,5 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
   updateProjectSetting,
   updateSettingShown,
+  setProjectOwner,
 })(ProjectSettingDialog);
