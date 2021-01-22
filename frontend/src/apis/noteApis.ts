@@ -243,7 +243,6 @@ export const shareNoteByEmail = (
 ) => {
   const Delta = Quill.import('delta');
   let contentsHTML : Content[] = [];
-
   contents.forEach((content) => {
     let contentHTML = {...content};
     contentHTML['text'] = createHTML(new Delta(JSON.parse(content.text)['delta']));

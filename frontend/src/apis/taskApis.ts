@@ -400,7 +400,6 @@ export const shareTaskByEmail = (
 ) => {
   const Delta = Quill.import('delta');
   let contentsHTML : Content[] = [];
-  console.log(contents);
   contents.forEach((content) => {
     let contentHTML = {...content};
     contentHTML['text'] = createHTML(new Delta(JSON.parse(content.text)['delta']));
