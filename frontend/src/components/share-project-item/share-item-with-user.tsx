@@ -3,8 +3,9 @@ import { List, Form, Input, Result, Avatar, Tooltip } from 'antd';
 import { SolutionOutlined, UserOutlined, SendOutlined, ShareAltOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
-import { shareTask } from '../../features/tasks/actions';
-import { shareNote } from '../../features/notes/actions';
+import { shareTask, shareTaskByEmail } from '../../features/tasks/actions';
+import { shareNote, shareNoteByEmail } from '../../features/notes/actions';
+import { shareTransactionByEmail } from '../../features/transactions/actions';
 import {
   getProjectItemType,
   ProjectType,
@@ -12,6 +13,7 @@ import {
 import { clearUser, updateUser } from '../../features/user/actions';
 import { UserWithAvatar } from '../../features/user/reducer';
 import './share-item-modal.styles.less';
+import { Content } from '../../features/myBuJo/interface';
 
 type ProjectItemProps = {
   type: ProjectType;
@@ -30,6 +32,30 @@ type ProjectItemProps = {
     targetGroup?: number,
     ttl?: number
   ) => void;
+  shareNoteByEmail: (
+    noteId: number,
+    contents: Content[],
+    emails: string[],
+    targetUser?: string,
+    targetGroup?: number,
+  ) => void;
+  shareTaskByEmail: (
+    taskId: number,
+    contents: Content[],
+    emails: string[],
+    targetUser?: string,
+    targetGroup?: number,
+  ) => void;
+  shareTransactionByEmail: (
+    transactionId: number,
+    contents: Content[],
+    emails: string[],
+    targetUser?: string,
+    targetGroup?: number,
+  ) => void;
+  noteContents: Content[];
+  taskContents: Content[];
+  transactionContents: Content[];
 };
 
 // props of user
@@ -55,11 +81,30 @@ const ShareProjectItemWithUser: React.FC<UserProps & ProjectItemProps> = (
     [ProjectType.LEDGER]: () => {},
   };
 
+  const shareProjectItemByEmailCall: { [key in ProjectType]: Function } = {
+    [ProjectType.NOTE]: props.shareNoteByEmail,
+    [ProjectType.TODO]: props.shareTaskByEmail,
+    [ProjectType.LEDGER]: props.shareTransactionByEmail,
+  };
+
+  const contents : { [key in ProjectType ] : Content[] } = {
+    [ProjectType.NOTE]: props.noteContents,
+    [ProjectType.TODO]: props.taskContents,
+    [ProjectType.LEDGER]: props.transactionContents,
+  }
+
   const shareFunction = shareProjectItemCall[props.type];
+  const shareByEmailFunction = shareProjectItemByEmailCall[props.type];
 
   const shareProjectItem = (values: any) => {
     if (props.user.name) {
       shareFunction(props.projectItemId, false, props.user.name);
+    }
+  };
+
+  const shareProjectItemByEmail = (values: any) => {
+    if (props.user.name) {
+      shareByEmailFunction(props.projectItemId, contents[props.type], [], props.user.name);
     }
   };
 
@@ -109,7 +154,14 @@ const ShareProjectItemWithUser: React.FC<UserProps & ProjectItemProps> = (
                 </Tooltip>,
                 <Tooltip title='Send email'>
                     <SendOutlined 
-                    onClick={()=> console.log('send')} 
+                    onClick={()=> {
+                      form
+                        .validateFields()
+                        .then((values) => {
+                          shareProjectItemByEmail(values);
+                        })
+                        .catch((info) => console.log(info))
+                    }} 
                     style={{color: '#00cae9', fontSize: '20px'}} />
                 </Tooltip>
               ]}
@@ -135,6 +187,9 @@ const ShareProjectItemWithUser: React.FC<UserProps & ProjectItemProps> = (
 
 const mapStateToProps = (state: IState) => ({
   user: state.user,
+  noteContents: state.note.contents,
+  taskContents: state.task.contents,
+  transactionContents: state.transaction.contents,
 });
 
 export default connect(mapStateToProps, {
@@ -142,4 +197,7 @@ export default connect(mapStateToProps, {
   shareNote,
   updateUser,
   clearUser,
+  shareNoteByEmail,
+  shareTaskByEmail,
+  shareTransactionByEmail,
 })(ShareProjectItemWithUser);
