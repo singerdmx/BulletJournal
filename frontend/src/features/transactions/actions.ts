@@ -31,11 +31,12 @@ export const createTransaction = (
   amount: number,
   name: string,
   payer: string,
-  date: string,
   transactionType: number,
   timezone: string,
   labels: number[],
-  time?: string
+  date?: string,
+  time?: string,
+  recurrenceRule?: string
 ) =>
   actions.TransactionsCreate({
     projectId: projectId,
@@ -47,6 +48,7 @@ export const createTransaction = (
     timezone: timezone,
     labels: labels,
     time: time,
+    recurrenceRule: recurrenceRule
   });
 export const getTransaction = (transactionId: number) =>
   actions.TransactionGet({ transactionId: transactionId });
@@ -67,11 +69,12 @@ export const patchTransaction = (
   amount: number,
   name: string,
   payer: string,
-  date: string,
-  time: string,
   transactionType: number,
   timezone: string,
-  labels?: number[]
+  date?: string,
+  time?: string,
+  recurrenceRule?: string,
+  labels?: number[],
 ) =>
   actions.TransactionPatch({
     transactionId: transactionId,
@@ -83,6 +86,7 @@ export const patchTransaction = (
     transactionType: transactionType,
     timezone: timezone,
     labels: labels,
+    recurrenceRule: recurrenceRule
   });
 export const setTransactionLabels = (transactionId: number, labels: number[]) =>
   actions.TransactionSetLabels({

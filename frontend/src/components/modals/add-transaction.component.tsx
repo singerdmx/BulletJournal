@@ -71,11 +71,12 @@ interface TransactionCreateFormProps {
     amount: number,
     name: string,
     payer: string,
-    date: string,
     transactionType: number,
     timezone: string,
     labels: number[],
-    time: string
+    date?: string,
+    time?: string,
+    recurrenceRule?: string
   ) => void;
   updateExpandedMyself: (updateSettings: boolean) => void;
   currency: string;
@@ -108,11 +109,12 @@ const AddTransaction: React.FC<
         values.amount,
         values.transactionName,
         payerName,
-        date_value,
         values.transactionType,
         timezone,
         values.labels,
-        time_value
+        date_value,
+        time_value,
+        undefined
       );
     }
     props.updateTransactionVisible(false);

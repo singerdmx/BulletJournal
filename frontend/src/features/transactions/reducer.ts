@@ -70,10 +70,11 @@ export type CreateTransaction = {
   name: string;
   payer: string;
   transactionType: number;
-  date: string;
+  date?: string;
   timezone: string;
   labels: number[];
   time?: string;
+  recurrenceRule?: string;
 };
 
 export type GetTransaction = {
@@ -114,6 +115,7 @@ export type PatchTransaction = {
   time?: string;
   timezone?: string;
   labels?: number[];
+  recurrenceRule?: string;
 };
 
 export type MoveTransaction = {

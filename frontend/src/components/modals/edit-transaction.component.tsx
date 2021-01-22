@@ -64,10 +64,11 @@ interface TransactionEditFormProps {
     amount: number,
     name: string,
     payer: string,
-    date: string,
-    time: string,
     transactionType: number,
     timezone: string,
+    date?: string,
+    time?: string,
+    recurrenceRule?: string,
     labels?: number[]
   ) => void;
   currency: string;
@@ -111,11 +112,12 @@ const EditTransaction: React.FC<
       values.amount,
       values.transactionName,
       values.payerName,
-      date_value,
-      time_value,
       values.transactionType,
       values.timezone,
-      values.labels
+      date_value,
+      time_value,
+      undefined,
+      values.labels,
     );
     setVisible(false);
   };

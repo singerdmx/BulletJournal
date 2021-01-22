@@ -90,11 +90,11 @@ export const createTransaction = (
   name: string,
   payer: string,
   transactionType: number,
-  date: string,
   timezone: string,
-  labels?: number[],
-  time?: string
-) => {
+  date?: string,
+  time?: string,
+  recurrenceRule?: string,
+  labels?: number[]) => {
   const postBody = JSON.stringify({
     amount: amount,
     name: name,
@@ -104,6 +104,7 @@ export const createTransaction = (
     time: time,
     labels: labels,
     timezone: timezone,
+    recurrenceRule: recurrenceRule
   });
   return doPost(`/api/projects/${projectId}/transactions`, postBody)
     .then((res) => res.json())
@@ -121,7 +122,8 @@ export const updateTransaction = (
   date?: string,
   time?: string,
   timezone?: string,
-  labels?: number[]
+  labels?: number[],
+  recurrenceRule?: string
 ) => {
   const patchBody = JSON.stringify({
     amount: amount,
@@ -132,6 +134,7 @@ export const updateTransaction = (
     time: time,
     timezone: timezone,
     labels: labels,
+    recurrenceRule: recurrenceRule
   });
   return doPatch(`/api/transactions/${transactionId}`, patchBody)
     .then((res) => res.json())

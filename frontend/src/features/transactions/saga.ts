@@ -132,7 +132,8 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
       timezone,
       labels,
       time,
-    } = action.payload;
+      recurrenceRule
+  } = action.payload;
     yield call(
       createTransaction,
       projectId,
@@ -140,10 +141,11 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
       name,
       payer,
       transactionType,
-      date,
       timezone,
-      labels,
-      time
+      date,
+      time,
+      recurrenceRule,
+      labels
     );
 
     const state: IState = yield select();
@@ -372,6 +374,7 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
       time,
       timezone,
       labels,
+      recurrenceRule
     } = action.payload;
     const data = yield call(
       updateTransaction,
@@ -383,7 +386,8 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
       date,
       time,
       timezone,
-      labels
+      labels,
+      recurrenceRule
     );
     const projectId = data.projectId;
     const state: IState = yield select();
