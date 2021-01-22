@@ -95,7 +95,7 @@ const NoteColorSettingDialog: React.FC<NoteColorSettingProps> = (props) => {
         <BgColorsOutlined />
 
         <div>
-            { displayColorPicker ? 
+            { displayColorPicker && 
             <div>
               <SwatchesPicker
               color={color}
@@ -111,7 +111,7 @@ const NoteColorSettingDialog: React.FC<NoteColorSettingProps> = (props) => {
                       ['#FAF0E4', '#EECFBB', '#F6B99D', '#CB8A90'],
                       ['#FEF5D4', '#FFD6AA', '#EFBAD6', '#DADAFC']]}
               />
-            </div> : null }
+            </div>}
         </div>
       </div>      
     </Modal>

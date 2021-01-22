@@ -142,7 +142,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
       onCancel={closeModal}
       footer={false}
     >
-      {group ? <div style={{marginBottom: '5px'}} >
+      {group && <div style={{marginBottom: '5px'}} >
       <CrownOutlined style={{marginRight: '8px'}} />Owner 
         <Tooltip title='Set Project Owner' >
           <Select
@@ -198,7 +198,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
             }}
           />
         </Tooltip>
-      </div > : null}
+      </div >}
       {project?.projectType === ProjectType.TODO && <div style={{marginBottom: '5px'}}>
         <Checkbox
             style={{marginTop: '-0.5em'}}
@@ -219,7 +219,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
         </Checkbox>
         <BgColorsOutlined />
         <div style={{marginTop: '5px'}} >
-            { displayColorPicker ? 
+            { displayColorPicker &&
             <div>
               <SwatchesPicker
               color={color}
@@ -235,7 +235,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
                       ['#FAF0E4', '#EECFBB', '#F6B99D', '#CB8A90'],
                       ['#FEF5D4', '#FFD6AA', '#EFBAD6', '#DADAFC']]}
               />
-            </div> : null }
+            </div>}
         </div>
       </div>      
     </Modal>

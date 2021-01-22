@@ -162,10 +162,10 @@ const ProjectsPage: React.FC<RouteComponentProps & GroupsProps & ProjectsProps> 
                                         <span>Copy Link Address</span>
                                     </Item>
                                 </CopyToClipboard>
-                                {project.owner.name === myself ? <Item onClick={(e) => handleClickChangeSetting(project.id)}>
+                                {project.owner.name === myself && <Item onClick={(e) => handleClickChangeSetting(project.id)}>
                                     <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><SettingOutlined/></IconFont>
                                     <span>Change Settings</span>
-                                </Item> : null}
+                                </Item>}
                             </Menu>
                         </>
                     }
