@@ -3,6 +3,14 @@ import { Content } from '../features/myBuJo/interface';
 import { Quill } from 'react-quill';
 import { createHTML } from '../components/content/content-item.component';
 
+export const fetchRecurringTransactions = (projectId: number) => {
+  return doFetch(`/api/projects/${projectId}/recurringTransactions`)
+      .then((res) => res.json())
+      .catch((err) => {
+        throw Error(err.message);
+      });
+}
+
 export const fetchTransactions = (
   projectId: number,
   timezone: string,

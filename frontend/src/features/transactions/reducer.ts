@@ -56,6 +56,10 @@ export type UpdateTransactions = {
   labelsToRemove?: number[];
 };
 
+export type UpdateRecurringTransactions = {
+  projectId: number;
+};
+
 export type updateVisibleAction = {
   visible: boolean;
 };
@@ -151,6 +155,10 @@ export type TransactionsByPayerAction = {
   transactionsByPayer: Array<Transaction>;
 };
 
+export type RecurringTransactionsAction = {
+  transactions: Transaction[];
+};
+
 export type UpdateTransactionColorSettingShownAction = {
   TransactionColorSettingShown: boolean;
 };
@@ -179,6 +187,7 @@ let initialState = {
   frequencyType: FrequencyType.MONTHLY,
   ledgerSummaryType: LedgerSummaryType.DEFAULT,
   timezone: '',
+  recurringTransactions: [] as Array<Transaction>,
   transactionsByPayer: [] as Array<Transaction>,
   transactionColorSettingShown: false,
 };
@@ -193,6 +202,13 @@ const slice = createSlice({
     ) => {
       const { transactionsByPayer } = action.payload;
       state.transactionsByPayer = transactionsByPayer;
+    },
+    recurringTransactionsReceived: (
+        state,
+        action: PayloadAction<RecurringTransactionsAction>
+    ) => {
+      const { transactions } = action.payload;
+      state.recurringTransactions = transactions;
     },
     getTransactionsByPayer: (
       state,
@@ -222,6 +238,8 @@ const slice = createSlice({
     ) => state,
     TransactionsUpdate: (state, action: PayloadAction<UpdateTransactions>) =>
       state,
+    RecurringTransactionsUpdate: (state, action: PayloadAction<UpdateRecurringTransactions>) =>
+        state,
     TransactionsCreate: (state, action: PayloadAction<CreateTransaction>) =>
       state,
     TransactionGet: (state, action: PayloadAction<GetTransaction>) => state,

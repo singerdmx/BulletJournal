@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   Avatar,
   Button,
-  DatePicker,
+  DatePicker, Empty,
   Form,
   Input,
   InputNumber,
@@ -16,7 +16,7 @@ import {PlusOutlined, SyncOutlined} from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { RouteComponentProps, withRouter, useParams } from 'react-router';
 import {
-  createTransaction,
+  createTransaction, updateRecurringTransactions,
   updateTransactionVisible,
 } from '../../features/transactions/actions';
 import { IState } from '../../store';
@@ -34,6 +34,7 @@ import {Button as FloatButton, Container, darkColors, lightColors} from "react-f
 import {useHistory} from "react-router-dom";
 import {PlusCircleTwoTone} from "@ant-design/icons/lib";
 import ProjectSettingDialog from "../../components/modals/project-setting.component";
+import {Transaction} from "../../features/transactions/interface";
 
 
 const { Option } = Select;
@@ -59,6 +60,8 @@ type TransactionProps = {
   project: Project | undefined;
   group: Group | undefined;
   myself: string;
+  recurringTransactions: Transaction[];
+  updateRecurringTransactions: (projectId: number) => void;
 };
 
 interface TransactionCreateFormProps {
@@ -90,6 +93,7 @@ const AddTransaction: React.FC<
   const [form] = Form.useForm();
   const history = useHistory();
   const [timeVisible, setTimeVisible] = useState(false);
+  const [manageRecurringTransDialogVisible, setManageRecurringTransDialogVisible] = useState(false);
   const { projectId } = useParams();
 
   const addTransaction = (values: any) => {
@@ -113,8 +117,8 @@ const AddTransaction: React.FC<
     }
     props.updateTransactionVisible(false);
   };
-  const onCancel = () => props.updateTransactionVisible(false);
-  const openModal = () => {
+  const onCancelNewDialogModal = () => props.updateTransactionVisible(false);
+  const openNewTranDialogModal = () => {
     props.updateTransactionVisible(true);
   };
 
@@ -148,7 +152,29 @@ const AddTransaction: React.FC<
     );
   };
 
-  const getModal = () => {
+  const getRecurringTransactionsDiv = () => {
+    if (props.recurringTransactions.length === 0) {
+      return <Empty/>
+    }
+
+    return <div></div>
+  }
+
+  const getManageRecurringTransactionsModal = () => {
+    return (
+        <Modal
+            destroyOnClose
+            centered
+            title='Manage Recurring Transactions'
+            visible={manageRecurringTransDialogVisible}
+            footer={null}
+            onCancel={() => setManageRecurringTransDialogVisible(false)}>
+          {getRecurringTransactionsDiv()}
+        </Modal>
+    )
+  };
+
+  const getNewTransactionModal = () => {
     return (
       <Modal
         destroyOnClose
@@ -156,7 +182,7 @@ const AddTransaction: React.FC<
         title='Create New Transaction'
         visible={props.addTransactionVisible}
         okText='Create'
-        onCancel={onCancel}
+        onCancel={onCancelNewDialogModal}
         onOk={() => {
           form
             .validateFields()
@@ -294,10 +320,10 @@ const AddTransaction: React.FC<
   if (props.mode === 'button') {
     return (
       <div className='add-transaction'>
-        <Button type='primary' onClick={openModal}>
+        <Button type='primary' onClick={openNewTranDialogModal}>
           Create New Transaction
         </Button>
-        {getModal()}
+        {getNewTransactionModal()}
       </div>
     );
   }
@@ -307,19 +333,26 @@ const AddTransaction: React.FC<
       <Container>
         <FloatButton
             tooltip="Manage Recurring Transactions"
+            onClick={() => {
+              if (props.project) {
+                props.updateRecurringTransactions(props.project.id);
+              }
+              setManageRecurringTransDialogVisible(true);
+            }}
             styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
         >
           <SyncOutlined spin />
         </FloatButton>
+        {getManageRecurringTransactionsModal()}
         {props.project && props.project.owner.name === props.myself && <ProjectSettingDialog />}
         <FloatButton
             tooltip="Add New Transaction"
-            onClick={openModal}
+            onClick={openNewTranDialogModal}
             styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
         >
           <PlusOutlined/>
         </FloatButton>
-        {getModal()}
+        {getNewTransactionModal()}
       </Container>
     </div>
   );
@@ -333,6 +366,7 @@ const mapStateToProps = (state: IState) => ({
   myself: state.myself.username,
   addTransactionVisible: state.transaction.addTransactionVisible,
   labelOptions: state.label.labelOptions,
+  recurringTransactions: state.transaction.recurringTransactions,
 });
 
 export default connect(mapStateToProps, {
@@ -340,4 +374,5 @@ export default connect(mapStateToProps, {
   updateExpandedMyself,
   updateTransactionVisible,
   labelsUpdate,
+  updateRecurringTransactions
 })(withRouter(AddTransaction));

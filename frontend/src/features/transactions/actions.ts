@@ -24,6 +24,8 @@ export const updateTransactions = (
     labelsToKeep: labelsToKeep,
     labelsToRemove: labelsToRemove
   });
+export const updateRecurringTransactions = (projectId: number) =>
+    actions.RecurringTransactionsUpdate({projectId: projectId});
 export const createTransaction = (
   projectId: number,
   amount: number,

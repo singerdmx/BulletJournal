@@ -1,5 +1,5 @@
-import { all, call, put, select, takeLatest } from 'redux-saga/effects';
-import { message } from 'antd';
+import {all, call, put, select, takeLatest} from 'redux-saga/effects';
+import {message} from 'antd';
 import {
   actions as transactionsActions,
   CreateContent,
@@ -14,41 +14,43 @@ import {
   PatchTransaction,
   SetTransactionLabels,
   ShareTransaction,
+  ShareTransactionByEmailAction,
   TransactionApiErrorAction,
+  UpdateRecurringTransactions,
+  UpdateTransactionColorAction,
   UpdateTransactionContentRevision,
   UpdateTransactionContents,
   UpdateTransactions,
-  UpdateTransactionColorAction,
-  ShareTransactionByEmailAction,
 } from './reducer';
-import { IState } from '../../store';
-import { PayloadAction } from 'redux-starter-kit';
+import {IState} from '../../store';
+import {PayloadAction} from 'redux-starter-kit';
 import {
   addContent,
   createTransaction,
   deleteContent,
   deleteTransactionById,
   deleteTransactions as deleteTransactionsApi,
+  fetchRecurringTransactions,
   fetchTransactions,
   getContentRevision,
   getContents,
   getTransactionById,
   moveToTargetProject,
+  putTransactionColor,
   setTransactionLabels,
+  shareTransactionByEmail,
   shareTransactionWithOther,
   updateContent,
   updateTransaction,
-  putTransactionColor,
-  shareTransactionByEmail,
 } from '../../apis/transactionApis';
-import { LedgerSummary, Transaction } from './interface';
-import { getProjectItemsAfterUpdateSelect } from '../myBuJo/actions';
-import { updateTransactionContents } from './actions';
-import { Content, ProjectItems, Revision } from '../myBuJo/interface';
+import {LedgerSummary, Transaction} from './interface';
+import {getProjectItemsAfterUpdateSelect} from '../myBuJo/actions';
+import {updateTransactionContents} from './actions';
+import {Content, ProjectItems, Revision} from '../myBuJo/interface';
 import {projectLabelsUpdate, updateItemsByLabels} from '../label/actions';
-import { ProjectItemUIType } from "../project/constants";
-import { ContentType } from "../myBuJo/constants";
-import { recentItemsReceived } from "../recent/actions";
+import {ProjectItemUIType} from "../project/constants";
+import {ContentType} from "../myBuJo/constants";
+import {recentItemsReceived} from "../recent/actions";
 import {setDisplayMore, updateTargetContent} from "../content/actions";
 import {reloadReceived} from "../myself/actions";
 
@@ -96,6 +98,24 @@ function* transactionsUpdate(action: PayloadAction<UpdateTransactions>) {
       yield put(reloadReceived(true));
     } else {
       yield call(message.error, `Transaction Error Received: ${error}`);
+    }
+  }
+}
+
+function* recurringTransactionsUpdate(action: PayloadAction<UpdateRecurringTransactions>) {
+  try {
+    const {projectId} = action.payload;
+    const data = yield call(fetchRecurringTransactions, projectId);
+    yield put(
+        transactionsActions.recurringTransactionsReceived({
+          transactions: data,
+        })
+    );
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `recurringTransactionsUpdate Error Received: ${error}`);
     }
   }
 }
@@ -766,6 +786,8 @@ export default function* transactionSagas() {
     yield takeLatest(
       transactionsActions.TransactionShareByEmail.type, 
       shareTransactionByEmails),
-
+    yield takeLatest(
+      transactionsActions.RecurringTransactionsUpdate.type,
+      recurringTransactionsUpdate),
   ]);
 }
