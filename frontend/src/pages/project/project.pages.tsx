@@ -650,10 +650,10 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
             <span>Copy Link Address</span>
           </Item>
         </CopyToClipboard>
-        <Item onClick={() => this.props.updateSettingShown(true)}>
+        {this.props.myself === project.owner.name ? <Item onClick={() => this.props.updateSettingShown(true)}>
             <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><SettingOutlined/></IconFont>
             <span>Change Settings</span>
-        </Item>
+        </Item> : null}
       </Menu>
     </>
   }
