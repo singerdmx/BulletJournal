@@ -19,6 +19,8 @@ import {
   createTransaction, updateRecurringTransactions,
   updateTransactionVisible,
 } from '../../features/transactions/actions';
+import ReactRRuleGenerator from '../../features/recurrence/RRuleGenerator';
+import {convertToTextWithRRule,} from '../../features/recurrence/actions';
 import { IState } from '../../store';
 import { Project } from '../../features/project/interface';
 import { Group } from '../../features/group/interface';
@@ -86,6 +88,7 @@ interface TransactionCreateFormProps {
   addTransactionVisible: boolean;
   labelsUpdate: (projectId: number | undefined) => void;
   labelOptions: Label[];
+  rRuleString: any;
 }
 
 const AddTransaction: React.FC<
@@ -96,13 +99,16 @@ const AddTransaction: React.FC<
   const [timeVisible, setTimeVisible] = useState(false);
   const [manageRecurringTransDialogVisible, setManageRecurringTransDialogVisible] = useState(false);
   const { projectId } = useParams();
+  const [recurrent, setRecurrent] = useState(false);
 
   const addTransaction = (values: any) => {
     //convert time object to format string
-    const date_value = values.date.format(dateFormat);
+    const date_value = values.date ? values.date.format(dateFormat) : undefined;
     const time_value = values.time ? values.time.format('HH:mm') : undefined;
     const payerName = values.payerName ? values.payerName : props.myself;
     const timezone = values.timezone ? values.timezone : props.timezone;
+    // const recurrence = recurrent ? props.rRuleString : undefined;
+
     if (props.project) {
       props.createTransaction(
         props.project.id,
@@ -114,7 +120,7 @@ const AddTransaction: React.FC<
         values.labels,
         date_value,
         time_value,
-        undefined
+        undefined,
       );
     }
     props.updateTransactionVisible(false);
@@ -247,33 +253,64 @@ const AddTransaction: React.FC<
             </Form.Item>
           </div>
 
+          {/* transaction type------------------------------------- */}
+          <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>Transaction Type &nbsp;&nbsp;</span>
+          <Radio.Group
+            defaultValue={'oneTime'}
+            onChange={(e) => setRecurrent(e.target.value === 'Recurrent')}
+            buttonStyle="solid"
+            style={{ marginBottom: 18 }}
+          >
+            <Radio.Button value={'oneTime'}>One Time</Radio.Button>
+            <Radio.Button value={'Recurrent'}>Recurrence</Radio.Button>
+          </Radio.Group>
+
+          {recurrent ? (
+            <div
+              style={{
+                borderTop: '1px solid #E8E8E8',
+                borderBottom: '1px solid #E8E8E8',
+                paddingTop: '24px',
+                marginBottom: '24px',
+              }}
+            >
+              {/* <div className="recurrence-title">{rRuleText}</div> */}
+              <div className="recurrence-title">this is rule text placeholder</div>
+              <ReactRRuleGenerator />
+            </div>
+          ):
+          (
+            <div style={{ display: 'flex' }}>
+              <div style={{ display: 'flex', flex: 1 }}>
+                <Tooltip title="Select Date" placement="left">
+                  <Form.Item 
+                    name="date" 
+                    style={{ width: '100%' }}
+                    rules={[{ required: true, message: 'Missing Date!' }]}>
+                    <DatePicker
+                      allowClear={true}
+                      style={{ width: '100%' }}
+                      placeholder="Date"
+                    />
+                  </Form.Item>
+                </Tooltip>
+                <Tooltip title="Select Time" placement="right">
+                  <Form.Item name="time" style={{width: '210px'}}>
+                    <TimePicker
+                        allowClear={true}
+                        format="HH:mm"
+                        placeholder="Time"
+                    />
+                  </Form.Item>
+                </Tooltip>
+              </div>
+            </div>
+          )
+          }
+
           <div style={{ display: 'flex' }}>
-            <Tooltip title='Select Date' placement='left'>
-              <Form.Item
-                name='date'
-                rules={[{ required: true, message: 'Missing Date!' }]}
-              >
-                <DatePicker
-                  placeholder='Select Date'
-                  onChange={(value) => setTimeVisible(value !== null)}
-                />
-              </Form.Item>
-            </Tooltip>
-
-            {timeVisible && (
-              <Tooltip title='Select Time' placement='right'>
-                <Form.Item name='time' style={{ width: '100px' }}>
-                  <TimePicker
-                    allowClear
-                    format='HH:mm'
-                    placeholder='Select Time'
-                  />
-                </Form.Item>
-              </Tooltip>
-            )}
-
             <Tooltip title='Time Zone'>
-              <Form.Item name='timezone'>
+              <Form.Item name='timezone' label="Time Zone">
                 <Select
                   showSearch={true}
                   placeholder='Select Time Zone'
@@ -369,6 +406,7 @@ const mapStateToProps = (state: IState) => ({
   addTransactionVisible: state.transaction.addTransactionVisible,
   labelOptions: state.label.labelOptions,
   recurringTransactions: state.transaction.recurringTransactions,
+  rRuleString: state.rRule.rRuleString,
 });
 
 export default connect(mapStateToProps, {
