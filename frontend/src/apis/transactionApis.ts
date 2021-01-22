@@ -1,4 +1,7 @@
 import { doFetch, doPost, doDelete, doPatch, doPut } from './api-helper';
+import { Content } from '../features/myBuJo/interface';
+import { Quill } from 'react-quill';
+import { createHTML } from '../components/content/content-item.component';
 
 export const fetchTransactions = (
   projectId: number,
@@ -241,3 +244,31 @@ export const putTransactionColor = (transactionId: number, color: string | undef
     });
 };
 
+export const shareTransactionByEmail = (
+  transactionId: number,
+  contents: Content[],
+  emails: string[],
+  targetUser?: string,
+  targetGroup?: number,
+) => {
+  const Delta = Quill.import('delta');
+  let contentsHTML : Content[] = [];
+  console.log(contents);
+  contents.forEach((content) => {
+    let contentHTML = {...content};
+    contentHTML['text'] = createHTML(new Delta(JSON.parse(content.text)['delta']));
+    contentsHTML.push(contentHTML);
+  })
+  
+  const postBody = JSON.stringify({
+    targetUser: targetUser,
+    targetGroup: targetGroup,
+    emails: emails,
+    contents: contentsHTML,
+  });
+  return doPost(`/api/transactions/${transactionId}/exportEmail`, postBody)
+    .then((res) => (res))
+    .catch((err) => {
+      throw Error(err);
+    });
+};

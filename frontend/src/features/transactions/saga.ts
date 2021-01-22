@@ -19,6 +19,7 @@ import {
   UpdateTransactionContents,
   UpdateTransactions,
   UpdateTransactionColorAction,
+  ShareTransactionByEmailAction,
 } from './reducer';
 import { IState } from '../../store';
 import { PayloadAction } from 'redux-starter-kit';
@@ -38,6 +39,7 @@ import {
   updateContent,
   updateTransaction,
   putTransactionColor,
+  shareTransactionByEmail,
 } from '../../apis/transactionApis';
 import { LedgerSummary, Transaction } from './interface';
 import { getProjectItemsAfterUpdateSelect } from '../myBuJo/actions';
@@ -670,6 +672,33 @@ function* updateTransactionColor(
   }
 }
 
+function* shareTransactionByEmails(action: PayloadAction<ShareTransactionByEmailAction>) {
+  try {
+    const {
+      transactionId,
+      contents,
+      emails,
+      targetUser,
+      targetGroup,
+    } = action.payload;
+    const data = yield call(
+      shareTransactionByEmail,
+      transactionId,
+      contents,
+      emails,
+      targetUser,
+      targetGroup,
+    );
+    yield call(message.success, 'Transaction shared by email successfully');
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Transaction Share By Email Error Received: ${error}`);
+    }
+  }
+}
+
 export default function* transactionSagas() {
   yield all([
     yield takeLatest(
@@ -734,5 +763,9 @@ export default function* transactionSagas() {
       transactionsActions.updateTransactionColor.type, 
       updateTransactionColor
     ),
+    yield takeLatest(
+      transactionsActions.TransactionShareByEmail.type, 
+      shareTransactionByEmails),
+
   ]);
 }

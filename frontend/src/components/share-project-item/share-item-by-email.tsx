@@ -10,6 +10,7 @@ import { connect } from 'react-redux';
 import { IState } from '../../store';
 import { shareTaskByEmail } from '../../features/tasks/actions';
 import { shareNoteByEmail } from '../../features/notes/actions';
+import { shareTransactionByEmail } from '../../features/transactions/actions';
 import {
   getProjectItemType,
   ProjectType,
@@ -35,6 +36,13 @@ type ProjectItemProps = {
     targetUser?: string,
     targetGroup?: number,
   ) => void;
+  shareTransactionByEmail: (
+    transactionId: number,
+    contents: Content[],
+    emails: string[],
+    targetUser?: string,
+    targetGroup?: number,
+  ) => void;
   noteContents: Content[];
   taskContents: Content[];
   transactionContents: Content[];
@@ -48,7 +56,7 @@ const ShareProjectItemByEmail: React.FC<ProjectItemProps> = (
   const shareProjectItemByEmailCall: { [key in ProjectType]: Function } = {
     [ProjectType.NOTE]: props.shareNoteByEmail,
     [ProjectType.TODO]: props.shareTaskByEmail,
-    [ProjectType.LEDGER]: () => {},
+    [ProjectType.LEDGER]: props.shareTransactionByEmail,
   };
   const contents : { [key in ProjectType ] : Content[] } = {
     [ProjectType.NOTE]: props.noteContents,
@@ -139,4 +147,5 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
   shareNoteByEmail,
   shareTaskByEmail,
+  shareTransactionByEmail,
 })(ShareProjectItemByEmail);

@@ -2,6 +2,7 @@ import { actions } from './reducer';
 import { History } from 'history';
 import {FrequencyType, LedgerSummaryType, Transaction} from './interface';
 import {ProjectItemUIType} from "../project/constants";
+import { Content } from '../myBuJo/interface';
 
 export const updateTransactions = (
   projectId: number,
@@ -200,4 +201,19 @@ export const updateTransactionColor = (
   actions.updateTransactionColor({ 
     transactionId: transactionId,
     color: color,
+  });
+
+export const shareTransactionByEmail = (
+  transactionId: number,
+  contents: Content[],
+  emails: string[],
+  targetUser?: string,
+  targetGroup?: number,
+) =>
+  actions.TransactionShareByEmail({
+    transactionId: transactionId,
+    contents: contents,
+    emails: emails,
+    targetUser: targetUser,
+    targetGroup: targetGroup,
   });
