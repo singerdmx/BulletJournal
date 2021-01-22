@@ -95,7 +95,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
      *
      * @param id - Transaction identifier to retrieve transaction from ledger
      *           repository
-     * @retVal a Transaction object
+     * @return a Transaction object
      */
     public com.bulletjournal.controller.models.Transaction getTransaction(String requester, Long id) {
         Transaction transaction = this.getProjectItem(id, requester);
@@ -116,7 +116,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
      *                  repository
      * @param startTime - Start Time to retrieve transaction from ledger repository
      * @param endTime   - End Time to retrieve transaction from ledger repository
-     * @retVal List of Transaction
+     * @return List of Transaction
      */
     public List<Transaction> getTransactionsBetween(
             String payer, ZonedDateTime startTime, ZonedDateTime endTime, List<Project> projects) {
