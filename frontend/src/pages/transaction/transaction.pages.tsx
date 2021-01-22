@@ -1,61 +1,44 @@
 // react imports
-import React, { useEffect, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
-import { connect } from 'react-redux';
+import React, {useEffect, useState} from 'react';
+import {useHistory, useParams} from 'react-router-dom';
+import {connect} from 'react-redux';
 // features
-import { Transaction } from '../../features/transactions/interface';
-import { IState } from '../../store';
+import {Transaction} from '../../features/transactions/interface';
+import {IState} from '../../store';
+import {ProjectItemUIType, ProjectType,} from '../../features/project/constants';
 import {
-  ProjectItemUIType,
-  ProjectType,
-} from '../../features/project/constants';
-import {
-  deleteTransaction, deleteContent,
+  deleteContent,
+  deleteTransaction,
   getTransaction,
-  updateTransactionContents,
-  updateTransactionColorSettingShown
+  updateTransactionColorSettingShown,
+  updateTransactionContents
 } from '../../features/transactions/actions';
-import { dateFormat } from '../../features/myBuJo/constants';
+import {dateFormat} from '../../features/myBuJo/constants';
 // modals import
 import EditTransaction from '../../components/modals/edit-transaction.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
 import ShareProjectItem from '../../components/modals/share-project-item.component';
 // antd imports
+import {Avatar, BackTop, Card, Col, Divider, message, Popconfirm, Row, Statistic, Tooltip,} from 'antd';
 import {
-  Avatar,
-  BackTop,
-  Card,
-  Col,
-  Divider, message,
-  Popconfirm,
-  Row,
-  Statistic,
-  Tooltip,
-} from 'antd';
-import {
+  BgColorsOutlined,
   CreditCardOutlined,
   DeleteTwoTone,
   DollarCircleOutlined,
+  PlusOutlined,
   SyncOutlined,
   UpSquareOutlined,
-  PlusOutlined,
-  BgColorsOutlined,
 } from '@ant-design/icons';
 import moment from 'moment';
 import DraggableLabelsList from '../../components/draggable-labels/draggable-label-list.component';
 import TransactionContentList from '../../components/content/content-list.component';
-import { Content } from '../../features/myBuJo/interface';
+import {Content} from '../../features/myBuJo/interface';
 import './transaction-page.styles.less';
 import 'braft-editor/dist/index.css';
 import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
 import LabelManagement from '../project/label-management.compoent';
-import {
-  Container,
-  Button as FloatButton,
-  lightColors,
-  darkColors,
-} from 'react-floating-action-button';
-import { setDisplayMore, setDisplayRevision } from "../../features/content/actions";
+import {Button as FloatButton, Container, darkColors, lightColors,} from 'react-floating-action-button';
+import {setDisplayMore, setDisplayRevision} from "../../features/content/actions";
 import {CopyOutlined, DeleteOutlined, EditOutlined, HighlightOutlined} from "@ant-design/icons/lib";
 import {animation, IconFont, Item, Menu, MenuProvider} from "react-contexify";
 import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
@@ -315,7 +298,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
               cancelText="No"
               onConfirm={() => {
                 deleteTransaction(transaction.id, ProjectItemUIType.PAGE);
-                history.goBack();
+                setTimeout(() => history.goBack(), 500);
               }}
               className="group-setting"
               placement="bottom"

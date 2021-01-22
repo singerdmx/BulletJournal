@@ -232,12 +232,9 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
     const { transactionId, type, dateTime } = action.payload;
     const state: IState = yield select();
     const transaction : Transaction = yield call(getTransactionById, transactionId);
-
-    yield put(
-      transactionsActions.transactionReceived({ transaction: undefined })
-    );
     yield call(deleteTransactionById, transactionId, dateTime);
 
+    console.log(type);
     if (type === ProjectItemUIType.PROJECT || type === ProjectItemUIType.PAYER) {
       const data = yield call(
         fetchTransactions,
@@ -301,6 +298,10 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
     if (state.project.project && ![ProjectItemUIType.LABEL, ProjectItemUIType.TODAY, ProjectItemUIType.RECENT].includes(type)) {
       yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
     }
+    yield call(message.success, `Transaction '${transaction.name}' deleted successfully`);
+    yield put(
+        transactionsActions.transactionReceived({ transaction: undefined })
+    );
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
