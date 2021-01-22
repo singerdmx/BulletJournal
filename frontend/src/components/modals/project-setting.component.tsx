@@ -5,13 +5,12 @@ import {IState} from '../../store';
 import {connect} from 'react-redux';
 import './modals.styles.less';
 import {Project, ProjectSetting} from '../../features/project/interface';
-import {BgColorsOutlined, FileExcelOutlined, SettingOutlined, CrownOutlined} from '@ant-design/icons';
+import {BgColorsOutlined, FileExcelOutlined, SettingOutlined, CrownOutlined, CloseCircleOutlined, CheckCircleOutlined} from '@ant-design/icons';
 import {updateProjectSetting, updateSettingShown} from '../../features/project/actions';
 import {ProjectType} from "../../features/project/constants";
 import {Button as FloatButton, darkColors, lightColors} from "react-floating-action-button";
 import {getGroupByProject} from '../../pages/projects/projects.pages';
-import { GroupsWithOwner } from '../../features/group/interface';
-import { iconMapper } from '../project-dnd/project-dnd.component';
+import {GroupsWithOwner} from '../../features/group/interface';
 
 type ProjectSettingProps = {
   project: Project | undefined;
@@ -48,6 +47,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
     b: '0',
     a: '0',
   });
+  const [currentOwner, setCurrentOwner] = useState(project?.owner.name);
 
   useEffect(() => {
     setDisplayColorPicker(!!projectSetting.color);
@@ -102,9 +102,16 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
   const group = getGroupByProject(groups, project);
   const { Option } = Select;
 
-  const handleChange = (value: any) => {
+  const handleSelectChange = (value: any) => {
     if (value.length === 0) return;
-    console.log('set project owner ' + value);
+    console.log('set project current owner ' + value);
+    setCurrentOwner(value);
+  }
+
+  const handleSetOwner = (change : boolean) => {
+    change ? 
+    console.log('call set owner API') : 
+    console.log('reset');
   }
 
   const getModal = () => (
@@ -114,14 +121,13 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
       onCancel={closeModal}
       footer={false}
     >
-      <div>
-        Owner <CrownOutlined style={{marginRight: '8px'}} />
-        <Tooltip title='Set Project Owner'>
+      {group ? <div style={{marginBottom: '5px'}} >
+      <CrownOutlined style={{marginRight: '8px'}} />Owner 
+        <Tooltip title='Set Project Owner' >
           <Select
-            style={{ minWidth: '100px', maxWidth: '500px'}}
-            placeholder='Select User'
+            style={{ width: '300px', marginLeft: '8px'}}
             defaultValue={project.owner.name}
-            onChange={handleChange}
+            onChange={handleSelectChange}
           >
             {group.users.map((u, index) => { 
               return (
@@ -140,8 +146,38 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
             } 
           </Select>
         </Tooltip>
-      </div>
-      {project?.projectType === ProjectType.TODO && <div>
+        <Tooltip placement="top" title="Save">
+          <CheckCircleOutlined
+            onClick={() => handleSetOwner(true)}
+            style={{
+              marginLeft: '20px',
+              cursor: 'pointer',
+              color: '#00e600',
+              fontSize: 20,
+              visibility:
+                currentOwner !== project.owner.name
+                  ? 'visible'
+                  : 'hidden',
+            }}
+          />
+        </Tooltip>
+        <Tooltip placement="top" title="Cancel">
+          <CloseCircleOutlined
+            onClick={() => handleSetOwner(false)}
+            style={{
+              marginLeft: '20px',
+              cursor: 'pointer',
+              color: '#ff0000',
+              fontSize: 20,
+              visibility:
+                currentOwner !== project.owner.name
+                  ? 'visible'
+                  : 'hidden',
+            }}
+          />
+        </Tooltip>
+      </div > : null}
+      {project?.projectType === ProjectType.TODO && <div style={{marginBottom: '5px'}}>
         <Checkbox
             style={{marginTop: '-0.5em'}}
             onChange={handleAutoDeleteChange}
@@ -151,7 +187,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
         </Checkbox>
         <FileExcelOutlined/>
       </div>}
-      <div>
+      <div style={{marginBottom: '5px'}}>
         <Checkbox
             style={{ marginTop: '-0.5em' }}
             checked={displayColorPicker}
@@ -160,15 +196,14 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
             Set background color
         </Checkbox>
         <BgColorsOutlined />
-
-        <div>
+        <div style={{marginTop: '5px'}} >
             { displayColorPicker ? 
             <div>
               <SwatchesPicker
               color={color}
               onChange={ handleColorChange }
               width={420} 
-              height={150}
+              height={130}
               colors={[['#FCE9DA', '#FFCEC7', '#FFD0A6', '#E098AE'], 
                       ['#EFEFF1', '#ECD4D4', '#CCDBE2', '#C9CBE0'], 
                       ['#E9E1D4', '#F5DDAD', '#F1BCAE', '#C9DECF'], 
