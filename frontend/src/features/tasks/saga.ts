@@ -31,6 +31,7 @@ import {
   UpdateTaskContentRevision,
   UpdateTaskContents,
   UpdateTasks,
+  ShareTaskByEmailAction,
 } from './reducer';
 import {PayloadAction} from 'redux-starter-kit';
 import {
@@ -61,9 +62,10 @@ import {
   uncompleteTaskById,
   updateContent,
   updateSampleContent,
-  updateTask
+  updateTask,
+  shareTaskByEmail
 } from '../../apis/taskApis';
-import {updateLoadingCompletedTask, updateTaskContents, updateTasks,} from './actions';
+import {updateLoadingCompletedTask, updateTaskContents, updateTasks } from './actions';
 import {getProjectItemsAfterUpdateSelect} from '../myBuJo/actions';
 import {IState} from '../../store';
 import {Content, ProjectItems, Revision} from '../myBuJo/interface';
@@ -1300,6 +1302,33 @@ function* fetchTaskStatistics(action: PayloadAction<GetTaskStatisticsAction>) {
   }
 }
 
+function* shareTaskByEmails(action: PayloadAction<ShareTaskByEmailAction>) {
+  try {
+    const {
+      taskId,
+      contents,
+      emails,
+      targetUser,
+      targetGroup,
+    } = action.payload;
+    const data = yield call(
+      shareTaskByEmail,
+      taskId,
+      contents,
+      emails,
+      targetUser,
+      targetGroup,
+    );
+    yield call(message.success, 'Task shared by email successfully');
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Task Share By Email Error Received: ${error}`);
+    }
+  }
+}
+
 export default function* taskSagas() {
   yield all([
     yield takeLatest(
@@ -1353,5 +1382,6 @@ export default function* taskSagas() {
     yield takeLatest(tasksActions.TasksComplete.type, completeTasks),
     yield takeLatest(tasksActions.TaskStatusSet.type, setTaskStatus),
     yield takeLatest(tasksActions.GetTaskStatistics.type, fetchTaskStatistics),
+    yield takeLatest(tasksActions.TaskShareByEmail.type, shareTaskByEmails),
   ]);
 }

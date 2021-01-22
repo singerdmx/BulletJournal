@@ -8,13 +8,12 @@ import {
 } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { IState } from '../../store';
-import { shareTask } from '../../features/tasks/actions';
+import { shareTaskByEmail } from '../../features/tasks/actions';
 import { shareNoteByEmail } from '../../features/notes/actions';
 import {
   getProjectItemType,
   ProjectType,
 } from '../../features/project/constants';
-import { clearUser, updateUser } from '../../features/user/actions';
 import './share-item-modal.styles.less';
 import './share-item-by-email.styles.less'
 import { Content } from '../../features/myBuJo/interface';
@@ -29,7 +28,16 @@ type ProjectItemProps = {
     targetUser?: string,
     targetGroup?: number,
   ) => void;
-  contents: Content[];
+  shareTaskByEmail: (
+    taskId: number,
+    contents: Content[],
+    emails: string[],
+    targetUser?: string,
+    targetGroup?: number,
+  ) => void;
+  noteContents: Content[];
+  taskContents: Content[];
+  transactionContents: Content[];
 };
 
 const ShareProjectItemByEmail: React.FC<ProjectItemProps> = (
@@ -37,6 +45,17 @@ const ShareProjectItemByEmail: React.FC<ProjectItemProps> = (
 ) => {
 
   const [inputList, setInputList] = useState([""]);
+  const shareProjectItemByEmailCall: { [key in ProjectType]: Function } = {
+    [ProjectType.NOTE]: props.shareNoteByEmail,
+    [ProjectType.TODO]: props.shareTaskByEmail,
+    [ProjectType.LEDGER]: () => {},
+  };
+  const contents : { [key in ProjectType ] : Content[] } = {
+    [ProjectType.NOTE]: props.noteContents,
+    [ProjectType.TODO]: props.taskContents,
+    [ProjectType.LEDGER]: props.transactionContents,
+  }
+  const shareFunction = shareProjectItemByEmailCall[props.type];
 
   const handleAdd = () => {
     const values = [...inputList];
@@ -68,9 +87,9 @@ const ShareProjectItemByEmail: React.FC<ProjectItemProps> = (
               <Tooltip title='Send email'>
                   <SendOutlined 
                   onClick={()=> {
-                    props.shareNoteByEmail(
+                    shareFunction(
                       props.projectItemId, 
-                      props.contents,
+                      contents[props.type],
                       inputList
                       );
                   }} />
@@ -112,9 +131,12 @@ const ShareProjectItemByEmail: React.FC<ProjectItemProps> = (
 
 const mapStateToProps = (state: IState) => ({
   user: state.user,
-  contents: state.note.contents
+  noteContents: state.note.contents,
+  taskContents: state.task.contents,
+  transactionContents: state.transaction.contents
 });
 
 export default connect(mapStateToProps, {
   shareNoteByEmail,
+  shareTaskByEmail,
 })(ShareProjectItemByEmail);

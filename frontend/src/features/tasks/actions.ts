@@ -2,6 +2,7 @@ import { actions } from './reducer';
 import { Task, ReminderSetting, TaskStatus } from './interface';
 import { History } from 'history';
 import {ProjectItemUIType} from "../project/constants";
+import { Content } from '../myBuJo/interface';
 
 export const updateTasks = (projectId: number) =>
   actions.TasksUpdate({ projectId: projectId });
@@ -228,4 +229,18 @@ export const getTaskStatistics = (
     endDate: endDate
 });
 
+export const shareTaskByEmail = (
+  taskId: number,
+  contents: Content[],
+  emails: string[],
+  targetUser?: string,
+  targetGroup?: number,
+) =>
+  actions.TaskShareByEmail({
+    taskId: taskId,
+    contents: contents,
+    emails: emails,
+    targetUser: targetUser,
+    targetGroup: targetGroup,
+  });
 
