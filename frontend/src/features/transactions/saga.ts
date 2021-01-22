@@ -229,14 +229,14 @@ function* getTransaction(action: PayloadAction<GetTransaction>) {
 
 function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
   try {
-    const { transactionId, type } = action.payload;
+    const { transactionId, type, dateTime } = action.payload;
     const state: IState = yield select();
-    const transaction = yield call(getTransactionById, transactionId);
+    const transaction : Transaction = yield call(getTransactionById, transactionId);
 
     yield put(
       transactionsActions.transactionReceived({ transaction: undefined })
     );
-    yield call(deleteTransactionById, transactionId);
+    yield call(deleteTransactionById, transactionId, dateTime);
 
     if (type === ProjectItemUIType.PROJECT || type === ProjectItemUIType.PAYER) {
       const data = yield call(

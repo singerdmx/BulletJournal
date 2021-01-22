@@ -57,8 +57,12 @@ export const getTransactionById = (transactionId: number) => {
     });
 };
 
-export const deleteTransactionById = (transactionId: number) => {
-  return doDelete(`/api/transactions/${transactionId}`).catch((err) => {
+export const deleteTransactionById = (transactionId: number, dateTime?: string) => {
+  let url = `/api/transactions/${transactionId}`;
+  if (url) {
+    url += `?dateTime=${dateTime}`;
+  }
+  return doDelete(url).catch((err) => {
     throw Error(err.message);
   });
 };

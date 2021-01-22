@@ -73,7 +73,7 @@ type TransactionProps = {
   currency: string;
   transaction: Transaction | undefined;
   contents: Content[];
-  deleteTransaction: (transactionId: number, type: ProjectItemUIType) => void;
+  deleteTransaction: (transactionId: number, type: ProjectItemUIType, dateTime?: string) => void;
   updateTransactionContents: (transactionId: number, updateDisplayMore?: boolean) => void;
   getProject: (projectId: number) => void;
   updateTransactionColorSettingShown: (

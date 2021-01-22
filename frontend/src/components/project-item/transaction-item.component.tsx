@@ -39,7 +39,7 @@ type TransactionManageProps = {
   inModal?: boolean;
   transaction: Transaction;
   type: ProjectItemUIType;
-  deleteTransaction: (transactionId: number, type: ProjectItemUIType) => void;
+  deleteTransaction: (transactionId: number, type: ProjectItemUIType, dateTime?: string) => void;
 };
 
 const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
@@ -54,7 +54,8 @@ const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
               cancelText='No'
               className='group-setting'
               placement='bottom'
-              onConfirm={() => deleteTransaction(transaction.id, type)}
+              onConfirm={() => deleteTransaction(
+                  transaction.id, type, transaction.recurrenceRule ? transaction.date + ' ' + transaction.time : undefined)}
           >
             <div className='popover-control-item'>
               <span>Delete</span>
