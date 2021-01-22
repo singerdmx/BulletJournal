@@ -137,7 +137,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
 
   const getModal = () => (
     <Modal
-      title={'BuJo Settings'}
+      title={`BuJo '${project.name}' Settings`}
       visible={settingShown}
       onCancel={closeModal}
       footer={false}
@@ -151,7 +151,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
             onChange={handleSelectChange}
             value={currentOwner}
           >
-            {group.users.map((u, index) => { 
+            {group.users.filter((u) => u.accepted).map((u, index) => {
               return (
                 <Option value={u.name} key={u.id}>
                   <Tooltip
