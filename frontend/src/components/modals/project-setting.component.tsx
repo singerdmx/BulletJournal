@@ -1,15 +1,17 @@
 import React, {useEffect, useState} from 'react';
-import {Checkbox, Modal,} from 'antd';
+import {Checkbox, Modal, Tooltip, Select, Avatar,} from 'antd';
 import {RGBColor, SwatchesPicker} from 'react-color';
 import {IState} from '../../store';
 import {connect} from 'react-redux';
 import './modals.styles.less';
 import {Project, ProjectSetting} from '../../features/project/interface';
-import {BgColorsOutlined, FileExcelOutlined, SettingOutlined} from '@ant-design/icons';
+import {BgColorsOutlined, FileExcelOutlined, SettingOutlined, CrownOutlined} from '@ant-design/icons';
 import {updateProjectSetting, updateSettingShown} from '../../features/project/actions';
 import {ProjectType} from "../../features/project/constants";
 import {Button as FloatButton, darkColors, lightColors} from "react-floating-action-button";
-
+import {getGroupByProject} from '../../pages/projects/projects.pages';
+import { GroupsWithOwner } from '../../features/group/interface';
+import { iconMapper } from '../project-dnd/project-dnd.component';
 
 type ProjectSettingProps = {
   project: Project | undefined;
@@ -25,8 +27,13 @@ type ProjectSettingProps = {
   ) => void;
 };
 
-const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
+type GroupProps = {
+  groups: GroupsWithOwner[];
+};
+
+const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props) => {
   const {
+    groups,
     project,
     projectSetting,
     settingShown,
@@ -34,6 +41,10 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
     updateSettingShown,
   } = props;
   
+  if (!project) {
+    return null;
+  }
+
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
   const [bgColor, setBgColor] = useState({
     r: '0',
@@ -88,6 +99,14 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
   const openModal = () => updateSettingShown(true);
   const closeModal = () => updateSettingShown(false);
 
+  const group = getGroupByProject(groups, project);
+  const { Option } = Select;
+
+  const handleChange = (value: any) => {
+    if (value.length === 0) return;
+    console.log('set project owner ' + value);
+  }
+
   const getModal = () => (
     <Modal
       title={'BuJo Settings'}
@@ -95,6 +114,33 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
       onCancel={closeModal}
       footer={false}
     >
+      <div>
+        {/* <Tooltip title='Select BuJo'> */}
+          <Select
+            style={{ minWidth: '100px', maxWidth: '500px', marginRight: '8px'}}
+            placeholder='Select User'
+            defaultValue={project.owner.name}
+            onChange={handleChange}
+          >
+            {group.users.map((u, index) => { 
+              return (
+                <Option value={u.name} key={u.id}>
+                  {/* <Tooltip
+                    title={`${u.alias}`}
+                    placement='left'
+                  > */}
+                    <span>
+                      <Avatar size='small' src={u.avatar} />
+                        &nbsp; {u.alias}
+                    </span>
+                  {/* </Tooltip> */}
+                </Option>
+              )})
+            } 
+          </Select>
+        {/* </Tooltip> */}
+        Set Project Owner <CrownOutlined />
+      </div>
       {project?.projectType === ProjectType.TODO && <div>
         <Checkbox
             style={{marginTop: '-0.5em'}}
@@ -153,6 +199,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps> = (props) => {
 };
 
 const mapStateToProps = (state: IState) => ({
+  groups: state.group.groups,
   project: state.project.project,
   projectSetting: state.project.setting,
   settingShown: state.project.settingShown,
