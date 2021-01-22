@@ -41,10 +41,6 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
     updateSettingShown,
   } = props;
   
-  if (!project) {
-    return null;
-  }
-
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
   const [bgColor, setBgColor] = useState({
     r: '0',
@@ -62,6 +58,10 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
       a: '0',
     })
   }, [projectSetting]);
+
+  if (!project) {
+    return null;
+  }
 
   const onCheckColorIcon = (e: any) => {
     setDisplayColorPicker(!displayColorPicker);
@@ -115,9 +115,10 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
       footer={false}
     >
       <div>
-        {/* <Tooltip title='Select BuJo'> */}
+        Owner <CrownOutlined style={{marginRight: '8px'}} />
+        <Tooltip title='Set Project Owner'>
           <Select
-            style={{ minWidth: '100px', maxWidth: '500px', marginRight: '8px'}}
+            style={{ minWidth: '100px', maxWidth: '500px'}}
             placeholder='Select User'
             defaultValue={project.owner.name}
             onChange={handleChange}
@@ -125,21 +126,20 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
             {group.users.map((u, index) => { 
               return (
                 <Option value={u.name} key={u.id}>
-                  {/* <Tooltip
+                  <Tooltip
                     title={`${u.alias}`}
                     placement='left'
-                  > */}
+                  >
                     <span>
                       <Avatar size='small' src={u.avatar} />
                         &nbsp; {u.alias}
                     </span>
-                  {/* </Tooltip> */}
+                  </Tooltip>
                 </Option>
               )})
             } 
           </Select>
-        {/* </Tooltip> */}
-        Set Project Owner <CrownOutlined />
+        </Tooltip>
       </div>
       {project?.projectType === ProjectType.TODO && <div>
         <Checkbox
