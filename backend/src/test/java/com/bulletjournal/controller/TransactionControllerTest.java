@@ -265,7 +265,7 @@ public class TransactionControllerTest {
     private Transaction createTransaction(Project project, String name, String date, String payer, double amount, Integer type) {
         CreateTransactionParams transaction =
                 new CreateTransactionParams(name, payer, amount,
-                        date, null, TIMEZONE, type);
+                        date, null, TIMEZONE, type, null);
 
         ResponseEntity<Transaction> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,

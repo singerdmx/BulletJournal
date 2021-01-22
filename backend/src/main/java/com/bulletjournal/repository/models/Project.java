@@ -76,7 +76,7 @@ public class Project extends NamedModel {
     public void setOwner(String owner) {
         this.owner = owner;
     }
-    
+
     public Integer getType() {
         return type;
     }
