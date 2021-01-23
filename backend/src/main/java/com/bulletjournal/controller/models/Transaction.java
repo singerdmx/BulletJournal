@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Month;
