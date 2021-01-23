@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Avatar,
   Button,
-  DatePicker, Empty,
+  DatePicker,
+  Empty,
   Form,
   Input,
   InputNumber,
@@ -13,30 +14,33 @@ import {
   Tooltip,
 } from 'antd';
 import {PlusOutlined, SyncOutlined} from '@ant-design/icons';
-import { connect } from 'react-redux';
-import { RouteComponentProps, withRouter, useParams } from 'react-router';
+import {connect} from 'react-redux';
+import {RouteComponentProps, useParams, withRouter} from 'react-router';
 import {
-  createTransaction, updateRecurringTransactions,
+  createTransaction,
+  updateRecurringTransactions,
   updateTransactionVisible,
 } from '../../features/transactions/actions';
 import ReactRRuleGenerator from '../../features/recurrence/RRuleGenerator';
 import {convertToTextWithRRule,} from '../../features/recurrence/actions';
-import { IState } from '../../store';
-import { Project } from '../../features/project/interface';
-import { Group } from '../../features/group/interface';
+import {IState} from '../../store';
+import {Project} from '../../features/project/interface';
+import {Group} from '../../features/group/interface';
 import './modals.styles.less';
-import { updateExpandedMyself } from '../../features/myself/actions';
-import { zones } from '../settings/constants';
-import { dateFormat } from '../../features/myBuJo/constants';
-import { getIcon } from '../draggable-labels/draggable-label-list.component';
-import { labelsUpdate } from '../../features/label/actions';
-import { Label } from '../../features/label/interface';
+import {updateExpandedMyself} from '../../features/myself/actions';
+import {zones} from '../settings/constants';
+import {dateFormat} from '../../features/myBuJo/constants';
+import {getIcon} from '../draggable-labels/draggable-label-list.component';
+import {labelsUpdate} from '../../features/label/actions';
+import {Label} from '../../features/label/interface';
 import {onFilterLabel} from "../../utils/Util";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 import {useHistory} from "react-router-dom";
 import {PlusCircleTwoTone} from "@ant-design/icons/lib";
 import ProjectSettingDialog from "../../components/modals/project-setting.component";
 import {Transaction} from "../../features/transactions/interface";
+import {ProjectItemUIType} from "../../features/project/constants";
+import TransactionItem from "../project-item/transaction-item.component";
 
 
 const { Option } = Select;
@@ -180,7 +184,15 @@ const AddTransaction: React.FC<
       return <Empty/>
     }
 
-    return <div>{props.recurringTransactions.length}</div>
+    return <div>
+      {props.recurringTransactions.map((t: Transaction) => <TransactionItem
+              transaction={t}
+              type={ProjectItemUIType.PAYER}
+              inModal={true}
+              inProject={false}
+          />
+      )}
+    </div>
   }
 
   const getManageRecurringTransactionsModal = () => {
