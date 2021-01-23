@@ -1319,7 +1319,7 @@ function* shareTaskByEmails(action: PayloadAction<ShareTaskByEmailAction>) {
       targetUser,
       targetGroup,
     );
-    yield call(message.success, 'Task shared by email successfully');
+    yield call(message.success, 'Email sent');
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));

@@ -722,7 +722,7 @@ function* shareTransactionByEmails(action: PayloadAction<ShareTransactionByEmail
       targetUser,
       targetGroup,
     );
-    yield call(message.success, 'Transaction shared by email successfully');
+    yield call(message.success, 'Email sent');
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));

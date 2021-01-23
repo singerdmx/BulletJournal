@@ -673,7 +673,7 @@ function* shareNoteByEmails(action: PayloadAction<ShareNoteByEmailAction>) {
       targetUser,
       targetGroup,
     );
-    yield call(message.success, 'Note shared by email successfully');
+    yield call(message.success, 'Email sent');
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
