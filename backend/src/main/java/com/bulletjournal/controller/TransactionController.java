@@ -80,7 +80,9 @@ public class TransactionController {
     @GetMapping(RECURRING_TRANSACTIONS_ROUTE)
     public List<Transaction> getRecurringTransactions(@NotNull @PathVariable Long projectId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return this.transactionDaoJpa.getRecurringTransactions(username, projectId);
+        List<Transaction> transactions = this.transactionDaoJpa.getRecurringTransactions(username, projectId);
+        transactions = ProjectItem.addAvatar(transactions, this.userClient);
+        return transactions;
     }
 
     @GetMapping(TRANSACTIONS_ROUTE)

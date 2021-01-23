@@ -157,8 +157,10 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
   };
 
   const getAvatar = (user: User) => {
-    if (!inProject || !showModal) return <span
-        className='user-avatar-icon'><Avatar src={user.avatar} size='small' /></span>;
+    if (!inProject || !showModal) {
+        return <span
+            className='user-avatar-icon'><Avatar src={user.avatar} size='small' /></span>;
+    }
     return (
         <span
             className='user-avatar-icon'

@@ -153,7 +153,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
           >
             {group.users.filter((u) => u.accepted).map((u, index) => {
               return (
-                <Option value={u.name} key={u.id}>
+                <Option value={u.name} key={index}>
                   <Tooltip
                     title={`${u.alias}`}
                     placement='left'

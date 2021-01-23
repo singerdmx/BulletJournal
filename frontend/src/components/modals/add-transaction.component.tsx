@@ -391,7 +391,6 @@ const AddTransaction: React.FC<
         <Button type='primary' onClick={openNewTranDialogModal}>
           Create New Transaction
         </Button>
-        {getNewTransactionModal()}
       </div>
     );
   }
