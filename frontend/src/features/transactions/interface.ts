@@ -13,7 +13,7 @@ export interface Transaction extends ProjectItem {
 }
 
 export interface TransactionView extends Transaction {
-  paymentTime: number;
+  paymentTime?: number;
 }
 
 export interface TransactionsSummary {
