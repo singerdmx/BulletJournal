@@ -47,6 +47,7 @@ import {getProject} from "../../features/project/actions";
 import {Project} from "../../features/project/interface";
 import {contentEditable} from "../note/note.pages";
 import TransactionColorSettingDialog from '../../components/modals/transaction-color.component';
+import {convertToTextWithRRule} from "../../features/recurrence/actions";
 
 const LocaleCurrency = require('locale-currency');
 
@@ -199,6 +200,20 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
 
   const getPaymentDateTime = (transaction: Transaction) => {
     if (!transaction.date) {
+      if (transaction.recurrenceRule) {
+        const s = convertToTextWithRRule(transaction.recurrenceRule);
+        return <Col span={12}>
+          <Card style={{background: bgColor}}>
+            <Statistic
+                title='Recurring Transaction'
+                value={s}
+                valueStyle={{ fontSize: '21px' }}
+                prefix={<CreditCardOutlined />}
+            />
+          </Card>
+        </Col>
+      }
+
       return null;
     }
 
@@ -322,6 +337,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
                   ` ${currencyType ? `(${currencyType})` : ''}`
                 }
                 value={transaction.amount}
+                valueStyle={{ color: transaction.transactionType === 0 ? '#3f8600' : '#cf1322' }}
                 prefix={<DollarCircleOutlined />}
               />
             </Card>
