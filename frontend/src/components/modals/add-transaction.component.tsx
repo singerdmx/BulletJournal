@@ -121,9 +121,7 @@ const AddTransaction: React.FC<
         date_value,
         time_value,
         recurrence,
-        () => {
-          setManageRecurringTransDialogVisible(true);
-        }
+        openManageRecurringTransDialog
       );
     }
     props.updateTransactionVisible(false);
@@ -132,6 +130,13 @@ const AddTransaction: React.FC<
   const openNewTranDialogModal = () => {
     props.updateTransactionVisible(true);
   };
+
+  const openManageRecurringTransDialog = () => {
+    if (props.project) {
+      props.updateRecurringTransactions(props.project.id);
+    }
+    setManageRecurringTransDialogVisible(true);
+  }
 
   useEffect(() => {
     props.updateExpandedMyself(true);
@@ -380,12 +385,7 @@ const AddTransaction: React.FC<
       <Container>
         <FloatButton
             tooltip="Manage Recurring Transactions"
-            onClick={() => {
-              if (props.project) {
-                props.updateRecurringTransactions(props.project.id);
-              }
-              setManageRecurringTransDialogVisible(true);
-            }}
+            onClick={openManageRecurringTransDialog}
             styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
         >
           <SyncOutlined spin />
