@@ -103,7 +103,7 @@ class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
         }
       });
       item.transactions.forEach((transaction, index) => {
-        if ((transaction.paymentTime)) {
+        if (transaction.paymentTime) {
           calendarEvents.push({
             id: transaction.id,
             title: transaction.name + this.getTransactionTimeString(transaction),

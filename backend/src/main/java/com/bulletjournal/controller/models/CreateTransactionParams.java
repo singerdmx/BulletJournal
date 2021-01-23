@@ -21,8 +21,6 @@ public class CreateTransactionParams {
     @NotNull
     private Double amount;
 
-    @NotBlank
-    @Size(min = 10, max = 10)
     private String date; // "yyyy-MM-dd"
 
     private String time; // "hh:mm"
@@ -43,7 +41,7 @@ public class CreateTransactionParams {
     }
 
     public CreateTransactionParams(@NotBlank @Size(min = 1, max = 100) String name, @NotBlank String payer,
-            @NotNull Double amount, @NotBlank @Size(min = 10, max = 10) String date, String time,
+            @NotNull Double amount, String date, String time,
             @NotBlank String timezone, @NotNull Integer transactionType, String recurrenceRule) {
         this.name = name;
         this.payer = payer;

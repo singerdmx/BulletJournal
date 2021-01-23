@@ -42,8 +42,7 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
     @Column(nullable = false)
     private TransactionType transactionType;
 
-    @NotBlank
-    @Column(nullable = false)
+    @Column
     private String date;
 
     @Column
@@ -53,12 +52,10 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
     @Column(length = 50, nullable = false)
     private String timezone;
 
-    @NotNull
-    @Column(name = "start_time", nullable = false)
+    @Column(name = "start_time")
     private Timestamp startTime;
 
-    @NotNull
-    @Column(name = "end_time", nullable = false)
+    @Column(name = "end_time")
     private Timestamp endTime;
 
     @Column
