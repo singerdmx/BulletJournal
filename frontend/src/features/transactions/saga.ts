@@ -132,7 +132,8 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
       timezone,
       labels,
       time,
-      recurrenceRule
+      recurrenceRule,
+      onSuccess
   } = action.payload;
     yield call(
       createTransaction,
@@ -145,7 +146,7 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
       date,
       time,
       recurrenceRule,
-      labels
+      labels,
     );
 
     const state: IState = yield select();
@@ -166,6 +167,9 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
     );
     if (state.project.project) {
       yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
+    }
+    if (onSuccess) {
+      onSuccess();
     }
   } catch (error) {
     if (error.message === 'reload') {

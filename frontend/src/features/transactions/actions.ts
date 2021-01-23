@@ -36,7 +36,8 @@ export const createTransaction = (
   labels: number[],
   date?: string,
   time?: string,
-  recurrenceRule?: string
+  recurrenceRule?: string,
+  onSuccess?: Function
 ) =>
   actions.TransactionsCreate({
     projectId: projectId,
@@ -48,7 +49,8 @@ export const createTransaction = (
     timezone: timezone,
     labels: labels,
     time: time,
-    recurrenceRule: recurrenceRule
+    recurrenceRule: recurrenceRule,
+    onSuccess: onSuccess
   });
 export const getTransaction = (transactionId: number) =>
   actions.TransactionGet({ transactionId: transactionId });

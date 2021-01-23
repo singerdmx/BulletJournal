@@ -78,7 +78,8 @@ interface TransactionCreateFormProps {
     labels: number[],
     date?: string,
     time?: string,
-    recurrenceRule?: string
+    recurrenceRule?: string,
+    onSuccess?: Function
   ) => void;
   updateExpandedMyself: (updateSettings: boolean) => void;
   currency: string;
@@ -120,6 +121,9 @@ const AddTransaction: React.FC<
         date_value,
         time_value,
         recurrence,
+        () => {
+          setManageRecurringTransDialogVisible(true);
+        }
       );
     }
     props.updateTransactionVisible(false);
@@ -171,7 +175,7 @@ const AddTransaction: React.FC<
       return <Empty/>
     }
 
-    return <div></div>
+    return <div>{props.recurringTransactions.length}</div>
   }
 
   const getManageRecurringTransactionsModal = () => {

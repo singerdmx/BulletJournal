@@ -75,6 +75,7 @@ export type CreateTransaction = {
   labels: number[];
   time?: string;
   recurrenceRule?: string;
+  onSuccess?: Function;
 };
 
 export type GetTransaction = {
