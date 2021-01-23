@@ -96,7 +96,6 @@ const AddTransaction: React.FC<
 > = (props) => {
   const [form] = Form.useForm();
   const history = useHistory();
-  const [timeVisible, setTimeVisible] = useState(false);
   const [manageRecurringTransDialogVisible, setManageRecurringTransDialogVisible] = useState(false);
   const { projectId } = useParams();
   const [recurrent, setRecurrent] = useState(false);
@@ -107,7 +106,7 @@ const AddTransaction: React.FC<
     const time_value = values.time ? values.time.format('HH:mm') : undefined;
     const payerName = values.payerName ? values.payerName : props.myself;
     const timezone = values.timezone ? values.timezone : props.timezone;
-    // const recurrence = recurrent ? props.rRuleString : undefined;
+    const recurrence = recurrent ? props.rRuleString : undefined;
 
     if (props.project) {
       props.createTransaction(
@@ -120,7 +119,7 @@ const AddTransaction: React.FC<
         values.labels,
         date_value,
         time_value,
-        undefined,
+        recurrence,
       );
     }
     props.updateTransactionVisible(false);
@@ -139,6 +138,13 @@ const AddTransaction: React.FC<
       props.labelsUpdate(parseInt(projectId));
     }
   }, []);
+
+  const [rRuleText, setRRuleText] = useState(
+    convertToTextWithRRule(props.rRuleString)
+  );
+  useEffect(() => {
+    setRRuleText(convertToTextWithRRule(props.rRuleString));
+  }, [props.rRuleString]);
 
   const getSelections = () => {
     if (!props.group || !props.group.users) {
@@ -256,7 +262,7 @@ const AddTransaction: React.FC<
           {/* transaction type------------------------------------- */}
           <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>Transaction Type &nbsp;&nbsp;</span>
           <Radio.Group
-            defaultValue={'oneTime'}
+            defaultValue={recurrent ? 'Recurrent' : 'oneTime'}
             onChange={(e) => setRecurrent(e.target.value === 'Recurrent')}
             buttonStyle="solid"
             style={{ marginBottom: 18 }}
@@ -274,8 +280,7 @@ const AddTransaction: React.FC<
                 marginBottom: '24px',
               }}
             >
-              {/* <div className="recurrence-title">{rRuleText}</div> */}
-              <div className="recurrence-title">this is rule text placeholder</div>
+              <div className="recurrence-title">{rRuleText}</div>
               <ReactRRuleGenerator />
             </div>
           ):
@@ -305,8 +310,7 @@ const AddTransaction: React.FC<
                 </Tooltip>
               </div>
             </div>
-          )
-          }
+          )}
 
           <div style={{ display: 'flex' }}>
             <Tooltip title='Time Zone'>
