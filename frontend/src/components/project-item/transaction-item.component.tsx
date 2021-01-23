@@ -21,6 +21,7 @@ import {animation, IconFont, Item, Menu, MenuProvider} from "react-contexify";
 import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
 import CopyToClipboard from "react-copy-to-clipboard";
 import {CopyOutlined} from "@ant-design/icons/lib";
+import {convertToTextWithRRule} from "../../features/recurrence/actions";
 
 const LocaleCurrency = require('locale-currency'); //currency code
 
@@ -117,6 +118,18 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
 
   const getPaymentDateTime = () => {
     if (!transaction.date) {
+        if (transaction.recurrenceRule) {
+            const s = convertToTextWithRRule(transaction.recurrenceRule);
+            return <Tooltip
+                title={s}
+                placement={'bottom'}
+            >
+                <div className="project-item-time">
+                    <Tag className="item-tag">{s}</Tag>
+                </div>
+            </Tooltip>
+        }
+
       return null;
     }
 
