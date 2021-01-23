@@ -125,7 +125,11 @@ const AddTransaction: React.FC<
         date_value,
         time_value,
         recurrence,
-        openManageRecurringTransDialog
+        () => {
+          if (recurrence) {
+            openManageRecurringTransDialog();
+          }
+        }
       );
     }
     props.updateTransactionVisible(false);
