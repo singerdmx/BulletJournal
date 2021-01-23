@@ -1,7 +1,8 @@
-import { doFetch, doPost, doDelete, doPatch, doPut } from './api-helper';
-import { Content } from '../features/myBuJo/interface';
-import { Quill } from 'react-quill';
-import { createHTML } from '../components/content/content-item.component';
+import {doDelete, doFetch, doPatch, doPost, doPut} from './api-helper';
+import {Content} from '../features/myBuJo/interface';
+import {Quill} from 'react-quill';
+import {createHTML} from '../components/content/content-item.component';
+import {Transaction} from "../features/transactions/interface";
 
 export const fetchRecurringTransactions = (projectId: number) => {
   return doFetch(`/api/projects/${projectId}/recurringTransactions`)
@@ -68,16 +69,25 @@ export const deleteTransactionById = (transactionId: number, dateTime?: string) 
 };
 
 export const deleteTransactions = (
-  projectId: number,
-  transactionsId: number[]
+    projectId: number,
+    transactions: Transaction[]
 ) => {
-  let url = `/api/projects/${projectId}/transactions`;
-  if (transactionsId && transactionsId.length > 0) {
-    url += `?transactions=${transactionsId[0]}`;
-
-    for (var i = 1; i < transactionsId.length; i++) {
-      url += `&transactions=${transactionsId[i]}`;
+  const getTransactionString = (t: Transaction) => {
+    if (!t.recurrenceRule) {
+      return t.id;
     }
+
+    // %23 => #
+    // %20 => space
+    return t.id + '%23' + t.date + '%20' + t.time;
+  }
+
+  console.log('transactions', transactions);
+  let url = `/api/projects/${projectId}/transactions`;
+  url += `?transactions=${getTransactionString(transactions[0])}`;
+
+  for (let i = 1; i < transactions.length; i++) {
+    url += `&transactions=${getTransactionString(transactions[i])}`;
   }
   return doDelete(url).catch((err) => {
     throw Error(err.message);

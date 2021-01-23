@@ -323,12 +323,12 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
 
 function* deleteTransactions(action: PayloadAction<DeleteTransactions>) {
   try {
-    const { projectId, transactionsId, type } = action.payload;
+    const { projectId, transactions, type } = action.payload;
     const state: IState = yield select();
 
     if (type === ProjectItemUIType.PAYER) {
       const transactionsByPayer = state.transaction.transactionsByPayer.filter(
-        (t) => !transactionsId.includes(t.id)
+        (t) => !transactions.includes(t)
       );
       yield put(
         transactionsActions.transactionsByPayerReceived({
@@ -340,7 +340,7 @@ function* deleteTransactions(action: PayloadAction<DeleteTransactions>) {
     yield put(
       transactionsActions.transactionReceived({ transaction: undefined })
     );
-    yield call(deleteTransactionsApi, projectId, transactionsId);
+    yield call(deleteTransactionsApi, projectId, transactions);
 
     const data = yield call(
       fetchTransactions,

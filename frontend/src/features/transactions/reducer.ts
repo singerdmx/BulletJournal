@@ -98,7 +98,7 @@ export type DeleteTransaction = {
 
 export type DeleteTransactions = {
   projectId: number;
-  transactionsId: number[];
+  transactions: Transaction[];
   type: ProjectItemUIType;
 };
 

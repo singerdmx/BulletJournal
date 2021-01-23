@@ -12,7 +12,10 @@ import com.bulletjournal.ledger.FrequencyType;
 import com.bulletjournal.ledger.LedgerSummary;
 import com.bulletjournal.ledger.LedgerSummaryCalculator;
 import com.bulletjournal.ledger.LedgerSummaryType;
-import com.bulletjournal.notifications.*;
+import com.bulletjournal.notifications.Auditable;
+import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.NotificationService;
+import com.bulletjournal.notifications.RemoveElasticsearchDocumentEvent;
 import com.bulletjournal.notifications.informed.Informed;
 import com.bulletjournal.notifications.informed.RemoveTransactionEvent;
 import com.bulletjournal.notifications.informed.UpdateTransactionPayerEvent;
@@ -37,9 +40,7 @@ import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
@@ -223,7 +224,7 @@ public class TransactionController {
 
     @DeleteMapping(TRANSACTIONS_ROUTE)
     public void deleteTransactions(@NotNull @PathVariable Long projectId,
-                                   @NotNull @RequestParam List<Long> transactions) {
+                                   @NotNull @RequestParam List<String> transactions) {
         // curl -X DELETE
         // "http://localhost:8080/api/projects/11/transactions?transactions=12&transactions=11&transactions=13&transactions=14"
         // -H "accept: */*"
@@ -233,9 +234,25 @@ public class TransactionController {
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
         com.bulletjournal.repository.models.Project project = this.projectDaoJpa.getProject(projectId, username);
+        List<Long> transactionIds = new ArrayList<>();
+        for (String transaction : transactions) {
+            int separator = transaction.indexOf('#');
+            if (separator < 0) {
+                transactionIds.add(Long.parseLong(transaction));
+                continue;
+            }
+
+            this.transactionDaoJpa.delete(username,
+                    Long.parseLong(transaction.substring(0, separator)),
+                    transaction.substring(separator + 1));
+        }
+
+        if (transactionIds.isEmpty()) {
+            return;
+        }
         List<com.bulletjournal.repository.models.Transaction> transactionList =
-                this.transactionDaoJpa.findAllById(transactions, project).stream()
-                        .filter(t -> t != null)
+                this.transactionDaoJpa.findAllById(transactionIds, project).stream()
+                        .filter(Objects::nonNull)
                         .map(t -> (com.bulletjournal.repository.models.Transaction) t)
                         .collect(Collectors.toList());
         if (transactionList.isEmpty()) {
@@ -244,7 +261,7 @@ public class TransactionController {
 
         this.transactionRepository.deleteInBatch(transactionList);
 
-        List<String> deleteESDocumentIds = ESUtil.getProjectItemSearchIndexIds(transactions, ContentType.TRANSACTION);
+        List<String> deleteESDocumentIds = ESUtil.getProjectItemSearchIndexIds(transactionIds, ContentType.TRANSACTION);
         this.notificationService.deleteESDocument(new RemoveElasticsearchDocumentEvent(deleteESDocumentIds));
 
         for (com.bulletjournal.repository.models.Transaction transaction : transactionList) {

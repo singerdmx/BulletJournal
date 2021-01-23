@@ -58,12 +58,12 @@ export const deleteTransaction = (transactionId: number, type: ProjectItemUIType
   actions.TransactionDelete({ transactionId: transactionId, type: type, dateTime: dateTime });
 export const deleteTransactions = (
   projectId: number,
-  transactionsId: number[],
+  transactions: Transaction[],
   type: ProjectItemUIType
 ) =>
   actions.TransactionsDelete({
     projectId: projectId,
-    transactionsId: transactionsId,
+    transactions: transactions,
     type: type
   });
 export const patchTransaction = (
