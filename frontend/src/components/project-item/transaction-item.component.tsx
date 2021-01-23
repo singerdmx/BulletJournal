@@ -2,7 +2,14 @@ import React from 'react';
 import {Link, useHistory} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {Avatar, message, Popconfirm, Popover, Tag, Tooltip} from 'antd';
-import {CreditCardOutlined, DeleteTwoTone, DollarOutlined, MoreOutlined, BgColorsOutlined,} from '@ant-design/icons';
+import {
+    CreditCardOutlined,
+    DeleteTwoTone,
+    DollarOutlined,
+    MoreOutlined,
+    BgColorsOutlined,
+    CheckCircleTwoTone,
+} from '@ant-design/icons';
 import {deleteTransaction, updateTransactionColorSettingShown} from '../../features/transactions/actions';
 import {Label, stringToRGB} from '../../features/label/interface';
 import {Transaction} from '../../features/transactions/interface';
@@ -79,7 +86,21 @@ const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
         projectItemId={transaction.id}
         mode="div"
       />
-      <Popconfirm
+      {transaction.recurrenceRule ? <Popconfirm
+              title="One Time Only or All Events"
+              okText="Series"
+              cancelText="Occurrence"
+              className='group-setting'
+              placement='bottom'
+              onConfirm={() => deleteTransaction(transaction.id, type)}
+              onCancel={() => deleteTransaction(transaction.id, type, transaction.date + ' ' + transaction.time)}
+          >
+              <div className='popover-control-item'>
+                  <span>Delete</span>
+                  <DeleteTwoTone twoToneColor='#f5222d' />
+              </div>
+          </Popconfirm> :
+          <Popconfirm
         title='Are you sure?'
         okText='Yes'
         cancelText='No'
@@ -91,7 +112,7 @@ const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
           <span>Delete</span>
           <DeleteTwoTone twoToneColor='#f5222d' />
         </div>
-      </Popconfirm>
+      </Popconfirm>}
     </div>
   );
 };
