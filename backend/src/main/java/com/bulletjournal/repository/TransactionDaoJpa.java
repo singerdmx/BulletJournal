@@ -265,13 +265,14 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         String time = updateTransactionParams.getOrDefaultTime(transaction.getTime());
         String timezone = updateTransactionParams.getOrDefaultTimezone(transaction.getTimezone());
 
-        DaoHelper.updateIfPresent(updateTransactionParams.needsUpdateDateTime(),
-                Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()),
-                transaction::setStartTime);
-
-        DaoHelper.updateIfPresent(updateTransactionParams.needsUpdateDateTime(),
-                Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()),
-                transaction::setEndTime);
+        if (date != null) {
+            DaoHelper.updateIfPresent(updateTransactionParams.needsUpdateDateTime(),
+                    Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()),
+                    transaction::setStartTime);
+            DaoHelper.updateIfPresent(updateTransactionParams.needsUpdateDateTime(),
+                    Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()),
+                    transaction::setEndTime);
+        }
 
         transaction.setRecurrenceRule(updateTransactionParams.getRecurrenceRule());
         if (updateTransactionParams.hasRecurrenceRule()) {
