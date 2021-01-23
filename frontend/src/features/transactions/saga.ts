@@ -45,7 +45,7 @@ import {
 } from '../../apis/transactionApis';
 import {LedgerSummary, Transaction} from './interface';
 import {getProjectItemsAfterUpdateSelect} from '../myBuJo/actions';
-import {updateTransactionContents} from './actions';
+import {updateRecurringTransactions, updateTransactionContents} from './actions';
 import {Content, ProjectItems, Revision} from '../myBuJo/interface';
 import {projectLabelsUpdate, updateItemsByLabels} from '../label/actions';
 import {ProjectItemUIType} from "../project/constants";
@@ -241,7 +241,7 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
     yield call(deleteTransactionById, transactionId, dateTime);
 
     console.log(type);
-    if (type === ProjectItemUIType.PROJECT || type === ProjectItemUIType.PAYER) {
+    if (type === ProjectItemUIType.PROJECT || type === ProjectItemUIType.PAYER || type == ProjectItemUIType.MANAGE_RECURRING) {
       const data = yield call(
         fetchTransactions,
         transaction.projectId,
@@ -293,6 +293,10 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
           transactionsByPayer: transactionsByPayer,
         })
       );
+    }
+
+    if (type === ProjectItemUIType.MANAGE_RECURRING) {
+      yield put(updateRecurringTransactions(transaction.projectId));
     }
 
     if (type === ProjectItemUIType.RECENT) {

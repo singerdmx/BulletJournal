@@ -191,7 +191,7 @@ const AddTransaction: React.FC<
     return <div>
       {props.recurringTransactions.map((t: Transaction) => <TransactionItem
               transaction={t}
-              type={ProjectItemUIType.PAYER}
+              type={ProjectItemUIType.MANAGE_RECURRING}
               inModal={true}
               inProject={false}
           />

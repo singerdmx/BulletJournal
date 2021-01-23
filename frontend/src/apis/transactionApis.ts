@@ -59,7 +59,7 @@ export const getTransactionById = (transactionId: number) => {
 
 export const deleteTransactionById = (transactionId: number, dateTime?: string) => {
   let url = `/api/transactions/${transactionId}`;
-  if (url) {
+  if (dateTime) {
     url += `?dateTime=${dateTime}`;
   }
   return doDelete(url).catch((err) => {

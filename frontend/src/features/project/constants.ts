@@ -94,5 +94,6 @@ export enum ProjectItemUIType {
     PAYER,
     ASSIGNEE,
     PAGE,
-    COMPLETE_TASK
+    COMPLETE_TASK,
+    MANAGE_RECURRING
 }
