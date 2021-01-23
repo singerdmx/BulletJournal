@@ -2,14 +2,7 @@ import React from 'react';
 import {Link, useHistory} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {Avatar, message, Popconfirm, Popover, Tag, Tooltip} from 'antd';
-import {
-    CreditCardOutlined,
-    DeleteTwoTone,
-    DollarOutlined,
-    MoreOutlined,
-    BgColorsOutlined,
-    CheckCircleTwoTone,
-} from '@ant-design/icons';
+import {BgColorsOutlined, CreditCardOutlined, DeleteTwoTone, DollarOutlined, MoreOutlined,} from '@ant-design/icons';
 import {deleteTransaction, updateTransactionColorSettingShown} from '../../features/transactions/actions';
 import {Label, stringToRGB} from '../../features/label/interface';
 import {Transaction} from '../../features/transactions/interface';
@@ -52,23 +45,44 @@ type TransactionManageProps = {
 const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
   const { transaction, deleteTransaction, inModal, type } = props;
 
+    const getPopConfirmForDelete = (transaction: Transaction) => {
+        if (!transaction.date || !transaction.recurrenceRule) {
+            // recurring or single occurrence
+            return <Popconfirm
+                title='Are you sure?'
+                okText='Yes'
+                cancelText='No'
+                className='group-setting'
+                placement='bottom'
+                onConfirm={() => deleteTransaction(transaction.id, type)}
+            >
+                <div className='popover-control-item'>
+                    <span>Delete</span>
+                    <DeleteTwoTone twoToneColor='#f5222d'/>
+                </div>
+            </Popconfirm>
+        }
+
+        return <Popconfirm
+            title="One Time Only or All Events"
+            okText="Series"
+            cancelText="Occurrence"
+            className='group-setting'
+            placement='bottom'
+            onConfirm={() => deleteTransaction(transaction.id, type)}
+            onCancel={() => deleteTransaction(transaction.id, type, transaction.date + ' ' + transaction.time)}
+        >
+            <div className='popover-control-item'>
+                <span>Delete</span>
+                <DeleteTwoTone twoToneColor='#f5222d'/>
+            </div>
+        </Popconfirm>
+    }
+
   if (inModal === true) {
     return (
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <Popconfirm
-              title='Are you sure?'
-              okText='Yes'
-              cancelText='No'
-              className='group-setting'
-              placement='bottom'
-              onConfirm={() => deleteTransaction(
-                  transaction.id, type, transaction.recurrenceRule ? transaction.date + ' ' + transaction.time : undefined)}
-          >
-            <div className='popover-control-item'>
-              <span>Delete</span>
-              <DeleteTwoTone twoToneColor='#f5222d' />
-            </div>
-          </Popconfirm>
+        <div style={{display: 'flex', flexDirection: 'column'}}>
+            {getPopConfirmForDelete(transaction)}
         </div>
     );
   }
@@ -86,33 +100,7 @@ const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
         projectItemId={transaction.id}
         mode="div"
       />
-      {transaction.recurrenceRule ? <Popconfirm
-              title="One Time Only or All Events"
-              okText="Series"
-              cancelText="Occurrence"
-              className='group-setting'
-              placement='bottom'
-              onConfirm={() => deleteTransaction(transaction.id, type)}
-              onCancel={() => deleteTransaction(transaction.id, type, transaction.date + ' ' + transaction.time)}
-          >
-              <div className='popover-control-item'>
-                  <span>Delete</span>
-                  <DeleteTwoTone twoToneColor='#f5222d' />
-              </div>
-          </Popconfirm> :
-          <Popconfirm
-        title='Are you sure?'
-        okText='Yes'
-        cancelText='No'
-        className='group-setting'
-        placement='bottom'
-        onConfirm={() => deleteTransaction(transaction.id, type)}
-      >
-        <div className='popover-control-item'>
-          <span>Delete</span>
-          <DeleteTwoTone twoToneColor='#f5222d' />
-        </div>
-      </Popconfirm>}
+      {getPopConfirmForDelete(transaction)}
     </div>
   );
 };
