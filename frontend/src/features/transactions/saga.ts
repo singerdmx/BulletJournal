@@ -276,7 +276,7 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
         projectItem = { ...projectItem };
         if (projectItem.transactions) {
           projectItem.transactions = projectItem.transactions.filter(
-            (transaction) => transaction.id !== transactionId
+            (t) => t.id !== transactionId
           );
         }
         labelItems.push(projectItem);
@@ -286,12 +286,12 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
 
     if (type === ProjectItemUIType.PAYER) {
       const transactionsByPayer = state.transaction.transactionsByPayer.filter(
-        (t) => t.id !== transactionId
+          (t) => t !== transaction
       );
       yield put(
-        transactionsActions.transactionsByPayerReceived({
-          transactionsByPayer: transactionsByPayer,
-        })
+          transactionsActions.transactionsByPayerReceived({
+            transactionsByPayer: transactionsByPayer,
+          })
       );
     }
 

@@ -107,6 +107,10 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
         this.date = date;
     }
 
+    public boolean hasDate() {
+        return StringUtils.isNotBlank(this.date);
+    }
+
     public String getTime() {
         return time;
     }

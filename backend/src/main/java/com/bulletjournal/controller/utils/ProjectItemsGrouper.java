@@ -16,6 +16,15 @@ import java.util.stream.Collectors;
 public class ProjectItemsGrouper {
 
     public static final Comparator<Transaction> TRANSACTION_COMPARATOR = (t1, t2) -> {
+        if (!t1.hasDate() && !t2.hasDate()) {
+            return Long.compare(t1.getId(), t2.getId());
+        }
+        if (!t1.hasDate()) {
+            return 1;
+        }
+        if (!t2.hasDate()) {
+            return -1;
+        }
 
         // Sort transaction by date time
         ZonedDateTime z1 = ZonedDateTimeHelper.getEndTime(t1.getDate(), t1.getTime(), t1.getTimezone());

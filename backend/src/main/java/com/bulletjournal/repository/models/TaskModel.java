@@ -87,7 +87,7 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
     }
 
     public boolean hasDueDate() {
-        return this.dueDate != null;
+        return StringUtils.isNotBlank(this.dueDate);
     }
 
     public String getDueDate() {
