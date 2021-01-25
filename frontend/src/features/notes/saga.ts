@@ -24,6 +24,7 @@ import {
   UpdateNoteContents,
   UpdateNotes,
   UpdateNoteColorAction,
+  ShareNoteByEmailAction
 } from './reducer';
 import {PayloadAction} from 'redux-starter-kit';
 import {
@@ -46,6 +47,7 @@ import {
   updateContent,
   updateNote,
   putNoteColor,
+  shareNoteByEmail,
 } from '../../apis/noteApis';
 import {IState} from '../../store';
 import {updateNoteContents, updateNotes} from './actions';
@@ -654,6 +656,33 @@ function* updateNoteColor(
   }
 }
 
+function* shareNoteByEmails(action: PayloadAction<ShareNoteByEmailAction>) {
+  try {
+    const {
+      noteId,
+      contents,
+      emails,
+      targetUser,
+      targetGroup,
+    } = action.payload;
+    const data = yield call(
+      shareNoteByEmail,
+      noteId,
+      contents,
+      emails,
+      targetUser,
+      targetGroup,
+    );
+    yield call(message.success, 'Email sent');
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Note Share By Email Error Received: ${error}`);
+    }
+  }
+}
+
 export default function* noteSagas() {
   yield all([
     yield takeLatest(
@@ -684,5 +713,6 @@ export default function* noteSagas() {
     yield takeLatest(notesActions.getNotesByOrder.type, getNotesByOrder),
     yield takeLatest(notesActions.NotesDelete.type, notesDelete),
     yield takeLatest(notesActions.updateNoteColor.type, updateNoteColor),
+    yield takeLatest(notesActions.NoteShareByEmail.type, shareNoteByEmails),
   ]);
 }

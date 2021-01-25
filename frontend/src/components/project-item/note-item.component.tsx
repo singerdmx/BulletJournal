@@ -4,7 +4,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {useHistory} from 'react-router-dom';
 // antd imports
-import {CopyOutlined, DeleteTwoTone, FileTextOutlined, FormOutlined, MoreOutlined} from '@ant-design/icons';
+import {CopyOutlined, DeleteTwoTone, FileTextOutlined, FormOutlined, MoreOutlined, BgColorsOutlined} from '@ant-design/icons';
 import {Avatar, message, Popconfirm, Popover, Tag, Tooltip} from 'antd';
 // features import
 import {deleteNote} from '../../features/notes/actions';
@@ -27,6 +27,7 @@ import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
 import CopyToClipboard from "react-copy-to-clipboard";
 import 'react-contexify/dist/ReactContexify.min.css';
 import {IState} from "../../store";
+import {updateColorSettingShown} from '../../features/notes/actions';
 
 type ProjectProps = {
   readOnly: boolean;
@@ -38,6 +39,9 @@ type ProjectProps = {
 type NoteProps = {
   inProject: boolean;
   setSelectedLabel: (label: Label) => void;
+  updateColorSettingShown: (
+    visible: boolean
+  ) => void;
 };
 
 type NoteManageProps = {
@@ -113,7 +117,8 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
         showModal,
         showOrderModal,
         readOnly,
-        setSelectedLabel
+        setSelectedLabel,
+        updateColorSettingShown
     } = props;
 
   // hook history in router
@@ -221,6 +226,11 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
         </div>;
     }
 
+    const handleClickChangeBgColor = (noteId: number) => {
+      history.push(`/note/${noteId}`);
+      updateColorSettingShown(true);
+    }
+
     const getProjectItemContentWithMenu = () => {
         if (inModal === true) {
             return getProjectItemContentDiv()
@@ -231,7 +241,7 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
                 {getProjectItemContentDiv()}
             </MenuProvider>
 
-            <Menu id={`note${note.id}`}
+            <Menu id={`note${note.id}`} style={{background:bgColor}}
                   theme={theme === 'DARK' ? ContextMenuTheme.dark : ContextMenuTheme.light}
                   animation={animation.zoom}>
                 <CopyToClipboard
@@ -243,12 +253,19 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
                         <span>Copy Link Address</span>
                     </Item>
                 </CopyToClipboard>
+                <Item onClick={() => handleClickChangeBgColor(note.id)}>
+                    <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><BgColorsOutlined/></IconFont>
+                    <span>Set Background Color</span>
+                </Item>
             </Menu>
         </>
     }
 
+    const bgColorSetting = note.color ? JSON.parse(note.color) : undefined;
+    const bgColor = bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined;
+
     return (
-        <div className="project-item">
+        <div className="project-item" style={{background: bgColor}}>
             {getProjectItemContentWithMenu()}
             <div className="project-control">
                 <div style={{marginLeft: '5px'}}>
@@ -270,4 +287,4 @@ const mapStateToProps = (state: IState) => ({
     theme: state.myself.theme,
 });
 
-export default connect(mapStateToProps, { deleteNote, setSelectedLabel })(NoteItem);
+export default connect(mapStateToProps, { deleteNote, setSelectedLabel, updateColorSettingShown })(NoteItem);

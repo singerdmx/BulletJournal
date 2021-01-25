@@ -91,7 +91,7 @@ public class UserClient {
 
         try {
             com.bulletjournal.repository.models.User createdUser
-                = this.userDaoJpa.create(username, getUserTimeZone(userInfo));
+                    = this.userDaoJpa.create(username, getUserTimeZone(userInfo));
             updateEmail(createdUser);
         } catch (ResourceAlreadyExistException ex) {
             LOGGER.info(username + " already exists");

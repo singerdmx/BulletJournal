@@ -4,14 +4,16 @@ import {User} from "../group/interface";
 export interface Transaction extends ProjectItem {
   amount: number;
   payer: User;
-  date: string;
+  date?: string;
+  recurrenceRule?: string;
   time: string;
   timezone: string;
   transactionType: number;
+  color?: string;
 }
 
 export interface TransactionView extends Transaction {
-  paymentTime: number;
+  paymentTime?: number;
 }
 
 export interface TransactionsSummary {

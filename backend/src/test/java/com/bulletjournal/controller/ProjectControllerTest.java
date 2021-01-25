@@ -348,7 +348,7 @@ public class ProjectControllerTest {
     private Transaction createTransaction(Project project, String name, String date) {
         CreateTransactionParams transaction =
                 new CreateTransactionParams(name, "BulletJournal", 1000.0,
-                        date, null, TIMEZONE, 1);
+                        date, null, TIMEZONE, 1, null);
         ResponseEntity<Transaction> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,
                 HttpMethod.POST,

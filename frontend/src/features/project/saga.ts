@@ -11,7 +11,8 @@ import {
   UpdateProjects,
   UpdateSharedProjectsOrderAction,
   GetProjectHistoryAction,
-  UpdateProjectSettingAction
+  UpdateProjectSettingAction,
+  SetProjectOwnerAction,
 } from './reducer';
 import { actions as groupsActions } from '../group/reducer';
 import { actions as tasksActions } from '../tasks/reducer';
@@ -26,6 +27,7 @@ import {
   updateSharedProjectsOrder,
   GetProjectHistory,
   updateProjectSetting,
+  postProjectOwner,
 } from '../../apis/projectApis';
 import { IState } from '../../store';
 import { Project, Activity } from './interface';
@@ -309,6 +311,25 @@ function* getProjectHistory(action: PayloadAction<GetProjectHistoryAction>) {
   }
 }
 
+function* setProjectOwner(action: PayloadAction<SetProjectOwnerAction>) {
+  try {
+    const {
+      onSuccess,
+      projectId,
+      owner,
+    } = action.payload;
+
+    yield call(postProjectOwner, projectId, owner);
+    onSuccess();
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Set Project Owner Error Received: ${error}`);
+    }
+  }
+}
+
 export default function* projectSagas() {
   yield all([
     yield takeLatest(
@@ -332,6 +353,10 @@ export default function* projectSagas() {
     yield takeLatest(
       projectActions.updateProjectSetting.type,
       putProjectSetting
+    ),
+    yield takeLatest(
+      projectActions.setProjectOwner.type,
+      setProjectOwner
     ),
   ]);
 }

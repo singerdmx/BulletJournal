@@ -16,7 +16,10 @@ import com.bulletjournal.ledger.TransactionType;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
+import com.google.common.collect.ImmutableList;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.dmfs.rfc5545.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -27,10 +30,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -73,9 +73,12 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
             String requester) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
 
-        return this.transactionRepository
+        List<Transaction> transactions = this.transactionRepository
                 .findTransactionsByProjectBetween(project, Timestamp.from(startTime.toInstant()),
-                        Timestamp.from(endTime.toInstant()))
+                        Timestamp.from(endTime.toInstant()));
+        transactions.addAll(
+                this.getRecurringTransactions(startTime, endTime, ImmutableList.of(project), Optional.empty()));
+        return transactions
                 .stream().sorted((a, b) -> {
                     if (Objects.equals(a.getStartTime(), b.getStartTime())) {
                         return Long.compare(a.getId(), b.getId());
@@ -92,7 +95,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
      *
      * @param id - Transaction identifier to retrieve transaction from ledger
      *           repository
-     * @retVal a Transaction object
+     * @return a Transaction object
      */
     public com.bulletjournal.controller.models.Transaction getTransaction(String requester, Long id) {
         Transaction transaction = this.getProjectItem(id, requester);
@@ -113,12 +116,26 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
      *                  repository
      * @param startTime - Start Time to retrieve transaction from ledger repository
      * @param endTime   - End Time to retrieve transaction from ledger repository
-     * @retVal List of Transaction
+     * @return List of Transaction
      */
     public List<Transaction> getTransactionsBetween(
             String payer, ZonedDateTime startTime, ZonedDateTime endTime, List<Project> projects) {
-        return this.transactionRepository.findTransactionsOfPayerBetween(payer, Timestamp.from(startTime.toInstant()),
+        List<Transaction> result = this.transactionRepository.findTransactionsOfPayerBetween(payer, Timestamp.from(startTime.toInstant()),
                 Timestamp.from(endTime.toInstant()), projects);
+        result.addAll(this.getRecurringTransactions(startTime, endTime, projects, Optional.of(payer)));
+        return result;
+    }
+
+    private List<Transaction> getRecurringTransactions(
+            List<Transaction> targetTransactions, ZonedDateTime startTime, ZonedDateTime endTime) {
+        List<Transaction> recurringTransactionsBetween = new ArrayList<>();
+
+        for (Transaction transaction : targetTransactions) {
+            List<Transaction> recurringTransactions = DaoHelper.getRecurringTransaction(transaction, startTime, endTime);
+            recurringTransactionsBetween.addAll(recurringTransactions);
+        }
+
+        return recurringTransactionsBetween;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -135,6 +152,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         transaction.setPayer(createTransaction.getPayer());
         transaction.setAmount(createTransaction.getAmount());
         transaction.setDate(createTransaction.getDate());
+        transaction.setRecurrenceRule(createTransaction.getRecurrenceRule());
+
         transaction.setTime(createTransaction.getTime());
         transaction.setTimezone(createTransaction.getTimezone());
         transaction.setLocation(createTransaction.getLocation());
@@ -143,18 +162,23 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
             transaction.setLabels(createTransaction.getLabels());
         }
 
-        String date = createTransaction.getDate();
-        String time = createTransaction.getTime();
-        String timezone = createTransaction.getTimezone();
-        transaction.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
-        transaction.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
+        if (createTransaction.hasRecurrenceRule()) {
+            transaction.setDate(null);
+            transaction.setTime(null);
+        } else {
+            String date = createTransaction.getDate();
+            String time = createTransaction.getTime();
+            String timezone = createTransaction.getTimezone();
+            transaction.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()));
+            transaction.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
+        }
 
         return this.transactionRepository.save(transaction);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.Transaction> getTransactionsByPayer(Long projectId,
-            String requester, String payer, ZonedDateTime startTime, ZonedDateTime endTime) {
+                                                                                        String requester, String payer, ZonedDateTime startTime, ZonedDateTime endTime) {
         Project project = this.projectDaoJpa.getProject(projectId, requester);
         if (project.isShared()) {
             return Collections.emptyList();
@@ -162,7 +186,41 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
         List<Transaction> transactions = this.transactionRepository.findTransactionsInProjectByPayerBetween(payer,
                 project, Timestamp.from(startTime.toInstant()), Timestamp.from(endTime.toInstant()));
+        transactions.addAll(this.getRecurringTransactions(
+                startTime, endTime, ImmutableList.of(project), Optional.of(payer)));
         transactions.sort(ProjectItemsGrouper.TRANSACTION_COMPARATOR);
+        return transactions.stream().map(t -> {
+            List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
+            return t.toPresentationModel(labels);
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * Get all recurrent transactions paid by payer (optional) in [startTime, endTime]
+     *
+     * @param payer     the payer of recurrent transaction
+     * @param startTime the requested range start time
+     * @param endTime   the requested range end time
+     * @return List<Transaction> - a list of recurrent transactions within the time range
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Transaction> getRecurringTransactions(
+            ZonedDateTime startTime, ZonedDateTime endTime, List<Project> projects, Optional<String> payer) {
+        List<Transaction> recurringTransactions;
+        if (payer.isPresent()) {
+            recurringTransactions = this.transactionRepository
+                    .findRecurringTransactionsOfPayer(payer.get(), projects);
+        } else {
+            recurringTransactions = this.transactionRepository.findRecurringTransactions(projects);
+        }
+        return getRecurringTransactions(recurringTransactions, startTime, endTime);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<com.bulletjournal.controller.models.Transaction> getRecurringTransactions(
+            String requester, Long projectId) {
+        Project project = this.projectDaoJpa.getProject(projectId, requester);
+        List<Transaction> transactions = this.transactionRepository.findRecurringTransactionsByProject(project);
         return transactions.stream().map(t -> {
             List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
             return t.toPresentationModel(labels);
@@ -171,7 +229,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Pair<List<Event>, Transaction> partialUpdate(String requester, Long transactionId,
-            UpdateTransactionParams updateTransactionParams) {
+                                                        UpdateTransactionParams updateTransactionParams) {
         Transaction transaction = this.getProjectItem(transactionId, requester);
 
         this.authorizationService.checkAuthorizedToOperateOnContent(transaction.getOwner(), requester,
@@ -207,13 +265,22 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         String time = updateTransactionParams.getOrDefaultTime(transaction.getTime());
         String timezone = updateTransactionParams.getOrDefaultTimezone(transaction.getTimezone());
 
-        DaoHelper.updateIfPresent(updateTransactionParams.needsUpdateDateTime(),
-                Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()),
-                transaction::setStartTime);
+        if (date != null) {
+            DaoHelper.updateIfPresent(updateTransactionParams.needsUpdateDateTime(),
+                    Timestamp.from(ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant()),
+                    transaction::setStartTime);
+            DaoHelper.updateIfPresent(updateTransactionParams.needsUpdateDateTime(),
+                    Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()),
+                    transaction::setEndTime);
+        }
 
-        DaoHelper.updateIfPresent(updateTransactionParams.needsUpdateDateTime(),
-                Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()),
-                transaction::setEndTime);
+        transaction.setRecurrenceRule(updateTransactionParams.getRecurrenceRule());
+        if (updateTransactionParams.hasRecurrenceRule()) {
+            transaction.setDate(null);
+            transaction.setTime(null);
+            transaction.setStartTime(null);
+            transaction.setEndTime(null);
+        }
 
         if (updateTransactionParams.hasLabels()) {
             transaction.setLabels(updateTransactionParams.getLabels());
@@ -224,7 +291,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     }
 
     private List<Event> updatePayer(String requester, Long transactionId,
-            UpdateTransactionParams updateTransactionParams, Transaction transaction) {
+                                    UpdateTransactionParams updateTransactionParams, Transaction transaction) {
         List<Event> events = new ArrayList<>();
 
         if (!updateTransactionParams.hasPayer())
@@ -246,7 +313,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public Pair<List<Event>, Transaction> delete(String requester, Long transactionId) {
+    public Pair<List<Event>, Transaction> delete(String requester, Long transactionId, String dateTime) {
         Transaction transaction = this.getProjectItem(transactionId, requester);
         Project project = transaction.getProject();
         Long projectId = project.getId();
@@ -254,8 +321,29 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         this.authorizationService.checkAuthorizedToOperateOnContent(transaction.getOwner(), requester,
                 ContentType.TRANSACTION, Operation.DELETE, projectId, project.getOwner());
 
+        if (dateTime != null && StringUtils.isNotBlank(transaction.getRecurrenceRule())) {
+            return deleteSingleRecurringTransaction(transaction, dateTime);
+        }
+
         this.transactionRepository.delete(transaction);
         return Pair.of(generateEvents(transaction, requester, project), transaction);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public Pair<List<Event>, Transaction> deleteSingleRecurringTransaction(Transaction transaction, String dateTimeStr) {
+        Set<String> deletedSlotsSet = ZonedDateTimeHelper.parseDateTimeSet(transaction.getDeletedSlots());
+        String timezone = transaction.getTimezone();
+        DateTime dateTime = ZonedDateTimeHelper.getDateTime(ZonedDateTimeHelper.convertDateTime(dateTimeStr, timezone));
+
+        if (deletedSlotsSet.contains(dateTime.toString())) {
+            throw new IllegalArgumentException("Duplicated transaction deleted");
+        }
+
+        // update deleted slots and save
+        transaction.setDeletedSlots(transaction.getDeletedSlots() == null ? dateTime.toString()
+                : transaction.getDeletedSlots() + "," + dateTime.toString());
+        this.transactionRepository.save(transaction);
+        return Pair.of(Collections.emptyList(), transaction);
     }
 
     private List<Event> generateEvents(Transaction transaction, String requester, Project project) {

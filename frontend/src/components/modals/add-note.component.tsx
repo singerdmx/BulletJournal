@@ -112,7 +112,6 @@ const AddNote: React.FC<
         <Button type='primary' onClick={openModal}>
           Create New Note
         </Button>
-        {getModal()}
       </div>
     );
   }

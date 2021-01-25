@@ -5,6 +5,7 @@ import com.bulletjournal.repository.models.AuditModel;
 import com.bulletjournal.repository.models.Note;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.Transaction;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotNull;
@@ -15,6 +16,15 @@ import java.util.stream.Collectors;
 public class ProjectItemsGrouper {
 
     public static final Comparator<Transaction> TRANSACTION_COMPARATOR = (t1, t2) -> {
+        if (!t1.hasDate() && !t2.hasDate()) {
+            return Long.compare(t1.getId(), t2.getId());
+        }
+        if (!t1.hasDate()) {
+            return 1;
+        }
+        if (!t2.hasDate()) {
+            return -1;
+        }
 
         // Sort transaction by date time
         ZonedDateTime z1 = ZonedDateTimeHelper.getEndTime(t1.getDate(), t1.getTime(), t1.getTimezone());
@@ -48,8 +58,18 @@ public class ProjectItemsGrouper {
                                                                                 String timezone) {
         Map<ZonedDateTime, List<Transaction>> map = new HashMap<>();
         for (Transaction transaction : transactions) {
+            String date = transaction.getDate();
+            String time = transaction.getTime();
+            if (StringUtils.isBlank(date)) {
+                if (!transaction.hasRecurrenceRule()) {
+                    throw new IllegalStateException("Non-recurring transaction must have date");
+                }
+                ZonedDateTime deadline = ZonedDateTimeHelper.getNow(transaction.getTimezone());
+                date = deadline.format(ZonedDateTimeHelper.DATE_FORMATTER);
+                time = deadline.format(ZonedDateTimeHelper.TIME_FORMATTER);
+            }
             ZonedDateTime zonedDateTime =
-                    ZonedDateTimeHelper.getDateInDifferentZone(transaction.getDate(), transaction.getTime(), transaction.getTimezone(), timezone);
+                    ZonedDateTimeHelper.getDateInDifferentZone(date, time, transaction.getTimezone(), timezone);
             map.computeIfAbsent(zonedDateTime, x -> new ArrayList<>()).add(transaction);
         }
         return map;

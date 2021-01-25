@@ -3,10 +3,10 @@ package com.bulletjournal.controller.models;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.models.Project;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Month;
@@ -26,8 +26,6 @@ public class Transaction extends ProjectItem {
     @NotNull
     private Double amount;
 
-    @NotBlank
-    @Size(min = 10, max = 10)
     private String date;
 
     @NotNull
@@ -42,6 +40,8 @@ public class Transaction extends ProjectItem {
 
     private String color;
 
+    private String recurrenceRule;
+
     public Transaction() {
     }
 
@@ -51,7 +51,7 @@ public class Transaction extends ProjectItem {
                        @NotNull Project project,
                        @NotNull User payer,
                        @NotNull Double amount,
-                       @NotNull String date,
+                       String date,
                        String time,
                        @NotNull String timezone,
                        @NotNull Integer transactionType,
@@ -59,7 +59,8 @@ public class Transaction extends ProjectItem {
                        @NotNull Long updatedAt,
                        List<Label> labels,
                        String location,
-                       String color) {
+                       String color,
+                       String recurrenceRule) {
         super(id, name, owner, project, labels, location);
         this.payer = payer;
         this.amount = amount;
@@ -70,6 +71,7 @@ public class Transaction extends ProjectItem {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.color = color;
+        this.recurrenceRule = recurrenceRule;
         getView(this);
     }
 
@@ -96,6 +98,10 @@ public class Transaction extends ProjectItem {
 
     public String getDate() {
         return date;
+    }
+
+    private boolean hasDate() {
+        return StringUtils.isNotBlank(getDate());
     }
 
     public void setDate(String date) {
@@ -135,15 +141,24 @@ public class Transaction extends ProjectItem {
     }
 
     public String getYear() {
-        return this.date.substring(0, 4);
+        if (!this.hasDate()) {
+            return null;
+        }
+        return this.getDate().substring(0, 4);
     }
 
     public String getMonth() {
-        return this.date.substring(5, 7);
+        if (!hasDate()) {
+            return null;
+        }
+        return this.getDate().substring(5, 7);
     }
 
     public String getYearMonth() {
-        return this.date.substring(0, 7);
+        if (!hasDate()) {
+            return null;
+        }
+        return this.getDate().substring(0, 7);
     }
 
 
@@ -155,20 +170,37 @@ public class Transaction extends ProjectItem {
         this.color = color;
     }
 
+    public String getRecurrenceRule() {
+        return recurrenceRule;
+    }
+
+    public void setRecurrenceRule(String recurrenceRule) {
+        this.recurrenceRule = recurrenceRule;
+    }
+
     public String getReadableYearMonth() {
+        if (!hasDate()) {
+            return null;
+        }
         String month = Month.of(Integer.parseInt(this.getMonth())).name();
         return this.getYear() + " " + month;
     }
 
     public String getReadableWeek() {
         Calendar cal = getCalendar();
+        if (cal == null) {
+            return null;
+        }
         int weekNumber = cal.get(Calendar.WEEK_OF_MONTH);
         String m = Month.of(Integer.parseInt(this.getMonth())).name();
         return this.getYear() + " " + m + " Week " + weekNumber;
     }
 
     private Calendar getCalendar() {
-        String oraceDt = date + " " + ZonedDateTimeHelper.DEFAULT_TIME;
+        if (!hasDate()) {
+            return null;
+        }
+        String oraceDt = getDate() + " " + ZonedDateTimeHelper.DEFAULT_TIME;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(ZonedDateTimeHelper.PATTERN);
         ZonedDateTime zonedDateTime = ZonedDateTime.parse(oraceDt, formatter.withZone(ZoneId.of(timezone)));
         Calendar cal = GregorianCalendar.from(zonedDateTime);
@@ -178,6 +210,10 @@ public class Transaction extends ProjectItem {
 
     public String getWeek() {
         Calendar cal = getCalendar();
+
+        if (cal == null) {
+            return null;
+        }
         cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
 
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -200,16 +236,23 @@ public class Transaction extends ProjectItem {
                 Objects.equals(getDate(), that.getDate()) &&
                 Objects.equals(getTransactionType(), that.getTransactionType()) &&
                 Objects.equals(getTime(), that.getTime()) &&
-                Objects.equals(getTimezone(), that.getTimezone());
+                Objects.equals(getTimezone(), that.getTimezone()) &&
+                Objects.equals(getColor(), that.getColor()) &&
+                Objects.equals(getRecurrenceRule(), that.getRecurrenceRule());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getPayer(), getAmount(), getDate(), getTransactionType(), getTime(), getTimezone());
+        return Objects.hash(super.hashCode(), getPayer(),
+                getAmount(), getDate(), getTransactionType(),
+                getTime(), getTimezone(), getColor());
     }
 
     public static Transaction getView(Transaction transaction) {
         String date = transaction.getDate();
+        if (date == null) {
+            return transaction;
+        }
         String time = transaction.getTime();
         String timezone = transaction.getTimezone();
         Long paymentTime = ZonedDateTimeHelper.getStartTime(date, time, timezone).toInstant().toEpochMilli();

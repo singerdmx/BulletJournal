@@ -123,7 +123,7 @@ public class ProjectDaoJpa {
         }
 
         List<com.bulletjournal.controller.models.Project> l = getOwnerProjects(
-                this.userProjectsRepository.findById(o).get(), o, projectsByOwner);
+                this.userProjectsRepository.findById(o).orElse(new UserProjects()), o, projectsByOwner);
         if (l.isEmpty()) {
             return;
         }
@@ -375,5 +375,16 @@ public class ProjectDaoJpa {
         }
 
         return result;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void setProjectOwner(Long projectId, String owner, String requester) {
+        Project project = getProject(projectId, requester);
+        this.authorizationService.checkAuthorizedToOperateOnContent(
+                project.getOwner(), requester, ContentType.PROJECT, Operation.UPDATE, project.getId());
+
+        this.authorizationService.validateRequesterInProjectGroup(owner, project);
+        project.setOwner(owner);
+        this.projectRepository.save(project);
     }
 }

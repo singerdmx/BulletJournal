@@ -2,6 +2,7 @@ import {actions} from './reducer';
 import {Note} from './interface';
 import {History} from 'history';
 import {ProjectItemUIType} from "../project/constants";
+import { Content } from '../myBuJo/interface';
 
 export const updateNotes = (projectId: number) =>
   actions.NotesUpdate({ projectId: projectId });
@@ -117,4 +118,19 @@ export const updateNoteColor = (
   actions.updateNoteColor({ 
     noteId: noteId,
     color: color,
+  });
+
+export const shareNoteByEmail = (
+  noteId: number,
+  contents: Content[],
+  emails: string[],
+  targetUser?: string,
+  targetGroup?: number,
+) =>
+  actions.NoteShareByEmail({
+    noteId: noteId,
+    contents: contents,
+    emails: emails,
+    targetUser: targetUser,
+    targetGroup: targetGroup,
   });

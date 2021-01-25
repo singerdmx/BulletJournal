@@ -56,6 +56,10 @@ export type UpdateTransactions = {
   labelsToRemove?: number[];
 };
 
+export type UpdateRecurringTransactions = {
+  projectId: number;
+};
+
 export type updateVisibleAction = {
   visible: boolean;
 };
@@ -66,10 +70,12 @@ export type CreateTransaction = {
   name: string;
   payer: string;
   transactionType: number;
-  date: string;
+  date?: string;
   timezone: string;
   labels: number[];
   time?: string;
+  recurrenceRule?: string;
+  onSuccess?: Function;
 };
 
 export type GetTransaction = {
@@ -87,11 +93,12 @@ export type TransactionAction = {
 export type DeleteTransaction = {
   transactionId: number;
   type: ProjectItemUIType;
+  dateTime?: string;
 };
 
 export type DeleteTransactions = {
   projectId: number;
-  transactionsId: number[];
+  transactions: Transaction[];
   type: ProjectItemUIType;
 };
 
@@ -109,6 +116,7 @@ export type PatchTransaction = {
   time?: string;
   timezone?: string;
   labels?: number[];
+  recurrenceRule?: string;
 };
 
 export type MoveTransaction = {
@@ -151,6 +159,27 @@ export type TransactionsByPayerAction = {
   transactionsByPayer: Array<Transaction>;
 };
 
+export type RecurringTransactionsAction = {
+  transactions: Transaction[];
+};
+
+export type UpdateTransactionColorSettingShownAction = {
+  TransactionColorSettingShown: boolean;
+};
+
+export type UpdateTransactionColorAction = {
+  transactionId: number;
+  color: string | undefined;
+};
+
+export type ShareTransactionByEmailAction = {
+  transactionId: number,
+  contents: Content[],
+  emails: string[],
+  targetUser?: string,
+  targetGroup?: number,
+};
+
 let initialState = {
   contents: [] as Array<Content>,
   transaction: undefined as Transaction | undefined,
@@ -162,7 +191,9 @@ let initialState = {
   frequencyType: FrequencyType.MONTHLY,
   ledgerSummaryType: LedgerSummaryType.DEFAULT,
   timezone: '',
+  recurringTransactions: [] as Array<Transaction>,
   transactionsByPayer: [] as Array<Transaction>,
+  transactionColorSettingShown: false,
 };
 
 const slice = createSlice({
@@ -175,6 +206,13 @@ const slice = createSlice({
     ) => {
       const { transactionsByPayer } = action.payload;
       state.transactionsByPayer = transactionsByPayer;
+    },
+    recurringTransactionsReceived: (
+        state,
+        action: PayloadAction<RecurringTransactionsAction>
+    ) => {
+      const { transactions } = action.payload;
+      state.recurringTransactions = transactions;
     },
     getTransactionsByPayer: (
       state,
@@ -204,6 +242,8 @@ const slice = createSlice({
     ) => state,
     TransactionsUpdate: (state, action: PayloadAction<UpdateTransactions>) =>
       state,
+    RecurringTransactionsUpdate: (state, action: PayloadAction<UpdateRecurringTransactions>) =>
+        state,
     TransactionsCreate: (state, action: PayloadAction<CreateTransaction>) =>
       state,
     TransactionGet: (state, action: PayloadAction<GetTransaction>) => state,
@@ -263,6 +303,18 @@ const slice = createSlice({
         state.timezone = timezone;
       }
     },
+    updateTransactionColorSettingShown: (
+      state,
+      action: PayloadAction<UpdateTransactionColorSettingShownAction>
+    ) => {
+      const { TransactionColorSettingShown } = action.payload;
+      state.transactionColorSettingShown = TransactionColorSettingShown;
+    },
+    updateTransactionColor: (
+      state,
+      action: PayloadAction<UpdateTransactionColorAction>
+    ) => state,
+    TransactionShareByEmail: (state, action: PayloadAction<ShareTransactionByEmailAction>) => state,
   },
 });
 

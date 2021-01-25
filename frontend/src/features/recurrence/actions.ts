@@ -2,6 +2,7 @@ import {actions} from './reducer';
 import {bySetPosMap, byWeekDayMap, MonthlyOn, MonthlyOnThe, Weekly, YearlyOn, YearlyOnThe,} from './interface';
 import RRule, {Frequency} from 'rrule';
 import {Task} from "../tasks/interface";
+import { Transaction } from '../transactions/interface';
 
 export const updateFreq = (freq: Frequency) =>
   actions.updateFreq({ freq: freq });
@@ -74,6 +75,9 @@ export const updateYearlyOn = (yearlyOn: boolean) =>
 
 export const updateRruleString = (task: Task) =>
   actions.updateRRuleString({ task: task });
+
+export const updateTransactionRruleString = (transaction: Transaction) =>
+  actions.updateTransactionRRuleString({ transaction: transaction });
 
 export const getBySetPosWhich = (rule: RRule) => {
     let which = 'First';

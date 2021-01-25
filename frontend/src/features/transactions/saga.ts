@@ -1,5 +1,5 @@
-import { all, call, put, select, takeLatest } from 'redux-saga/effects';
-import { message } from 'antd';
+import {all, call, put, select, takeLatest} from 'redux-saga/effects';
+import {message} from 'antd';
 import {
   actions as transactionsActions,
   CreateContent,
@@ -14,37 +14,43 @@ import {
   PatchTransaction,
   SetTransactionLabels,
   ShareTransaction,
+  ShareTransactionByEmailAction,
   TransactionApiErrorAction,
+  UpdateRecurringTransactions,
+  UpdateTransactionColorAction,
   UpdateTransactionContentRevision,
   UpdateTransactionContents,
   UpdateTransactions,
 } from './reducer';
-import { IState } from '../../store';
-import { PayloadAction } from 'redux-starter-kit';
+import {IState} from '../../store';
+import {PayloadAction} from 'redux-starter-kit';
 import {
   addContent,
   createTransaction,
   deleteContent,
   deleteTransactionById,
   deleteTransactions as deleteTransactionsApi,
+  fetchRecurringTransactions,
   fetchTransactions,
   getContentRevision,
   getContents,
   getTransactionById,
   moveToTargetProject,
+  putTransactionColor,
   setTransactionLabels,
+  shareTransactionByEmail,
   shareTransactionWithOther,
   updateContent,
   updateTransaction,
 } from '../../apis/transactionApis';
-import { LedgerSummary } from './interface';
-import { getProjectItemsAfterUpdateSelect } from '../myBuJo/actions';
-import { updateTransactionContents } from './actions';
-import { Content, ProjectItems, Revision } from '../myBuJo/interface';
+import {LedgerSummary, Transaction} from './interface';
+import {getProjectItemsAfterUpdateSelect} from '../myBuJo/actions';
+import {updateRecurringTransactions, updateTransactionContents} from './actions';
+import {Content, ProjectItems, Revision} from '../myBuJo/interface';
 import {projectLabelsUpdate, updateItemsByLabels} from '../label/actions';
-import { ProjectItemUIType } from "../project/constants";
-import { ContentType } from "../myBuJo/constants";
-import { recentItemsReceived } from "../recent/actions";
+import {ProjectItemUIType} from "../project/constants";
+import {ContentType} from "../myBuJo/constants";
+import {recentItemsReceived} from "../recent/actions";
 import {setDisplayMore, updateTargetContent} from "../content/actions";
 import {reloadReceived} from "../myself/actions";
 
@@ -96,6 +102,24 @@ function* transactionsUpdate(action: PayloadAction<UpdateTransactions>) {
   }
 }
 
+function* recurringTransactionsUpdate(action: PayloadAction<UpdateRecurringTransactions>) {
+  try {
+    const {projectId} = action.payload;
+    const data = yield call(fetchRecurringTransactions, projectId);
+    yield put(
+        transactionsActions.recurringTransactionsReceived({
+          transactions: data,
+        })
+    );
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `recurringTransactionsUpdate Error Received: ${error}`);
+    }
+  }
+}
+
 function* transactionCreate(action: PayloadAction<CreateTransaction>) {
   try {
     const {
@@ -108,7 +132,9 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
       timezone,
       labels,
       time,
-    } = action.payload;
+      recurrenceRule,
+      onSuccess
+  } = action.payload;
     yield call(
       createTransaction,
       projectId,
@@ -116,10 +142,11 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
       name,
       payer,
       transactionType,
-      date,
       timezone,
+      date,
+      time,
+      recurrenceRule,
       labels,
-      time
     );
 
     const state: IState = yield select();
@@ -140,6 +167,9 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
     );
     if (state.project.project) {
       yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
+    }
+    if (onSuccess) {
+      onSuccess();
     }
   } catch (error) {
     if (error.message === 'reload') {
@@ -205,16 +235,13 @@ function* getTransaction(action: PayloadAction<GetTransaction>) {
 
 function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
   try {
-    const { transactionId, type } = action.payload;
+    const { transactionId, type, dateTime } = action.payload;
     const state: IState = yield select();
-    const transaction = yield call(getTransactionById, transactionId);
+    const transaction : Transaction = yield call(getTransactionById, transactionId);
+    yield call(deleteTransactionById, transactionId, dateTime);
 
-    yield put(
-      transactionsActions.transactionReceived({ transaction: undefined })
-    );
-    yield call(deleteTransactionById, transactionId);
-
-    if (type === ProjectItemUIType.PROJECT || type === ProjectItemUIType.PAYER) {
+    console.log(type);
+    if (type === ProjectItemUIType.PROJECT || type === ProjectItemUIType.PAYER || type == ProjectItemUIType.MANAGE_RECURRING) {
       const data = yield call(
         fetchTransactions,
         transaction.projectId,
@@ -249,7 +276,7 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
         projectItem = { ...projectItem };
         if (projectItem.transactions) {
           projectItem.transactions = projectItem.transactions.filter(
-            (transaction) => transaction.id !== transactionId
+            (t) => t.id !== transactionId
           );
         }
         labelItems.push(projectItem);
@@ -259,13 +286,17 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
 
     if (type === ProjectItemUIType.PAYER) {
       const transactionsByPayer = state.transaction.transactionsByPayer.filter(
-        (t) => t.id !== transactionId
+          (t) => t !== transaction
       );
       yield put(
-        transactionsActions.transactionsByPayerReceived({
-          transactionsByPayer: transactionsByPayer,
-        })
+          transactionsActions.transactionsByPayerReceived({
+            transactionsByPayer: transactionsByPayer,
+          })
       );
+    }
+
+    if (type === ProjectItemUIType.MANAGE_RECURRING) {
+      yield put(updateRecurringTransactions(transaction.projectId));
     }
 
     if (type === ProjectItemUIType.RECENT) {
@@ -277,6 +308,10 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
     if (state.project.project && ![ProjectItemUIType.LABEL, ProjectItemUIType.TODAY, ProjectItemUIType.RECENT].includes(type)) {
       yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
     }
+    yield call(message.success, `Transaction '${transaction.name}' deleted successfully`);
+    yield put(
+        transactionsActions.transactionReceived({ transaction: undefined })
+    );
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
@@ -288,12 +323,12 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
 
 function* deleteTransactions(action: PayloadAction<DeleteTransactions>) {
   try {
-    const { projectId, transactionsId, type } = action.payload;
+    const { projectId, transactions, type } = action.payload;
     const state: IState = yield select();
 
     if (type === ProjectItemUIType.PAYER) {
       const transactionsByPayer = state.transaction.transactionsByPayer.filter(
-        (t) => !transactionsId.includes(t.id)
+        (t) => !transactions.includes(t)
       );
       yield put(
         transactionsActions.transactionsByPayerReceived({
@@ -305,7 +340,7 @@ function* deleteTransactions(action: PayloadAction<DeleteTransactions>) {
     yield put(
       transactionsActions.transactionReceived({ transaction: undefined })
     );
-    yield call(deleteTransactionsApi, projectId, transactionsId);
+    yield call(deleteTransactionsApi, projectId, transactions);
 
     const data = yield call(
       fetchTransactions,
@@ -347,6 +382,7 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
       time,
       timezone,
       labels,
+      recurrenceRule
     } = action.payload;
     const data = yield call(
       updateTransaction,
@@ -358,7 +394,8 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
       date,
       time,
       timezone,
-      labels
+      labels,
+      recurrenceRule
     );
     const projectId = data.projectId;
     const state: IState = yield select();
@@ -647,6 +684,54 @@ function* getTransactionsByPayer(
   }
 }
 
+function* updateTransactionColor(
+  action: PayloadAction<UpdateTransactionColorAction>
+) {
+  try {
+    const {transactionId, color} = action.payload;
+    const data : Transaction = yield call(
+      putTransactionColor,
+      transactionId,
+      color,
+    );
+
+    yield put(transactionsActions.transactionReceived({transaction: data}));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Set Transaction Color Fail: ${error}`);
+    }
+  }
+}
+
+function* shareTransactionByEmails(action: PayloadAction<ShareTransactionByEmailAction>) {
+  try {
+    const {
+      transactionId,
+      contents,
+      emails,
+      targetUser,
+      targetGroup,
+    } = action.payload;
+    const data = yield call(
+      shareTransactionByEmail,
+      transactionId,
+      contents,
+      emails,
+      targetUser,
+      targetGroup,
+    );
+    yield call(message.success, 'Email sent');
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Transaction Share By Email Error Received: ${error}`);
+    }
+  }
+}
+
 export default function* transactionSagas() {
   yield all([
     yield takeLatest(
@@ -707,5 +792,15 @@ export default function* transactionSagas() {
       transactionsActions.getTransactionsByPayer.type,
       getTransactionsByPayer
     ),
+    yield takeLatest(
+      transactionsActions.updateTransactionColor.type, 
+      updateTransactionColor
+    ),
+    yield takeLatest(
+      transactionsActions.TransactionShareByEmail.type, 
+      shareTransactionByEmails),
+    yield takeLatest(
+      transactionsActions.RecurringTransactionsUpdate.type,
+      recurringTransactionsUpdate),
   ]);
 }

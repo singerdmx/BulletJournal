@@ -91,6 +91,62 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Autowired
     private UserDaoJpa userDaoJpa;
 
+    public static Task generateTask(String owner, Project project, CreateTaskParams createTaskParams) {
+        return generateTask(owner, project, createTaskParams, null);
+    }
+
+    public static Task generateTask(String owner, Project project, CreateTaskParams createTaskParams,
+                                    SampleTask sampleTask) {
+        createTaskParams.selfClean();
+
+        Task task = new Task();
+        task.setProject(project);
+        task.setDueDate(createTaskParams.getDueDate());
+        task.setDueTime(createTaskParams.getDueTime());
+        task.setOwner(owner);
+        task.setName(createTaskParams.getName());
+        task.setTimezone(createTaskParams.getTimezone());
+        task.setDuration(createTaskParams.getDuration());
+        if (createTaskParams.hasDuration() && createTaskParams.getDuration() <= 0) {
+            task.setDuration(null);
+        }
+        task.setAssignees(createTaskParams.getAssignees());
+        task.setRecurrenceRule(createTaskParams.getRecurrenceRule());
+        if (createTaskParams.getLabels() != null && !createTaskParams.getLabels().isEmpty()) {
+            task.setLabels(createTaskParams.getLabels());
+        }
+
+        String date = createTaskParams.getDueDate();
+        String time = createTaskParams.getDueTime();
+        String timezone = createTaskParams.getTimezone();
+        ReminderSetting reminderSetting = getReminderSetting(date, task, time, timezone,
+                createTaskParams.getRecurrenceRule(), createTaskParams.getReminderSetting());
+        task.setReminderSetting(reminderSetting);
+        task.setLocation(createTaskParams.getLocation());
+        task.setSampleTask(sampleTask);
+        return task;
+    }
+
+    private static ReminderSetting getReminderSetting(String dueDate, Task task, String time, String timezone,
+                                                      String recurrenceRule, ReminderSetting reminderSetting) {
+        if (dueDate != null) {
+            task.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(dueDate, time, timezone).toInstant()));
+            task.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(dueDate, time, timezone).toInstant()));
+        } else {
+            task.setStartTime(null);
+            task.setEndTime(null);
+            if (recurrenceRule == null) {
+                // set no reminder
+                reminderSetting = new ReminderSetting();
+            }
+        }
+
+        if (reminderSetting == null) {
+            reminderSetting = new ReminderSetting();
+        }
+        return reminderSetting;
+    }
+
     @Override
     public JpaRepository getJpaRepository() {
         return this.taskRepository;
@@ -278,7 +334,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             return false;
         }).collect(Collectors.toList());
 
-        List<Task> recurrentTasks = this.getRecurringTaskOfAssignee(assignee, startTime, endTime);
+        List<Task> recurrentTasks = this.getRecurringTaskOfAssigneeInProjects(assignee, projectIds, startTime, endTime);
 
         tasks.addAll(recurrentTasks);
         return tasks;
@@ -341,6 +397,20 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Task> getRecurringTaskOfAssignee(String assignee, ZonedDateTime startTime, ZonedDateTime endTime) {
         List<Task> recurringTasks = this.taskRepository.findTasksByAssigneeAndRecurrenceRuleNotNull(assignee);
+        return getRecurringTasks(recurringTasks, startTime, endTime);
+    }
+
+    /**
+     * Get all recurrent tasks of an assignee in [startTime, endTime]
+     *
+     * @param assignee  the assignee of recurrent task
+     * @param startTime the requested range start time
+     * @param endTime   the requested range end time
+     * @return List<Task> - a list of recurrent tasks within the time range
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Task> getRecurringTaskOfAssigneeInProjects(String assignee, List<Long> projectIds, ZonedDateTime startTime, ZonedDateTime endTime) {
+        List<Task> recurringTasks = this.taskRepository.findTasksInProjectsByAssigneeAndRecurrenceRuleNotNull(assignee, projectIds);
         return getRecurringTasks(recurringTasks, startTime, endTime);
     }
 
@@ -528,42 +598,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         return result;
     }
 
-    public static Task generateTask(String owner, Project project, CreateTaskParams createTaskParams) {
-        return generateTask(owner, project, createTaskParams, null);
-    }
-
-    public static Task generateTask(String owner, Project project, CreateTaskParams createTaskParams,
-                                    SampleTask sampleTask) {
-        createTaskParams.selfClean();
-
-        Task task = new Task();
-        task.setProject(project);
-        task.setDueDate(createTaskParams.getDueDate());
-        task.setDueTime(createTaskParams.getDueTime());
-        task.setOwner(owner);
-        task.setName(createTaskParams.getName());
-        task.setTimezone(createTaskParams.getTimezone());
-        task.setDuration(createTaskParams.getDuration());
-        if (createTaskParams.hasDuration() && createTaskParams.getDuration() <= 0) {
-            task.setDuration(null);
-        }
-        task.setAssignees(createTaskParams.getAssignees());
-        task.setRecurrenceRule(createTaskParams.getRecurrenceRule());
-        if (createTaskParams.getLabels() != null && !createTaskParams.getLabels().isEmpty()) {
-            task.setLabels(createTaskParams.getLabels());
-        }
-
-        String date = createTaskParams.getDueDate();
-        String time = createTaskParams.getDueTime();
-        String timezone = createTaskParams.getTimezone();
-        ReminderSetting reminderSetting = getReminderSetting(date, task, time, timezone,
-                createTaskParams.getRecurrenceRule(), createTaskParams.getReminderSetting());
-        task.setReminderSetting(reminderSetting);
-        task.setLocation(createTaskParams.getLocation());
-        task.setSampleTask(sampleTask);
-        return task;
-    }
-
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void create(Long projectId, String owner, CreateTaskParams createTaskParams, String eventId, String text) {
         // Skip duplicated eventId
@@ -595,26 +629,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Optional<Task> getTaskByGoogleCalendarEventId(String eventId, Project project) {
         return this.taskRepository.findTaskByGoogleCalendarEventIdAndProject(eventId, project);
-    }
-
-    private static ReminderSetting getReminderSetting(String dueDate, Task task, String time, String timezone,
-                                                      String recurrenceRule, ReminderSetting reminderSetting) {
-        if (dueDate != null) {
-            task.setStartTime(Timestamp.from(ZonedDateTimeHelper.getStartTime(dueDate, time, timezone).toInstant()));
-            task.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(dueDate, time, timezone).toInstant()));
-        } else {
-            task.setStartTime(null);
-            task.setEndTime(null);
-            if (recurrenceRule == null) {
-                // set no reminder
-                reminderSetting = new ReminderSetting();
-            }
-        }
-
-        if (reminderSetting == null) {
-            reminderSetting = new ReminderSetting();
-        }
-        return reminderSetting;
     }
 
     /**
@@ -739,7 +753,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * 2. Delete tasks and its sub tasks from task table
      * 3. Add tasks and its sub tasks to complete task table
      *
-     * @param taskList  the tasks
+     * @param taskList the tasks
      * @return List<CompleteTask> - a list of repository model complete task objects
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

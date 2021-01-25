@@ -2,6 +2,7 @@ import { actions } from './reducer';
 import { History } from 'history';
 import {FrequencyType, LedgerSummaryType, Transaction} from './interface';
 import {ProjectItemUIType} from "../project/constants";
+import { Content } from '../myBuJo/interface';
 
 export const updateTransactions = (
   projectId: number,
@@ -23,16 +24,20 @@ export const updateTransactions = (
     labelsToKeep: labelsToKeep,
     labelsToRemove: labelsToRemove
   });
+export const updateRecurringTransactions = (projectId: number) =>
+    actions.RecurringTransactionsUpdate({projectId: projectId});
 export const createTransaction = (
   projectId: number,
   amount: number,
   name: string,
   payer: string,
-  date: string,
   transactionType: number,
   timezone: string,
   labels: number[],
-  time?: string
+  date?: string,
+  time?: string,
+  recurrenceRule?: string,
+  onSuccess?: Function
 ) =>
   actions.TransactionsCreate({
     projectId: projectId,
@@ -44,19 +49,21 @@ export const createTransaction = (
     timezone: timezone,
     labels: labels,
     time: time,
+    recurrenceRule: recurrenceRule,
+    onSuccess: onSuccess
   });
 export const getTransaction = (transactionId: number) =>
   actions.TransactionGet({ transactionId: transactionId });
-export const deleteTransaction = (transactionId: number, type: ProjectItemUIType) =>
-  actions.TransactionDelete({ transactionId: transactionId, type: type });
+export const deleteTransaction = (transactionId: number, type: ProjectItemUIType, dateTime?: string) =>
+  actions.TransactionDelete({ transactionId: transactionId, type: type, dateTime: dateTime });
 export const deleteTransactions = (
   projectId: number,
-  transactionsId: number[],
+  transactions: Transaction[],
   type: ProjectItemUIType
 ) =>
   actions.TransactionsDelete({
     projectId: projectId,
-    transactionsId: transactionsId,
+    transactions: transactions,
     type: type
   });
 export const patchTransaction = (
@@ -64,11 +71,12 @@ export const patchTransaction = (
   amount: number,
   name: string,
   payer: string,
-  date: string,
-  time: string,
   transactionType: number,
   timezone: string,
-  labels?: number[]
+  date?: string,
+  time?: string,
+  recurrenceRule?: string,
+  labels?: number[],
 ) =>
   actions.TransactionPatch({
     transactionId: transactionId,
@@ -80,6 +88,7 @@ export const patchTransaction = (
     transactionType: transactionType,
     timezone: timezone,
     labels: labels,
+    recurrenceRule: recurrenceRule
   });
 export const setTransactionLabels = (transactionId: number, labels: number[]) =>
   actions.TransactionSetLabels({
@@ -189,3 +198,30 @@ export const getTransactionsByPayer = (
 
 export const transactionReceived = (transaction: Transaction | undefined) =>
     actions.transactionReceived({transaction: transaction});
+
+export const updateTransactionColorSettingShown = (visible: boolean) =>
+    actions.updateTransactionColorSettingShown({TransactionColorSettingShown: visible});
+
+export const updateTransactionColor = (
+  transactionId: number,
+  color: string | undefined
+) =>
+  actions.updateTransactionColor({ 
+    transactionId: transactionId,
+    color: color,
+  });
+
+export const shareTransactionByEmail = (
+  transactionId: number,
+  contents: Content[],
+  emails: string[],
+  targetUser?: string,
+  targetGroup?: number,
+) =>
+  actions.TransactionShareByEmail({
+    transactionId: transactionId,
+    contents: contents,
+    emails: emails,
+    targetUser: targetUser,
+    targetGroup: targetGroup,
+  });

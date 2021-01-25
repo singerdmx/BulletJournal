@@ -16,21 +16,21 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     List<Long> findUniqueLabelsByProject(@Param("project_id") Long projectId);
 
     @Query("SELECT transaction FROM Transaction transaction where transaction.project = :project AND "
-            + "((transaction.startTime >= :startTime AND transaction.startTime <= :endTime) OR "
-            + "(transaction.endTime >= :startTime AND transaction.endTime <= :endTime))")
+            + "((transaction.startTime IS NOT NULL AND transaction.startTime >= :startTime AND transaction.startTime <= :endTime) OR "
+            + "(transaction.endTime IS NOT NULL AND transaction.endTime >= :startTime AND transaction.endTime <= :endTime))")
     List<Transaction> findTransactionsByProjectBetween(@Param("project") Project project,
                                                        @Param("startTime") Timestamp startTime, @Param("endTime") Timestamp endTime);
 
     @Query("SELECT transaction FROM Transaction transaction where transaction.project IN :projects AND transaction.payer = :payer AND "
-            + "((transaction.startTime >= :startTime AND transaction.startTime <= :endTime) OR "
-            + "(transaction.endTime >= :startTime AND transaction.endTime <= :endTime))")
+            + "((transaction.startTime IS NOT NULL AND transaction.startTime >= :startTime AND transaction.startTime <= :endTime) OR "
+            + "(transaction.endTime IS NOT NULL AND transaction.endTime >= :startTime AND transaction.endTime <= :endTime))")
     List<Transaction> findTransactionsOfPayerBetween(@Param("payer") String payer,
                                                      @Param("startTime") Timestamp startTime, @Param("endTime") Timestamp endTime,
                                                      @Param("projects") List<Project> projects);
 
     @Query("SELECT transaction FROM Transaction transaction where transaction.project = :project AND transaction.payer = :payer AND "
-            + "((transaction.startTime >= :startTime AND transaction.startTime <= :endTime) OR "
-            + "(transaction.endTime >= :startTime AND transaction.endTime <= :endTime))")
+            + "((transaction.startTime IS NOT NULL AND transaction.startTime >= :startTime AND transaction.startTime <= :endTime) OR "
+            + "(transaction.endTime IS NOT NULL AND transaction.endTime >= :startTime AND transaction.endTime <= :endTime))")
     List<Transaction> findTransactionsInProjectByPayerBetween(@Param("payer") String payer,
                                                               @Param("project") Project project, @Param("startTime") Timestamp startTime,
                                                               @Param("endTime") Timestamp endTime);
@@ -41,4 +41,20 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     List<Transaction> findTransactionsBetween(@Param("startTime") Timestamp startTime,
                                               @Param("endTime") Timestamp endTime,
                                               @Param("projects") List<Project> projects);
+
+    @Query("SELECT transaction FROM Transaction transaction where transaction.project = :project AND "
+            + "transaction.recurrenceRule IS NOT NULL")
+    List<Transaction> findRecurringTransactionsByProject(@Param("project") Project project);
+
+    @Query(value = "SELECT transaction FROM Transaction transaction WHERE transaction.payer = :payer AND " +
+            "transaction.project IN (:projects) AND transaction.recurrenceRule IS NOT NULL")
+    List<Transaction> findRecurringTransactionsOfPayer(@Param("payer") String payer, @Param("projects") List<Project> projects);
+
+    @Query("SELECT transaction FROM Transaction transaction where transaction.project = :project AND transaction.payer = :payer AND "
+            + "transaction.recurrenceRule IS NOT NULL")
+    List<Transaction> findRecurringTransactionsInProjectByPayer(@Param("payer") String payer, @Param("project") Project project);
+
+    @Query(value = "SELECT transaction FROM Transaction transaction WHERE " +
+            "transaction.project IN (:projects) AND transaction.recurrenceRule IS NOT NULL")
+    List<Transaction> findRecurringTransactions(@Param("projects") List<Project> projects);
 }

@@ -12,7 +12,7 @@ import {updateExpandedMyself} from '../../features/myself/actions';
 import ReactRRuleGenerator from '../../features/recurrence/RRuleGenerator';
 import {ReminderBeforeTaskText} from '../settings/reducer';
 import {labelsUpdate} from '../../features/label/actions';
-import {convertToTextWithRRule, updateRruleString,} from '../../features/recurrence/actions';
+import {convertToTextWithRRule, updateRruleString} from '../../features/recurrence/actions';
 import {ReminderSetting, Task} from '../../features/tasks/interface';
 import {dateFormat} from '../../features/myBuJo/constants';
 import moment from 'moment';

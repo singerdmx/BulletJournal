@@ -6,6 +6,7 @@ import {
   TeamOutlined,
   LinkOutlined,
   ToolOutlined,
+  MailOutlined,
 } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import './modals.styles.less';
@@ -17,6 +18,7 @@ import ShareProjectItemWithGroup from '../share-project-item/share-item-with-gro
 import ShareProjectItemWithUser from '../share-project-item/share-item-with-user';
 import ShareProjectItemGenerateLink from '../share-project-item/share-item-generate-link';
 import ShareProjectItemManagement from '../share-project-item/share-item-management';
+import ShareProjectItemByEmail from '../share-project-item/share-item-by-email';
 import { getTaskSharables } from '../../features/tasks/actions';
 import { getNoteSharables } from '../../features/notes/actions';
 
@@ -102,7 +104,7 @@ const ShareProjectItem: React.FC<ProjectItemProps> = (props) => {
                 projectItemId={props.projectItemId}
               />
             </TabPane>
-            <TabPane
+            {props.type === ProjectType.LEDGER ? null : <TabPane
               tab={
                 <Tooltip title='Link'>
                   <LinkOutlined className='large-icon' />
@@ -114,8 +116,8 @@ const ShareProjectItem: React.FC<ProjectItemProps> = (props) => {
                 type={props.type}
                 projectItemId={props.projectItemId}
               />
-            </TabPane>
-            <TabPane
+            </TabPane>}
+            {props.type === ProjectType.LEDGER ? null : <TabPane
               tab={
                 <Tooltip title='Manage'>
                   <ToolOutlined className='large-icon' />
@@ -124,6 +126,19 @@ const ShareProjectItem: React.FC<ProjectItemProps> = (props) => {
               key='Manage'
             >
               <ShareProjectItemManagement
+                type={props.type}
+                projectItemId={props.projectItemId}
+              />
+            </TabPane>}
+            <TabPane
+              tab={
+                <Tooltip title={`Email ${getProjectItemType(props.type).toLocaleLowerCase()} to others`}>
+                  <MailOutlined className='large-icon' />
+                </Tooltip>
+              }
+              key='Email'
+            >
+              <ShareProjectItemByEmail
                 type={props.type}
                 projectItemId={props.projectItemId}
               />

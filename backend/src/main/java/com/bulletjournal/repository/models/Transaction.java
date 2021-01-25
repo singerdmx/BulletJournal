@@ -4,6 +4,7 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.User;
 import com.bulletjournal.ledger.TransactionType;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -41,8 +42,7 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
     @Column(nullable = false)
     private TransactionType transactionType;
 
-    @NotBlank
-    @Column(nullable = false)
+    @Column
     private String date;
 
     @Column
@@ -52,16 +52,20 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
     @Column(length = 50, nullable = false)
     private String timezone;
 
-    @NotNull
-    @Column(name = "start_time", nullable = false)
+    @Column(name = "start_time")
     private Timestamp startTime;
 
-    @NotNull
-    @Column(name = "end_time", nullable = false)
+    @Column(name = "end_time")
     private Timestamp endTime;
 
     @Column
     private String color;
+
+    @Column(name = "recurrence_rule")
+    private String recurrenceRule;
+
+    @Column(name = "deleted_slots", columnDefinition = "TEXT")
+    private String deletedSlots;
 
     public Long getId() {
         return id;
@@ -101,6 +105,10 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public boolean hasDate() {
+        return StringUtils.isNotBlank(this.date);
     }
 
     public String getTime() {
@@ -143,6 +151,31 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
         this.color = color;
     }
 
+    public String getRecurrenceRule() {
+        return recurrenceRule;
+    }
+
+    public void setRecurrenceRule(String recurrenceRule) {
+        this.recurrenceRule = recurrenceRule;
+    }
+
+    public boolean hasRecurrenceRule() {
+        return StringUtils.isNotBlank(this.recurrenceRule);
+    }
+
+    public String getDeletedSlots() {
+        return deletedSlots;
+    }
+
+    public void setDeletedSlots(String deletedSlots) {
+        this.deletedSlots = deletedSlots;
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
     @Override
     public com.bulletjournal.controller.models.Transaction toPresentationModel() {
         return this.toPresentationModel(this.getLabels().stream()
@@ -167,7 +200,8 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
                 this.getUpdatedAt().getTime(),
                 labels,
                 this.getLocation(),
-                this.getColor());
+                this.getColor(),
+                this.getRecurrenceRule());
     }
 
     @Override

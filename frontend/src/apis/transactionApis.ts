@@ -1,4 +1,16 @@
-import { doFetch, doPost, doDelete, doPatch, doPut } from './api-helper';
+import {doDelete, doFetch, doPatch, doPost, doPut} from './api-helper';
+import {Content} from '../features/myBuJo/interface';
+import {Quill} from 'react-quill';
+import {createHTML} from '../components/content/content-item.component';
+import {Transaction} from "../features/transactions/interface";
+
+export const fetchRecurringTransactions = (projectId: number) => {
+  return doFetch(`/api/projects/${projectId}/recurringTransactions`)
+      .then((res) => res.json())
+      .catch((err) => {
+        throw Error(err.message);
+      });
+}
 
 export const fetchTransactions = (
   projectId: number,
@@ -46,23 +58,36 @@ export const getTransactionById = (transactionId: number) => {
     });
 };
 
-export const deleteTransactionById = (transactionId: number) => {
-  return doDelete(`/api/transactions/${transactionId}`).catch((err) => {
+export const deleteTransactionById = (transactionId: number, dateTime?: string) => {
+  let url = `/api/transactions/${transactionId}`;
+  if (dateTime) {
+    url += `?dateTime=${dateTime}`;
+  }
+  return doDelete(url).catch((err) => {
     throw Error(err.message);
   });
 };
 
 export const deleteTransactions = (
-  projectId: number,
-  transactionsId: number[]
+    projectId: number,
+    transactions: Transaction[]
 ) => {
-  let url = `/api/projects/${projectId}/transactions`;
-  if (transactionsId && transactionsId.length > 0) {
-    url += `?transactions=${transactionsId[0]}`;
-
-    for (var i = 1; i < transactionsId.length; i++) {
-      url += `&transactions=${transactionsId[i]}`;
+  const getTransactionString = (t: Transaction) => {
+    if (!t.recurrenceRule) {
+      return t.id;
     }
+
+    // %23 => #
+    // %20 => space
+    return t.id + '%23' + t.date + '%20' + t.time;
+  }
+
+  console.log('transactions', transactions);
+  let url = `/api/projects/${projectId}/transactions`;
+  url += `?transactions=${getTransactionString(transactions[0])}`;
+
+  for (let i = 1; i < transactions.length; i++) {
+    url += `&transactions=${getTransactionString(transactions[i])}`;
   }
   return doDelete(url).catch((err) => {
     throw Error(err.message);
@@ -75,11 +100,11 @@ export const createTransaction = (
   name: string,
   payer: string,
   transactionType: number,
-  date: string,
   timezone: string,
-  labels?: number[],
-  time?: string
-) => {
+  date?: string,
+  time?: string,
+  recurrenceRule?: string,
+  labels?: number[]) => {
   const postBody = JSON.stringify({
     amount: amount,
     name: name,
@@ -89,6 +114,7 @@ export const createTransaction = (
     time: time,
     labels: labels,
     timezone: timezone,
+    recurrenceRule: recurrenceRule
   });
   return doPost(`/api/projects/${projectId}/transactions`, postBody)
     .then((res) => res.json())
@@ -106,7 +132,8 @@ export const updateTransaction = (
   date?: string,
   time?: string,
   timezone?: string,
-  labels?: number[]
+  labels?: number[],
+  recurrenceRule?: string
 ) => {
   const patchBody = JSON.stringify({
     amount: amount,
@@ -117,6 +144,7 @@ export const updateTransaction = (
     time: time,
     timezone: timezone,
     labels: labels,
+    recurrenceRule: recurrenceRule
   });
   return doPatch(`/api/transactions/${transactionId}`, patchBody)
     .then((res) => res.json())
@@ -230,5 +258,41 @@ export const getContentRevision = (
     .then((res) => res.json())
     .catch((err) => {
       throw Error(err.message);
+    });
+};
+
+export const putTransactionColor = (transactionId: number, color: string | undefined) => {
+  return doPut(`/api/transactions/${transactionId}/setColor`, color)
+    .then((res) => res.json())
+    .catch((err) => {
+      throw Error(err.message);
+    });
+};
+
+export const shareTransactionByEmail = (
+  transactionId: number,
+  contents: Content[],
+  emails: string[],
+  targetUser?: string,
+  targetGroup?: number,
+) => {
+  const Delta = Quill.import('delta');
+  let contentsHTML : Content[] = [];
+  contents.forEach((content) => {
+    let contentHTML = {...content};
+    contentHTML['text'] = createHTML(new Delta(JSON.parse(content.text)['delta']));
+    contentsHTML.push(contentHTML);
+  })
+  
+  const postBody = JSON.stringify({
+    targetUser: targetUser,
+    targetGroup: targetGroup,
+    emails: emails,
+    contents: contentsHTML,
+  });
+  return doPost(`/api/transactions/${transactionId}/exportEmail`, postBody)
+    .then((res) => (res))
+    .catch((err) => {
+      throw Error(err);
     });
 };

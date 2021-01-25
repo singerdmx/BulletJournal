@@ -6,6 +6,7 @@ import moment from 'moment';
 import {dateFormat} from '../myBuJo/constants';
 import {Task} from "../tasks/interface";
 import {getBySetPosWhich, getByWeekDay} from "./actions";
+import { Transaction } from '../transactions/interface';
 
 export type End = {
   count: number | null;
@@ -72,6 +73,10 @@ export type YearlyOnAction = {
 
 export type RRuleStringFromTask = {
   task: Task;
+};
+
+export type RRuleStringFromTransaction = {
+  transaction: Transaction;
 };
 
 export const defaultDate = moment(new Date().toLocaleString('fr-CA'), dateFormat).format(dateFormat);
@@ -338,6 +343,88 @@ const slice = createSlice({
       const {task} = action.payload;
       const rruleString = task.recurrenceRule;
       console.log(rruleString);
+
+      if (!rruleString.startsWith("DTSTART:")) {
+        alert("Invalid rruleString: " + rruleString);
+        return;
+      }
+
+      state.rRuleString = rruleString;
+      const rule = RRule.fromString(rruleString);
+      state.repeat = {freq: rule.options.freq, interval: rule.options.interval} as any;
+      const which = getBySetPosWhich(rule);
+      const day = getByWeekDay(rule);
+
+      switch (state.repeat.freq) {
+        case Frequency.WEEKLY:
+          state.repeat.byweekday = rule.options.byweekday;
+          let i = 0;
+          state.repeatWeekly = {
+            mon: state.repeat.byweekday.includes(i++),
+            tue: state.repeat.byweekday.includes(i++),
+            wed: state.repeat.byweekday.includes(i++),
+            thu: state.repeat.byweekday.includes(i++),
+            fri: state.repeat.byweekday.includes(i++),
+            sat: state.repeat.byweekday.includes(i++),
+            sun: state.repeat.byweekday.includes(i++),
+          };
+          break;
+        case Frequency.MONTHLY:
+          if (rule.options.bysetpos) {
+            state.repeatMonthlyOnThe = {
+              which: which,
+              day: day
+            }
+            state.monthlyOn = false;
+          } else {
+            state.repeatMonthlyOn = {
+              day: rule.options.bymonthday[0]
+            }
+            state.monthlyOn = true;
+          }
+          break;
+        case Frequency.YEARLY:
+          state.repeat.interval = 1;
+          const m = MONTHS[rule.options.bymonth[0] - 1];
+          if (rule.options.bysetpos) {
+            state.repeatYearlyOnThe = {
+              month: m,
+              which: which,
+              day: day
+            }
+            state.yearlyOn = false;
+          } else {
+            state.repeatYearlyOn = {
+              month: m,
+              day: rule.options.bymonthday[0]
+            }
+            state.yearlyOn = true;
+          }
+          break;
+      }
+
+      state.startDate = rruleString.substring(8, 12) + '-' + rruleString.substring(12, 14) + '-' + rruleString.substring(14, 16);
+      state.startTime = rruleString.substring(17, 19) + ':' + rruleString.substring(19, 21);
+      state.start = {
+        dtstart: moment(
+            new Date(state.startDate + 'T' + state.startTime + ':00+00:00')
+        ).toDate(),
+      };
+
+      if (rule.options.count) {
+        state.end = {count: rule.options.count, until: null};
+      } else if (rule.options.until) {
+        state.end = {until: rule.options.until, count: null};
+      } else {
+        state.end = {until: null, count: null};
+      }
+    },
+    updateTransactionRRuleString: (state, action: PayloadAction<RRuleStringFromTransaction>) => {
+      const {transaction} = action.payload;
+      const rruleString = transaction.recurrenceRule;
+      if (!rruleString) {
+        return;
+      }
 
       if (!rruleString.startsWith("DTSTART:")) {
         alert("Invalid rruleString: " + rruleString);

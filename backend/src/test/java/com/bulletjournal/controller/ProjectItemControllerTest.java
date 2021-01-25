@@ -243,7 +243,7 @@ public class ProjectItemControllerTest {
     private Transaction createTransaction(Project project, String name, String date) {
         CreateTransactionParams transaction =
                 new CreateTransactionParams(name, sampleUsers[0], 1000.0,
-                        date, null, TIMEZONE, 1);
+                        date, null, TIMEZONE, 1, null);
 
         ResponseEntity<Transaction> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,
@@ -585,7 +585,7 @@ public class ProjectItemControllerTest {
     private Transaction createRecentTransaction(Project project, String name, String date) {
         CreateTransactionParams transaction =
                 new CreateTransactionParams(name, USER_0518, 1000.0,
-                        date, null, TIMEZONE, 1);
+                        date, null, TIMEZONE, 1, null);
 
         ResponseEntity<Transaction> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE,

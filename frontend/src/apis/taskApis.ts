@@ -1,5 +1,8 @@
 import {doDelete, doFetch, doPatch, doPost, doPut} from './api-helper';
 import {ReminderSetting, Task, TaskStatus} from '../features/tasks/interface';
+import { Content } from '../features/myBuJo/interface';
+import { Quill } from 'react-quill';
+import { createHTML } from '../components/content/content-item.component';
 
 export const fetchTasks = (
   projectId: number,
@@ -387,3 +390,31 @@ export const getTaskStatistics = (
         throw Error(err.message);
       });
 }
+
+export const shareTaskByEmail = (
+  taskId: number,
+  contents: Content[],
+  emails: string[],
+  targetUser?: string,
+  targetGroup?: number,
+) => {
+  const Delta = Quill.import('delta');
+  let contentsHTML : Content[] = [];
+  contents.forEach((content) => {
+    let contentHTML = {...content};
+    contentHTML['text'] = createHTML(new Delta(JSON.parse(content.text)['delta']));
+    contentsHTML.push(contentHTML);
+  })
+  
+  const postBody = JSON.stringify({
+    targetUser: targetUser,
+    targetGroup: targetGroup,
+    emails: emails,
+    contents: contentsHTML,
+  });
+  return doPost(`/api/tasks/${taskId}/exportEmail`, postBody)
+    .then((res) => (res))
+    .catch((err) => {
+      throw Error(err);
+    });
+};

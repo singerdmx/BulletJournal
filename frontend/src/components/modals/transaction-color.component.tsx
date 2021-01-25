@@ -5,28 +5,28 @@ import {IState} from '../../store';
 import {connect} from 'react-redux';
 import './modals.styles.less';
 import {BgColorsOutlined} from '@ant-design/icons';
-import {updateColorSettingShown, updateNoteColor} from '../../features/notes/actions';
+import {updateTransactionColorSettingShown, updateTransactionColor} from '../../features/transactions/actions';
 import {Button as FloatButton, darkColors, lightColors} from "react-floating-action-button";
-import {Note} from '../../features/notes/interface';
+import {Transaction} from '../../features/transactions/interface';
 
-type NoteColorSettingProps = {
-  note: Note | undefined;
-  colorSettingShown: boolean;
-  updateNoteColor: (
-    noteId: number,
+type TransactionColorSettingProps = {
+  transaction: Transaction | undefined;
+  transactionColorSettingShown: boolean;
+  updateTransactionColor: (
+    transactionId: number,
     color: string | undefined,
   ) => void;
-  updateColorSettingShown: (
+  updateTransactionColorSettingShown: (
     visible: boolean
   ) => void;
 };
 
-const NoteColorSettingDialog: React.FC<NoteColorSettingProps> = (props) => {
+const TransactionColorSettingDialog: React.FC<TransactionColorSettingProps> = (props) => {
   const {
-    note,
-    colorSettingShown,
-    updateColorSettingShown,
-    updateNoteColor,
+    transaction,
+    transactionColorSettingShown,
+    updateTransactionColorSettingShown,
+    updateTransactionColor,
   } = props;
   
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
@@ -38,20 +38,20 @@ const NoteColorSettingDialog: React.FC<NoteColorSettingProps> = (props) => {
   });
 
   useEffect(() => {
-    const show = !!note && !!note.color;
+    const show = !!transaction && !!transaction.color;
     setDisplayColorPicker(show);
-    setBgColor(show && note?.color ? JSON.parse(note.color) : {
+    setBgColor(show && transaction?.color ? JSON.parse(transaction.color) : {
       r: '0',
       g: '0',
       b: '0',
       a: '0',
     });
-  }, [note]);
+  }, [transaction]);
 
   const onCheckColorIcon = (e: any) => {
     setDisplayColorPicker(!displayColorPicker);
-    if (!e.target.checked && note) {
-      updateNoteColor(note.id, undefined);
+    if (!e.target.checked && transaction) {
+      updateTransactionColor(transaction.id, undefined);
       setBgColor({
         r: '0',
         g: '0',
@@ -62,8 +62,8 @@ const NoteColorSettingDialog: React.FC<NoteColorSettingProps> = (props) => {
   }
 
   const handleColorChange = (c : any , event : any) => {
-    if (note) {
-      updateNoteColor(note.id, JSON.stringify(c.rgb));
+    if (transaction) {
+      updateTransactionColor(transaction.id, JSON.stringify(c.rgb));
     }
     setBgColor(c.rgb);    
   };  
@@ -75,12 +75,12 @@ const NoteColorSettingDialog: React.FC<NoteColorSettingProps> = (props) => {
     a: Number(bgColor.a),
   }
 
-  const openModal = () => updateColorSettingShown(true);
-  const closeModal = () => updateColorSettingShown(false);
+  const openModal = () => updateTransactionColorSettingShown(true);
+  const closeModal = () => updateTransactionColorSettingShown(false);
 
   const getModal = () => (
     <Modal
-      visible={colorSettingShown}
+      visible={transactionColorSettingShown}
       onCancel={closeModal}
       footer={false}
     >
@@ -132,11 +132,11 @@ const NoteColorSettingDialog: React.FC<NoteColorSettingProps> = (props) => {
 };
 
 const mapStateToProps = (state: IState) => ({
-  note: state.note.note,
-  colorSettingShown: state.note.colorSettingShown,
+  transaction: state.transaction.transaction,
+  transactionColorSettingShown: state.transaction.transactionColorSettingShown,
 });
 
 export default connect(mapStateToProps, {
-  updateColorSettingShown,
-  updateNoteColor,
-})(NoteColorSettingDialog);
+  updateTransactionColorSettingShown,
+  updateTransactionColor,
+})(TransactionColorSettingDialog);

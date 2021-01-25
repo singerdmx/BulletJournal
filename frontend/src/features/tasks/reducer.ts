@@ -228,6 +228,14 @@ export type TaskStatisticsAction = {
   projectStatistics: TaskStatistics;
 }
 
+export type ShareTaskByEmailAction = {
+  taskId: number,
+  contents: Content[],
+  emails: string[],
+  targetUser?: string,
+  targetGroup?: number,
+};
+
 let initialState = {
   addTaskVisible: false,
   contents: [] as Array<Content>,
@@ -384,6 +392,7 @@ const slice = createSlice({
       const { projectStatistics } = action.payload;
       state.projectStatistics = projectStatistics;
     },
+    TaskShareByEmail: (state, action: PayloadAction<ShareTaskByEmailAction>) => state,
   },
 });
 

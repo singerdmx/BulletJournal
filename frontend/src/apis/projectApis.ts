@@ -109,3 +109,14 @@ export const updateProjectSetting = (projectId: number, autoDelete: boolean, col
       throw Error(err.message);
     });
 };
+
+export const postProjectOwner = (
+  projectId: number,
+  owner: string,
+) => {
+  return doPost(`/api/projects/${projectId}/setOwner`, owner)
+    .then((res) => res)
+    .catch((err) => {
+      throw Error(err.message);
+    });
+};

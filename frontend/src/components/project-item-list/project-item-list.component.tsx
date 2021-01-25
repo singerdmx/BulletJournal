@@ -103,13 +103,15 @@ class ProjectItemList extends React.Component<ProjectItemProps & PathProps> {
         }
       });
       item.transactions.forEach((transaction, index) => {
-        calendarEvents.push({
-          id: transaction.id,
-          title: transaction.name + this.getTransactionTimeString(transaction),
-          start: new Date(transaction.paymentTime),
-          end: new Date(transaction.paymentTime),
-          resource: `/transaction/${transaction.id}`
-        });
+        if (transaction.paymentTime) {
+          calendarEvents.push({
+            id: transaction.id,
+            title: transaction.name + this.getTransactionTimeString(transaction),
+            start: new Date(transaction.paymentTime),
+            end: new Date(transaction.paymentTime),
+            resource: `/transaction/${transaction.id}`
+          });
+        }
       });
     });
     return this.setState({ calendarEvents });

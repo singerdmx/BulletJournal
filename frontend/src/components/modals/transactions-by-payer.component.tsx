@@ -17,7 +17,7 @@ type TransactionsByPayerProps = {
   visible: boolean;
   payer: User | undefined;
   onCancel: () => void;
-  deleteTransactions: (projectId: number, transactionsId: number[], type: ProjectItemUIType) => void;
+  deleteTransactions: (projectId: number, transactions: Transaction[], type: ProjectItemUIType) => void;
 };
 
 const TransactionsByPayer: React.FC<TransactionsByPayerProps> = (props) => {
@@ -29,14 +29,14 @@ const TransactionsByPayer: React.FC<TransactionsByPayerProps> = (props) => {
     deleteTransactions,
   } = props;
   const [checkboxVisible, setCheckboxVisible] = useState(false);
-  const [checked, setChecked] = useState([] as number[]);
-  const onCheck = (id: number) => {
-    if (checked.includes(id)) {
-      setChecked(checked.filter((c) => c !== id));
+  const [checked, setChecked] = useState([] as Transaction[]);
+  const onCheck = (t: Transaction) => {
+    if (checked.includes(t)) {
+      setChecked(checked.filter((c) => c !== t));
       return;
     }
 
-    setChecked(checked.concat([id]));
+    setChecked(checked.concat([t]));
   };
 
   const getList = () => {
@@ -45,10 +45,10 @@ const TransactionsByPayer: React.FC<TransactionsByPayerProps> = (props) => {
         <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
           {checkboxVisible && (
             <Checkbox
-              checked={checked.includes(transaction.id)}
+              checked={checked.includes(transaction)}
               key={transaction.id}
               style={{ marginRight: '0.5rem', marginTop: '-0.5em' }}
-              onChange={(e) => onCheck(transaction.id)}
+              onChange={(e) => onCheck(transaction)}
             />
           )}
           <TransactionItem
@@ -64,7 +64,7 @@ const TransactionsByPayer: React.FC<TransactionsByPayerProps> = (props) => {
 
   const selectAll = () => {
     setCheckboxVisible(true);
-    setChecked(transactionsByPayer.map((t) => t.id));
+    setChecked([...transactionsByPayer]);
   };
 
   const clearAll = () => {
@@ -81,10 +81,10 @@ const TransactionsByPayer: React.FC<TransactionsByPayerProps> = (props) => {
     if (checked.length === 0) {
       message.error('No Selection');
       return;
-    } else {
-      deleteTransactions(project.id, checked, ProjectItemUIType.PAYER);
-      setChecked([] as number[]);
     }
+
+    deleteTransactions(project.id, checked, ProjectItemUIType.PAYER);
+    setChecked([] as Transaction[]);
   };
 
   return (

@@ -82,6 +82,12 @@ export type UpdateSettingShownAction = {
   settingShown: boolean;
 };
 
+export type SetProjectOwnerAction = {
+  onSuccess: Function;
+  projectId: number,
+  owner: string,
+};
+
 let initialState = {
   settingShown: false,
   owned: [] as Project[],
@@ -149,6 +155,10 @@ const slice = createSlice({
       const { settingShown } = action.payload;
       state.settingShown = settingShown;
     },
+    setProjectOwner: (
+      state,
+      action: PayloadAction<SetProjectOwnerAction>
+    ) => state,
   },
 });
 

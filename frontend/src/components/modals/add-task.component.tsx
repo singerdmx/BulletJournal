@@ -472,7 +472,6 @@ const AddTask: React.FC<
         <Button type="primary" onClick={openModal}>
           Create New Task
         </Button>
-        {getModal()}
       </div>
     );
   }

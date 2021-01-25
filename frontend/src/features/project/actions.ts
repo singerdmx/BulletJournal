@@ -73,3 +73,13 @@ export const historyReceived = (activities: Activity[]) =>
 
 export const updateSettingShown = (visible: boolean) =>
   actions.updateSettingShown({settingShown: visible});
+
+export const setProjectOwner = (
+  onSuccess: Function,
+  projectId: number, 
+  owner: string) =>
+  actions.setProjectOwner({
+    onSuccess: onSuccess,
+    projectId: projectId,
+    owner: owner
+  });
