@@ -3,6 +3,7 @@ module github.com/singerdmx/BulletJournal/daemon
 go 1.15
 
 require (
+	github.com/buger/jsonparser v1.1.1
 	github.com/go-redis/redis/v8 v8.2.3
 	github.com/go-resty/resty/v2 v2.3.0
 	github.com/golang/protobuf v1.4.3 // indirect

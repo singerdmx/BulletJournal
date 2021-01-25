@@ -3,9 +3,9 @@ package persistence
 import (
 	"context"
 	"errors"
+	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"time"
 
-	"github.com/singerdmx/BulletJournal/daemon/logging"
 	"gorm.io/gorm"
 )
 
@@ -23,6 +23,9 @@ func NewSampleTaskDao(ctx context.Context, db *gorm.DB) (*SampleTaskDao, error) 
 	}, nil
 }
 
+/**
+ * Return true if new record
+ */
 func (s *SampleTaskDao) Upsert(t *SampleTask) (uint64, bool) {
 	logger := *logging.GetLogger()
 
@@ -30,12 +33,13 @@ func (s *SampleTaskDao) Upsert(t *SampleTask) (uint64, bool) {
 	r := s.Db.Where("uid = ?", t.Uid).Last(&prevReport)
 
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
-		// If current time is more recent than duedate, skip this instance
+		// If current time is more recent than due date, skip this instance
 		dueDate, err := time.Parse(LAYOUT, t.DueDate)
 		if err != nil {
-			logger.Errorf("due date parse to format yyyy-mm-dd failed, duedate: %s, error: %v", t.DueDate, err)
+			logger.Errorf("due date parse to format yyyy-mm-dd failed, due date: %s, error: %v", t.DueDate, err)
 			return 0, false
 		}
+
 		if dueDate.Before(time.Now()) {
 			return 0, false
 		}
@@ -44,7 +48,7 @@ func (s *SampleTaskDao) Upsert(t *SampleTask) (uint64, bool) {
 			logger.Errorf("Create Sample Task Error: %v", err)
 			return 0, false
 		}
-		return t.ID, true
+		return prevReport.ID, true
 	}
 
 	// in case controller didn't receive the call
@@ -58,9 +62,10 @@ func (s *SampleTaskDao) Upsert(t *SampleTask) (uint64, bool) {
 	}
 
 	// Update the SampleTask for only Content, DueDate, availableBefore, DueTime
-	s.Db.Model(&t).Where("uid = ?", t.Uid).Select("raw", "due_date", "due_time", "available_before", "name").
+	s.Db.Model(&t).Where("uid = ?", t.Uid).Select("raw", "content","due_date", "due_time", "available_before", "name").
 		Updates(map[string]interface{}{
 			"raw":              t.Raw,
+			"content":          t.Content,
 			"due_date":         t.DueDate,
 			"due_time":         t.DueTime,
 			"available_before": t.AvailableBefore,
