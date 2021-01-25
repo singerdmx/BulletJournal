@@ -14,8 +14,8 @@ type SportsTestSuite struct {
 func (suite *SportsTestSuite) TestFetchNbaScheduleData() {
 	restClient := resty.New()
 	nc := sports.GetNbaClient(restClient)
-	nc.FetchNbaScheduleData(sports.NbaSheduleEndpoint)
-
+	//nc.FetchNbaScheduleData(sports.NbaScheduleEndpoint)
+	nc.FetchAndStoreNbaScheduleData()
 }
 
 // In order for 'go test' to run this suite, we need to create

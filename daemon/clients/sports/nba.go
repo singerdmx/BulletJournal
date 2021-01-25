@@ -15,9 +15,9 @@ type NbaClient struct {
 }
 
 const (
-	NbaSheduleEndpoint = "https://cdn.nba.com/static/json/staticData/scheduleLeagueV2.json"
-	dateOnlyLayout     = "2006-01-02"
-	timeOnlyLayout     = "3:04:05 PM"
+	NbaScheduleEndpoint = "https://cdn.nba.com/static/json/staticData/scheduleLeagueV2.json"
+	dateOnlyLayout      = "2006-01-02"
+	timeOnlyLayout      = "3:04:05 PM"
 )
 
 func GetNbaClient(restClient *resty.Client) *NbaClient {
@@ -28,7 +28,7 @@ func GetNbaClient(restClient *resty.Client) *NbaClient {
 
 func (nc *NbaClient) FetchAndStoreNbaScheduleData() {
 	//Fetch data from NBA CDN
-	nbaMatchScheduleData := nc.FetchNbaScheduleData(NbaSheduleEndpoint)
+	nbaMatchScheduleData := nc.FetchNbaScheduleData(NbaScheduleEndpoint)
 	//Convert the Nba MatchScheduleData to SampleTasks data
 	for _, schedule := range nbaMatchScheduleData.NbaMatchSchedules {
 		//Upsert the SampleTasks data based on the gameId
@@ -72,7 +72,12 @@ func (nc *NbaClient) FetchNbaScheduleData(scheduleEndPoint string) *NbaMatchSche
 
 	seasonYear, _ := jsonparser.GetString(resp.Body(), "leagueSchedule", "seasonYear")
 	_, err = jsonparser.ArrayEach(resp.Body(), func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
+		gameStatus, err := jsonparser.GetString(value, "gameStatus")
 		date, err := jsonparser.GetString(value, "gameDate")
+		if err != nil || gameStatus == "3" {
+			//Will not process if not able to get date or game status or game status means game finished
+			return
+		}
 		log.Printf("Processing games for: %v\n", date)
 		// TODO Filter out of the game with status of 3
 		_, err = jsonparser.ArrayEach(value, func(game []byte, dataType jsonparser.ValueType, offset int, err error) {
