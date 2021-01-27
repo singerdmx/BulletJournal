@@ -33,8 +33,8 @@ export const googleCalendarEventListReceived = (
     googleCalendarEventList: googleCalendarEventList,
   });
 
-export const importEventsToProject = (eventList: string[], projectId: number) =>
-  actions.importEventsToProject({ eventList: eventList, projectId: projectId });
+export const importEventsToProject = (eventList: string[], projectId: number, onSuccess: Function) =>
+  actions.importEventsToProject({ eventList: eventList, projectId: projectId, onSuccess: onSuccess });
 
 export const updateSyncing = (syncing: boolean) => {
   actions.updateSyncing({ syncing: syncing });

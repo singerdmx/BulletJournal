@@ -47,21 +47,6 @@ export const getGoogleCalendarEventList = (
     });
 };
 
-export const createGoogleCalendarEvents = (
-  projectId: number,
-  events: GoogleCalendarEvent[]
-) => {
-  const postBody = JSON.stringify({
-    projectId: projectId,
-    events: events,
-  });
-  return doPost('/api/calendar/google/events', postBody)
-    .then((res) => res)
-    .catch((err) => {
-      throw Error(err.message);
-    });
-};
-
 export const getWatchedProject = (calendarId: string) => {
   return doFetch(
     `/api/calendar/google/calendars/${encodeURIComponent(
@@ -116,7 +101,7 @@ export const importEventsToProject = (
     projectId: projectId,
     events: events,
   });
-  return doPost(`/api/calendar/google/events`, postBody)
+  return doPost('/api/calendar/google/events', postBody)
     .then((res) => res)
     .catch((err) => {
       throw Error(err.message);

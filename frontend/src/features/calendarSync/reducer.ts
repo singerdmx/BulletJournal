@@ -52,6 +52,7 @@ export type UpdateExpirationTimeAction = {};
 export type ImportEventsToProjectAction = {
   eventList: string[];
   projectId: number;
+  onSuccess: Function;
 };
 
 export type SyncingAction = {

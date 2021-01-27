@@ -1,27 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { IState } from '../../store';
-import { connect } from 'react-redux';
-import { Project } from '../../features/project/interface';
-import {
-  Avatar,
-  Badge,
-  Button,
-  Card,
-  DatePicker,
-  Form,
-  Modal,
-  Select,
-  Tabs,
-  Tooltip,
-} from 'antd';
-import { iconMapper } from '../side-menu/side-menu.component';
+import React, {useEffect, useState} from 'react';
+import {IState} from '../../store';
+import {connect} from 'react-redux';
+import {Project} from '../../features/project/interface';
+import {Avatar, Badge, Button, Card, DatePicker, Form, Modal, Select, Tabs, Tooltip,} from 'antd';
+import {iconMapper} from '../side-menu/side-menu.component';
 import AddProject from './add-project.component';
-import { useHistory } from 'react-router-dom';
-import {
-  CalendarListEntry,
-  CalendarWatchedProject,
-  GoogleCalendarEvent,
-} from '../../features/calendarSync/interface';
+import {useHistory} from 'react-router-dom';
+import {CalendarListEntry, CalendarWatchedProject, GoogleCalendarEvent,} from '../../features/calendarSync/interface';
 import {
   googleCalendarEventListReceived,
   googleCalendarEventListUpdate,
@@ -33,9 +18,9 @@ import {
 
 import './modals.styles.less';
 import moment from 'moment';
-import { dateFormat } from '../../features/myBuJo/constants';
-import { getReminderSettingString } from '../../features/tasks/interface';
-import { getDueDateTime } from '../project-item/task-item.component';
+import {dateFormat} from '../../features/myBuJo/constants';
+import {getReminderSettingString} from '../../features/tasks/interface';
+import {getDueDateTime} from '../project-item/task-item.component';
 import {
   AlertOutlined,
   CheckSquareTwoTone,
@@ -70,7 +55,7 @@ type ModalProps = {
   googleCalendarEventListReceived: (
     googleCalendarEventList: GoogleCalendarEvent[]
   ) => void;
-  importEventsToProject: (eventList: string[], projectId: number) => void;
+  importEventsToProject: (eventList: string[], projectId: number, onSuccess: Function) => void;
 };
 
 const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
@@ -258,10 +243,9 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
   };
 
   const importTask = (eventList: string[], projectId: number) => {
-    importEventsToProject(eventList, projectId);
+    importEventsToProject(eventList, projectId, () => history.push(`/projects/${projectId}`));
     googleCalendarEventListReceived([] as GoogleCalendarEvent[]);
     setVisible(false);
-    history.push(`/projects/${projectId}`);
   };
 
   const handleOnclick = (e: any) => {
