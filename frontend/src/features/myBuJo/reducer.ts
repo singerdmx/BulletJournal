@@ -48,7 +48,7 @@ let initialState = {
   endDate: '',
   projectItems: [] as ProjectItems[],
   todoSelected: true,
-  ledgerSelected: false,
+  ledgerSelected: true,
   noteSelected: true,
   calendarMode: 'month',
   selectedCalendarDay: '',
