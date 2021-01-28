@@ -47,6 +47,7 @@ public class ProjectItemsGrouper {
         ZonedDateTime z2 = ZonedDateTimeHelper.getEndTime(t2.getDueDate(), t2.getDueTime(), t2.getTimezone());
         return z1.compareTo(z2);
     };
+    public static final Comparator<Task> TASK_BY_STATUS_COMPARATOR = Comparator.comparingInt(Task::getIntStatus);
     public static final Comparator<Note> NOTE_COMPARATOR = Comparator.comparing(AuditModel::getUpdatedAt);
 
     /*
@@ -160,7 +161,7 @@ public class ProjectItemsGrouper {
             projectItem.setDate(ZonedDateTimeHelper.getDate(zonedDateTime));
             projectItem.setDayOfWeek(zonedDateTime.getDayOfWeek());
             List<Task> tasks = tasksMap.get(zonedDateTime);
-            tasks.sort(TASK_COMPARATOR);
+            tasks.sort(TASK_BY_STATUS_COMPARATOR);
             projectItem.setTasks(tasks.stream().map(t ->
                     t.toPresentationModel())
                     .collect(Collectors.toList()));

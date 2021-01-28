@@ -69,7 +69,14 @@ public class Task extends TaskModel {
     }
 
     public Integer getStatus() {
-        return status;
+        return this.status;
+    }
+
+    public int getIntStatus() {
+        if (this.status == null) {
+            return Integer.MAX_VALUE;
+        }
+        return this.status;
     }
 
     public void setStatus(Integer status) {

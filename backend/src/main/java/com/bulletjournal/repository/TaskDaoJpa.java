@@ -219,7 +219,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         }
 
         List<Task> tasks = this.taskRepository.findTasksByAssigneeAndProject(assignee, projectId);
-        tasks.sort(ProjectItemsGrouper.TASK_COMPARATOR);
+        tasks.sort(ProjectItemsGrouper.TASK_BY_STATUS_COMPARATOR);
         return tasks.stream().map(t -> {
             List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
             return t.toPresentationModel(labels);
