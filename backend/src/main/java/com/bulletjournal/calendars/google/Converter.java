@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 public class Converter {
     private static final int DEFAULT_REMINDER_SETTING = 30;
+    private static final String INSERT_STR_FORMAT = "{\"insert\":\"%s\"},";
     public static final Logger LOGGER = LoggerFactory.getLogger(Converter.class);
 
     public static GoogleCalendarEvent toTask(Event event, String timezone) {
@@ -57,6 +58,55 @@ public class Converter {
             setTaskReminder(task, timezone, event.getReminders(), startDateTimeValue);
         }
 
+        Content content = new Content();
+        content.setText(getText(event, task));
+        content.setBaseText(getBaseText(event, task));
+        content.setOwner(new User(username));
+
+        return new GoogleCalendarEvent(task, content, event.getId());
+    }
+
+    private static String getBaseText(Event event, Task task) {
+        StringBuilder baseText = new StringBuilder("[");
+        if (event.getDescription() != null) {
+            baseText.append(String.format(INSERT_STR_FORMAT, event.getDescription()));
+            baseText.append(String.format(INSERT_STR_FORMAT, "\n"));
+        }
+
+        if (event.getLocation() != null) {
+            task.setLocation(event.getLocation());
+            baseText.append(String.format(INSERT_STR_FORMAT, "\n"))
+                    .append(String.format(INSERT_STR_FORMAT, "Location: "))
+                    .append(String.format(INSERT_STR_FORMAT, event.getLocation()))
+                    .append(String.format(INSERT_STR_FORMAT, "\n"));
+        }
+
+        List<EventAttendee> attendeeList = event.getAttendees();
+        attendeeList = attendeeList != null ?
+                attendeeList.stream().filter((a) -> StringUtils.isNotBlank(a.getDisplayName()))
+                        .collect(Collectors.toList()) : Collections.emptyList();
+        if (!attendeeList.isEmpty()) {
+            baseText.append(String.format(INSERT_STR_FORMAT, "\n"))
+                    .append(String.format(INSERT_STR_FORMAT, "Attendees:"))
+                    .append(String.format(INSERT_STR_FORMAT, "\n"));
+            for (EventAttendee attendee : attendeeList) {
+                baseText.append(String.format(INSERT_STR_FORMAT, " ["))
+                        .append(String.format(INSERT_STR_FORMAT, attendee.getDisplayName()));
+
+                if (StringUtils.isNotBlank(attendee.getEmail())) {
+                    baseText.append(String.format(INSERT_STR_FORMAT, " " + attendee.getEmail()));
+                }
+                baseText.append(String.format(INSERT_STR_FORMAT, "]"))
+                        .append(String.format(INSERT_STR_FORMAT, "\n"));
+            }
+        }
+
+        baseText.append("{\"insert\":\"\\n\"}").append("]");
+        return baseText.toString();
+    }
+
+
+    private static String getText(Event event, Task task) {
         StringBuilder text = new StringBuilder();
         if (event.getDescription() != null) {
             text.append(event.getDescription()).append(System.lineSeparator());
@@ -81,11 +131,7 @@ public class Converter {
             }
         }
 
-        Content content = new Content();
-        content.setText(text.toString());
-        content.setOwner(new User(username));
-
-        return new GoogleCalendarEvent(task, content, event.getId());
+        return text.toString();
     }
 
     private static Long getValue(EventDateTime eventDateTime) {
