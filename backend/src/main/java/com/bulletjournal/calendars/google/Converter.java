@@ -70,8 +70,23 @@ public class Converter {
     private static String getBaseText(Event event, Task task) {
         StringBuilder baseText = new StringBuilder("[");
         if (event.getDescription() != null) {
-            baseText.append(String.format(INSERT_STR_FORMAT, event.getDescription()));
-            baseText.append(INSERT_LINE_BREAK);
+            String description = event.getDescription();
+            // Split description based on break line,
+            StringBuilder sb = new StringBuilder();
+            for (char c : description.toCharArray()) {
+                if (c == '\n' || c == '\r') {
+                    if (sb.length() > 0) {
+                        baseText.append(String.format(INSERT_STR_FORMAT, sb.toString()));
+                    }
+                    baseText.append(INSERT_LINE_BREAK);
+                    sb.setLength(0);
+                } else {
+                    sb.append(c);
+                }
+            }
+            if (sb.length() > 0) {
+                baseText.append(sb.toString());
+            }
         }
 
         if (event.getLocation() != null) {
