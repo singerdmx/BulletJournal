@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 public class Converter {
     private static final int DEFAULT_REMINDER_SETTING = 30;
     private static final String INSERT_STR_FORMAT = "{\"insert\":\"%s\"},";
+    private static final String INSERT_LINE_BREAK = "{\"insert\":\"\\n\"},";
     public static final Logger LOGGER = LoggerFactory.getLogger(Converter.class);
 
     public static GoogleCalendarEvent toTask(Event event, String timezone) {
@@ -70,15 +71,15 @@ public class Converter {
         StringBuilder baseText = new StringBuilder("[");
         if (event.getDescription() != null) {
             baseText.append(String.format(INSERT_STR_FORMAT, event.getDescription()));
-            baseText.append(String.format(INSERT_STR_FORMAT, "\n"));
+            baseText.append(INSERT_LINE_BREAK);
         }
 
         if (event.getLocation() != null) {
             task.setLocation(event.getLocation());
-            baseText.append(String.format(INSERT_STR_FORMAT, "\n"))
+            baseText.append(INSERT_LINE_BREAK)
                     .append(String.format(INSERT_STR_FORMAT, "Location: "))
                     .append(String.format(INSERT_STR_FORMAT, event.getLocation()))
-                    .append(String.format(INSERT_STR_FORMAT, "\n"));
+                    .append(INSERT_LINE_BREAK);
         }
 
         List<EventAttendee> attendeeList = event.getAttendees();
@@ -86,9 +87,9 @@ public class Converter {
                 attendeeList.stream().filter((a) -> StringUtils.isNotBlank(a.getDisplayName()))
                         .collect(Collectors.toList()) : Collections.emptyList();
         if (!attendeeList.isEmpty()) {
-            baseText.append(String.format(INSERT_STR_FORMAT, "\n"))
+            baseText.append(INSERT_LINE_BREAK)
                     .append(String.format(INSERT_STR_FORMAT, "Attendees:"))
-                    .append(String.format(INSERT_STR_FORMAT, "\n"));
+                    .append(INSERT_LINE_BREAK);
             for (EventAttendee attendee : attendeeList) {
                 baseText.append(String.format(INSERT_STR_FORMAT, " ["))
                         .append(String.format(INSERT_STR_FORMAT, attendee.getDisplayName()));
@@ -97,11 +98,11 @@ public class Converter {
                     baseText.append(String.format(INSERT_STR_FORMAT, " " + attendee.getEmail()));
                 }
                 baseText.append(String.format(INSERT_STR_FORMAT, "]"))
-                        .append(String.format(INSERT_STR_FORMAT, "\n"));
+                        .append(INSERT_LINE_BREAK);
             }
         }
 
-        baseText.append("{\"insert\":\"\\n\"}").append("]");
+        baseText.append(INSERT_LINE_BREAK).append("]");
         return baseText.toString();
     }
 
