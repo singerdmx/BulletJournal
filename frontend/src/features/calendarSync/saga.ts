@@ -188,7 +188,7 @@ function* importEventsToProject(
     });
 
     yield call(importEventsApi, projectId, importEvents);
-    yield call(message.error, 'Calendar events imported successfully');
+    yield call(message.success, 'Calendar events imported successfully');
     onSuccess();
   } catch (error) {
     yield call(message.error, `watchCalendarChannel Error Received: ${error}`);
