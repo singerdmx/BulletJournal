@@ -102,7 +102,7 @@ public class Converter {
             }
         }
 
-        baseText.append(INSERT_LINE_BREAK).append("]");
+        baseText.append("{\"insert\":\"\\n\"}").append("]");
         return baseText.toString();
     }
 
