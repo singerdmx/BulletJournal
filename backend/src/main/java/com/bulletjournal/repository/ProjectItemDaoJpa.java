@@ -23,6 +23,7 @@ import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.util.ContentDiffTool;
 import com.bulletjournal.util.DeltaContent;
+import com.bulletjournal.util.MapWithExpiration;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
@@ -65,6 +66,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     private ProjectRepository projectRepository;
     @Autowired
     protected NotificationService notificationService;
+
+    private final MapWithExpiration contentUpdateLock = new MapWithExpiration();
 
     abstract <T extends ProjectItemModel> JpaRepository<T, Long> getJpaRepository();
 
@@ -238,9 +241,11 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         this.authorizationService.checkAuthorizedToOperateOnContent(content.getOwner(), requester, ContentType.CONTENT,
                 Operation.UPDATE, content.getId(), projectItem.getOwner(), projectItem.getProject().getOwner(),
                 projectItem);
+        if (this.contentUpdateLock.get(contentId.toString()) != null) {
+            return Pair.of(content, projectItem);
+        }
 
         String oldText = content.getText();
-
         if (etag.isPresent()) {
             String itemEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                     EtagGenerator.HashType.TO_HASHCODE, oldText);
@@ -250,6 +255,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
                         projectItemId, requester, this.newContent(updateContentParams.getText()));
             }
         }
+
+        this.contentUpdateLock.put(contentId.toString(), requester, 2_000);
         return updateContent(requester, updateContentParams, projectItem, content, oldText);
     }
 

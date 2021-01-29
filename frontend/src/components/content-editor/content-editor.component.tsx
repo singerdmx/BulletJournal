@@ -256,9 +256,9 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = (
                 projectItemId,
                 JSON.stringify(editorContent));
         } else if (content) {
-            const newContent = new Delta(editorContent['delta']);
-            console.log(oldContents!)
-            console.log(newContent)
+            const newContent : DeltaStatic = new Delta(editorContent['delta']);
+            console.log(oldContents!);
+            console.log(newContent);
             const diff = new Delta(oldContents!).diff(newContent);
             console.log(diff)
             patchContentFunction(
