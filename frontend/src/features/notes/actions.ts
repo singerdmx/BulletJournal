@@ -18,8 +18,8 @@ export const updateNoteContentRevision = (
     contentId: contentId,
     revisionId: revisionId,
   });
-export const createNote = (projectId: number, name: string, labels: number[]) =>
-  actions.NotesCreate({ projectId: projectId, name: name, labels: labels });
+export const createNote = (projectId: number, name: string, location: string, labels: number[]) =>
+  actions.NotesCreate({ projectId: projectId, name: name, location: location, labels: labels });
 export const createContent = (noteId: number, text: string) =>
   actions.NoteContentCreate({ noteId: noteId, text: text });
 export const getNote = (noteId: number) => actions.NoteGet({ noteId: noteId });
@@ -39,8 +39,8 @@ export const deleteNotes = (
   });
 export const deleteContent = (noteId: number, contentId: number) =>
   actions.NoteContentDelete({ noteId: noteId, contentId: contentId });
-export const patchNote = (noteId: number, name: string, labels?: number[]) =>
-  actions.NotePatch({ noteId: noteId, name: name, labels: labels });
+export const patchNote = (noteId: number, name: string, location: string, labels?: number[]) =>
+  actions.NotePatch({ noteId: noteId, name: name, location: location, labels: labels });
 export const patchContent = (noteId: number, contentId: number, text: string, diff: string) =>
   actions.NoteContentPatch({
     noteId: noteId,

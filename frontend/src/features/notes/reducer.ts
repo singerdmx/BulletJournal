@@ -32,6 +32,7 @@ export type updateVisibleAction = {
 export type CreateNote = {
   projectId: number;
   name: string;
+  location: string;
   labels?: number[];
 };
 
@@ -70,6 +71,7 @@ export type DeleteContent = {
 export type PatchNote = {
   noteId: number;
   name: string;
+  location: string;
   labels?: number[];
 };
 

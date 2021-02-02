@@ -18,7 +18,8 @@ type SearchBarState = {
 export const DefaultLocation: any = {
 	//default location to LA
 	latitude: 34.0522342,
-	longitude: -118.2436849
+	longitude: -118.2436849,
+	setLocation: ()=>{},
 }
 
 const isObject = (val: any) => {
@@ -44,9 +45,8 @@ const classnames = (...args: any[]) => {
 		);
 	  }
 	});
-  
 	return classes.join(' ');
-  };
+};
 
 class SearchBar extends React.Component<SearchBarProps, SearchBarState>{
 
@@ -61,24 +61,38 @@ class SearchBar extends React.Component<SearchBarProps, SearchBarState>{
 		this.props.setLocation(address);
 	}
 
-	componentDidMount(){
-		navigator.geolocation.getCurrentPosition(
-			(position) => {
-				console.log("Latitude is :", position.coords.latitude);
-				console.log("Longitude is :", position.coords.longitude);
-				this.setState({
-					latitude: position.coords.latitude,
-					longitude: position.coords.latitude,
-					errorMessage: ''
-				});
-			}, 
-			(error) => { 
-				console.log("Get location Error: ", error); 
-			}, 
-			{ 
-				enableHighAccuracy: true 
+	componentDidMount() {
+		const { location } = this.props;
+		if(location === ""){
+			navigator.geolocation.getCurrentPosition(
+				(position) => {
+					this.setState({
+						latitude: position.coords.latitude,
+						longitude: position.coords.longitude,
+						errorMessage: ''
+					});
+				}, 
+				(error) => { 
+					console.log("Get location Error: ", error); 
+				}, 
+				{ 
+					enableHighAccuracy: true,
+					timeout: 5000,
+					maximumAge: 10000
 			});
-	}
+		}else{
+			geocodeByAddress(location)
+			.then(res => getLatLng(res[0]))
+			.then((res) => {
+				const { lat, lng } = res;
+				this.setState({
+					latitude: lat,
+					longitude: lng,
+					isGeocoding: false
+				})
+			})
+		}
+	  }
 
 	handleSelect = (selected: string) => {
 		this.props.setLocation(selected);
@@ -107,9 +121,13 @@ class SearchBar extends React.Component<SearchBarProps, SearchBarState>{
 	}
 	render() {
 		const { latitude, longitude } = this.state;
-        console.log("🚀 ~ file: search-bar.component.tsx ~ line 111 ~ SearchBar ~ render ~ longitude", longitude)
-        console.log("🚀 ~ file: search-bar.component.tsx ~ line 111 ~ SearchBar ~ render ~ latitude", latitude)
-		const { location } = this.props;
+		const { location, setLocation } = this.props;
+		const setLatLng = (latitude: number, longitude: number) => {
+			this.setState({
+				latitude: latitude,
+				longitude: longitude,
+			})
+		}
 		return <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'}}>
 			<PlacesAutocomplete
 				onChange={this.handleChange}
@@ -124,7 +142,7 @@ class SearchBar extends React.Component<SearchBarProps, SearchBarState>{
 								<div className="search-input-container">
 									<input
 										{...getInputProps({
-										placeholder: ' Search Places...',
+										placeholder: 'Search Places...',
 										className: 'search-input',
 										})}
 									/>
@@ -160,7 +178,7 @@ class SearchBar extends React.Component<SearchBarProps, SearchBarState>{
 						);
 					}}
 				</PlacesAutocomplete>
-				<LocationContext.Provider value={{latitude, longitude}}>
+				<LocationContext.Provider value={{latitude, longitude, setLocation }}>
 					<MapIndicateIcon />
 				</LocationContext.Provider>
 		</div>;

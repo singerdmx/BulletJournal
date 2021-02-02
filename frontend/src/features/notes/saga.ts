@@ -233,8 +233,8 @@ function* getNotesByOrder(action: PayloadAction<GetNotesByOrder>) {
 
 function* noteCreate(action: PayloadAction<CreateNote>) {
   try {
-    const { projectId, name, labels } = action.payload;
-    yield call(createNote, projectId, name, labels);
+    const { projectId, name, location, labels } = action.payload;
+    yield call(createNote, projectId, name, location, labels);
     yield put(updateNotes(projectId));
     const state: IState = yield select();
     if (state.project.project) {
@@ -305,8 +305,8 @@ function* getNote(action: PayloadAction<GetNote>) {
 
 function* patchNote(action: PayloadAction<PatchNote>) {
   try {
-    const { noteId, name, labels } = action.payload;
-    const data = yield call(updateNote, noteId, name, labels);
+    const { noteId, name, location, labels } = action.payload;
+    const data = yield call(updateNote, noteId, name, location, labels);
     yield put(
       notesActions.notesReceived({
         notes: data,

@@ -7,7 +7,7 @@ import { Note } from '../../features/notes/interface';
 // components
 import NoteContentList from '../../components/content/content-list.component';
 // antd imports
-import {Avatar, Divider, message, Tooltip} from 'antd';
+import {Avatar, Divider, message, Tag, Tooltip} from 'antd';
 import './note-page.styles.less';
 import 'braft-editor/dist/index.css';
 import { ProjectType } from '../../features/project/constants';
@@ -19,7 +19,7 @@ import {connect} from "react-redux";
 import {animation, IconFont, Item, Menu, MenuProvider} from "react-contexify";
 import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
 import CopyToClipboard from "react-copy-to-clipboard";
-import {CopyOutlined, BgColorsOutlined} from "@ant-design/icons/lib";
+import {CopyOutlined, BgColorsOutlined, EnvironmentOutlined} from "@ant-design/icons/lib";
 import {updateColorSettingShown} from '../../features/notes/actions';
 
 
@@ -57,6 +57,30 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
       document.title = note.name;
     }
   }, [note]);
+
+  const getLocation = (note: Note) => {
+    if(!note.location){
+        return null;
+    }
+    const taskLocation = `Location: ${note.location}`
+    return (
+        <Tooltip title={taskLocation}>
+            <Tag icon={<EnvironmentOutlined />}>{note.location}</Tag>
+        </Tooltip>
+    );
+  };
+
+  const getNoteStatisticsDiv = (note: Note) => {
+	if (isPublic) {
+		return null;
+	}
+	return <div
+		className="note-statistic-card"
+	>
+		{getLocation(note)}
+	</div>;
+};
+
   if (!note) return null;
 
   const bgColorSetting = note.color ? JSON.parse(note.color) : undefined;
@@ -110,7 +134,9 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
 
         {noteOperation()}
       </div>
-      <Divider />
+      <Divider style={{marginTop: '5px', marginBottom: '0px'}}/>
+        {getNoteStatisticsDiv(note)}
+      <Divider style={{marginTop: '0px'}}/>
       <div className="note-content">
         <div className="content-list">
           <NoteContentList projectItem={note} contents={contents} />

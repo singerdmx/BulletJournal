@@ -59,10 +59,12 @@ export const deleteNotes = (projectId: number, notesId: number[]) => {
 export const createNote = (
   projectId: number,
   name: string,
+  location: string,
   labels?: number[]
 ) => {
   const postBody = JSON.stringify({
     name: name,
+    location: location,
     labels: labels,
   });
   return doPost(`/api/projects/${projectId}/notes`, postBody)
@@ -81,9 +83,10 @@ export const putNotes = (projectId: number, notes: Note[], etag: string) => {
   );
 };
 
-export const updateNote = (noteId: number, name: string, labels?: number[]) => {
+export const updateNote = (noteId: number, name: string, location: string, labels?: number[]) => {
   const patchBody = JSON.stringify({
     name: name,
+    location: location,
     labels: labels,
   });
   return doPatch(`/api/notes/${noteId}`, patchBody)

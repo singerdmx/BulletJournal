@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Input, Modal, Tooltip, Form, Select } from 'antd';
-import { EditTwoTone } from '@ant-design/icons';
+import { EditTwoTone, EnvironmentOutlined } from '@ant-design/icons';
 import './modals.styles.less';
 import { patchNote } from '../../features/notes/actions';
 import { connect } from 'react-redux';
@@ -12,11 +12,13 @@ import {useHistory, useParams} from 'react-router-dom';
 import { labelsUpdate } from '../../features/label/actions';
 import {onFilterLabel} from "../../utils/Util";
 import {PlusCircleTwoTone} from "@ant-design/icons/lib";
+import SearchBar from '../map-search-bar/search-bar.component';
+
 const { Option } = Select;
 type NoteProps = {
   mode: string;
   note: Note;
-  patchNote: (noteId: number, name: string, labels: number[]) => void;
+  patchNote: (noteId: number, name: string, location: string, labels: number[]) => void;
   labelOptions: Label[];
   labelsUpdate: (projectId: number | undefined) => void;
 };
@@ -26,10 +28,11 @@ const EditNote: React.FC<NoteProps> = (props) => {
   const [form] = Form.useForm();
   const history = useHistory();
   const [visible, setVisible] = useState(false);
+  const [location, setLocation] = useState(note.location || '');
   const { projectId } = useParams();
 
   const updateNote = (values: any) => {
-    patchNote(note.id, values.noteName, values.labels);
+    patchNote(note.id, values.noteName, location, values.labels);
   }
 
   useEffect(() => {
@@ -81,6 +84,9 @@ const EditNote: React.FC<NoteProps> = (props) => {
                 placeholder='Enter Note Name'
                 defaultValue={note.name ? note.name : ''}
             />
+          </Form.Item>
+          <Form.Item label={<div><EnvironmentOutlined/><span style={{ padding: '0 4px' }}>Location</span></div>}>
+                <SearchBar setLocation={setLocation} location={location} />
           </Form.Item>
           {/* label */}
           <div>
