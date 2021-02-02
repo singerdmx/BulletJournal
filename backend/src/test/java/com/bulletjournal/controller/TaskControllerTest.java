@@ -80,7 +80,7 @@ public class TaskControllerTest {
      * verify revision
      */
     @Test
-    public void testGetContentRevision() {
+    public void testGetContentRevision() throws Exception {
         String testContent1 = TestHelpers.generateDeltaContent("Test content 1.");
         String testContent2 = TestHelpers.generateDeltaContent("Test content 2.");
         String testUpdateContent2 = "{\"text\":\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"Test Content 2\\\\n\\\"}]}}\",\"diff\":\"{\\\"ops\\\":[{\\\"retain\\\":13},{\\\"insert\\\":\\\"2\\\"},{\\\"delete\\\":1}]}\"}";
@@ -106,7 +106,9 @@ public class TaskControllerTest {
                 new CreateTaskParams("task_1", "2021-01-01", "01:01", 3, new ReminderSetting(), users, TIMEZONE, null));
         Content content1 = addContent(task1, testContent1);
         List<Content> contents1 = updateContent(task1.getId(), content1.getId(), testUpdateContent2);
+        Thread.sleep(1000); // we block update the same content id in 2 sec
         List<Content> contents2 = updateContent(task1.getId(), content1.getId(), testUpdateContent3);
+        Thread.sleep(1000); // we block update the same content id in 2 sec
         List<Content> contents3 = updateContent(task1.getId(), content1.getId(), testUpdateContent4);
         assertEquals(testContent1, getContentRevision(task1.getId(), content1.getId(), 1L));
         assertEquals(testUpdateContent2Expected, getContentRevision(task1.getId(), content1.getId(), 2L));
@@ -116,6 +118,7 @@ public class TaskControllerTest {
         testUpdateAssignees(p1, task1, users);
         int maxRevisionNumber = revisionConfig.getMaxRevisionNumber();
         for (int i = 0; i < 2 * maxRevisionNumber; ++i) {
+            Thread.sleep(1000); // we block update the same content id in 2 sec
             contents1 = updateContent(task1.getId(), content1.getId(), generateUpdateContent(String.valueOf(i)));
         }
         assertEquals(1, contents1.size());

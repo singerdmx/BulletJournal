@@ -174,12 +174,13 @@ public abstract class ProjectItem {
                 Objects.equals(getName(), that.getName()) &&
                 Objects.equals(getProjectId(), that.getProjectId()) &&
                 Objects.equals(getOwner(), that.getOwner()) &&
-                Objects.equals(getLabels(), that.getLabels());
+                Objects.equals(getLabels(), that.getLabels()) &&
+                Objects.equals(getLocation(), that.getLocation());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getProjectId(), getOwner(), getLabels());
+        return Objects.hash(getId(), getName(), getProjectId(), getOwner(), getLabels(), getLocation());
     }
 
     public void clone(ProjectItem projectItem) {
@@ -190,6 +191,7 @@ public abstract class ProjectItem {
         this.setOwner(projectItem.getOwner());
         this.setUpdatedAt(projectItem.getUpdatedAt());
         this.setCreatedAt(projectItem.getCreatedAt());
+        this.setLocation(projectItem.getLocation());
         if (projectItem instanceof Note) {
             ((Note) this).setColor(((Note) projectItem).getColor());
         }

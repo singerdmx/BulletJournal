@@ -241,7 +241,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         this.authorizationService.checkAuthorizedToOperateOnContent(content.getOwner(), requester, ContentType.CONTENT,
                 Operation.UPDATE, content.getId(), projectItem.getOwner(), projectItem.getProject().getOwner(),
                 projectItem);
-        if (this.contentUpdateLock.get(contentId.toString()) != null) {
+        if (this.contentUpdateLock.get(requester + "#" + contentId.toString()) != null) {
             return Pair.of(content, projectItem);
         }
 
@@ -256,7 +256,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             }
         }
 
-        this.contentUpdateLock.put(contentId.toString(), requester, 2_000);
+        this.contentUpdateLock.put(requester + "#" + contentId.toString(), requester, 1_000);
         return updateContent(requester, updateContentParams, projectItem, content, oldText);
     }
 
@@ -325,7 +325,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
                 "ProjectItem ID mismatch");
         Revision[] revisions = GSON.fromJson(content.getRevisions(), Revision[].class);
         Preconditions.checkNotNull(revisions, "Revisions for Content: {} is null", contentId);
-        if (!Arrays.stream(revisions).anyMatch(revision -> Objects.equals(revision.getId(), revisionId))) {
+        if (Arrays.stream(revisions).noneMatch(revision -> Objects.equals(revision.getId(), revisionId))) {
             throw new BadRequestException("Invalid revisionId: " + revisionId + " for content: " + contentId);
         }
 
