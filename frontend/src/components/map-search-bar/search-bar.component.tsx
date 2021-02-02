@@ -122,12 +122,7 @@ class SearchBar extends React.Component<SearchBarProps, SearchBarState>{
 	render() {
 		const { latitude, longitude } = this.state;
 		const { location, setLocation } = this.props;
-		const setLatLng = (latitude: number, longitude: number) => {
-			this.setState({
-				latitude: latitude,
-				longitude: longitude,
-			})
-		}
+
 		return <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'}}>
 			<PlacesAutocomplete
 				onChange={this.handleChange}

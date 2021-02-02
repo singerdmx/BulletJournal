@@ -345,9 +345,6 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
           </Tooltip>
         </div>
       </div>
-      <Divider style={{marginTop: '5px', marginBottom: '0px'}}/>
-        {getTransactionStatisticsDiv(transaction)}
-      <Divider style={{marginTop: '0px'}}/>
       <div className="transaction-statistic-card" style={{background: bgColor}}>
         <Row gutter={10}>
           {getPaymentDateTime(transaction)}
@@ -366,7 +363,8 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
           </Col>
         </Row>
       </div>
-      <Divider />
+	  {getTransactionStatisticsDiv(transaction)}
+      <Divider style={{marginTop: '5px'}}/>
       <div className="tran-content">
         <div className="content-list">
           <TransactionContentList
