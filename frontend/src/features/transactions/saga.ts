@@ -130,6 +130,7 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
       transactionType,
       date,
       timezone,
+      location,
       labels,
       time,
       recurrenceRule,
@@ -143,6 +144,7 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
       payer,
       transactionType,
       timezone,
+      location,
       date,
       time,
       recurrenceRule,
@@ -381,6 +383,7 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
       date,
       time,
       timezone,
+      location,
       labels,
       recurrenceRule
     } = action.payload;
@@ -394,6 +397,7 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
       date,
       time,
       timezone,
+      location,
       labels,
       recurrenceRule
     );

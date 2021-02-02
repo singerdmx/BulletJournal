@@ -101,6 +101,7 @@ export const createTransaction = (
   payer: string,
   transactionType: number,
   timezone: string,
+  location: string,
   date?: string,
   time?: string,
   recurrenceRule?: string,
@@ -114,6 +115,7 @@ export const createTransaction = (
     time: time,
     labels: labels,
     timezone: timezone,
+    location: location,
     recurrenceRule: recurrenceRule
   });
   return doPost(`/api/projects/${projectId}/transactions`, postBody)
@@ -132,6 +134,7 @@ export const updateTransaction = (
   date?: string,
   time?: string,
   timezone?: string,
+  location?: string,
   labels?: number[],
   recurrenceRule?: string
 ) => {
@@ -143,6 +146,7 @@ export const updateTransaction = (
     date: date,
     time: time,
     timezone: timezone,
+    location: location,
     labels: labels,
     recurrenceRule: recurrenceRule
   });

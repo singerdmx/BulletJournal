@@ -19,7 +19,7 @@ import EditTransaction from '../../components/modals/edit-transaction.component'
 import MoveProjectItem from '../../components/modals/move-project-item.component';
 import ShareProjectItem from '../../components/modals/share-project-item.component';
 // antd imports
-import {Avatar, BackTop, Card, Col, Divider, message, Popconfirm, Row, Statistic, Tooltip,} from 'antd';
+import {Avatar, BackTop, Card, Col, Divider, message, Popconfirm, Row, Statistic, Tag, Tooltip,} from 'antd';
 import {
   BgColorsOutlined,
   CreditCardOutlined,
@@ -39,7 +39,7 @@ import ContentEditorDrawer from '../../components/content-editor/content-editor-
 import LabelManagement from '../project/label-management.compoent';
 import {Button as FloatButton, Container, darkColors, lightColors,} from 'react-floating-action-button';
 import {setDisplayMore, setDisplayRevision} from "../../features/content/actions";
-import {CopyOutlined, DeleteOutlined, EditOutlined, HighlightOutlined} from "@ant-design/icons/lib";
+import {CopyOutlined, DeleteOutlined, EditOutlined, HighlightOutlined, EnvironmentOutlined} from "@ant-design/icons/lib";
 import {animation, IconFont, Item, Menu, MenuProvider} from "react-contexify";
 import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
 import CopyToClipboard from "react-copy-to-clipboard";
@@ -73,6 +73,26 @@ interface TransactionPageHandler {
   setDisplayRevision: (displayRevision: boolean) => void;
   deleteContent: (taskId: number, contentId: number) => void;
 }
+
+const getLocation = (transaction: Transaction) => {
+    if(!transaction.location){
+        return null;
+    }
+    const transactionLocation = `Location: ${transaction.location}`
+    return (
+        <Tooltip title={transactionLocation}>
+            <Tag icon={<EnvironmentOutlined />}>{transaction.location}</Tag>
+        </Tooltip>
+    );
+  };
+
+const getTransactionStatisticsDiv = (transaction: Transaction) => {
+	return <div
+		className="transaction-location-card"
+	>
+		{getLocation(transaction)}
+	</div>;
+  };
 
 const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   props
@@ -325,7 +345,9 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
           </Tooltip>
         </div>
       </div>
-      <Divider />
+      <Divider style={{marginTop: '5px', marginBottom: '0px'}}/>
+        {getTransactionStatisticsDiv(transaction)}
+      <Divider style={{marginTop: '0px'}}/>
       <div className="transaction-statistic-card" style={{background: bgColor}}>
         <Row gutter={10}>
           {getPaymentDateTime(transaction)}

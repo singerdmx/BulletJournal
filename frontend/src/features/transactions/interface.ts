@@ -8,6 +8,7 @@ export interface Transaction extends ProjectItem {
   recurrenceRule?: string;
   time: string;
   timezone: string;
+  location: string;
   transactionType: number;
   color?: string;
 }

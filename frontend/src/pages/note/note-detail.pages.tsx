@@ -62,9 +62,9 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
     if(!note.location){
         return null;
     }
-    const taskLocation = `Location: ${note.location}`
+    const noteLocation = `Location: ${note.location}`
     return (
-        <Tooltip title={taskLocation}>
+        <Tooltip title={noteLocation}>
             <Tag icon={<EnvironmentOutlined />}>{note.location}</Tag>
         </Tooltip>
     );
@@ -79,7 +79,7 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
 	>
 		{getLocation(note)}
 	</div>;
-};
+  };
 
   if (!note) return null;
 

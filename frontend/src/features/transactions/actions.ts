@@ -33,6 +33,7 @@ export const createTransaction = (
   payer: string,
   transactionType: number,
   timezone: string,
+  location: string,
   labels: number[],
   date?: string,
   time?: string,
@@ -47,6 +48,7 @@ export const createTransaction = (
     date: date,
     transactionType: transactionType,
     timezone: timezone,
+    location: location,
     labels: labels,
     time: time,
     recurrenceRule: recurrenceRule,
@@ -73,6 +75,7 @@ export const patchTransaction = (
   payer: string,
   transactionType: number,
   timezone: string,
+  location: string,
   date?: string,
   time?: string,
   recurrenceRule?: string,
@@ -87,6 +90,7 @@ export const patchTransaction = (
     time: time,
     transactionType: transactionType,
     timezone: timezone,
+    location: location,
     labels: labels,
     recurrenceRule: recurrenceRule
   });

@@ -11,7 +11,7 @@ import {
   Tooltip,
   InputNumber,
 } from 'antd';
-import { EditTwoTone } from '@ant-design/icons';
+import { EditTwoTone, EnvironmentOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { RouteComponentProps, withRouter, useParams } from 'react-router';
 import { IState } from '../../store';
@@ -32,6 +32,7 @@ import {PlusCircleTwoTone} from "@ant-design/icons/lib";
 import {convertToTextWithRRule, updateTransactionRruleString} from '../../features/recurrence/actions';
 import ReactRRuleGenerator from '../../features/recurrence/RRuleGenerator';
 import moment from 'moment';
+import SearchBar from '../map-search-bar/search-bar.component';
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -68,6 +69,7 @@ interface TransactionEditFormProps {
     payer: string,
     transactionType: number,
     timezone: string,
+    location: string,
     date?: string,
     time?: string,
     recurrenceRule?: string,
@@ -101,6 +103,7 @@ const EditTransaction: React.FC<
     transaction.transactionType
   );
   const [transTimezone, setTransTimezone] = useState(transaction.timezone);
+  const [location, setLocation] = useState(transaction.location || '');
   const { projectId } = useParams();
 
   useEffect(() => {
@@ -134,6 +137,7 @@ const EditTransaction: React.FC<
       values.payerName,
       values.transactionType,
       values.timezone,
+      location,
       date_value,
       time_value,
       recurrence,
@@ -362,7 +366,9 @@ const EditTransaction: React.FC<
               </Form.Item>
             </Tooltip>
           </div>
-
+          <Form.Item label={<div><EnvironmentOutlined/><span style={{ padding: '0 4px'}}>Location</span></div>}>
+                <SearchBar setLocation={setLocation} location={location}/>
+          </Form.Item>
           {/* label */}
           <div>
             <Form.Item name="labels" label={

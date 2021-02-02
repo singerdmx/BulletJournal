@@ -13,7 +13,7 @@ import {
   TimePicker,
   Tooltip,
 } from 'antd';
-import {PlusOutlined, SyncOutlined} from '@ant-design/icons';
+import {PlusOutlined, SyncOutlined, EnvironmentOutlined} from '@ant-design/icons';
 import {connect} from 'react-redux';
 import {RouteComponentProps, useParams, withRouter} from 'react-router';
 import {
@@ -41,6 +41,7 @@ import ProjectSettingDialog from "../../components/modals/project-setting.compon
 import {Transaction} from "../../features/transactions/interface";
 import {ProjectItemUIType} from "../../features/project/constants";
 import TransactionItem from "../project-item/transaction-item.component";
+import SearchBar from '../map-search-bar/search-bar.component';
 
 
 const { Option } = Select;
@@ -79,6 +80,7 @@ interface TransactionCreateFormProps {
     payer: string,
     transactionType: number,
     timezone: string,
+    location: string,
     labels: number[],
     date?: string,
     time?: string,
@@ -104,6 +106,7 @@ const AddTransaction: React.FC<
   const [manageRecurringTransDialogVisible, setManageRecurringTransDialogVisible] = useState(false);
   const { projectId } = useParams();
   const [recurrent, setRecurrent] = useState(false);
+  const [location, setLocation] = useState('');
 
   const addTransaction = (values: any) => {
     //convert time object to format string
@@ -121,6 +124,7 @@ const AddTransaction: React.FC<
         payerName,
         values.transactionType,
         timezone,
+        location,
         values.labels,
         date_value,
         time_value,
@@ -356,6 +360,9 @@ const AddTransaction: React.FC<
               </Form.Item>
             </Tooltip>
           </div>
+          <Form.Item label={<div><EnvironmentOutlined/><span style={{ padding: '0 4px'}}>Location</span></div>}>
+                <SearchBar setLocation={setLocation} location={location}/>
+          </Form.Item>
           {/* label */}
           <div>
             <Form.Item name="labels" label={
