@@ -1311,7 +1311,7 @@ function* shareTaskByEmails(action: PayloadAction<ShareTaskByEmailAction>) {
       targetUser,
       targetGroup,
     } = action.payload;
-    const data = yield call(
+    yield call(
       shareTaskByEmail,
       taskId,
       contents,

@@ -665,7 +665,7 @@ function* shareNoteByEmails(action: PayloadAction<ShareNoteByEmailAction>) {
       targetUser,
       targetGroup,
     } = action.payload;
-    const data = yield call(
+    yield call(
       shareNoteByEmail,
       noteId,
       contents,

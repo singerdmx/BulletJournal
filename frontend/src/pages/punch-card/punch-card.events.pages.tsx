@@ -353,7 +353,7 @@ const TemplateEvents: React.FC<TemplateEventsProps> = (
     return (
         <div>
             <div className='banner'>
-                <a id="templates_pic" target="_blank"
+                <a id="templates_pic" target="_blank" rel="noopener noreferrer"
                    href="https://bulletjournal.us/public/templates">
                     <img className="banner-pic"
                          src="https://user-images.githubusercontent.com/122956/93190453-3df4d800-f6f8-11ea-8a66-4074db4adc70.png"

@@ -2,7 +2,6 @@ import { all, call, put, takeLatest, select } from 'redux-saga/effects';
 import { message } from 'antd';
 import {
   actions as calendarSyncActions,
-  GoogleCalendarCreateEventsAction,
   UnwatchedCalendarAction,
   UpdateExpirationTimeAction,
   UpdateGoogleCalendarEventListAction,

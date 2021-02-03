@@ -13,11 +13,6 @@ export type UpdateGoogleCalendarEventListAction = {
   endDate?: string;
 };
 
-export type GoogleCalendarCreateEventsAction = {
-  projectId: number;
-  events: GoogleCalendarEvent[];
-};
-
 export type UpdateWatchedProjectAction = {
   calendarId: string;
 };
@@ -118,10 +113,6 @@ const slice = createSlice({
     googleCalendarEventListUpdate: (
       state,
       action: PayloadAction<UpdateGoogleCalendarEventListAction>
-    ) => state,
-    googleCalendarCreateEvents: (
-      state,
-      action: PayloadAction<GoogleCalendarCreateEventsAction>
     ) => state,
     watchedProjectUpdate: (
       state,

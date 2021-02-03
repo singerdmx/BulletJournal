@@ -4,7 +4,7 @@ import { LocationContext } from './search-bar.component';
 import './map-container.styles.less';
 
 const Marker = (props: any) => {
-	const { color, name, id } = props;
+	const { color, name } = props;
 	return (
 		<div>
 			<div

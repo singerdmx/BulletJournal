@@ -15,11 +15,6 @@ export const googleCalendarEventListUpdate = (
     startDate: startDate,
     endDate: endDate,
   });
-export const googleCalendarCreateEvents = (
-  projectId: number,
-  events: GoogleCalendarEvent[]
-) =>
-  actions.googleCalendarCreateEvents({ projectId: projectId, events: events });
 export const updateWatchedProject = (calendarId: string) =>
   actions.watchedProjectUpdate({ calendarId: calendarId });
 export const watchCalendar = (calendarId: string, projectId: number) =>

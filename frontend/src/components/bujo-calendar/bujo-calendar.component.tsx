@@ -204,6 +204,7 @@ class BujoCalendar extends React.Component<BujoCalendarProps & PathProps> {
   };
 
   onPanelChange = (value: moment.Moment, mode: CalendarMode) => {
+    console.log('onPanelChange value', value);
     this.setState({
       selectedValue: value,
     });

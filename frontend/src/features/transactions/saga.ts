@@ -243,7 +243,7 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
     yield call(deleteTransactionById, transactionId, dateTime);
 
     console.log(type);
-    if (type === ProjectItemUIType.PROJECT || type === ProjectItemUIType.PAYER || type == ProjectItemUIType.MANAGE_RECURRING) {
+    if (type === ProjectItemUIType.PROJECT || type === ProjectItemUIType.PAYER || type === ProjectItemUIType.MANAGE_RECURRING) {
       const data = yield call(
         fetchTransactions,
         transaction.projectId,
@@ -718,7 +718,7 @@ function* shareTransactionByEmails(action: PayloadAction<ShareTransactionByEmail
       targetUser,
       targetGroup,
     } = action.payload;
-    const data = yield call(
+    yield call(
       shareTransactionByEmail,
       transactionId,
       contents,

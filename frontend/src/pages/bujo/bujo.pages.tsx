@@ -18,7 +18,6 @@ import { BackTop, Checkbox, Tooltip } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
 import {
   getProjectItemsAfterUpdateSelect,
-  getProjectItems,
 } from '../../features/myBuJo/actions';
 
 import './bujo.styles.less';
@@ -37,12 +36,6 @@ type BujoProps = {
     noteSelected: boolean,
     category: string,
     forceToday?: boolean
-  ) => void;
-  getProjectItems: (
-    startDate: string,
-    endDate: string,
-    timezone: string,
-    category: string
   ) => void;
 };
 
@@ -197,5 +190,4 @@ const mapStateToProps = (state: IState) => ({
 
 export default connect(mapStateToProps, {
   getProjectItemsAfterUpdateSelect,
-  getProjectItems,
 })(withRouter(BujoPage));
