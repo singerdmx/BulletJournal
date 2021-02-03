@@ -122,7 +122,7 @@ public class MessagingService {
 
     private static final String ITEM_NAME_PROPERTY = "item_name";
 
-    private static final String HTML_CONTENT = "html_content";
+    private static final String HTML_CONTENT_PROPERTY = "html_content";
 
     @Autowired
     public MessagingService(
@@ -297,7 +297,7 @@ public class MessagingService {
             return null;
         }
 
-        String title = requester + " is sharing " + itemType + " " + itemName + " with you.";
+        String title = requester + " is sharing " + itemType + " <" + itemName + "> with you.";
 
         return new MailjetEmailParams(
             Arrays.asList(new ImmutablePair(null, email)),
@@ -312,11 +312,10 @@ public class MessagingService {
             itemType,
             ITEM_NAME_PROPERTY,
             itemName,
-            HTML_CONTENT,
+            HTML_CONTENT_PROPERTY,
             htmlContent
         );
     }
-
 
     public void sendAppInvitationEmailsToUser(String inviter, List<String> emails) {
         LOGGER.info("Sending app invitation emails...");
