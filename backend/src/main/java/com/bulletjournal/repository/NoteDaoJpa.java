@@ -15,6 +15,7 @@ import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.NoteRelationsProcessor;
+import com.bulletjournal.messaging.MessagingService;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
@@ -58,6 +59,8 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     private UserDaoJpa userDaoJpa;
     @Autowired
     private GroupDaoJpa groupDaoJpa;
+    @Autowired
+    private MessagingService messagingService;
 
     @Override
     public JpaRepository getJpaRepository() {
@@ -373,5 +376,8 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
 
         System.out.println(targetEmails);
         System.out.println(params.generateExportHtml());
+
+        messagingService.sendExportedContentEmailsToUsers(requester, "note",
+            note.getName(), params.generateExportHtml(), targetEmails);
     }
 }
