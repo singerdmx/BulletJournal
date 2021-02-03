@@ -263,6 +263,61 @@ public class MessagingService {
         return paramsList;
     }
 
+    public void sendExportedContentEmailsToUsers(String requester, String itemType,
+        String itemName, String htmlContent, List<String> emails) {
+        LOGGER.info("Sending exported content emails ...");
+        try {
+            List<MailjetEmailParams> emailParamsList = new ArrayList<>();
+            for (String email : new HashSet<>(emails)) {
+                MailjetEmailParams mailjetEmailParams =
+                    createEmailParamForExportedContentEmail(requester, this.getAvatar(requester),
+                        itemType, itemName, htmlContent, email);
+                if (mailjetEmailParams != null) {
+                    emailParamsList.add(mailjetEmailParams);
+                }
+            }
+            mailjetClient.sendAllEmailAsync(emailParamsList);
+
+        } catch (Exception e) {
+            LOGGER.error("sendExportedContentEmailsToUsers failed", e);
+        }
+    }
+
+    public MailjetEmailParams createEmailParamForExportedContentEmail(
+        String requester, String requestAvatar, String itemType,
+        String itemName, String htmlContent, String email) {
+
+        if (!this.isValidEmailAddr(email)) {
+            LOGGER.error("Invalid target email address: {}", email);
+            return null;
+        }
+
+        if (requester == null || requestAvatar == null) {
+            LOGGER.error("Export Content Email: Invalid requester information");
+            return null;
+        }
+
+        String title = requester + " is sharing " + itemType + " " + itemName + " with you.";
+
+        return new MailjetEmailParams(
+            Arrays.asList(new ImmutablePair(null, email)),
+            title,
+            null,
+            Template.EXPORT_CONTENT_AS_EMAIL,
+            REQUESTER_PROPERTY,
+            requester,
+            REQUESTER_AVATAR_PROPERTY,
+            requestAvatar,
+            ITEM_TYPE_PROPERTY,
+            itemType,
+            ITEM_NAME_PROPERTY,
+            itemName,
+            HTML_CONTENT,
+            htmlContent
+        );
+    }
+
+
     public void sendAppInvitationEmailsToUser(String inviter, List<String> emails) {
         LOGGER.info("Sending app invitation emails...");
         try {
@@ -367,6 +422,12 @@ public class MessagingService {
                 groupInviterAvatar
             );
     }
+
+//    private MailjetEmailParams createEmailParamForExportContentAsEmail(
+//        String itemName, String itemType, String request
+//    ) {
+//
+//    }
 
     private List<MailjetEmailParams> createEmailParamsForDueTask(
         Task task, Map<String, String> nameEmailMap
