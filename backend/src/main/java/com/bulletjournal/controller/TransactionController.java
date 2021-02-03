@@ -420,5 +420,7 @@ public class TransactionController {
             @NotNull @PathVariable Long transactionId,
             @NotNull @RequestBody ExportProjectItemAsEmailParams exportProjectItemAsEmailParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
+        transactionDaoJpa.exportTransactionAsEmail(
+            transactionId, exportProjectItemAsEmailParams, username);
     }
 }
