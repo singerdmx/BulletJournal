@@ -115,23 +115,23 @@ function* getProjectItemsAfterUpdateSelect(
     if (noteSelected) types.push(ProjectType.NOTE);
 
     let data = [];
-
+    const selectedCalendarDay = state.myBuJo.selectedCalendarDay ? state.myBuJo.selectedCalendarDay : moment().format('YYYY-MM-DD');
     if (category === 'calendar') {
       if (state.myBuJo.calendarMode === 'month') {
         data = yield call(
           fetchProjectItems,
           types,
           state.myself.timezone,
-          moment(state.myBuJo.selectedCalendarDay)
+          moment(selectedCalendarDay)
             .add(-60, 'days')
             .format(dateFormat),
-          moment(state.myBuJo.selectedCalendarDay)
+          moment(selectedCalendarDay)
             .add(60, 'days')
             .format(dateFormat)
         );
       } else {
         // calendarMode is 'year'
-        const year = state.myBuJo.selectedCalendarDay.substring(0, 4);
+        const year = selectedCalendarDay.substring(0, 4);
         data = yield call(
           fetchProjectItems,
           types,
