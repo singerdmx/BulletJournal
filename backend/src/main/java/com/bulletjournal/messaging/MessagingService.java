@@ -113,6 +113,16 @@ public class MessagingService {
     private static final Pattern GROUP_INVITATION_TITLE_PATTERN =  Pattern
         .compile("(?s)(?<=##).*?(?=##)");
 
+    // EXPORT CONTENT AS EMAIL PROPERTIES
+    private static final String REQUESTER_PROPERTY = "requester_name";
+
+    private static final String REQUESTER_AVATAR_PROPERTY = "requester_avatar";
+
+    private static final String ITEM_TYPE_PROPERTY = "item_type";
+
+    private static final String ITEM_NAME_PROPERTY = "item_name";
+
+    private static final String HTML_CONTENT = "html_content";
 
     @Autowired
     public MessagingService(
@@ -357,7 +367,6 @@ public class MessagingService {
                 groupInviterAvatar
             );
     }
-
 
     private List<MailjetEmailParams> createEmailParamsForDueTask(
         Task task, Map<String, String> nameEmailMap
