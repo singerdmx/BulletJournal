@@ -85,9 +85,12 @@ const EditNote: React.FC<NoteProps> = (props) => {
                 defaultValue={note.name ? note.name : ''}
             />
           </Form.Item>
+          <Tooltip title={location} placement="bottom">
           <Form.Item label={<div><EnvironmentOutlined/><span style={{ padding: '0 4px' }}>Location</span></div>}>
                 <SearchBar setLocation={setLocation} location={location} />
           </Form.Item>
+          </Tooltip>
+
           {/* label */}
           <div>
             <Form.Item name="labels" label={

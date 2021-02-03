@@ -366,9 +366,11 @@ const EditTransaction: React.FC<
               </Form.Item>
             </Tooltip>
           </div>
-          <Form.Item label={<div><EnvironmentOutlined/><span style={{ padding: '0 4px'}}>Location</span></div>}>
-                <SearchBar setLocation={setLocation} location={location}/>
-          </Form.Item>
+          <Tooltip title={location} placement="bottom">
+            <Form.Item label={<div><EnvironmentOutlined/><span style={{ padding: '0 4px'}}>Location</span></div>}>
+                  <SearchBar setLocation={setLocation} location={location}/>
+            </Form.Item>
+          </Tooltip>
           {/* label */}
           <div>
             <Form.Item name="labels" label={
