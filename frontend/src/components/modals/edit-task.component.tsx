@@ -111,6 +111,12 @@ const EditTask: React.FC<
 
   const [location, setLocation] = useState(task.location || '');
 
+  const getLocationItem =() => {
+	return <Form.Item label={<div><EnvironmentOutlined/><span style={{padding: '0 4px'}}>Location</span></div>}>
+	  <SearchBar setLocation={setLocation} location={location}/>
+	</Form.Item>;
+  }
+
   useEffect(() => {
     setRRuleText(convertToTextWithRRule(props.rRuleString));
   }, [props.rRuleString]);
@@ -564,11 +570,9 @@ const EditTask: React.FC<
               )}
             </div>
           </div>
-          <Tooltip title={location} placement="bottom">
-            <Form.Item label={<div><EnvironmentOutlined/><span style={{ padding: '0 4px' }}>Location</span></div>}>
-                  <SearchBar setLocation={setLocation} location={location} />
-            </Form.Item>
-          </Tooltip>
+          {location.length > 40 ? <Tooltip title={location} placement="bottom">
+            {getLocationItem()}
+          </Tooltip> : getLocationItem()}
           {/* label */}
           <div>
             <Form.Item name="labels" label={

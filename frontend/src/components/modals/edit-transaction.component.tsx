@@ -193,6 +193,12 @@ const EditTransaction: React.FC<
     );
   };
 
+  const getLocationItem =() => {
+	return <Form.Item label={<div><EnvironmentOutlined/><span style={{padding: '0 4px'}}>Location</span></div>}>
+	  <SearchBar setLocation={setLocation} location={location}/>
+	</Form.Item>;
+  }
+
   const getModal = () => {
     const { transaction } = props;
     return (
@@ -366,11 +372,9 @@ const EditTransaction: React.FC<
               </Form.Item>
             </Tooltip>
           </div>
-          <Tooltip title={location} placement="bottom">
-            <Form.Item label={<div><EnvironmentOutlined/><span style={{ padding: '0 4px'}}>Location</span></div>}>
-                  <SearchBar setLocation={setLocation} location={location}/>
-            </Form.Item>
-          </Tooltip>
+          {location.length > 40 ? <Tooltip title={location} placement="bottom">
+            {getLocationItem()}
+          </Tooltip> : getLocationItem()}
           {/* label */}
           <div>
             <Form.Item name="labels" label={

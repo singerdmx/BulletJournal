@@ -167,6 +167,12 @@ const AddTransaction: React.FC<
     setRRuleText(convertToTextWithRRule(props.rRuleString));
   }, [props.rRuleString]);
 
+  const getLocationItem = () => {
+	return <Form.Item label={<div><EnvironmentOutlined/><span style={{padding: '0 4px'}}>Location</span></div>}>
+	  <SearchBar setLocation={setLocation} location={location}/>
+	</Form.Item>;
+  }
+
   const getSelections = () => {
     if (!props.group || !props.group.users) {
       return null;
@@ -360,9 +366,9 @@ const AddTransaction: React.FC<
               </Form.Item>
             </Tooltip>
           </div>
-          <Form.Item label={<div><EnvironmentOutlined/><span style={{ padding: '0 4px'}}>Location</span></div>}>
-                <SearchBar setLocation={setLocation} location={location}/>
-          </Form.Item>
+          {location.length > 40 ? <Tooltip title={location} placement="bottom">
+            {getLocationItem()}
+          </Tooltip> : getLocationItem()}
           {/* label */}
           <div>
             <Form.Item name="labels" label={

@@ -54,6 +54,12 @@ const AddNote: React.FC<
     props.updateNoteVisible(false);
   };
 
+  const getLocationItem =() => {
+	return <Form.Item label={<div><EnvironmentOutlined/><span style={{padding: '0 4px'}}>Location</span></div>}>
+	  <SearchBar setLocation={setLocation} location={location}/>
+	</Form.Item>;
+  }
+
   const onCancel = () => props.updateNoteVisible(false);
   const openModal = () => props.updateNoteVisible(true);
   const getModal = () => {
@@ -81,9 +87,9 @@ const AddNote: React.FC<
           >
             <Input placeholder='Enter Note Name' allowClear />
           </Form.Item>
-		  <Form.Item label={<div><EnvironmentOutlined/><span style={{ padding: '0 4px'}}>Location</span></div>}>
-                <SearchBar setLocation={setLocation} location={location}/>
-          </Form.Item>
+          {location.length > 40 ? <Tooltip title={location} placement="bottom">
+            {getLocationItem()}
+          </Tooltip> : getLocationItem()}
           <div>
             <Form.Item name="labels" label={
               <Tooltip title="Click to go to labels page to create label">

@@ -50,6 +50,12 @@ const EditNote: React.FC<NoteProps> = (props) => {
     setVisible(true);
   };
 
+  const getLocationItem =() => {
+	return <Form.Item label={<div><EnvironmentOutlined/><span style={{padding: '0 4px'}}>Location</span></div>}>
+	  <SearchBar setLocation={setLocation} location={location}/>
+	</Form.Item>;
+  }
+
   const getModal = () => {
     return (
       <Modal
@@ -85,11 +91,9 @@ const EditNote: React.FC<NoteProps> = (props) => {
                 defaultValue={note.name ? note.name : ''}
             />
           </Form.Item>
-          <Tooltip title={location} placement="bottom">
-          <Form.Item label={<div><EnvironmentOutlined/><span style={{ padding: '0 4px' }}>Location</span></div>}>
-                <SearchBar setLocation={setLocation} location={location} />
-          </Form.Item>
-          </Tooltip>
+          {location.length > 40 ? <Tooltip title={location} placement="bottom">
+            {getLocationItem()}
+          </Tooltip> : getLocationItem()}
 
           {/* label */}
           <div>
