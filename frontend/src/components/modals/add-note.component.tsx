@@ -87,7 +87,7 @@ const AddNote: React.FC<
           >
             <Input placeholder='Enter Note Name' allowClear />
           </Form.Item>
-          {location.length > 40 ? <Tooltip title={location} placement="bottom">
+          {location && location.length > 40 ? <Tooltip title={location} placement="bottom">
             {getLocationItem()}
           </Tooltip> : getLocationItem()}
           <div>

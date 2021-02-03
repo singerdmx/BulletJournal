@@ -570,7 +570,7 @@ const EditTask: React.FC<
               )}
             </div>
           </div>
-          {location.length > 40 ? <Tooltip title={location} placement="bottom">
+          {location && location.length > 40 ? <Tooltip title={location} placement="bottom">
             {getLocationItem()}
           </Tooltip> : getLocationItem()}
           {/* label */}

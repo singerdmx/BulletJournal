@@ -372,7 +372,7 @@ const EditTransaction: React.FC<
               </Form.Item>
             </Tooltip>
           </div>
-          {location.length > 40 ? <Tooltip title={location} placement="bottom">
+          {location && location.length > 40 ? <Tooltip title={location} placement="bottom">
             {getLocationItem()}
           </Tooltip> : getLocationItem()}
           {/* label */}

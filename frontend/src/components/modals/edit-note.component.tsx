@@ -91,7 +91,7 @@ const EditNote: React.FC<NoteProps> = (props) => {
                 defaultValue={note.name ? note.name : ''}
             />
           </Form.Item>
-          {location.length > 40 ? <Tooltip title={location} placement="bottom">
+          {location && location.length > 40 ? <Tooltip title={location} placement="bottom">
             {getLocationItem()}
           </Tooltip> : getLocationItem()}
 
