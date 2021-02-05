@@ -210,6 +210,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     private <T extends ProjectItemModel> void populateContent(String owner, K content, T projectItem) {
         content.setProjectItem(projectItem);
         content.setOwner(owner);
+        DeltaContent newContent = new DeltaContent(content.getText());
+        content.setText(newContent.toJSON());
         updateRevision(content, owner, content.getText(), content.getText());
     }
 
