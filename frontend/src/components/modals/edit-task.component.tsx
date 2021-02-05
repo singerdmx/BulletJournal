@@ -383,7 +383,7 @@ const EditTask: React.FC<
                 //force remind option to be before
                 setRemindButton('remindBefore');
                 setReminderType('remindBefore');
-              }}>Recurrence</span>
+              }}>Recurring</span>
             </Radio>
           </Radio.Group>
 

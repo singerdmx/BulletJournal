@@ -288,7 +288,7 @@ const AddTask: React.FC<
                 setReminderType('remindBefore');
               }}
             >
-              Recurrence
+              Recurring
             </Radio.Button>
           </Radio.Group>
           {dueType === 'dueByTime' && (

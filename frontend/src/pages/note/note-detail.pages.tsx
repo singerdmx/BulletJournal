@@ -59,7 +59,7 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
   }, [note]);
 
   const getLocation = (note: Note) => {
-    if(!note.location){
+    if(!note.location) {
         return null;
     }
     const noteLocation = `Location: ${note.location}`
@@ -74,6 +74,9 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
 	if (isPublic) {
 		return null;
 	}
+    if(!note.location) {
+      return null;
+    }
 	return <div
 		className="note-statistic-card"
 	>

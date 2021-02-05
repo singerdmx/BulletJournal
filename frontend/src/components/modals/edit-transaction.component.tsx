@@ -99,9 +99,8 @@ const EditTransaction: React.FC<
   const [transactionName, setTransactionName] = useState(transaction.name);
   const [payerName, setPayerName] = useState(transaction.payer.name);
   const [amount, setAmount] = useState(transaction.amount);
-  const [transactionType, setTransactionType] = useState(
-    transaction.transactionType
-  );
+  const [transactionDateRequired, setTransactionDateRequired] = useState(false);
+  const [transactionType, setTransactionType] = useState(transaction.transactionType);
   const [transTimezone, setTransTimezone] = useState(transaction.timezone);
   const [location, setLocation] = useState(transaction.location || '');
   const { projectId } = useParams();
@@ -118,15 +117,14 @@ const EditTransaction: React.FC<
 
   const editTransaction = (values: any) => {
     //convert time object to format string
-    let date_value = values.date
+    let dateValue = values.date
       ? values.date.format(dateFormat)
       : transaction.date;
     const time_value = values.time ? values.time.format('HH:mm') : undefined;
     let recurrence = props.rRuleString;
     if (recurrent) {
-      date_value = null;
-    }
-    else {
+      dateValue = null;
+    } else {
       recurrence = null;
     }
 
@@ -138,7 +136,7 @@ const EditTransaction: React.FC<
       values.transactionType,
       values.timezone,
       location,
-      date_value,
+      dateValue,
       time_value,
       recurrence,
       values.labels,
@@ -197,6 +195,12 @@ const EditTransaction: React.FC<
 	return <Form.Item label={<div><EnvironmentOutlined/><span style={{padding: '0 4px'}}>Location</span></div>}>
 	  <SearchBar setLocation={setLocation} location={location}/>
 	</Form.Item>;
+  }
+
+  const onDateChange = (date: any, dateString: string) => {
+    console.log('date', date);
+    console.log('dateString', dateString);
+    setTransactionDateRequired(!date);
   }
 
   const getModal = () => {
@@ -294,12 +298,17 @@ const EditTransaction: React.FC<
           <span style={{ color: 'rgba(0, 0, 0, 0.85)' }}>Transaction Type &nbsp;&nbsp;</span>
           <Radio.Group
             defaultValue={recurrent ? 'Recurrent' : 'oneTime'}
-            onChange={(e) => setRecurrent(e.target.value === 'Recurrent')}
+            onChange={(e) => {
+              setRecurrent(e.target.value === 'Recurrent');
+              console.log('form date', form.getFieldValue('date'));
+              setTransactionDateRequired(e.target.value === 'oneTime' && !form.getFieldValue('date')
+                  && !transaction.date);
+            }}
             buttonStyle="solid"
             style={{ marginBottom: 18 }}
           >
             <Radio.Button value={'oneTime'}>One Time</Radio.Button>
-            <Radio.Button value={'Recurrent'}>Recurrence</Radio.Button>
+            <Radio.Button value={'Recurrent'}>Recurring</Radio.Button>
           </Radio.Group>
 
           {recurrent ? (
@@ -322,13 +331,14 @@ const EditTransaction: React.FC<
                   <Form.Item 
                     name="date" 
                     style={{ width: '100%' }}
-                    rules={[{ required: true, message: 'Missing Date!' }]}>
+                    rules={[{ required: transactionDateRequired, message: 'Missing Date!' }]}>
                     <DatePicker
                       allowClear={true}
                       style={{ width: '100%' }}
                       placeholder="Date"
+                      onChange={(date, dateString) => onDateChange(date, dateString)}
                       defaultValue={
-                        transaction.recurrenceRule
+                        transaction.recurrenceRule || !transaction.date
                           ? undefined
                           : moment(transaction.date, dateFormat)
                       }
@@ -342,7 +352,7 @@ const EditTransaction: React.FC<
                         format="HH:mm"
                         placeholder="Time"
                         defaultValue={
-                          transaction.recurrenceRule
+                          transaction.recurrenceRule || !transaction.time
                             ? undefined
                             : moment(transaction.time, 'HH:mm')
                         }

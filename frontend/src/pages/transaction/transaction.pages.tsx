@@ -39,7 +39,13 @@ import ContentEditorDrawer from '../../components/content-editor/content-editor-
 import LabelManagement from '../project/label-management.compoent';
 import {Button as FloatButton, Container, darkColors, lightColors,} from 'react-floating-action-button';
 import {setDisplayMore, setDisplayRevision} from "../../features/content/actions";
-import {CopyOutlined, DeleteOutlined, EditOutlined, HighlightOutlined, EnvironmentOutlined} from "@ant-design/icons/lib";
+import {
+  CopyOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  EnvironmentOutlined,
+  HighlightOutlined
+} from "@ant-design/icons/lib";
 import {animation, IconFont, Item, Menu, MenuProvider} from "react-contexify";
 import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
 import CopyToClipboard from "react-copy-to-clipboard";
@@ -87,12 +93,15 @@ const getLocation = (transaction: Transaction) => {
   };
 
 const getTransactionStatisticsDiv = (transaction: Transaction) => {
-	return <div
-		className="transaction-location-card"
-	>
-		{getLocation(transaction)}
-	</div>;
-  };
+  if (!transaction.location) {
+    return null;
+  }
+  return <div
+      className="transaction-location-card"
+  >
+    {getLocation(transaction)}
+  </div>;
+};
 
 const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   props

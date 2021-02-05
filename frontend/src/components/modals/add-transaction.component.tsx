@@ -303,7 +303,7 @@ const AddTransaction: React.FC<
             style={{ marginBottom: 18 }}
           >
             <Radio.Button value={'oneTime'}>One Time</Radio.Button>
-            <Radio.Button value={'Recurrent'}>Recurrence</Radio.Button>
+            <Radio.Button value={'Recurrent'}>Recurring</Radio.Button>
           </Radio.Group>
 
           {recurrent ? (
