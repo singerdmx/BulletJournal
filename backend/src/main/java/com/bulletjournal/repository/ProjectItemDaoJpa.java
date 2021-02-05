@@ -210,8 +210,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     private <T extends ProjectItemModel> void populateContent(String owner, K content, T projectItem) {
         content.setProjectItem(projectItem);
         content.setOwner(owner);
-        DeltaContent newContent = new DeltaContent(content.getText());
-        content.setText(newContent.toJSON());
+        adjustContentText(content.getText(), content);
         updateRevision(content, owner, content.getText(), content.getText());
     }
 
@@ -266,12 +265,19 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             String requester, UpdateContentParams updateContentParams,
             T projectItem, K content, String oldText) {
 
-        DeltaContent newContent = new DeltaContent(updateContentParams.getText());
-        content.setText(newContent.toJSON());
+        adjustContentText(updateContentParams.getText(), content);
 
         updateRevision(content, requester, content.getText(), oldText);
         this.getContentJpaRepository().save(content);
         return Pair.of(content, projectItem);
+    }
+
+    private void adjustContentText(String newText, K content) {
+        DeltaContent newContent = new DeltaContent(newText);
+        // TODO: call grpc to get html string from delta
+        // newContent.getDeltaOpsString() => html string
+        // newContent.setHtml(<html string>);
+        content.setText(newContent.toJSON());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
