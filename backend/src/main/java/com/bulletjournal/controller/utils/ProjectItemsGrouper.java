@@ -49,6 +49,8 @@ public class ProjectItemsGrouper {
     };
     public static final Comparator<Task> TASK_BY_STATUS_COMPARATOR = Comparator.comparingInt(Task::getIntStatus);
     public static final Comparator<Note> NOTE_COMPARATOR = Comparator.comparing(AuditModel::getUpdatedAt);
+    public static final Comparator<Note> NOTE_COMPARATOR_REVERSE_ORDER =
+            (a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt());
 
     /*
      * Convert list of transactions to a <ZonedDateTime, Transaction List> Map
@@ -188,7 +190,7 @@ public class ProjectItemsGrouper {
             List<Note> notes = notesMap.get(zonedDateTime);
 
             // Sort note by update time
-            notes.sort(NOTE_COMPARATOR);
+            notes.sort(NOTE_COMPARATOR_REVERSE_ORDER);
             projectItem.setNotes(notes.stream().map(n ->
                     n.toPresentationModel())
                     .collect(Collectors.toList()));

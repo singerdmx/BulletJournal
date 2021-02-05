@@ -133,7 +133,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
             }
         }
 
-        notes.sort(ProjectItemsGrouper.NOTE_COMPARATOR);
+        notes.sort(ProjectItemsGrouper.NOTE_COMPARATOR_REVERSE_ORDER);
         return this.labelDaoJpa.getLabelsForProjectItemList(notes.stream()
                 .map(Note::toPresentationModel).collect(Collectors.toList()));
     }
@@ -191,7 +191,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         }
 
         List<Note> notes = this.noteRepository.findNotesByOwnerAndProject(owner, project);
-        notes.sort(ProjectItemsGrouper.NOTE_COMPARATOR);
+        notes.sort(ProjectItemsGrouper.NOTE_COMPARATOR_REVERSE_ORDER);
         return notes.stream().map(t -> {
             List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
             return t.toPresentationModel(labels);
