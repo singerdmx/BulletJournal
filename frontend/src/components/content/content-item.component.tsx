@@ -117,7 +117,7 @@ const ContentItem: React.FC<ContentProps> = ({
 
   const contentJson = JSON.parse(content.text);
   const delta = contentJson['delta'];
-  const contentHtml = contentJson['###html###'];
+  const contentHtml = contentJson['$$$html$$$'];
   let newDelta : DeltaStatic = new Delta();
   if (contentHtml) {
     console.log('contentHtml', contentHtml);
