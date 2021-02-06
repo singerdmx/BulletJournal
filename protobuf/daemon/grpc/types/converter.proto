@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+import "google/protobuf/any.proto";
+
+package types;
+
+option go_package = "github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types";
+option java_multiple_files = true;
+option java_package = "com.bulletjournal.protobuf.daemon.grpc.types";
+option java_outer_classname = "ConverterProto";
+
+message ConvertJsonObjectsToHtmlRequest {
+    // The ID or Request ID for the request
+    fixed64 id = 1;
+
+    // The length of json objects for validation purpose
+    int32 objects_length = 2;
+
+    // The requested json objects array
+    repeated google.protobuf.Any objects = 3; 
+}
+
+message ConvertJsonObjectsToHtmlResponse {
+    // The ID or Request ID for the request
+    fixed64 id = 1;
+
+    // The size of returned html in Bytes
+    int32 html_output_size = 2;
+
+    // The html coverted from Json Objects Array
+    string html_output = 3;
+}

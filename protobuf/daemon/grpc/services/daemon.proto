@@ -3,6 +3,7 @@ syntax = "proto3";
 package services;
 
 import "daemon/grpc/types/subscribe_notification.proto";
+import "daemon/grpc/types/converter.proto";
 import "daemon/grpc/types/health.proto";
 import "google/api/annotations.proto";
 
@@ -23,4 +24,7 @@ service Daemon {
           get: "/daemon/healthcheck"
     };
   }
+
+  // Serve rpc call to convert json object array to html
+  rpc ConvertDeltaToHtml (types.ConvertJsonObjectsToHtmlRequest) returns (types.ConvertJsonObjectsToHtmlResponse) {}
 }
