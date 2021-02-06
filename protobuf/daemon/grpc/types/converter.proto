@@ -8,17 +8,11 @@ option java_package = "com.bulletjournal.protobuf.daemon.grpc.types";
 option java_outer_classname = "ConverterProto";
 
 message ConvertJsonObjectsToHtmlRequest {
-    // The ID or Request ID for the request
-    fixed64 id = 1;
-
     // The requested json objects array
-    string delta_string = 2;
+    string delta_string = 1;
 }
 
 message ConvertJsonObjectsToHtmlResponse {
-    // The ID or Request ID for the request
-    fixed64 id = 1;
-
     // The html converted from Json Objects Array
-    string html_output = 2;
+    string html_output = 1;
 }
