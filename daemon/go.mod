@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/buger/jsonparser v1.1.1
+	github.com/dchenk/go-render-quill v0.0.0-20200811011436-e982f73799ca // indirect
 	github.com/go-redis/redis/v8 v8.2.3
 	github.com/go-resty/resty/v2 v2.3.0
 	github.com/golang/protobuf v1.4.3 // indirect

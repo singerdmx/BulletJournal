@@ -2,6 +2,7 @@ package com.bulletjournal.repository;
 
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
+import com.bulletjournal.clients.DaemonServiceClient;
 import com.bulletjournal.config.ContentRevisionConfig;
 import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.contents.ContentType;
@@ -66,6 +67,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     private ProjectRepository projectRepository;
     @Autowired
     protected NotificationService notificationService;
+    @Autowired
+    private DaemonServiceClient daemonServiceClient;
 
     private final MapWithExpiration contentUpdateLock = new MapWithExpiration();
 
@@ -274,9 +277,9 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     private void adjustContentText(String newText, K content) {
         DeltaContent newContent = new DeltaContent(newText);
-        // TODO: call grpc to get html string from delta
-        // newContent.getDeltaOpsString() => html string
-        // newContent.setHtml(<html string>);
+        // call grpc to get html string from delta
+        String htmlString = this.daemonServiceClient.convertDeltaToHtml(newContent.getDeltaOpsString());
+        newContent.setHtml(htmlString);
         content.setText(newContent.toJSON());
     }
 
