@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-import "google/protobuf/any.proto";
-
 package types;
 
 option go_package = "github.com/singerdmx/BulletJournal/protobuf/daemon/grpc/types";
@@ -17,7 +15,7 @@ message ConvertJsonObjectsToHtmlRequest {
     int32 objects_length = 2;
 
     // The requested json objects array
-    repeated google.protobuf.Any objects = 3; 
+    repeated string objects = 3; 
 }
 
 message ConvertJsonObjectsToHtmlResponse {
