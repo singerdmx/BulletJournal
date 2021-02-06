@@ -66,6 +66,10 @@ public class DaemonServiceClient {
     }
 
     public String convertDeltaToHtml(String deltaString) {
+        if (!this.daemonClientConfig.isEnabled()) {
+            LOGGER.info("daemonClientConfig not Enabled, convertDeltaToHtml returns null");
+            return null;
+        }
         return this.daemonBlockingStub.convertDeltaToHtml(
                 ConvertJsonObjectsToHtmlRequest.newBuilder()
                         .setDeltaString(deltaString).build())

@@ -34,7 +34,7 @@ func main() {
 		id = os.Args[1]
 	}
 
-	stream, err := client.SubscribeNotification(ctx, &types.SubscribeNotification{ServiceName: id})
+	stream, err := client.SubscribeNotification(ctx, &types.SubscribeNotificationMsg{ServiceName: id})
 	//r, err := client.Rest(ctx, &types.JoinGroupEvents{JoinGroupEvents: []*types.JoinGroupEvent{{Events: []*types.Event{}, Originator: "1"},{Events: []*types.Event{}, Originator: "2"}}})
 	//if err != nil {
 	//	log.Fatalf("Could not send JoinGroupEvents: %v", err)
