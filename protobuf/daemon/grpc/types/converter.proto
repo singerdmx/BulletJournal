@@ -11,20 +11,14 @@ message ConvertJsonObjectsToHtmlRequest {
     // The ID or Request ID for the request
     fixed64 id = 1;
 
-    // The length of json objects for validation purpose
-    int32 objects_length = 2;
-
     // The requested json objects array
-    repeated string objects = 3; 
+    string delta_string = 2;
 }
 
 message ConvertJsonObjectsToHtmlResponse {
     // The ID or Request ID for the request
     fixed64 id = 1;
 
-    // The size of returned html in Bytes
-    int32 html_output_size = 2;
-
-    // The html coverted from Json Objects Array
-    string html_output = 3;
+    // The html converted from Json Objects Array
+    string html_output = 2;
 }

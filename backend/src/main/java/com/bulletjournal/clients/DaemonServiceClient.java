@@ -4,6 +4,7 @@ import com.bulletjournal.config.DaemonClientConfig;
 import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.SampleTaskChange;
 import com.bulletjournal.protobuf.daemon.grpc.services.DaemonGrpc;
+import com.bulletjournal.protobuf.daemon.grpc.types.ConvertJsonObjectsToHtmlRequest;
 import com.bulletjournal.protobuf.daemon.grpc.types.NotificationStreamMsg;
 import com.bulletjournal.protobuf.daemon.grpc.types.SubscribeNotificationMsg;
 import com.bulletjournal.protobuf.daemon.grpc.types.SubscribeSampleTaskMsg;
@@ -62,6 +63,13 @@ public class DaemonServiceClient {
         } else {
             LOGGER.info("Daemon streaming is Disabled");
         }
+    }
+
+    public String convertDeltaToHtml(String deltaString) {
+        return this.daemonBlockingStub.convertDeltaToHtml(
+                ConvertJsonObjectsToHtmlRequest.newBuilder()
+                        .setDeltaString(deltaString).build())
+                .getHtmlOutput();
     }
 
     private void subscribeNotification() {
