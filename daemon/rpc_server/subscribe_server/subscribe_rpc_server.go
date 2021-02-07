@@ -319,11 +319,12 @@ func (s *SubscribeRpcServer) SubscribeNotification(
 func (s *SubscribeRpcServer) ConvertDeltaToHtml(ctx context.Context, request *types.ConvertJsonObjectsToHtmlRequest) (*types.ConvertJsonObjectsToHtmlResponse, error) {
 	delta := request.DeltaString
 	html, err := quill.Render([]byte(delta))
-	htmlStr := string(html)
 	if err != nil {
-		htmlStr = ""
+		logger.Error(err.Error())
+		return nil, err
 	}
 
+	htmlStr := string(html)
 	res := types.ConvertJsonObjectsToHtmlResponse{
 		HtmlOutput: htmlStr,
 	}

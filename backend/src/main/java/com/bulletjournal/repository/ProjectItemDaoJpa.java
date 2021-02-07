@@ -279,6 +279,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         DeltaContent newContent = new DeltaContent(newText);
         // call grpc to get html string from delta
         String htmlString = this.daemonServiceClient.convertDeltaToHtml(newContent.getDeltaOpsString());
+        LOGGER.info("htmlString: {}", htmlString);
         newContent.setHtml(htmlString);
         content.setText(newContent.toJSON());
     }
