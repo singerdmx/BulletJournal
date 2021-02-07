@@ -56,6 +56,7 @@ public class TaskController {
     protected static final String MOVE_TASK_ROUTE = "/api/tasks/{taskId}/move";
     protected static final String SHARE_TASK_ROUTE = "/api/tasks/{taskId}/share";
     protected static final String TASK_EXPORT_EMAIL_ROUTE = "/api/tasks/{taskId}/exportEmail";
+    protected static final String TASK_EXPORT_ROUTE = "/api/tasks/{taskId}/export";
     protected static final String GET_SHARABLES_ROUTE = "/api/tasks/{taskId}/sharables";
     protected static final String REVOKE_SHARABLE_ROUTE = "/api/tasks/{taskId}/revokeSharable";
     protected static final String REMOVE_SHARED_ROUTE = "/api/tasks/{taskId}/removeShared";
@@ -401,6 +402,11 @@ public class TaskController {
             @NotNull @PathVariable Long taskId,
             @NotNull @RequestBody ExportProjectItemAsEmailParams exportProjectItemAsEmailParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
+    }
+
+    @PostMapping(TASK_EXPORT_ROUTE)
+    public void exportTask(@NotNull @PathVariable Long taskId,
+                           @NotNull @RequestBody ExportProjectItemParams exportProjectItemParams) {
     }
 
     @GetMapping(GET_SHARABLES_ROUTE)
