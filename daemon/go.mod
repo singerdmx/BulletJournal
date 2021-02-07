@@ -4,13 +4,14 @@ go 1.15
 
 require (
 	github.com/buger/jsonparser v1.1.1
-	github.com/dchenk/go-render-quill v0.0.0-20200811011436-e982f73799ca // indirect
+	github.com/dchenk/go-render-quill v0.0.0-20200811011436-e982f73799ca
 	github.com/go-redis/redis/v8 v8.2.3
 	github.com/go-resty/resty/v2 v2.3.0
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/mailjet/mailjet-apiv3-go v0.0.0-20201009050126-c24bc15a9394
 	github.com/pkg/errors v0.9.1
+	github.com/quilljs/delta v0.0.0-20200802223041-ddda3bf088cd // indirect
 	github.com/singerdmx/BulletJournal/protobuf/daemon v0.0.0
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.6.1

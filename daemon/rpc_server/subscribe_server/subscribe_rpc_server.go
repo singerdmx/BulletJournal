@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/dchenk/go-render-quill"
 	"github.com/go-resty/resty/v2"
 	daemon "github.com/singerdmx/BulletJournal/daemon/api/service"
 	"github.com/singerdmx/BulletJournal/daemon/config"
@@ -121,7 +122,7 @@ func (provider *sessionProvider) terminateSession(clientId string, reason string
 }
 
 func (provider *sessionProvider) terminateAllSessions() {
-	for clientId, _ := range provider.sessionMap {
+	for clientId := range provider.sessionMap {
 		provider.terminateSession(clientId, "Terminate all connected sessions")
 	}
 }
@@ -129,7 +130,7 @@ func (provider *sessionProvider) terminateAllSessions() {
 func (provider *sessionProvider) getSessionDump() string {
 	ret := "\n\t------- Session Provider dump: --------"
 	ret += "\n\tConnected ClientId: {"
-	for clientId, _ := range provider.sessionMap {
+	for clientId := range provider.sessionMap {
 		ret += clientId + ", "
 	}
 	ret += "}"
@@ -313,4 +314,18 @@ func (s *SubscribeRpcServer) SubscribeNotification(
 	err = <-errorChan
 	logger.Infof("Closing subscribe streaming for ClientId: %s due to: %v", clientId, err)
 	return err
+}
+
+func (s *SubscribeRpcServer) ConvertDeltaToHtml(request *types.ConvertJsonObjectsToHtmlRequest) (*types.ConvertJsonObjectsToHtmlResponse, error) {
+	delta := request.DeltaString
+	html, err := quill.Render([]byte(delta))
+	htmlStr := string(html)
+	if err != nil {
+		htmlStr = ""
+	}
+
+	res := types.ConvertJsonObjectsToHtmlResponse{
+		HtmlOutput: htmlStr,
+	}
+	return &res, err
 }
