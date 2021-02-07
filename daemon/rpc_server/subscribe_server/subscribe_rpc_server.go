@@ -316,7 +316,7 @@ func (s *SubscribeRpcServer) SubscribeNotification(
 	return err
 }
 
-func (s *SubscribeRpcServer) ConvertDeltaToHtml(request *types.ConvertJsonObjectsToHtmlRequest) (*types.ConvertJsonObjectsToHtmlResponse, error) {
+func (s *SubscribeRpcServer) ConvertDeltaToHtml(ctx context.Context, request *types.ConvertJsonObjectsToHtmlRequest) (*types.ConvertJsonObjectsToHtmlResponse, error) {
 	delta := request.DeltaString
 	html, err := quill.Render([]byte(delta))
 	htmlStr := string(html)
