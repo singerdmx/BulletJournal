@@ -70,10 +70,15 @@ public class DaemonServiceClient {
             LOGGER.info("daemonClientConfig not Enabled, convertDeltaToHtml returns null");
             return null;
         }
-        return this.daemonBlockingStub.convertDeltaToHtml(
-                ConvertJsonObjectsToHtmlRequest.newBuilder()
-                        .setDeltaString(deltaString).build())
-                .getHtmlOutput();
+        try {
+            return this.daemonBlockingStub.convertDeltaToHtml(
+                    ConvertJsonObjectsToHtmlRequest.newBuilder()
+                            .setDeltaString(deltaString).build())
+                    .getHtmlOutput();
+        } catch (Exception ex) {
+            LOGGER.error("Error converting " + deltaString, ex);
+            return null;
+        }
     }
 
     private void subscribeNotification() {
