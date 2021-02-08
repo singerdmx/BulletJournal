@@ -8,7 +8,19 @@ brew install protobuf
 cd //BulletJournal/protobuf/daemon
 go get -u github.com/golang/protobuf/protoc-gen-go
 go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
-go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+```
+
+
+For the issue of missing proto-gen-go on MacOS, please run following command.
+
+Bashrc
+```
+make add_gopath_bashrc
+```
+
+Zshrc
+```
+make add_gopath_zshrc
 ```
 
 ## This part will be called by daemon Makefile
