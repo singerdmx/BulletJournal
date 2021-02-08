@@ -13,14 +13,9 @@ go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
 
 For the issue of missing proto-gen-go on MacOS, please run following command.
 
-Bashrc
 ```
-make add_gopath_bashrc
-```
-
-Zshrc
-```
-make add_gopath_zshrc
+make add_gopath_bashrc # Adding GOPATH to bashrc
+make add_gopath_zshrc # Adding GOPATH to zshrc
 ```
 
 ## This part will be called by daemon Makefile
