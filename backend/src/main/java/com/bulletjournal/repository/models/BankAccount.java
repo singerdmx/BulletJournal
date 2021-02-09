@@ -68,4 +68,16 @@ public class BankAccount extends OwnedModel {
     public void setNetBalance(Double netBalance) {
         this.netBalance = netBalance;
     }
+
+    public com.bulletjournal.controller.models.BankAccount toPresentationModel() {
+        return new com.bulletjournal.controller.models.BankAccount(
+                this.getId(),
+                this.getName(),
+                new com.bulletjournal.controller.models.User(this.getOwner()),
+                this.getAccountNumber(),
+                this.getDescription(),
+                this.getAccountType(),
+                this.getNetBalance()
+        );
+    }
 }

@@ -103,7 +103,11 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
      */
     public com.bulletjournal.controller.models.Transaction getTransaction(String requester, Long id) {
         Transaction transaction = this.getProjectItem(id, requester);
-        return addLabels(transaction);
+        com.bulletjournal.controller.models.Transaction result = addLabels(transaction);
+        if (Objects.equals(requester, transaction.getOwner()) && transaction.getBankAccount() != null) {
+            result.setBankAccount(transaction.getBankAccount().toPresentationModel());
+        }
+        return result;
     }
 
     private com.bulletjournal.controller.models.Transaction addLabels(Transaction transaction) {

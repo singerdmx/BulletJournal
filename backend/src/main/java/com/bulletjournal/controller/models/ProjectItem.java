@@ -64,6 +64,7 @@ public abstract class ProjectItem {
             case TRANSACTION:
                 Transaction transaction = ((Transaction) projectItem);
                 transaction.setPayer(userClient.getUser(transaction.getPayer().getName()));
+                BankAccount.addOwnerAvatar(transaction.getBankAccount(), userClient);
                 break;
             case TASK:
                 Task task = ((Task) projectItem);
