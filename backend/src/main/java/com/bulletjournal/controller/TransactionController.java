@@ -52,6 +52,7 @@ public class TransactionController {
     protected static final String TRANSACTION_ROUTE = "/api/transactions/{transactionId}";
     protected static final String TRANSACTION_SET_LABELS_ROUTE = "/api/transactions/{transactionId}/setLabels";
     protected static final String TRANSACTION_SET_COLOR_ROUTE = "/api/transactions/{transactionId}/setColor";
+    protected static final String TRANSACTION_SET_BANK_ACCOUNT_ROUTE = "/api/transactions/{transactionId}/setBankAccount";
     protected static final String MOVE_TRANSACTION_ROUTE = "/api/transactions/{transactionId}/move";
     protected static final String SHARE_TRANSACTION_ROUTE = "/api/transactions/{transactionId}/share";
     protected static final String ADD_CONTENT_ROUTE = "/api/transactions/{transactionId}/addContent";
@@ -284,6 +285,14 @@ public class TransactionController {
     public Transaction setColor(@NotNull @PathVariable Long transactionId, @RequestBody Optional<String> color) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.transactionDaoJpa.setColor(username, transactionId, color.orElse(null));
+        return getTransaction(transactionId);
+    }
+
+    @PutMapping(TRANSACTION_SET_BANK_ACCOUNT_ROUTE)
+    public Transaction setBankAccount(@NotNull @PathVariable Long transactionId,
+                                @RequestBody Optional<Long> bankAccount) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.transactionDaoJpa.setBankAccount(username, transactionId, bankAccount.orElse(null));
         return getTransaction(transactionId);
     }
 

@@ -42,6 +42,8 @@ public class Transaction extends ProjectItem {
 
     private String recurrenceRule;
 
+    private BankAccount bankAccount;
+
     public Transaction() {
     }
 
@@ -161,7 +163,6 @@ public class Transaction extends ProjectItem {
         return this.getDate().substring(0, 7);
     }
 
-
     public String getColor() {
         return color;
     }
@@ -176,6 +177,14 @@ public class Transaction extends ProjectItem {
 
     public void setRecurrenceRule(String recurrenceRule) {
         this.recurrenceRule = recurrenceRule;
+    }
+
+    public BankAccount getBankAccount() {
+        return bankAccount;
+    }
+
+    public void setBankAccount(BankAccount bankAccount) {
+        this.bankAccount = bankAccount;
     }
 
     public String getReadableYearMonth() {

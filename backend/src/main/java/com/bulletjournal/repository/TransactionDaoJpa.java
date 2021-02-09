@@ -12,6 +12,8 @@ import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.es.ESUtil;
 import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.exceptions.BadRequestException;
+import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.ledger.TransactionType;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
@@ -48,6 +50,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     private TransactionContentRepository transactionContentRepository;
     @Autowired
     private SearchIndexDaoJpa searchIndexDaoJpa;
+    @Autowired
+    private BankAccountRepository bankAccountRepository;
 
     @Override
     public JpaRepository getJpaRepository() {
@@ -446,5 +450,23 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
                 ContentType.TRANSACTION, Operation.UPDATE, transactionId, transaction.getProject().getOwner());
         transaction.setColor(color);
         this.transactionRepository.save(transaction);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public Transaction setBankAccount(
+            String requester, Long transactionId, Long bankAccountId) {
+        Transaction transaction = this.getProjectItem(transactionId, requester);
+        if (!transaction.getOwner().equals(requester)) {
+            throw new UnAuthorizedException("Only owner " + transaction.getOwner() + " can set bank account");
+        }
+
+        BankAccount bankAccount = null;
+        if (bankAccountId != null) {
+            bankAccount = this.bankAccountRepository.findById(bankAccountId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Bank Account " + bankAccountId + " not found"));
+        }
+
+        transaction.setBankAccount(bankAccount);
+        return this.transactionRepository.save(transaction);
     }
 }
