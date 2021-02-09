@@ -40,6 +40,7 @@ class ContentLayout extends React.Component {
           <Route exact path='/bujo/:category' component={BujoPage} />
           <Route exact path='/points' component={PointsPage} />
           <Route exact path='/settings' component={SettingPage} />
+          <Route exact path='/bank' component={SettingPage} />
           <Route exact path='/googleCalendar' component={SettingPage} />
           <Route exact path='/projects' component={ProjectsPage} />
           <Route exact path='/projects/:projectId' component={ProjectPage} />

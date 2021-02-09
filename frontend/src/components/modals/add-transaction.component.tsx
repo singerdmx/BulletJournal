@@ -13,7 +13,7 @@ import {
   TimePicker,
   Tooltip,
 } from 'antd';
-import {PlusOutlined, SyncOutlined, EnvironmentOutlined} from '@ant-design/icons';
+import {PlusOutlined, SyncOutlined, EnvironmentOutlined, BankOutlined} from '@ant-design/icons';
 import {connect} from 'react-redux';
 import {RouteComponentProps, useParams, withRouter} from 'react-router';
 import {
@@ -411,6 +411,13 @@ const AddTransaction: React.FC<
   return (
     <div>
       <Container>
+        <FloatButton
+            tooltip="Bank Account"
+            onClick={() => history.push('/bank')}
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
+        >
+          <BankOutlined />
+        </FloatButton>
         <FloatButton
             tooltip="Manage Recurring Transactions"
             onClick={openManageRecurringTransDialog}
