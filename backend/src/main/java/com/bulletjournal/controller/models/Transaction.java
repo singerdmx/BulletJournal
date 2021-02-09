@@ -201,7 +201,17 @@ public class Transaction extends ProjectItem {
             return null;
         }
         int weekNumber = cal.get(Calendar.WEEK_OF_MONTH);
-        String m = Month.of(Integer.parseInt(this.getMonth())).name();
+        String m;
+        if (weekNumber == 0) {
+            if (this.getMonth().equals("01")) {
+                m = Month.of(12).name();
+            } else {
+                m = Month.of(Integer.parseInt(this.getMonth()) - 1).name();
+            }
+            weekNumber = 4;
+        } else {
+            m = Month.of(Integer.parseInt(this.getMonth())).name();
+        }
         return this.getYear() + " " + m + " Week " + weekNumber;
     }
 

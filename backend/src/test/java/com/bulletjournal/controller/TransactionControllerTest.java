@@ -73,9 +73,31 @@ public class TransactionControllerTest {
         Transaction t3 = createTransaction(p1, "T3", "2019-12-15", "ccc", 300.0, 0, null);
         Transaction t4 = createTransaction(p1, "T4", "2019-12-22", "Joker", 200.0, 1, null);
         Transaction t5 = createTransaction(p1, "T5", "2019-12-28", "ccc", 100.0, 0, null);
+
+        Transaction t12 = createTransaction(p1, "T12", "2021-04-01", "BulletJournal", 10.0, 0, null);
+        Transaction t13 = createTransaction(p1, "T13", "2021-05-01", "BulletJournal", 10.0, 0, null);
+        String url = UriComponentsBuilder.fromHttpUrl(
+                ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE)
+                .queryParam("frequencyType", FrequencyType.WEEKLY.name())
+                .queryParam("timezone", TIMEZONE)
+                .queryParam("ledgerSummaryType", LedgerSummaryType.DEFAULT.name())
+                .queryParam("startDate", "2021-04-01")
+                .queryParam("endDate", "2021-05-01")
+                .buildAndExpand(p1.getId()).toUriString();
+        ResponseEntity<LedgerSummary> transactionsResponse = this.restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                TestHelpers.actAsOtherUser(null, USER),
+                LedgerSummary.class);
+        LedgerSummary summary = transactionsResponse.getBody();
+        List<TransactionsSummary> transactionsSummaries = summary.getTransactionsSummaries();
+        assertEquals(2, summary.getTransactions().size());
+        assertEquals("2021 MARCH Week 4", transactionsSummaries.get(0).getName());
+        assertEquals("2021 APRIL Week 4", transactionsSummaries.get(1).getName());
+
         testRecurringTransactionCRUD(p1);
         // Get transactions by payer
-        String url = UriComponentsBuilder.fromHttpUrl(
+        url = UriComponentsBuilder.fromHttpUrl(
                 ROOT_URL + randomServerPort + TransactionController.TRANSACTIONS_ROUTE)
                 .queryParam("frequencyType", FrequencyType.MONTHLY.name())
                 .queryParam("timezone", TIMEZONE)
@@ -83,14 +105,14 @@ public class TransactionControllerTest {
                 .queryParam("startDate", "2019-12-01")
                 .queryParam("endDate", "2019-12-31")
                 .buildAndExpand(p1.getId()).toUriString();
-        ResponseEntity<LedgerSummary> transactionsResponse = this.restTemplate.exchange(
+        transactionsResponse = this.restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 TestHelpers.actAsOtherUser(null, USER),
                 LedgerSummary.class);
         List<Transaction> transactions = transactionsResponse.getBody().getTransactions();
-        LedgerSummary summary = transactionsResponse.getBody();
-        List<TransactionsSummary> transactionsSummaries = summary.getTransactionsSummaries();
+        summary = transactionsResponse.getBody();
+        transactionsSummaries = summary.getTransactionsSummaries();
         assertEquals("BulletJournal", transactionsSummaries.get(0).getName());
         assertTrue(Math.abs(summary.getBalance() - 700.0) < 1e-4);
         assertTrue(Math.abs(summary.getIncome() - 1400.0) < 1e-4);
