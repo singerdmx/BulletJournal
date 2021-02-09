@@ -7,6 +7,8 @@ import org.apache.commons.lang3.StringUtils;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
+import java.util.Objects;
 
 public class BankAccount {
 
@@ -105,6 +107,14 @@ public class BankAccount {
         this.netBalance = netBalance;
     }
 
+    public static List<BankAccount> addOwnerAvatar(List<BankAccount> bankAccounts, UserClient userClient) {
+        if (bankAccounts == null) {
+            return null;
+        }
+        bankAccounts.forEach(bankAccount -> addOwnerAvatar(bankAccount, userClient));
+        return bankAccounts;
+    }
+
     public static BankAccount addOwnerAvatar(BankAccount bankAccount, UserClient userClient) {
         if (bankAccount == null) {
             return null;
@@ -113,5 +123,25 @@ public class BankAccount {
             bankAccount.setOwner(userClient.getUser(bankAccount.getOwner().getName()));
         }
         return bankAccount;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BankAccount that = (BankAccount) o;
+        return Objects.equals(getId(), that.getId()) &&
+                Objects.equals(getName(), that.getName()) &&
+                Objects.equals(getOwner(), that.getOwner()) &&
+                Objects.equals(getAccountNumber(), that.getAccountNumber()) &&
+                Objects.equals(getDescription(), that.getDescription()) &&
+                getAccountType() == that.getAccountType() &&
+                Objects.equals(getNetBalance(), that.getNetBalance());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), getOwner(),
+                getAccountNumber(), getDescription(), getAccountType(), getNetBalance());
     }
 }
