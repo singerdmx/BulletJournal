@@ -273,6 +273,15 @@ export const putTransactionColor = (transactionId: number, color: string | undef
     });
 };
 
+export const putTransactionBankAccount = (transactionId: number, bankAccount: number | undefined) => {
+  return doPut(`/api/transactions/${transactionId}/setBankAccount`,
+      bankAccount ? bankAccount.toString() : undefined)
+      .then((res) => res.json())
+      .catch((err) => {
+        throw Error(err.message);
+      });
+};
+
 export const shareTransactionByEmail = (
   transactionId: number,
   contents: Content[],

@@ -174,6 +174,11 @@ export type UpdateTransactionColorAction = {
   color: string | undefined;
 };
 
+export type UpdateTransactionBankAccountAction = {
+  transactionId: number;
+  bankAccount: number | undefined;
+};
+
 export type ShareTransactionByEmailAction = {
   transactionId: number,
   contents: Content[],
@@ -315,6 +320,10 @@ const slice = createSlice({
     updateTransactionColor: (
       state,
       action: PayloadAction<UpdateTransactionColorAction>
+    ) => state,
+    updateTransactionBankAccount: (
+        state,
+        action: PayloadAction<UpdateTransactionBankAccountAction>
     ) => state,
     TransactionShareByEmail: (state, action: PayloadAction<ShareTransactionByEmailAction>) => state,
   },

@@ -290,9 +290,10 @@ public class TransactionController {
 
     @PutMapping(TRANSACTION_SET_BANK_ACCOUNT_ROUTE)
     public Transaction setBankAccount(@NotNull @PathVariable Long transactionId,
-                                @RequestBody Optional<Long> bankAccount) {
+                                @RequestBody Optional<String> bankAccount) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.transactionDaoJpa.setBankAccount(username, transactionId, bankAccount.orElse(null));
+        this.transactionDaoJpa.setBankAccount(username, transactionId,
+                bankAccount.isPresent() ? Long.parseLong(bankAccount.get()) : null);
         return getTransaction(transactionId);
     }
 

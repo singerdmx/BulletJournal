@@ -1,6 +1,22 @@
 import { ProjectItem } from '../myBuJo/interface';
 import {User} from "../group/interface";
 
+export enum BankAccountType {
+  CHECKING_ACCOUNT = 'CHECKING_ACCOUNT',
+  SAVING_ACCOUNT = 'SAVING_ACCOUNT',
+  CREDIT_CARD = 'CREDIT_CARD'
+}
+
+export interface BankAccount {
+  id: number;
+  name: string;
+  owner: User;
+  accountType: BankAccountType;
+  netBalance: number;
+  accountNumber?: number;
+  description?: string;
+}
+
 export interface Transaction extends ProjectItem {
   amount: number;
   payer: User;
@@ -11,6 +27,7 @@ export interface Transaction extends ProjectItem {
   location: string;
   transactionType: number;
   color?: string;
+  bankAccount?: BankAccount;
 }
 
 export interface TransactionView extends Transaction {

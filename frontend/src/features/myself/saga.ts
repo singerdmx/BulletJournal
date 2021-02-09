@@ -60,7 +60,8 @@ function* getExpandedMyself(action: PayloadAction<UpdateExpandedMyself>) {
                 theme: data.theme,
                 points: data.points,
                 firstTime: data.firstTime,
-                sendUserInvitation: data.sendUserInvitation
+                sendUserInvitation: data.sendUserInvitation,
+                bankAccounts: data.bankAccounts
             })
         );
         const state: IState = yield select();
@@ -108,7 +109,10 @@ function* updateTheme(action: PayloadAction<ThemeUpdate>) {
                 before: data.reminderBeforeTask,
                 currency: data.currency,
                 theme: data.theme,
+                points: data.points,
                 firstTime: data.firstTime,
+                sendUserInvitation: data.sendUserInvitation,
+                bankAccounts: data.bankAccounts
             })
         );
         yield put(expandedMyselfLoading(false));

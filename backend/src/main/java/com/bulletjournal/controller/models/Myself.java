@@ -2,6 +2,9 @@ package com.bulletjournal.controller.models;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Myself extends User {
 
@@ -19,16 +22,18 @@ public class Myself extends User {
 
     private boolean sendUserInvitation = false;
 
+    private List<BankAccount> bankAccounts = new ArrayList<>();
+
     public Myself() {
     }
 
     public Myself(User user, String timezone, Before reminderBeforeTask, String currency, String theme,
                   Integer points) {
-        this(user, timezone, reminderBeforeTask, currency, theme, points, false, false);
+        this(user, timezone, reminderBeforeTask, currency, theme, points, false, false, new ArrayList<>());
     }
 
     public Myself(User user, String timezone, Before reminderBeforeTask, String currency, String theme,
-                  Integer points, boolean firstTime, boolean sendUserInvitation) {
+                  Integer points, boolean firstTime, boolean sendUserInvitation, List<BankAccount> bankAccounts) {
         super(user.getId(), user.getName(), user.getThumbnail(), user.getAvatar());
         this.timezone = timezone;
         if (reminderBeforeTask != null) {
@@ -39,6 +44,7 @@ public class Myself extends User {
         this.points = points;
         this.firstTime = firstTime;
         this.sendUserInvitation = sendUserInvitation;
+        this.bankAccounts = bankAccounts;
     }
 
     public String getTimezone() {
@@ -103,5 +109,13 @@ public class Myself extends User {
 
     public void setSendUserInvitation(boolean sendUserInvitation) {
         this.sendUserInvitation = sendUserInvitation;
+    }
+
+    public List<BankAccount> getBankAccounts() {
+        return bankAccounts;
+    }
+
+    public void setBankAccounts(List<BankAccount> bankAccounts) {
+        this.bankAccounts = bankAccounts;
     }
 }

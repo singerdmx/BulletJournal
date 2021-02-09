@@ -16,7 +16,7 @@ import {
   ShareTransaction,
   ShareTransactionByEmailAction,
   TransactionApiErrorAction,
-  UpdateRecurringTransactions,
+  UpdateRecurringTransactions, UpdateTransactionBankAccountAction,
   UpdateTransactionColorAction,
   UpdateTransactionContentRevision,
   UpdateTransactionContents,
@@ -37,6 +37,7 @@ import {
   getTransactionById,
   moveToTargetProject,
   putTransactionColor,
+  putTransactionBankAccount,
   setTransactionLabels,
   shareTransactionByEmail,
   shareTransactionWithOther,
@@ -709,6 +710,27 @@ function* updateTransactionColor(
   }
 }
 
+function* updateTransactionBankAccount(
+    action: PayloadAction<UpdateTransactionBankAccountAction>
+) {
+  try {
+    const {transactionId, bankAccount} = action.payload;
+    const data : Transaction = yield call(
+        putTransactionBankAccount,
+        transactionId,
+        bankAccount,
+    );
+
+    yield put(transactionsActions.transactionReceived({transaction: data}));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Set Transaction Bank Account Fail: ${error}`);
+    }
+  }
+}
+
 function* shareTransactionByEmails(action: PayloadAction<ShareTransactionByEmailAction>) {
   try {
     const {
@@ -799,6 +821,10 @@ export default function* transactionSagas() {
     yield takeLatest(
       transactionsActions.updateTransactionColor.type, 
       updateTransactionColor
+    ),
+    yield takeLatest(
+        transactionsActions.updateTransactionBankAccount.type,
+        updateTransactionBankAccount
     ),
     yield takeLatest(
       transactionsActions.TransactionShareByEmail.type, 

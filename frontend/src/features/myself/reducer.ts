@@ -2,6 +2,7 @@ import {createSlice, PayloadAction} from 'redux-starter-kit';
 import {UserPointActivity} from "../../pages/points/interface";
 import {SubscribedCategory} from "./interface";
 import {SampleTask} from "../templates/interface";
+import {BankAccount} from "../transactions/interface";
 
 export type MyselfWithAvatar = {
     username?: string;
@@ -13,6 +14,7 @@ export type MyselfWithAvatar = {
     points?: number;
     firstTime?: boolean;
     sendUserInvitation?: boolean;
+    bankAccounts?: BankAccount[];
 };
 
 export type MyselfApiErrorAction = {
@@ -107,6 +109,7 @@ let initialState = {
     subscribedCategories: [] as SubscribedCategory[],
     sampleTasks: [] as SampleTask[],
     removingSampleTasks: false,
+    bankAccounts: [] as BankAccount[]
 };
 
 const slice = createSlice({
@@ -123,7 +126,8 @@ const slice = createSlice({
                 theme,
                 points,
                 firstTime,
-                sendUserInvitation
+                sendUserInvitation,
+                bankAccounts
             } = action.payload;
             if (username && username.length > 0) state.username = username;
             if (avatar && avatar.length > 0) state.avatar = avatar;
@@ -134,6 +138,7 @@ const slice = createSlice({
             if (points) state.points = points;
             if (firstTime) state.firstTime = firstTime;
             if (sendUserInvitation !== undefined) state.sendUserInvitation = sendUserInvitation;
+            if (bankAccounts) state.bankAccounts = bankAccounts;
         },
         reloadReceived: (state, action: PayloadAction<ReloadAction>) => {
             const {reload} = action.payload;

@@ -5,6 +5,7 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.messaging.MessagingService;
 import com.bulletjournal.redis.FirstTimeUserRepository;
 import com.bulletjournal.redis.models.FirstTimeUser;
+import com.bulletjournal.repository.BankAccountDaoJpa;
 import com.bulletjournal.repository.UserAliasDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.google.gson.Gson;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -68,6 +70,9 @@ public class UserController {
     @Autowired
     private MessagingService messagingService;
 
+    @Autowired
+    private BankAccountDaoJpa bankAccountDaoJpa;
+
     @GetMapping(GET_USER_ROUTE)
     public User getUser(@NotNull @PathVariable String username) {
         return this.userClient.getUser(username);
@@ -83,6 +88,7 @@ public class UserController {
         Integer points = 0;
         boolean sendUserInvitation = false;
         User self = userClient.getUser(username);
+        List<BankAccount> bankAccounts = Collections.emptyList();
 
         if (Objects.equals(expand, TRUE)) {
             com.bulletjournal.repository.models.User user = this.userDaoJpa.getByName(username);
@@ -91,11 +97,12 @@ public class UserController {
             currency = user.getCurrency();
             theme = user.getTheme() == null ? Theme.LIGHT.name() : user.getTheme();
             points = user.getPoints();
-            this.userClient.updateEmail(user); //TODO: remove this line
+//            this.userClient.updateEmail(user);
             sendUserInvitation = this.needToSendUserInvitation(user);
+            bankAccounts = BankAccount.addOwnerAvatar(this.bankAccountDaoJpa.getBankAccounts(username), this.userClient);
         }
         return new Myself(self, timezone, before, currency, theme, points,
-                this.firstTimeUserRepository.existsById(username), sendUserInvitation);
+                this.firstTimeUserRepository.existsById(username), sendUserInvitation, bankAccounts);
     }
 
     @PatchMapping(MYSELF_ROUTE)
