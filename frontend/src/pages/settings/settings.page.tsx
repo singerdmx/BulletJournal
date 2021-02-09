@@ -5,6 +5,7 @@ import {BankOutlined, GoogleOutlined, SettingOutlined} from '@ant-design/icons';
 import './setting.style.less';
 import {useLocation} from 'react-use';
 import GoogleCalendarSyncPage from '../../components/settings/google-calendar-sync';
+import BankPage from "../../components/settings/bank";
 
 const {TabPane} = Tabs;
 
@@ -31,6 +32,7 @@ const SettingPage: React.FC<SettingProps> = (props) => {
                 </TabPane>
                 <TabPane tab={<span><BankOutlined/>Bank</span>} key="#/bank">
                     <div>
+                        <BankPage/>
                     </div>
                 </TabPane>
                 <TabPane tab={<span><GoogleOutlined/>Sync Google Calendar</span>} key="#/googleCalendar">
