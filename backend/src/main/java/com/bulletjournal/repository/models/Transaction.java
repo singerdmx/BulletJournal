@@ -5,6 +5,8 @@ import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.User;
 import com.bulletjournal.ledger.TransactionType;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -66,6 +68,11 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
 
     @Column(name = "deleted_slots", columnDefinition = "TEXT")
     private String deletedSlots;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bank_account")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private BankAccount bankAccount;
 
     public Long getId() {
         return id;
@@ -169,6 +176,14 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
 
     public void setDeletedSlots(String deletedSlots) {
         this.deletedSlots = deletedSlots;
+    }
+
+    public BankAccount getBankAccount() {
+        return bankAccount;
+    }
+
+    public void setBankAccount(BankAccount bankAccount) {
+        this.bankAccount = bankAccount;
     }
 
     @Override

@@ -45,7 +45,7 @@ public class AuditableDaoJpa {
         ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(startDate, null, timezone);
         ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
 
-        List<com.bulletjournal.repository.models.Auditable> auditables = Collections.emptyList();
+        List<com.bulletjournal.repository.models.Auditable> auditables;
 
         if (username.equals(EVERYONE) && action.equals(ContentAction.ALL_ACTIONS)) {
             auditables = this.auditableRepository.findAuditablesBetweenAllActionsAllUsers(projectId,
