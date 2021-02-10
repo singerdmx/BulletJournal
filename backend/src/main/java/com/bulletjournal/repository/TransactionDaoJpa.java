@@ -12,7 +12,6 @@ import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.es.ESUtil;
 import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.exceptions.BadRequestException;
-import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.ledger.TransactionType;
 import com.bulletjournal.notifications.Event;
@@ -51,7 +50,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     @Autowired
     private SearchIndexDaoJpa searchIndexDaoJpa;
     @Autowired
-    private BankAccountRepository bankAccountRepository;
+    private BankAccountDaoJpa bankAccountDaoJpa;
 
     @Override
     public JpaRepository getJpaRepository() {
@@ -464,12 +463,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
             throw new UnAuthorizedException("Only owner " + transaction.getOwner() + " can set bank account");
         }
 
-        BankAccount bankAccount = null;
-        if (bankAccountId != null) {
-            bankAccount = this.bankAccountRepository.findById(bankAccountId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Bank Account " + bankAccountId + " not found"));
-        }
-
+        BankAccount bankAccount = this.bankAccountDaoJpa.getBankAccount(requester, bankAccountId);
         transaction.setBankAccount(bankAccount);
         return this.transactionRepository.save(transaction);
     }
