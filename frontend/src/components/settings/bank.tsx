@@ -5,8 +5,8 @@ import './bank.styles.less';
 import {getBankAccounts} from "../../features/myself/actions";
 import {BankAccount, BankAccountType} from "../../features/transactions/interface";
 import BankAccountElem, {getBankAccountTypeIcon} from "./bank-account";
-import {Col, Row, Statistic, Switch} from "antd";
-import {CheckOutlined, CloseOutlined} from "@ant-design/icons";
+import {Button, Col, Row, Statistic, Switch, Tooltip} from "antd";
+import {CheckOutlined, CloseOutlined, PlusCircleFilled} from "@ant-design/icons";
 
 const LocaleCurrency = require('locale-currency');
 
@@ -43,7 +43,7 @@ const BankPage: React.FC<BankProps> = (
             arr = arr.filter(e => e !== t);
             setTypesFilter(arr);
         }
-        const tmp : BankAccount[] = [];
+        const tmp: BankAccount[] = [];
         bankAccounts.forEach(a => {
             if (arr.includes(a.accountType)) {
                 tmp.push(a);
@@ -54,6 +54,13 @@ const BankPage: React.FC<BankProps> = (
 
     return <div>
         <div className='banks-banner'>
+            <div className='add-bank-account-button'>
+                <Tooltip placement='bottom' title='Add New Bank Account'>
+                    <Button type="primary" shape="round" icon={<PlusCircleFilled/>}>
+                        Add
+                    </Button>
+                </Tooltip>
+            </div>
             <Row gutter={[1, 1]}>
                 {Object.values(BankAccountType).map(t => {
                     return <Col key={t} span={24}>
@@ -73,7 +80,7 @@ const BankPage: React.FC<BankProps> = (
         </div>
         <div className='banks-div'>
             {accounts && accounts.map(bankAccount => <BankAccountElem key={bankAccount.id}
-                                                                              bankAccount={bankAccount}/>)}
+                                                                      bankAccount={bankAccount}/>)}
         </div>
     </div>
 }
