@@ -15,6 +15,7 @@ import {Card, Statistic, Switch, Tag, Tooltip} from "antd";
 import './bank.styles.less';
 import {IState} from "../../store";
 import {connect} from "react-redux";
+import {updateTransactionBankAccount} from "../../features/transactions/actions";
 
 const {Meta} = Card;
 
@@ -48,14 +49,30 @@ type BankAccountProps = {
     bankAccount: BankAccount;
     mode: string;
     transaction: Transaction | undefined;
+    updateTransactionBankAccount: (
+        transactionId: number,
+        bankAccount: number | undefined
+    ) => void;
 }
 
 const BankAccountElem: React.FC<BankAccountProps> = (
     {
         bankAccount,
         mode,
-        transaction
+        transaction,
+        updateTransactionBankAccount
     }) => {
+    function onChange(checked: boolean, bankAccountId: number) {
+        if (!transaction) {
+            return;
+        }
+        if (checked) {
+            updateTransactionBankAccount(transaction.id, bankAccountId);
+        } else {
+            updateTransactionBankAccount(transaction.id, undefined);
+        }
+    }
+
     const color = stringToRGB(bankAccount.name);
     const icon = getBankAccountTypeIcon(bankAccount.accountType);
     const image = getBankAccountTypeImage(bankAccount.accountType);
@@ -116,6 +133,7 @@ const BankAccountElem: React.FC<BankAccountProps> = (
             checkedChildren={<CheckOutlined/>}
             unCheckedChildren={<CloseOutlined/>}
             checked={transaction && transaction.bankAccount && transaction.bankAccount.id === bankAccount.id}
+            onChange={(checked) => onChange(checked, bankAccount.id)}
         />
     </div>
 }
@@ -124,6 +142,6 @@ const mapStateToProps = (state: IState) => ({
     transaction: state.transaction.transaction
 });
 
-export default connect(mapStateToProps, {})(
+export default connect(mapStateToProps, {updateTransactionBankAccount})(
     BankAccountElem
 );

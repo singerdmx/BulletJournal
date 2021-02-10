@@ -215,6 +215,15 @@ export const updateTransactionColor = (
     color: color,
   });
 
+export const updateTransactionBankAccount = (
+    transactionId: number,
+    bankAccount: number | undefined
+) =>
+    actions.updateTransactionBankAccount({
+        transactionId: transactionId,
+        bankAccount: bankAccount,
+    });
+
 export const shareTransactionByEmail = (
   transactionId: number,
   contents: Content[],
