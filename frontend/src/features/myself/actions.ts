@@ -56,3 +56,5 @@ export const deleteMySampleTasks = (sampleTasks: number[],
     sampleTasks: sampleTasks, projectId: projectId, assignees: assignees, reminderBefore: reminderBefore,
     labels: labels, startDate: startDate, timezone: timezone
 });
+
+export const getBankAccounts = () => actions.getMyBankAccounts({});

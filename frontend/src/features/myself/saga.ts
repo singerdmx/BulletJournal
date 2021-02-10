@@ -5,7 +5,7 @@ import {
     ClearMyself,
     DeleteSampleTaskAction,
     DeleteSampleTasksAction,
-    FetchUserPointActivities,
+    FetchUserPointActivities, GetBankAccountsAction,
     GetSubscribedCategories,
     MySampleTasksAction,
     MyselfApiErrorAction,
@@ -34,6 +34,8 @@ import {
 import {SubscribedCategory} from "./interface";
 import {removeUserCategory, updateSubscription} from "../../apis/templates/categoryApis";
 import {SampleTask} from "../templates/interface";
+import {fetchBankAccounts} from "../../apis/bankAccountApis";
+import {BankAccount} from "../transactions/interface";
 
 function* myselfApiErrorAction(action: PayloadAction<MyselfApiErrorAction>) {
     yield call(message.error, `Myself Error Received: ${action.payload.error}`);
@@ -308,6 +310,23 @@ function* deleteMySampleTasks(action: PayloadAction<DeleteSampleTasksAction>) {
     yield put(myselfActions.removingSampleTasksReceived({deleting: false}));
 }
 
+function* getBankAccounts(action: PayloadAction<GetBankAccountsAction>) {
+    try {
+        const data: BankAccount[] = yield call(fetchBankAccounts);
+        yield put(
+            myselfActions.myselfDataReceived({
+                bankAccounts: data
+            })
+        );
+    } catch (error) {
+        if (error.message === 'reload') {
+            yield put(reloadReceived(true));
+        } else {
+            yield call(message.error, `getBankAccounts Error Received: ${error}`);
+        }
+    }
+}
+
 export default function* myselfSagas() {
     yield all([
         yield takeLatest(
@@ -329,6 +348,7 @@ export default function* myselfSagas() {
         yield takeLatest(myselfActions.getMySampleTasks.type, getMySampleTasks),
         yield takeLatest(myselfActions.deleteMySampleTask.type, deleteMySampleTask),
         yield takeLatest(myselfActions.deleteMySampleTasks.type, deleteMySampleTasks),
+        yield takeLatest(myselfActions.getMyBankAccounts.type, getBankAccounts),
     ]);
 }
 

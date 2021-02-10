@@ -93,6 +93,8 @@ export type SubscribedCategories = {
     subscribedCategories: SubscribedCategory[];
 };
 
+export type GetBankAccountsAction = {};
+
 let initialState = {
     username: '',
     avatar: '',
@@ -191,7 +193,8 @@ const slice = createSlice({
         removingSampleTasksReceived: (state, action: PayloadAction<DeletingSampleTasksAction>) => {
             const {deleting} = action.payload;
             state.removingSampleTasks = deleting;
-        }
+        },
+        getMyBankAccounts: (state, action: PayloadAction<GetBankAccountsAction>) => state,
     },
 });
 
