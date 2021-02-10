@@ -21,6 +21,8 @@ import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dmfs.rfc5545.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -37,6 +39,7 @@ import java.util.stream.Collectors;
 @Repository
 public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TransactionDaoJpa.class);
     @PersistenceContext
     EntityManager entityManager;
     @Autowired
@@ -103,7 +106,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     public com.bulletjournal.controller.models.Transaction getTransaction(String requester, Long id) {
         Transaction transaction = this.getProjectItem(id, requester);
         com.bulletjournal.controller.models.Transaction result = addLabels(transaction);
-        if (Objects.equals(requester, transaction.getOwner()) && transaction.getBankAccount() != null) {
+        if (Objects.equals(requester, transaction.getPayer()) && transaction.getBankAccount() != null) {
             result.setBankAccount(transaction.getBankAccount().toPresentationModel());
         }
         return result;
@@ -308,6 +311,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         String newPayer = updateTransactionParams.getPayer();
 
         if (!Objects.equals(oldPayer, newPayer)) {
+            LOGGER.info("Reset Bank Account for Payer Change");
+            transaction.setBankAccount(null);
             transaction.setPayer(newPayer);
             if (!Objects.equals(requester, newPayer)) {
                 events.add(new Event(newPayer, transactionId, transaction.getName()));
@@ -459,8 +464,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     public Transaction setBankAccount(
             String requester, Long transactionId, Long bankAccountId) {
         Transaction transaction = this.getProjectItem(transactionId, requester);
-        if (!transaction.getOwner().equals(requester)) {
-            throw new UnAuthorizedException("Only owner " + transaction.getOwner() + " can set bank account");
+        if (!transaction.getPayer().equals(requester)) {
+            throw new UnAuthorizedException("Only payer " + transaction.getOwner() + " can set bank account");
         }
 
         BankAccount bankAccount = this.bankAccountDaoJpa.getBankAccount(requester, bankAccountId);

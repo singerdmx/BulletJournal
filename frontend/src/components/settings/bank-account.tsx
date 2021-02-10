@@ -1,13 +1,20 @@
-import {BankAccount, BankAccountType} from "../../features/transactions/interface";
+import {BankAccount, BankAccountType, Transaction} from "../../features/transactions/interface";
 import {
     BankOutlined,
-    CreditCardOutlined, DeleteOutlined,
-    DollarCircleOutlined, EditOutlined, FileSearchOutlined,
+    CheckOutlined,
+    CloseOutlined,
+    CreditCardOutlined,
+    DeleteOutlined,
+    DollarCircleOutlined,
+    EditOutlined,
+    FileSearchOutlined,
 } from "@ant-design/icons";
 import React from "react";
 import {stringToRGB} from "../../utils/Util";
-import {Card, Statistic, Tooltip} from "antd";
+import {Card, Statistic, Switch, Tag, Tooltip} from "antd";
 import './bank.styles.less';
+import {IState} from "../../store";
+import {connect} from "react-redux";
 
 const {Meta} = Card;
 
@@ -31,7 +38,7 @@ const getBankAccountTypeImage = (type: BankAccountType) => {
         case BankAccountType.SAVING_ACCOUNT:
             return 'https://user-images.githubusercontent.com/122956/107489658-be9bf100-6b3d-11eb-90f8-807c2a718fc4.png';
         case BankAccountType.CREDIT_CARD:
-            return 'https://user-images.githubusercontent.com/122956/107489631-b3e15c00-6b3d-11eb-968a-2844d781d39c.png';
+            return 'https://user-images.githubusercontent.com/122956/107581636-3ce3ac00-6bad-11eb-8cb7-002428274e26.png';
         default:
             throw Error(`Invalid BankAccountType ${type}`);
     }
@@ -39,53 +46,84 @@ const getBankAccountTypeImage = (type: BankAccountType) => {
 
 type BankAccountProps = {
     bankAccount: BankAccount;
+    mode: string;
+    transaction: Transaction | undefined;
 }
 
 const BankAccountElem: React.FC<BankAccountProps> = (
     {
-        bankAccount
+        bankAccount,
+        mode,
+        transaction
     }) => {
     const color = stringToRGB(bankAccount.name);
+    const icon = getBankAccountTypeIcon(bankAccount.accountType);
     const image = getBankAccountTypeImage(bankAccount.accountType);
     const balanceColor = bankAccount.netBalance >= 0 ? '#3f8600' : '#cf1322';
     let description = bankAccount.accountNumber ? bankAccount.accountNumber + ' ' : '';
     if (bankAccount.description) {
         description += bankAccount.description;
     }
-    return <div className='bank-account-card'>
-        <Card
-            key={bankAccount.id}
-            style={{width: 280}}
-            cover={
-                <img
-                    alt={bankAccount.accountType}
-                    src={image}
+    if (mode === 'card') {
+        return <div className='bank-account-card'>
+            <Card
+                key={bankAccount.id}
+                style={{width: 280}}
+                cover={
+                    <img
+                        alt={bankAccount.accountType}
+                        src={image}
+                    />
+                }
+                title={<span style={{color: color}}>{bankAccount.name}</span>}
+                actions={[
+                    <Tooltip title='View Transactions'>
+                        <FileSearchOutlined key="View Transactions" title='View Transactions'/>
+                    </Tooltip>,
+                    <Tooltip title='Edit'>
+                        <EditOutlined key='Edit' title='Edit'/>
+                    </Tooltip>,
+                    <Tooltip title='Delete'>
+                        <DeleteOutlined key='Delete' title='Delete'/>
+                    </Tooltip>
+                ]}
+            >
+                <Meta
+                    style={{height: 65}}
+                    title={<Statistic
+                        value={bankAccount.netBalance}
+                        precision={2}
+                        valueStyle={{color: balanceColor}}
+                    />}
+                    description={description}
                 />
-            }
-            title={<span style={{color: color}}>{bankAccount.name}</span>}
-            actions={[
-                <Tooltip title='View Transactions'>
-                    <FileSearchOutlined key="View Transactions" title='View Transactions'/>
-                </Tooltip>,
-                <Tooltip title='Edit'>
-                    <EditOutlined key='Edit' title='Edit' />
-                </Tooltip>,
-                <Tooltip title='Delete'>
-                    <DeleteOutlined key='Delete' title='Delete' />
-                </Tooltip>
-            ]}
-        >
-            <Meta
-                style={{height: 65}}
-                title={<Statistic
-                    value={bankAccount.netBalance}
-                    precision={2}
-                    valueStyle={{ color: balanceColor}}
-                />}
-                description={description}
-            />
-        </Card>
+            </Card>
+        </div>
+    }
+
+    let res = <span className='bank-name'>{icon} {bankAccount.name} {bankAccount.accountNumber}</span>
+
+    if (bankAccount.description) {
+        res = <Tooltip title={bankAccount.description} placement='left'>
+            {res}
+        </Tooltip>
+    }
+    return <div className='bank-account-single' style={{color: color}}>
+        {res}
+        {'   '}
+        <Tag style={{color: balanceColor}}>{bankAccount.netBalance}</Tag>
+        <Switch
+            checkedChildren={<CheckOutlined/>}
+            unCheckedChildren={<CloseOutlined/>}
+            checked={transaction && transaction.bankAccount && transaction.bankAccount.id === bankAccount.id}
+        />
     </div>
 }
 
-export default BankAccountElem;
+const mapStateToProps = (state: IState) => ({
+    transaction: state.transaction.transaction
+});
+
+export default connect(mapStateToProps, {})(
+    BankAccountElem
+);

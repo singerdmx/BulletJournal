@@ -21,6 +21,7 @@ import ShareProjectItem from '../../components/modals/share-project-item.compone
 // antd imports
 import {Avatar, BackTop, Card, Col, Divider, message, Popconfirm, Row, Statistic, Tag, Tooltip,} from 'antd';
 import {
+  BankTwoTone,
   BgColorsOutlined,
   CreditCardOutlined,
   DeleteTwoTone,
@@ -54,6 +55,7 @@ import {Project} from "../../features/project/interface";
 import {contentEditable} from "../note/note.pages";
 import TransactionColorSettingDialog from '../../components/modals/transaction-color.component';
 import {convertToTextWithRRule} from "../../features/recurrence/actions";
+import BankList from "../../components/modals/bank-list.component";
 
 const LocaleCurrency = require('locale-currency');
 
@@ -352,6 +354,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
               </div>
             </Popconfirm>
           </Tooltip>
+          {myself === transaction.payer.name && <BankList/>}
         </div>
       </div>
       <div className="transaction-statistic-card" style={{background: bgColor}}>

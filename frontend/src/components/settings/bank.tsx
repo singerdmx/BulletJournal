@@ -80,6 +80,7 @@ const BankPage: React.FC<BankProps> = (
         </div>
         <div className='banks-div'>
             {accounts && accounts.map(bankAccount => <BankAccountElem key={bankAccount.id}
+                                                                      mode='card'
                                                                       bankAccount={bankAccount}/>)}
         </div>
     </div>
