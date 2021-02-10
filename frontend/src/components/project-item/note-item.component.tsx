@@ -9,7 +9,7 @@ import {Avatar, message, Popconfirm, Popover, Tag, Tooltip} from 'antd';
 // features import
 import {deleteNote} from '../../features/notes/actions';
 import {Note} from '../../features/notes/interface';
-import {Label, stringToRGB} from '../../features/label/interface';
+import {Label} from '../../features/label/interface';
 import {setSelectedLabel} from '../../features/label/actions';
 // modals import
 import EditNote from '../modals/edit-note.component';
@@ -28,6 +28,7 @@ import CopyToClipboard from "react-copy-to-clipboard";
 import 'react-contexify/dist/ReactContexify.min.css';
 import {IState} from "../../store";
 import {updateColorSettingShown} from '../../features/notes/actions';
+import {stringToRGB} from "../../utils/Util";
 
 type ProjectProps = {
   readOnly: boolean;

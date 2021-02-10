@@ -30,7 +30,7 @@ import TransactionsByPayer from '../../components/modals/transactions-by-payer.c
 import ShowProjectHistory from '../../components/modals/show-project-history.component';
 import {FrequencyType, LedgerSummaryType,} from '../../features/transactions/interface';
 import {projectLabelsUpdate, setSelectedLabel,} from '../../features/label/actions';
-import {Label, stringToRGB} from '../../features/label/interface';
+import {Label} from '../../features/label/interface';
 import {getIcon} from '../../components/draggable-labels/draggable-label-list.component';
 import {animation, IconFont, Item, Menu, MenuProvider} from "react-contexify";
 import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
@@ -38,6 +38,7 @@ import CopyToClipboard from "react-copy-to-clipboard";
 import {CheckSquareTwoTone, CloseCircleTwoTone, CopyOutlined, MenuOutlined, StopTwoTone} from "@ant-design/icons/lib";
 import {RadioChangeEvent} from "antd/lib/radio";
 import {getCookie} from "../../index";
+import {stringToRGB} from "../../utils/Util";
 
 type ProjectPathParams = {
   projectId: string;

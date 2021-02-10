@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Label, stringToRGB} from '../../features/label/interface';
+import {Label} from '../../features/label/interface';
 import {Select, Tag} from 'antd';
 import {useHistory} from 'react-router-dom';
 import {PlusOutlined, TagOutlined} from '@ant-design/icons';
@@ -17,7 +17,7 @@ import {IState} from '../../store';
 import {ProjectItem} from '../../features/myBuJo/interface';
 import {Project} from '../../features/project/interface';
 import {inPublicPage} from "../../index";
-import {onFilterLabel} from "../../utils/Util";
+import {onFilterLabel, stringToRGB} from "../../utils/Util";
 
 type DraggableLabelsProps = {
   mode: ProjectType;

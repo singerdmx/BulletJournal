@@ -26,7 +26,7 @@ import {
 } from '../../features/tasks/actions';
 import EditTask from '../modals/edit-task.component';
 import './project-item.styles.less';
-import {Label, stringToRGB} from '../../features/label/interface';
+import {Label} from '../../features/label/interface';
 import moment from 'moment-timezone';
 import MoveProjectItem from '../modals/move-project-item.component';
 import ShareProjectItem from '../modals/share-project-item.component';
@@ -39,6 +39,7 @@ import {IState} from '../../store';
 import {animation, IconFont, Item, Menu, MenuProvider, theme as ContextMenuTheme} from "react-contexify";
 import 'react-contexify/dist/ReactContexify.min.css';
 import CopyToClipboard from "react-copy-to-clipboard";
+import {stringToRGB} from "../../utils/Util";
 
 type ProjectProps = {
   readOnly: boolean;

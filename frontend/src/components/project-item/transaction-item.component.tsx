@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {Avatar, message, Popconfirm, Popover, Tag, Tooltip} from 'antd';
 import {BgColorsOutlined, CreditCardOutlined, DeleteTwoTone, DollarOutlined, MoreOutlined,} from '@ant-design/icons';
 import {deleteTransaction, updateTransactionColorSettingShown} from '../../features/transactions/actions';
-import {Label, stringToRGB} from '../../features/label/interface';
+import {Label} from '../../features/label/interface';
 import {Transaction} from '../../features/transactions/interface';
 import './project-item.styles.less';
 import moment from 'moment-timezone';
@@ -22,6 +22,7 @@ import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
 import CopyToClipboard from "react-copy-to-clipboard";
 import {CopyOutlined} from "@ant-design/icons/lib";
 import {convertToTextWithRRule} from "../../features/recurrence/actions";
+import {stringToRGB} from "../../utils/Util";
 
 const LocaleCurrency = require('locale-currency'); //currency code
 

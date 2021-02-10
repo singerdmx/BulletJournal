@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import { connect } from 'react-redux';
-import { Label, stringToRGB } from '../../features/label/interface';
+import { Label } from '../../features/label/interface';
 import {
   deleteLabel,
   patchLabel,
@@ -27,6 +27,7 @@ import {
 import { getIcon } from '../../components/draggable-labels/draggable-label-list.component';
 import { icons } from '../../assets/icons/index';
 import './labels.styles.less';
+import {stringToRGB} from "../../utils/Util";
 
 type LabelsProps = {
   labels: Label[];
