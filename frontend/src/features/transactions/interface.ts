@@ -13,7 +13,7 @@ export interface BankAccount {
   owner: User;
   accountType: BankAccountType;
   netBalance: number;
-  accountNumber?: number;
+  accountNumber?: string;
   description?: string;
 }
 

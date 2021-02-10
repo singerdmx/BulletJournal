@@ -4,6 +4,7 @@ import com.bulletjournal.ledger.BankAccountType;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "bank_accounts")
@@ -14,7 +15,8 @@ public class BankAccount extends OwnedModel {
     private Long id;
 
     @Column(name = "account_number")
-    private Integer accountNumber;
+    @Size(max = 50)
+    private String accountNumber;
 
     @Column(name = "description", length = 600)
     private String description;
@@ -37,11 +39,11 @@ public class BankAccount extends OwnedModel {
         this.id = id;
     }
 
-    public Integer getAccountNumber() {
+    public String getAccountNumber() {
         return accountNumber;
     }
 
-    public void setAccountNumber(Integer accountNumber) {
+    public void setAccountNumber(String accountNumber) {
         this.accountNumber = accountNumber;
     }
 

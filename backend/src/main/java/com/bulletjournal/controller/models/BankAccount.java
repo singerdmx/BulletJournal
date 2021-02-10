@@ -21,7 +21,8 @@ public class BankAccount {
     @NotNull
     protected User owner;
 
-    private Integer accountNumber;
+    @Size(max = 50)
+    private String accountNumber;
 
     private String description;
 
@@ -38,7 +39,7 @@ public class BankAccount {
             Long id,
             @NotBlank @Size(min = 1, max = 100) String name,
             @NotNull User owner,
-            Integer accountNumber,
+            String accountNumber,
             String description,
             @NotNull BankAccountType accountType,
             @NotNull Double netBalance) {
@@ -75,11 +76,11 @@ public class BankAccount {
         this.owner = owner;
     }
 
-    public Integer getAccountNumber() {
+    public String getAccountNumber() {
         return accountNumber;
     }
 
-    public void setAccountNumber(Integer accountNumber) {
+    public void setAccountNumber(String accountNumber) {
         this.accountNumber = accountNumber;
     }
 
