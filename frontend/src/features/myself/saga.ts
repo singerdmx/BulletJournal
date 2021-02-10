@@ -312,10 +312,11 @@ function* deleteMySampleTasks(action: PayloadAction<DeleteSampleTasksAction>) {
 
 function* getBankAccounts(action: PayloadAction<GetBankAccountsAction>) {
     try {
-        const data: BankAccount[] = yield call(fetchBankAccounts);
+        const data = yield call(fetchBankAccounts);
+        const bankAccounts : BankAccount[] = yield data.json();
         yield put(
             myselfActions.myselfDataReceived({
-                bankAccounts: data
+                bankAccounts: bankAccounts
             })
         );
     } catch (error) {

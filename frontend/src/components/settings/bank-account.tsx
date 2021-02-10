@@ -1,9 +1,17 @@
 import {BankAccount, BankAccountType} from "../../features/transactions/interface";
-import {BankOutlined, CreditCardOutlined, DollarCircleOutlined} from "@ant-design/icons";
+import {
+    BankOutlined,
+    CreditCardOutlined, DeleteOutlined,
+    DollarCircleOutlined, EditOutlined, FileSearchOutlined,
+} from "@ant-design/icons";
 import React from "react";
 import {stringToRGB} from "../../utils/Util";
+import {Card, Statistic, Tooltip} from "antd";
+import './bank.styles.less';
 
-const getBankAccountTypeIcon = (type: BankAccountType) => {
+const {Meta} = Card;
+
+export const getBankAccountTypeIcon = (type: BankAccountType) => {
     switch (type) {
         case BankAccountType.CHECKING_ACCOUNT:
             return <DollarCircleOutlined/>;
@@ -38,9 +46,46 @@ const BankAccountElem: React.FC<BankAccountProps> = (
         bankAccount
     }) => {
     const color = stringToRGB(bankAccount.name);
-    const icon = getBankAccountTypeIcon(bankAccount.accountType);
     const image = getBankAccountTypeImage(bankAccount.accountType);
-    return <div></div>
+    const balanceColor = bankAccount.netBalance >= 0 ? '#3f8600' : '#cf1322';
+    let description = bankAccount.accountNumber ? bankAccount.accountNumber + ' ' : '';
+    if (bankAccount.description) {
+        description += bankAccount.description;
+    }
+    return <div className='bank-account-card'>
+        <Card
+            key={bankAccount.id}
+            style={{width: 280}}
+            cover={
+                <img
+                    alt={bankAccount.accountType}
+                    src={image}
+                />
+            }
+            title={<span style={{color: color}}>{bankAccount.name}</span>}
+            actions={[
+                <Tooltip title='View Transactions'>
+                    <FileSearchOutlined key="View Transactions" title='View Transactions'/>
+                </Tooltip>,
+                <Tooltip title='Edit'>
+                    <EditOutlined key='Edit' title='Edit' />
+                </Tooltip>,
+                <Tooltip title='Delete'>
+                    <DeleteOutlined key='Delete' title='Delete' />
+                </Tooltip>
+            ]}
+        >
+            <Meta
+                style={{height: 65}}
+                title={<Statistic
+                    value={bankAccount.netBalance}
+                    precision={2}
+                    valueStyle={{ color: balanceColor}}
+                />}
+                description={description}
+            />
+        </Card>
+    </div>
 }
 
 export default BankAccountElem;

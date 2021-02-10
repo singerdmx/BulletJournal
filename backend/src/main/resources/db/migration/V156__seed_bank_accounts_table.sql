@@ -8,7 +8,9 @@ VALUES (1, 'BulletJournal', 'Chase', '1129', null, 'CHECKING_ACCOUNT', '2021-02-
         '2021-02-01 01:23:17.000000', -122),
        (3, 'BulletJournal', 'BOA', '2126', 'Bank of America', 'SAVING_ACCOUNT', '2021-02-02 01:23:14.000000',
         '2021-02-07 01:23:17.000000', 5123.0),
-       (4, 'BulletJournal', 'Citi', '0120', null, 'CREDIT_CARD', '2021-02-10 01:23:14.000000',
+       (4, 'BulletJournal', 'Citi Double Cash', '0120', null, 'CREDIT_CARD', '2021-02-10 01:23:14.000000',
         '2021-02-10 01:23:17.000000', -123.02),
        (5, 'BulletJournal', 'Amex', '0129', null, 'CREDIT_CARD', '2021-02-01 01:23:14.000000',
-        '2021-02-01 01:23:17.000000', -13.89);
+        '2021-02-01 01:23:17.000000', -13.89),
+       (6, 'BulletJournal', 'Capital One', null, null, 'CREDIT_CARD', '2021-02-01 01:23:14.000000',
+        '2021-02-01 01:23:17.000000', -138.9);
