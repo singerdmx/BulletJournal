@@ -27,6 +27,7 @@ public class Auditable extends AuditModel {
     private Long projectId;
 
     @Column(name = "activity", nullable = false, updatable = false)
+    @Size(max=512)
     private String activity;
 
     @Column(name = "activity_time", nullable = false, updatable = false)

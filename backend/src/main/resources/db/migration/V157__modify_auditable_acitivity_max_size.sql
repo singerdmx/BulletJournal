@@ -1,0 +1,1 @@
+alter table auditables alter column activity type varchar(512) using activity::varchar(512);
