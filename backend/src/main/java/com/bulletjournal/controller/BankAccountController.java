@@ -51,7 +51,7 @@ public class BankAccountController {
     }
 
     @PatchMapping(BANK_ACCOUNT_ROUTE)
-    public BankAccount updateProject(@NotNull @PathVariable Long bankAccountId,
+    public BankAccount updateBankAccount(@NotNull @PathVariable Long bankAccountId,
                                         @Valid @RequestBody UpdateBankAccountParams bankAccountParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
