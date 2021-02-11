@@ -56,6 +56,7 @@ import {contentEditable} from "../note/note.pages";
 import TransactionColorSettingDialog from '../../components/modals/transaction-color.component';
 import {convertToTextWithRRule} from "../../features/recurrence/actions";
 import BankList from "../../components/modals/bank-list.component";
+import { SingleBankAccountContainer } from '../../components/settings/bank-account';
 
 const LocaleCurrency = require('locale-currency');
 
@@ -134,6 +135,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   const currencyType = LocaleCurrency.getCurrency(currency);
   // hook history in router
   const history = useHistory();
+  const bankAccount = transaction?.bankAccount;
 
   // listening on the empty state working as componentDidmount
   useEffect(() => {
@@ -316,6 +318,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
             itemShared={transaction.shared}
           />
         </div>
+            {bankAccount && <SingleBankAccountContainer style={{ width: '50%' }} bankAccount={bankAccount} onToggleBankAccount={() => history.push('/bank')}/>}
         <div className="transaction-operation">
           <Tooltip title={`Created by ${transaction.owner.alias}`}>
             <div className="transaction-owner">

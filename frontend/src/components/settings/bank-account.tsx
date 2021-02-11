@@ -45,6 +45,35 @@ const getBankAccountTypeImage = (type: BankAccountType) => {
     }
 }
 
+const getBankBalanceColor = (bankAccount: BankAccount) => {
+	return bankAccount.netBalance >= 0 ? '#3f8600' : '#cf1322';
+};
+
+type BankAccountContainerProps = {
+	bankAccount: BankAccount;
+	style: object;
+	onToggleBankAccount: () => void;
+}
+
+export const SingleBankAccountContainer : React.FC<BankAccountContainerProps> = ({ bankAccount, style, onToggleBankAccount, children }) => {
+
+	const icon = getBankAccountTypeIcon(bankAccount.accountType);
+	const color = stringToRGB(bankAccount.name);
+	const balanceColor = getBankBalanceColor(bankAccount);
+    let res = <span className='bank-name'>{icon} {bankAccount.name} {bankAccount.accountNumber}</span>
+
+    if (bankAccount.description) {
+        res = <Tooltip title={bankAccount.description} placement='left'>
+            {res}
+        </Tooltip>
+    };
+    return (<div className='bank-account-single' style={{ ...style, color: color}} onClick={onToggleBankAccount}>
+        {res}
+        <Tag style={{color: balanceColor, display: 'flex', alignItems: 'center', }}>{bankAccount.netBalance}</Tag>
+        {children}
+    </div>);
+}
+
 type BankAccountProps = {
     bankAccount: BankAccount;
     mode: string;
@@ -118,24 +147,14 @@ const BankAccountElem: React.FC<BankAccountProps> = (
         </div>
     }
 
-    let res = <span className='bank-name'>{icon} {bankAccount.name} {bankAccount.accountNumber}</span>
-
-    if (bankAccount.description) {
-        res = <Tooltip title={bankAccount.description} placement='left'>
-            {res}
-        </Tooltip>
-    }
-    return <div className='bank-account-single' style={{color: color}}>
-        {res}
-        {'   '}
-        <Tag style={{color: balanceColor}}>{bankAccount.netBalance}</Tag>
-        <Switch
-            checkedChildren={<CheckOutlined/>}
-            unCheckedChildren={<CloseOutlined/>}
-            checked={transaction && transaction.bankAccount && transaction.bankAccount.id === bankAccount.id}
-            onChange={(checked) => onChange(checked, bankAccount.id)}
-        />
-    </div>
+    return (<SingleBankAccountContainer bankAccount={bankAccount} style={{}} onToggleBankAccount={() => {}}>
+                <Switch
+                    checkedChildren={<CheckOutlined/>}
+                    unCheckedChildren={<CloseOutlined/>}
+                    checked={transaction && transaction.bankAccount && transaction.bankAccount.id === bankAccount.id}
+                    onChange={(checked) => onChange(checked, bankAccount.id)}
+                />
+            </SingleBankAccountContainer>);
 }
 
 const mapStateToProps = (state: IState) => ({
