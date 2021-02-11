@@ -44,7 +44,7 @@ import {
   updateContent,
   updateTransaction,
 } from '../../apis/transactionApis';
-import {LedgerSummary, Transaction} from './interface';
+import {BankAccount, LedgerSummary, Transaction} from './interface';
 import {getProjectItemsAfterUpdateSelect} from '../myBuJo/actions';
 import {updateRecurringTransactions, updateTransactionContents} from './actions';
 import {Content, ProjectItems, Revision} from '../myBuJo/interface';
@@ -54,6 +54,8 @@ import {ContentType} from "../myBuJo/constants";
 import {recentItemsReceived} from "../recent/actions";
 import {setDisplayMore, updateTargetContent} from "../content/actions";
 import {reloadReceived} from "../myself/actions";
+import {fetchBankAccounts} from "../../apis/bankAccountApis";
+import {actions as myselfActions} from "../myself/reducer";
 
 
 function* transactionApiErrorReceived(
@@ -722,6 +724,13 @@ function* updateTransactionBankAccount(
     );
 
     yield put(transactionsActions.transactionReceived({transaction: data}));
+    const response = yield call(fetchBankAccounts);
+    const bankAccounts : BankAccount[] = yield response.json();
+    yield put(
+        myselfActions.myselfDataReceived({
+          bankAccounts: bankAccounts
+        })
+    );
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));

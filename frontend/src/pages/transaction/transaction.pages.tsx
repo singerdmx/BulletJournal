@@ -201,28 +201,28 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
       {contentEditable(myself, content, transaction, project) && <FloatButton
         tooltip="Delete Content"
         onClick={handleDelete}
-        styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
+        styles={{ backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
       >
         <DeleteOutlined />
       </FloatButton>}
       {content && content.revisions.length > 1 && contentEditable(myself, content, transaction, project) && <FloatButton
         tooltip={`View Revision History (${content.revisions.length - 1})`}
         onClick={handleOpenRevisions}
-        styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
+        styles={{ backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
       >
         <HighlightOutlined />
       </FloatButton>}
       {contentEditable(myself, content, transaction, project) && <FloatButton
         tooltip="Edit Content"
         onClick={handleEdit}
-        styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
+        styles={{ backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
       >
         <EditOutlined />
       </FloatButton>}
       <FloatButton
         tooltip="Add Content"
         onClick={createHandler}
-        styles={{ backgroundColor: darkColors.grey, color: lightColors.white }}
+        styles={{ backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
       >
         <PlusOutlined />
       </FloatButton>
