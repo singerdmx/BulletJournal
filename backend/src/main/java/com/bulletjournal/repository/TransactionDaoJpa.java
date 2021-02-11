@@ -460,6 +460,15 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         this.transactionRepository.save(transaction);
     }
 
+    private double getTransactionNetAmount(Transaction transaction) {
+        double amount = transaction.getAmount();
+        if (transaction.getTransactionType() == TransactionType.EXPENSE) {
+            amount = -amount;
+        }
+
+        return amount;
+    }
+
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Transaction setBankAccount(
             String requester, Long transactionId, Long bankAccountId) {
@@ -468,7 +477,18 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
             throw new UnAuthorizedException("Only payer " + transaction.getOwner() + " can set bank account");
         }
 
+        double amount = getTransactionNetAmount(transaction);
+        BankAccount oldBankAccount = transaction.getBankAccount();
+        if (oldBankAccount != null) {
+            double oldAccountBalance = oldBankAccount.getNetBalance();
+            oldBankAccount.setNetBalance(oldAccountBalance + amount);
+        }
         BankAccount bankAccount = this.bankAccountDaoJpa.getBankAccount(requester, bankAccountId);
+        if (bankAccount != null) {
+            double newAccountBalance = bankAccount.getNetBalance();
+             bankAccount.setNetBalance(newAccountBalance - amount);
+        }
+
         transaction.setBankAccount(bankAccount);
         return this.transactionRepository.save(transaction);
     }
