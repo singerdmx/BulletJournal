@@ -56,6 +56,7 @@ import {contentEditable} from "../note/note.pages";
 import TransactionColorSettingDialog from '../../components/modals/transaction-color.component';
 import {convertToTextWithRRule} from "../../features/recurrence/actions";
 import BankList from "../../components/modals/bank-list.component";
+import BankAccountElem from "../../components/settings/bank-account";
 
 const LocaleCurrency = require('locale-currency');
 
@@ -180,6 +181,8 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
     transaction && transaction.id && updateTransactionContents(transaction.id);
     transactionId && getTransaction(parseInt(transactionId));
   };
+
+  const bankAccount = transaction?.bankAccount;
 
   const createContentElem = (
     <Container>
@@ -357,6 +360,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
           {myself === transaction.payer.name && <BankList/>}
         </div>
       </div>
+      {bankAccount && <BankAccountElem bankAccount={bankAccount} mode='banner'/>}
       <div className="transaction-statistic-card" style={{background: bgColor}}>
         <Row gutter={10}>
           {getPaymentDateTime(transaction)}

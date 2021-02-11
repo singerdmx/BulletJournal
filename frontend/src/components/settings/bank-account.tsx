@@ -16,6 +16,7 @@ import './bank.styles.less';
 import {IState} from "../../store";
 import {connect} from "react-redux";
 import {updateTransactionBankAccount} from "../../features/transactions/actions";
+import {useHistory} from "react-router-dom";
 
 const {Meta} = Card;
 
@@ -62,6 +63,8 @@ const BankAccountElem: React.FC<BankAccountProps> = (
         transaction,
         updateTransactionBankAccount
     }) => {
+    const history = useHistory();
+
     function onChange(checked: boolean, bankAccountId: number) {
         if (!transaction) {
             return;
@@ -118,23 +121,30 @@ const BankAccountElem: React.FC<BankAccountProps> = (
         </div>
     }
 
-    let res = <span className='bank-name'>{icon} {bankAccount.name} {bankAccount.accountNumber}</span>
+    let bankTitle = <span className='bank-name'>{icon} {bankAccount.name} {bankAccount.accountNumber}</span>
 
     if (bankAccount.description) {
-        res = <Tooltip title={bankAccount.description} placement='left'>
-            {res}
+        bankTitle = <Tooltip title={bankAccount.description} placement='left'>
+            {bankTitle}
         </Tooltip>
     }
-    return <div className='bank-account-single' style={{color: color}}>
-        {res}
-        {'   '}
-        <Tag style={{color: balanceColor}}>{bankAccount.netBalance}</Tag>
-        <Switch
-            checkedChildren={<CheckOutlined/>}
-            unCheckedChildren={<CloseOutlined/>}
-            checked={transaction && transaction.bankAccount && transaction.bankAccount.id === bankAccount.id}
-            onChange={(checked) => onChange(checked, bankAccount.id)}
-        />
+
+    if (mode === 'single') {
+        return <div className='bank-account-single' style={{color: color}}>
+            {bankTitle}
+            {'   '}
+            <Tag style={{color: balanceColor}}>{bankAccount.netBalance}</Tag>
+            <Switch
+                checkedChildren={<CheckOutlined/>}
+                unCheckedChildren={<CloseOutlined/>}
+                checked={transaction && transaction.bankAccount && transaction.bankAccount.id === bankAccount.id}
+                onChange={(checked) => onChange(checked, bankAccount.id)}
+            />
+        </div>
+    }
+
+    return <div className='bank-account-banner' style={{color: color}} onClick={() => history.push('/bank')}>
+        {bankTitle}
     </div>
 }
 
