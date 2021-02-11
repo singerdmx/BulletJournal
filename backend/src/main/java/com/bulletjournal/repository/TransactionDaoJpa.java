@@ -486,7 +486,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         BankAccount bankAccount = this.bankAccountDaoJpa.getBankAccount(requester, bankAccountId);
         if (bankAccount != null) {
             double newAccountBalance = bankAccount.getNetBalance();
-             bankAccount.setNetBalance(newAccountBalance - amount);
+            bankAccount.setNetBalance(newAccountBalance - amount);
         }
 
         transaction.setBankAccount(bankAccount);
