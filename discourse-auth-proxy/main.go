@@ -330,7 +330,7 @@ func redirectToSSO(r *http.Request, w http.ResponseWriter) {
 	logger.Printf("Redirect %s to sso_provider", redirectURL)
 	ssoURL := config.SSOURLString + "/session/sso_provider?" + ssoPayload(config.SSOSecret, config.ProxyURLString, redirectURL)
 	deleteCookie(w)
-	http.Redirect(w, r, ssoURL, 302)
+	http.Redirect(w, r, ssoURL, http.StatusMovedPermanently)
 }
 
 func shouldByPass(r *http.Request) bool {
