@@ -772,7 +772,8 @@ function* changeAccountBalance(action: PayloadAction<ChangeBankAccountBalanceAct
     const {
       bankAccount,
       balance,
-      description
+      description,
+      onSuccess
     } = action.payload;
     yield call(
         setAccountBalance,
@@ -797,6 +798,7 @@ function* changeAccountBalance(action: PayloadAction<ChangeBankAccountBalanceAct
         })
     );
     yield call(message.success, `Balance is changed to ${balance} for account '${bankAccount.name}'`);
+    onSuccess();
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));

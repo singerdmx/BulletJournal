@@ -194,13 +194,14 @@ export type ShareTransactionByEmailAction = {
 export type ChangeBankAccountBalanceAction = {
   bankAccount: BankAccount,
   balance: number,
-  description: string
+  description: string,
+  onSuccess: Function
 };
 
 export type GetBankAccountTransactionsAction = {
   bankAccountId: number,
   startDate: string,
-  endDate: string,
+  endDate: string
 }
 
 let initialState = {

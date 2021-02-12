@@ -19,9 +19,8 @@ type BankAccountProps = {
     getBankAccounts: () => void;
     bankAccounts: BankAccount[];
     transactions: Transaction[];
-    changeAccountBalance: (bankAccount: BankAccount, balance: number, description: string) => void;
-    // changeAccountBalance: (bankAccount: BankAccount, balance: number, description: string, onSuccess: Function) => void;
     getBankAccountTransactions: (bankAccountId: number, startDate: string, endDate: string) => void;
+    changeAccountBalance: (bankAccount: BankAccount, balance: number, description: string, onSuccess: Function) => void;
 }
 
 const BankAccountPage: React.FC<BankAccountProps> = (
@@ -95,7 +94,11 @@ const BankAccountPage: React.FC<BankAccountProps> = (
             <div className='change-balance-button'>
                 <Button type="primary" shape="round" icon={<SaveOutlined/>} onClick={() => {
                     if (account) {
-                        changeAccountBalance(account, balance, memo);
+                        changeAccountBalance(account, balance, memo, () => {
+                            if (account) {
+                                getBankAccountTransactions(account.id, startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD'));
+                            }
+                        });
                     }
                 }}>
                     Change Balance

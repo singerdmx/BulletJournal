@@ -239,8 +239,8 @@ export const shareTransactionByEmail = (
     targetGroup: targetGroup,
   });
 
-export const changeAccountBalance = (bankAccount: BankAccount, balance: number, description: string) =>
-    actions.ChangeBankAccountBalance({bankAccount: bankAccount, balance: balance, description: description});
+export const changeAccountBalance = (bankAccount: BankAccount, balance: number, description: string, onSuccess: Function) =>
+    actions.ChangeBankAccountBalance({bankAccount: bankAccount, balance: balance, description: description, onSuccess: onSuccess});
 
 export const getBankAccountTransactions = (bankAccountId: number, startDate: string, endDate: string) =>
     actions.GetBankAccountTransactions({bankAccountId: bankAccountId, startDate: startDate, endDate: endDate});
