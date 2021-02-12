@@ -250,8 +250,6 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         this.authorizationService.checkAuthorizedToOperateOnContent(transaction.getOwner(), requester,
                 ContentType.TRANSACTION, Operation.UPDATE, transactionId, transaction.getProject().getOwner());
 
-        double oldAmount = getTransactionNetAmount(transaction);
-
         DaoHelper.updateIfPresent(updateTransactionParams.hasName(), updateTransactionParams.getName(),
                 transaction::setName);
 
@@ -305,8 +303,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
         transaction = this.transactionRepository.save(transaction);
 
-        double newAmount = getTransactionNetAmount(transaction);
-        if (transaction.hasBankAccount() && Math.abs(newAmount - oldAmount) > 0.00001) {
+        if (transaction.hasBankAccount()) {
             this.bankAccountBalanceRepository.deleteById(transaction.getBankAccount().getId());
         }
         return Pair.of(events, transaction);
