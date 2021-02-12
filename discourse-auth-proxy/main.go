@@ -93,11 +93,6 @@ func main() {
 		Addr: ":80",
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			logger.Printf("Port 80: Request %s %s", r.Host, r.URL)
-			if r.Host == "home.bulletjournal.us" {
-				logger.Printf("Port 80: Bypassing Auth Proxy: %s", r.RequestURI)
-				proxy.ServeHTTP(w, r)
-				return
-			}
 			if r.Host == "www.bulletjournal.us" {
 				logger.Printf("Redirecting www.bulletjournal.us: %s", r.RequestURI)
 				http.Redirect(w, r, "https://bulletjournal.us"+r.RequestURI, http.StatusMovedPermanently)
@@ -117,8 +112,8 @@ func authProxyHandler(handler http.Handler, config *Config) http.Handler {
 		}
 
 		if r.Host == "home.bulletjournal.us" {
-			logger.Printf("Port 443: Redirect to 80: %s", r.RequestURI)
-			http.Redirect(w, r, "http://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
+			logger.Printf("Port 443: Bypassing Auth Proxy: %s", r.RequestURI)
+			handler.ServeHTTP(w, r)
 			return
 		}
 		if r.Host == "www.bulletjournal.us" {
