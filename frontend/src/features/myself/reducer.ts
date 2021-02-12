@@ -2,7 +2,7 @@ import {createSlice, PayloadAction} from 'redux-starter-kit';
 import {UserPointActivity} from "../../pages/points/interface";
 import {SubscribedCategory} from "./interface";
 import {SampleTask} from "../templates/interface";
-import {BankAccount} from "../transactions/interface";
+import {BankAccount, BankAccountType} from "../transactions/interface";
 
 export type MyselfWithAvatar = {
     username?: string;
@@ -94,6 +94,14 @@ export type SubscribedCategories = {
 };
 
 export type GetBankAccountsAction = {};
+
+export type AddBankAccountAction = {
+    name: string,
+    accountType: BankAccountType,
+    onSuccess: (bankAccountId: number) => void,
+    accountNumber?: string,
+    description?: string
+};
 
 let initialState = {
     username: '',
@@ -195,6 +203,7 @@ const slice = createSlice({
             state.removingSampleTasks = deleting;
         },
         getMyBankAccounts: (state, action: PayloadAction<GetBankAccountsAction>) => state,
+        addMyBankAccount: (state, action: PayloadAction<AddBankAccountAction>) => state,
     },
 });
 

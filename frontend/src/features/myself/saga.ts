@@ -1,7 +1,7 @@
 import {all, call, put, select, takeLatest} from 'redux-saga/effects';
 import {message} from 'antd';
 import {
-    actions as myselfActions,
+    actions as myselfActions, AddBankAccountAction,
     ClearMyself,
     DeleteSampleTaskAction,
     DeleteSampleTasksAction,
@@ -34,7 +34,7 @@ import {
 import {SubscribedCategory} from "./interface";
 import {removeUserCategory, updateSubscription} from "../../apis/templates/categoryApis";
 import {SampleTask} from "../templates/interface";
-import {fetchBankAccounts} from "../../apis/bankAccountApis";
+import {createBankAccount, fetchBankAccounts} from "../../apis/bankAccountApis";
 import {BankAccount} from "../transactions/interface";
 
 function* myselfApiErrorAction(action: PayloadAction<MyselfApiErrorAction>) {
@@ -328,6 +328,20 @@ function* getBankAccounts(action: PayloadAction<GetBankAccountsAction>) {
     }
 }
 
+function* addBankAccount(action: PayloadAction<AddBankAccountAction>) {
+    try {
+        const {name, accountType, accountNumber, description, onSuccess} = action.payload;
+        const data : BankAccount = yield call(createBankAccount, name, accountType, accountNumber, description);
+        onSuccess(data.id);
+    } catch (error) {
+        if (error.message === 'reload') {
+            yield put(reloadReceived(true));
+        } else {
+            yield call(message.error, `addBankAccount Error Received: ${error}`);
+        }
+    }
+}
+
 export default function* myselfSagas() {
     yield all([
         yield takeLatest(
@@ -350,6 +364,7 @@ export default function* myselfSagas() {
         yield takeLatest(myselfActions.deleteMySampleTask.type, deleteMySampleTask),
         yield takeLatest(myselfActions.deleteMySampleTasks.type, deleteMySampleTasks),
         yield takeLatest(myselfActions.getMyBankAccounts.type, getBankAccounts),
+        yield takeLatest(myselfActions.addMyBankAccount.type, addBankAccount),
     ]);
 }
 

@@ -6,6 +6,7 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.CreateBankAccountParams;
 import com.bulletjournal.controller.models.UpdateBankAccountParams;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.repository.models.AuditModel;
 import com.bulletjournal.repository.models.BankAccount;
 import com.bulletjournal.repository.models.BankAccountTransaction;
 import com.bulletjournal.repository.utils.DaoHelper;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,7 +34,10 @@ public class BankAccountDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.BankAccount> getBankAccounts(String requester) {
         List<BankAccount> bankAccounts = this.bankAccountRepository.findAllByOwner(requester);
-        return bankAccounts.stream().map(b -> b.toPresentationModel(this)).collect(Collectors.toList());
+        return bankAccounts.stream()
+                .sorted(Comparator.comparing(AuditModel::getUpdatedAt))
+                .map(b -> b.toPresentationModel(this))
+                .collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

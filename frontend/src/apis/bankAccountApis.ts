@@ -1,4 +1,5 @@
 import {doFetch, doPost} from './api-helper';
+import {BankAccountType} from "../features/transactions/interface";
 
 export const fetchBankAccounts = () => {
     return doFetch('/api/bankAccounts')
@@ -22,6 +23,23 @@ export const fetchBankAccountTransactions = (
             throw Error(err.message);
         });
 }
+
+export const createBankAccount = (name: string,
+                               accountType: BankAccountType,
+                               accountNumber?: string,
+                               description?: string) => {
+    const postBody = JSON.stringify({
+        name: name,
+        accountType: accountType,
+        accountNumber: accountNumber,
+        description: description
+    });
+    return doPost('/api/bankAccounts', postBody)
+        .then(res => res.json())
+        .catch(err => {
+            throw Error(err.message);
+        });
+};
 
 export const setAccountBalance = (bankAccountId: number, balance: number, description: string) => {
     const postBody = JSON.stringify({
