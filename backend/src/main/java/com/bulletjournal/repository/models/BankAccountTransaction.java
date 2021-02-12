@@ -61,11 +61,14 @@ public class BankAccountTransaction extends NamedModel {
         t.setBankAccount(getBankAccount());
         t.setAmount(amount);
         t.setPayer(getBankAccount().getOwner());
+        t.setOwner(getBankAccount().getOwner());
         t.setTransactionType(transactionType);
         t.setStartTime(getCreatedAt());
         t.setEndTime(getCreatedAt());
         t.setName(getName());
-        t.setId(RAND.nextLong());
+        t.setId(-Math.abs(RAND.nextLong()));
+        t.setCreatedAt(getCreatedAt());
+        t.setUpdatedAt(getUpdatedAt());
         return t;
     }
 }

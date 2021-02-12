@@ -6,7 +6,7 @@ import {
   CreateTransaction,
   DeleteContent,
   DeleteTransaction,
-  DeleteTransactions,
+  DeleteTransactions, GetBankAccountTransactionsAction,
   GetTransaction,
   GetTransactionsByPayer,
   MoveTransaction,
@@ -54,7 +54,7 @@ import {ContentType} from "../myBuJo/constants";
 import {recentItemsReceived} from "../recent/actions";
 import {setDisplayMore, updateTargetContent} from "../content/actions";
 import {reloadReceived} from "../myself/actions";
-import {fetchBankAccounts, setAccountBalance} from "../../apis/bankAccountApis";
+import {fetchBankAccounts, fetchBankAccountTransactions, setAccountBalance} from "../../apis/bankAccountApis";
 import {actions as myselfActions} from "../myself/reducer";
 
 
@@ -780,12 +780,54 @@ function* changeAccountBalance(action: PayloadAction<ChangeBankAccountBalanceAct
         balance,
         description
     );
-    yield call(message.success, `Account '${bankAccount.name}' balance is changed to ${balance}`);
+    const state: IState = yield select();
+    const accounts = [] as BankAccount[];
+    state.myself.bankAccounts.forEach(account => {
+      if (account.id === bankAccount.id) {
+        const tmp = {...account};
+        tmp.netBalance = balance;
+        accounts.push(tmp);
+      } else {
+        accounts.push(account);
+      }
+    });
+    yield put(
+        myselfActions.myselfDataReceived({
+          bankAccounts: accounts
+        })
+    );
+    yield call(message.success, `Balance is changed to ${balance} for account '${bankAccount.name}'`);
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
     } else {
       yield call(message.error, `changeAccountBalance Error Received: ${error}`);
+    }
+  }
+}
+
+function* getBankAccountTransactions(action: PayloadAction<GetBankAccountTransactionsAction>) {
+  try {
+    const state: IState = yield select();
+
+    const {
+      bankAccountId,
+      startDate,
+      endDate
+    } = action.payload;
+    const data : Transaction[] = yield call(
+        fetchBankAccountTransactions,
+        bankAccountId,
+        state.myself.timezone,
+        startDate,
+        endDate
+    );
+    yield put(transactionsActions.bankAccountTransactionsReceived({transactions: data}));
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `getBankAccountTransactions Error Received: ${error}`);
     }
   }
 }
@@ -867,5 +909,8 @@ export default function* transactionSagas() {
     yield takeLatest(
         transactionsActions.ChangeBankAccountBalance.type,
         changeAccountBalance),
+    yield takeLatest(
+        transactionsActions.GetBankAccountTransactions.type,
+        getBankAccountTransactions),
   ]);
 }

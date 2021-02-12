@@ -197,6 +197,12 @@ export type ChangeBankAccountBalanceAction = {
   description: string
 };
 
+export type GetBankAccountTransactionsAction = {
+  bankAccountId: number,
+  startDate: string,
+  endDate: string,
+}
+
 let initialState = {
   contents: [] as Array<Content>,
   transaction: undefined as Transaction | undefined,
@@ -345,6 +351,7 @@ const slice = createSlice({
     ) => state,
     TransactionShareByEmail: (state, action: PayloadAction<ShareTransactionByEmailAction>) => state,
     ChangeBankAccountBalance: (state, action: PayloadAction<ChangeBankAccountBalanceAction>) => state,
+    GetBankAccountTransactions: (state, action: PayloadAction<GetBankAccountTransactionsAction>) => state,
   },
 });
 
