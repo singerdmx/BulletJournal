@@ -107,6 +107,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         Transaction transaction = this.getProjectItem(id, requester);
         com.bulletjournal.controller.models.Transaction result = addLabels(transaction);
         if (Objects.equals(requester, transaction.getPayer()) && transaction.getBankAccount() != null) {
+            // TODO: result.setBankAccount(transaction.getBankAccount().toPresentationModel(bankAccountDaoJpa));
             result.setBankAccount(transaction.getBankAccount().toPresentationModel());
         }
         return result;
@@ -477,18 +478,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
             throw new UnAuthorizedException("Only payer " + transaction.getOwner() + " can set bank account");
         }
 
-        double amount = getTransactionNetAmount(transaction);
-        BankAccount oldBankAccount = transaction.getBankAccount();
-        if (oldBankAccount != null) {
-            double oldAccountBalance = oldBankAccount.getNetBalance();
-            oldBankAccount.setNetBalance(oldAccountBalance + amount);
-        }
         BankAccount bankAccount = this.bankAccountDaoJpa.getBankAccount(requester, bankAccountId);
-        if (bankAccount != null) {
-            double newAccountBalance = bankAccount.getNetBalance();
-            bankAccount.setNetBalance(newAccountBalance - amount);
-        }
-
         transaction.setBankAccount(bankAccount);
         return this.transactionRepository.save(transaction);
     }

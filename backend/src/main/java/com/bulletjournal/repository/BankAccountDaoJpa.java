@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,11 +22,14 @@ public class BankAccountDaoJpa {
     @Autowired
     private BankAccountRepository bankAccountRepository;
     @Autowired
+    private TransactionRepository transactionRepository;
+    @Autowired
     private AuthorizationService authorizationService;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.BankAccount> getBankAccounts(String requester) {
         List<BankAccount> bankAccounts = this.bankAccountRepository.findAllByOwner(requester);
+        // TODO: return bankAccounts.stream().map(b -> b.toPresentationModel(this)).collect(Collectors.toList());
         return bankAccounts.stream().map(BankAccount::toPresentationModel).collect(Collectors.toList());
     }
 
@@ -59,8 +63,7 @@ public class BankAccountDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public com.bulletjournal.controller.models.BankAccount partialUpdate(String requester, Long bankAccountId,
                                                                          UpdateBankAccountParams updateBankAccountParams) {
-        BankAccount bankAccount = this.bankAccountRepository.findById(bankAccountId)
-                .orElseThrow(() -> new ResourceNotFoundException("Bank account " + bankAccountId + " not found"));
+        BankAccount bankAccount = getBankAccount(requester, bankAccountId);
 
         // check access
         this.authorizationService.checkAuthorizedToOperateOnContent(
@@ -78,17 +81,32 @@ public class BankAccountDaoJpa {
         DaoHelper.updateIfPresent(updateBankAccountParams.hasAccountType(), updateBankAccountParams.getAccountType(),
                 bankAccount::setAccountType);
 
+        // TODO: return this.bankAccountRepository.save(bankAccount).toPresentationModel(this);
         return this.bankAccountRepository.save(bankAccount).toPresentationModel();
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void deleteBankAccount(String requester, Long bankAccountId) {
-        BankAccount bankAccount = this.bankAccountRepository.findById(bankAccountId)
-                .orElseThrow(() -> new ResourceNotFoundException("Bank account " + bankAccountId + " not found"));
-
+        BankAccount bankAccount = getBankAccount(requester, bankAccountId);
         this.authorizationService.checkAuthorizedToOperateOnContent(bankAccount.getOwner(), requester, ContentType.BANK_ACCOUNT,
                 Operation.DELETE, bankAccountId);
 
         this.bankAccountRepository.delete(bankAccount);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Transaction> getTransactions(
+            Long bankAccountId, ZonedDateTime startTime, ZonedDateTime endTime, String requester) {
+        BankAccount bankAccount = getBankAccount(requester, bankAccountId);
+        return null;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public double getBankAccountBalance(Long bankAccountId) {
+        BankAccount bankAccount = this.bankAccountRepository.findById(bankAccountId)
+                .orElseThrow(() -> new ResourceNotFoundException("Bank Account " + bankAccountId + " not found"));
+        // add recurring amount
+        return bankAccount.getNetBalance() +
+                this.transactionRepository.getTransactionsAmountSumByBankAccount(bankAccountId);
     }
 }

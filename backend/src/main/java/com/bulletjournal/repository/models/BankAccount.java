@@ -1,6 +1,7 @@
 package com.bulletjournal.repository.models;
 
 import com.bulletjournal.ledger.BankAccountType;
+import com.bulletjournal.repository.BankAccountDaoJpa;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -83,6 +84,18 @@ public class BankAccount extends OwnedModel {
                 this.getDescription(),
                 this.getAccountType(),
                 this.getNetBalance()
+        );
+    }
+
+    public com.bulletjournal.controller.models.BankAccount toPresentationModel(BankAccountDaoJpa bankAccountDaoJpa) {
+        return new com.bulletjournal.controller.models.BankAccount(
+                this.getId(),
+                this.getName(),
+                new com.bulletjournal.controller.models.User(this.getOwner()),
+                this.getAccountNumber(),
+                this.getDescription(),
+                this.getAccountType(),
+                bankAccountDaoJpa.getBankAccountBalance(this.getId())
         );
     }
 }

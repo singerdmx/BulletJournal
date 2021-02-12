@@ -57,4 +57,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     @Query(value = "SELECT transaction FROM Transaction transaction WHERE " +
             "transaction.project IN (:projects) AND transaction.recurrenceRule IS NOT NULL")
     List<Transaction> findRecurringTransactions(@Param("projects") List<Project> projects);
+
+    @Query(value = "SELECT SUM(amount) FROM transactions " +
+            "WHERE transactions.bank_account = :bank_account AND transaction.recurrenceRule IS NOT NULL", nativeQuery = true)
+    double getTransactionsAmountSumByBankAccount(@Param("bank_account") Long bankAccount);
 }
