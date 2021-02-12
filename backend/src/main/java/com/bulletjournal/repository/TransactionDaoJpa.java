@@ -54,6 +54,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     private SearchIndexDaoJpa searchIndexDaoJpa;
     @Autowired
     private BankAccountDaoJpa bankAccountDaoJpa;
+    @Autowired
+    private BankAccountTransactionRepository bankAccountTransactionRepository;
 
     @Override
     public JpaRepository getJpaRepository() {
@@ -480,5 +482,25 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         BankAccount bankAccount = this.bankAccountDaoJpa.getBankAccount(requester, bankAccountId);
         transaction.setBankAccount(bankAccount);
         return this.transactionRepository.save(transaction);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<com.bulletjournal.controller.models.Transaction> getBankAccountTransactions(
+            Long bankAccountId, ZonedDateTime startTime, ZonedDateTime endTime, String requester) {
+        BankAccount bankAccount = this.bankAccountDaoJpa.getBankAccount(requester, bankAccountId);
+        // TODO: use startTime and endTime
+        List<com.bulletjournal.repository.models.Transaction> transactions = this.transactionRepository
+                .findByBankAccountAndRecurrenceRuleNotNull(bankAccount);
+        List<com.bulletjournal.repository.models.Transaction> bankAccountTransactions = this.bankAccountTransactionRepository
+                .findByBankAccount(bankAccount).stream()
+                .map(BankAccountTransaction::toTransaction).collect(Collectors.toList());
+
+        transactions.addAll(bankAccountTransactions);
+
+        // TODO: add recurring
+        return transactions.stream().map(t -> {
+            List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
+            return t.toPresentationModel(labels);
+        }).collect(Collectors.toList());
     }
 }

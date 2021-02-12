@@ -5,6 +5,7 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.BankAccountDaoJpa;
+import com.bulletjournal.repository.TransactionDaoJpa;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -30,6 +31,9 @@ public class BankAccountController {
 
     @Autowired
     private BankAccountDaoJpa bankAccountDaoJpa;
+
+    @Autowired
+    private TransactionDaoJpa transactionDaoJpa;
 
     @Autowired
     private UserClient userClient;
@@ -91,7 +95,7 @@ public class BankAccountController {
         ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(startDate, null, timezone);
         ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
         return ProjectItem.addAvatar(
-                this.bankAccountDaoJpa.getTransactions(bankAccountId, startTime, endTime, username),
+                this.transactionDaoJpa.getBankAccountTransactions(bankAccountId, startTime, endTime, username),
                 this.userClient);
     }
 }

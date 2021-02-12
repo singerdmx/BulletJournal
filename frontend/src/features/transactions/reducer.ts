@@ -165,6 +165,10 @@ export type RecurringTransactionsAction = {
   transactions: Transaction[];
 };
 
+export type BankAccountTransactionsAction = {
+  transactions: Transaction[];
+};
+
 export type UpdateTransactionColorSettingShownAction = {
   TransactionColorSettingShown: boolean;
 };
@@ -200,6 +204,7 @@ let initialState = {
   timezone: '',
   recurringTransactions: [] as Array<Transaction>,
   transactionsByPayer: [] as Array<Transaction>,
+  bankAccountTransactions: [] as Array<Transaction>,
   transactionColorSettingShown: false,
 };
 
@@ -220,6 +225,13 @@ const slice = createSlice({
     ) => {
       const { transactions } = action.payload;
       state.recurringTransactions = transactions;
+    },
+    bankAccountTransactionsReceived: (
+        state,
+        action: PayloadAction<BankAccountTransactionsAction>
+    ) => {
+      const { transactions } = action.payload;
+      state.bankAccountTransactions = transactions;
     },
     getTransactionsByPayer: (
       state,

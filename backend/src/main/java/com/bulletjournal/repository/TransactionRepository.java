@@ -1,5 +1,6 @@
 package com.bulletjournal.repository;
 
+import com.bulletjournal.repository.models.BankAccount;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -61,4 +62,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     @Query(value = "SELECT COALESCE(SUM(amount), 0) FROM transactions " +
             "WHERE transactions.bank_account = :bank_account AND transactions.recurrence_rule IS NOT NULL", nativeQuery = true)
     double getTransactionsAmountSumByBankAccount(@Param("bank_account") Long bankAccount);
+
+    List<Transaction> findByBankAccountAndRecurrenceRuleNotNull(BankAccount bankAccount);
 }

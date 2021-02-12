@@ -4,19 +4,16 @@ import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.CreateBankAccountParams;
-import com.bulletjournal.controller.models.Transaction;
 import com.bulletjournal.controller.models.UpdateBankAccountParams;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.models.BankAccount;
 import com.bulletjournal.repository.models.BankAccountTransaction;
 import com.bulletjournal.repository.utils.DaoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,9 +26,6 @@ public class BankAccountDaoJpa {
     private TransactionRepository transactionRepository;
     @Autowired
     private AuthorizationService authorizationService;
-    @Lazy
-    @Autowired
-    private TransactionDaoJpa transactionDaoJpa;
     @Autowired
     private BankAccountTransactionRepository bankAccountTransactionRepository;
 
@@ -99,16 +93,6 @@ public class BankAccountDaoJpa {
                 Operation.DELETE, bankAccountId);
 
         this.bankAccountRepository.delete(bankAccount);
-    }
-
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Transaction> getTransactions(
-            Long bankAccountId, ZonedDateTime startTime, ZonedDateTime endTime, String requester) {
-        BankAccount bankAccount = getBankAccount(requester, bankAccountId);
-        List<com.bulletjournal.repository.models.Transaction> bankAccountTransactions = this.bankAccountTransactionRepository
-                .findByBankAccount(bankAccount).stream()
-                .map(BankAccountTransaction::toTransaction).collect(Collectors.toList());
-        return null;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
