@@ -4,7 +4,7 @@ import {
     CheckOutlined,
     CloseOutlined,
     CreditCardOutlined,
-    DeleteOutlined,
+    DeleteOutlined, DollarCircleFilled,
     DollarCircleOutlined,
     EditOutlined,
     FileSearchOutlined,
@@ -19,6 +19,8 @@ import {updateTransactionBankAccount} from "../../features/transactions/actions"
 import {useHistory} from "react-router-dom";
 
 const {Meta} = Card;
+
+const LocaleCurrency = require('locale-currency');
 
 export const getBankAccountTypeIcon = (type: BankAccountType) => {
     switch (type) {
@@ -49,6 +51,7 @@ const getBankAccountTypeImage = (type: BankAccountType) => {
 type BankAccountProps = {
     bankAccount: BankAccount;
     mode: string;
+    currency: string;
     transaction: Transaction | undefined;
     updateTransactionBankAccount: (
         transactionId: number,
@@ -61,6 +64,7 @@ const BankAccountElem: React.FC<BankAccountProps> = (
         bankAccount,
         mode,
         transaction,
+        currency,
         updateTransactionBankAccount
     }) => {
     const history = useHistory();
@@ -98,7 +102,8 @@ const BankAccountElem: React.FC<BankAccountProps> = (
                 title={<span style={{color: color}}>{bankAccount.name}</span>}
                 actions={[
                     <Tooltip title='View Transactions'>
-                        <FileSearchOutlined key="View Transactions" title='View Transactions'/>
+                        <FileSearchOutlined key="View Transactions" title='View Transactions'
+                                            onClick={() => history.push(`/bank/${bankAccount.id}`)}/>
                     </Tooltip>,
                     <Tooltip title='Edit'>
                         <EditOutlined key='Edit' title='Edit'/>
@@ -111,8 +116,7 @@ const BankAccountElem: React.FC<BankAccountProps> = (
                 <Meta
                     style={{height: 65}}
                     title={<Statistic
-                        value={bankAccount.netBalance}
-                        precision={2}
+                        value={`${bankAccount.netBalance} ${LocaleCurrency.getCurrency(currency)}`}
                         valueStyle={{color: balanceColor}}
                     />}
                     description={description}
@@ -143,13 +147,23 @@ const BankAccountElem: React.FC<BankAccountProps> = (
         </div>
     }
 
-    return <div className='bank-account-banner' style={{color: color}} onClick={() => history.push('/bank')}>
+    if (mode === 'banner') {
+        return <div className='bank-account-banner' style={{color: color}}
+                    onClick={() => history.push(`/bank/${bankAccount.id}`)}>
+            {bankTitle}
+        </div>
+    }
+
+    return <div className='bank-account-title' style={{color: color}}>
         {bankTitle}
+        {'   '}
+        <span style={{color: balanceColor}}><DollarCircleFilled /> {bankAccount.netBalance} {LocaleCurrency.getCurrency(currency)}</span>
     </div>
 }
 
 const mapStateToProps = (state: IState) => ({
-    transaction: state.transaction.transaction
+    transaction: state.transaction.transaction,
+    currency: state.myself.currency
 });
 
 export default connect(mapStateToProps, {updateTransactionBankAccount})(

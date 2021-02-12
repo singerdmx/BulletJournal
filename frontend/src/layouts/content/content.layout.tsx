@@ -29,6 +29,7 @@ import AdminMetadataPage from "../../pages/admin/admin-metadata.pages";
 import AdminSampleTaskPage from "../../pages/admin/sample-task.pages";
 import SampleTaskPage from "../../pages/task/sample-task.pages";
 import {PaymentPage} from "../../pages/payment/payment.pages";
+import BankAccountPage from "../../pages/bank-account/bank-account.pages";
 
 const { Content } = Layout;
 class ContentLayout extends React.Component {
@@ -41,6 +42,7 @@ class ContentLayout extends React.Component {
           <Route exact path='/points' component={PointsPage} />
           <Route exact path='/settings' component={SettingPage} />
           <Route exact path='/bank' component={SettingPage} />
+          <Route exact path='/bank/:bankAccountId' component={BankAccountPage} />
           <Route exact path='/googleCalendar' component={SettingPage} />
           <Route exact path='/projects' component={ProjectsPage} />
           <Route exact path='/projects/:projectId' component={ProjectPage} />
