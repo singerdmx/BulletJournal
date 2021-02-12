@@ -8,6 +8,7 @@ import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.models.BankAccount;
 import com.bulletjournal.repository.utils.DaoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,12 +26,14 @@ public class BankAccountDaoJpa {
     private TransactionRepository transactionRepository;
     @Autowired
     private AuthorizationService authorizationService;
+    @Lazy
+    @Autowired
+    private TransactionDaoJpa transactionDaoJpa;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.BankAccount> getBankAccounts(String requester) {
         List<BankAccount> bankAccounts = this.bankAccountRepository.findAllByOwner(requester);
-        // TODO: return bankAccounts.stream().map(b -> b.toPresentationModel(this)).collect(Collectors.toList());
-        return bankAccounts.stream().map(BankAccount::toPresentationModel).collect(Collectors.toList());
+        return bankAccounts.stream().map(b -> b.toPresentationModel(this)).collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -81,8 +84,7 @@ public class BankAccountDaoJpa {
         DaoHelper.updateIfPresent(updateBankAccountParams.hasAccountType(), updateBankAccountParams.getAccountType(),
                 bankAccount::setAccountType);
 
-        // TODO: return this.bankAccountRepository.save(bankAccount).toPresentationModel(this);
-        return this.bankAccountRepository.save(bankAccount).toPresentationModel();
+        return this.bankAccountRepository.save(bankAccount).toPresentationModel(this);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

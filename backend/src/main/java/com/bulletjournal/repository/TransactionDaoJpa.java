@@ -107,8 +107,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         Transaction transaction = this.getProjectItem(id, requester);
         com.bulletjournal.controller.models.Transaction result = addLabels(transaction);
         if (Objects.equals(requester, transaction.getPayer()) && transaction.getBankAccount() != null) {
-            // TODO: result.setBankAccount(transaction.getBankAccount().toPresentationModel(bankAccountDaoJpa));
-            result.setBankAccount(transaction.getBankAccount().toPresentationModel());
+            result.setBankAccount(transaction.getBankAccount().toPresentationModel(bankAccountDaoJpa));
         }
         return result;
     }
