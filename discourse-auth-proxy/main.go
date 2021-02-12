@@ -98,6 +98,11 @@ func main() {
 				proxy.ServeHTTP(w, r)
 				return
 			}
+			if r.Host == "www.bulletjournal.us" {
+				logger.Printf("Redirecting www.bulletjournal.us: %s", r.RequestURI)
+				http.Redirect(w, r, "https://bulletjournal.us"+r.RequestURI, http.StatusMovedPermanently)
+				return
+			}
 			http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
 		}),
 	}
@@ -106,6 +111,7 @@ func main() {
 
 func authProxyHandler(handler http.Handler, config *Config) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		logger.Printf("Port 443: Request %s %s", r.Host, r.URL)
 		if !strings.HasPrefix(r.URL.Path, systemUpdateRoute) {
 			logger.Printf("Request %s %s", r.Host, r.URL)
 		}
@@ -113,6 +119,11 @@ func authProxyHandler(handler http.Handler, config *Config) http.Handler {
 		if r.Host == "home.bulletjournal.us" {
 			logger.Printf("Port 443: Redirect to 80: %s", r.RequestURI)
 			http.Redirect(w, r, "http://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
+			return
+		}
+		if r.Host == "www.bulletjournal.us" {
+			logger.Printf("Redirecting www.bulletjournal.us: %s", r.RequestURI)
+			http.Redirect(w, r, "https://bulletjournal.us"+r.RequestURI, http.StatusMovedPermanently)
 			return
 		}
 		if checkWhitelist(handler, r, w) {
