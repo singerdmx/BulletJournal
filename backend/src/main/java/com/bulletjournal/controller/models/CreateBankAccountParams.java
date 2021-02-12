@@ -19,22 +19,17 @@ public class CreateBankAccountParams {
     @NotNull
     private BankAccountType accountType;
 
-    @NotNull
-    private Double netBalance;
-
     public CreateBankAccountParams() {
 
     }
 
     public CreateBankAccountParams(@NotBlank @Size(min = 1, max = 100) String name,
                                    @Size(max = 50) String accountNumber,
-                                   String description, @NotNull BankAccountType accountType,
-                                   @NotNull Double netBalance) {
+                                   String description, @NotNull BankAccountType accountType) {
         this.name = name;
         this.accountNumber = accountNumber;
         this.description = description;
         this.accountType = accountType;
-        this.netBalance = netBalance;
     }
 
     public String getName() {
@@ -69,11 +64,4 @@ public class CreateBankAccountParams {
         this.accountType = accountType;
     }
 
-    public Double getNetBalance() {
-        return netBalance;
-    }
-
-    public void setNetBalance(Double netBalance) {
-        this.netBalance = netBalance;
-    }
 }

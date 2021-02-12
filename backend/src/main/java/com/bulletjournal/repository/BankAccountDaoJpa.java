@@ -5,10 +5,8 @@ import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
-import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.models.BankAccount;
 import com.bulletjournal.repository.utils.DaoHelper;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -38,39 +36,21 @@ public class BankAccountDaoJpa {
         }
         BankAccount bankAccount = this.bankAccountRepository.findById(bankAccountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Bank Account " + bankAccountId + " not found"));
-        if (!bankAccount.getOwner().equals(requester)) {
-            throw new UnAuthorizedException("Only owner " + bankAccount.getOwner() + " can get bank account " + bankAccountId);
-        }
+        // check access
+        this.authorizationService.checkAuthorizedToOperateOnContent(
+                bankAccount.getOwner(), requester, ContentType.BANK_ACCOUNT,
+                Operation.READ, bankAccountId);
 
         return bankAccount;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public com.bulletjournal.controller.models.BankAccount create(CreateBankAccountParams createBankAccountParams, String owner) {
-//        String name = createBankAccountParams.getName();
-//        if (!this.bankAccountRepository.findByNameAndOwner(name, owner).isEmpty()) {
-//            throw new ResourceAlreadyExistException("Bank account with name \"" + name + "\" already exists");
-//        }
-
-//        String accountNumber = createBankAccountParams.getAccountNumber();
-//        if (this.bankAccountRepository.findByAccountNumber(accountNumber) != null) {
-//            throw new ResourceAlreadyExistException("Bank account with number \"" + accountNumber + "\" already exists");
-//        }
-
         BankAccount bankAccount = new BankAccount();
         bankAccount.setOwner(owner);
-
-        // name
         bankAccount.setName(createBankAccountParams.getName());
-
-        // type, balance
         bankAccount.setAccountType(createBankAccountParams.getAccountType());
-        bankAccount.setNetBalance(createBankAccountParams.getNetBalance());
-
-        // number, description
-        if (StringUtils.isNotBlank(createBankAccountParams.getDescription())) {
-            bankAccount.setDescription(createBankAccountParams.getDescription());
-        }
+        bankAccount.setDescription(createBankAccountParams.getDescription());
         bankAccount.setAccountNumber(createBankAccountParams.getAccountNumber());
         bankAccount = this.bankAccountRepository.save(bankAccount);
         return bankAccount.toPresentationModel();
@@ -83,7 +63,8 @@ public class BankAccountDaoJpa {
                 .orElseThrow(() -> new ResourceNotFoundException("Bank account " + bankAccountId + " not found"));
 
         // check access
-        this.authorizationService.checkAuthorizedToOperateOnContent(bankAccount.getOwner(), requester, ContentType.BANK_ACCOUNT,
+        this.authorizationService.checkAuthorizedToOperateOnContent(
+                bankAccount.getOwner(), requester, ContentType.BANK_ACCOUNT,
                 Operation.UPDATE, bankAccountId);
 
         DaoHelper.updateIfPresent(updateBankAccountParams.hasName(), updateBankAccountParams.getName(),
@@ -96,10 +77,6 @@ public class BankAccountDaoJpa {
                 bankAccount::setAccountNumber);
         DaoHelper.updateIfPresent(updateBankAccountParams.hasAccountType(), updateBankAccountParams.getAccountType(),
                 bankAccount::setAccountType);
-
-        // net balance ?
-        DaoHelper.updateIfPresent(updateBankAccountParams.hasNetBalance(), updateBankAccountParams.getNetBalance(),
-                bankAccount::setNetBalance);
 
         return this.bankAccountRepository.save(bankAccount).toPresentationModel();
     }

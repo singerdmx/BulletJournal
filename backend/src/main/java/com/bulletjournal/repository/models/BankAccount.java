@@ -26,6 +26,9 @@ public class BankAccount extends OwnedModel {
     @Enumerated(EnumType.STRING)
     private BankAccountType accountType;
 
+    /**
+     * netBalance stores balance accumulated in bank_account_transactions table
+     */
     @NotNull
     @Column(name = "net_balance", nullable = false)
     private Double netBalance;

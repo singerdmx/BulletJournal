@@ -12,20 +12,16 @@ public class UpdateBankAccountParams {
 
     private BankAccountType accountType;
 
-    private Double netBalance;
-
     public UpdateBankAccountParams() {
 
     }
 
     public UpdateBankAccountParams(String name, String accountNumber,
-                                   String description, BankAccountType accountType,
-                                   Double netBalance) {
+                                   String description, BankAccountType accountType) {
         this.name = name;
         this.accountNumber = accountNumber;
         this.description = description;
         this.accountType = accountType;
-        this.netBalance = netBalance;
     }
 
     public boolean hasName() {
@@ -76,15 +72,4 @@ public class UpdateBankAccountParams {
         this.accountType = accountType;
     }
 
-    public boolean hasNetBalance() {
-        return this.netBalance != null;
-    }
-
-    public Double getNetBalance() {
-        return netBalance;
-    }
-
-    public void setNetBalance(Double netBalance) {
-        this.netBalance = netBalance;
-    }
 }

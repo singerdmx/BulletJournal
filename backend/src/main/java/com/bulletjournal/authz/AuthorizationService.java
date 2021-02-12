@@ -76,6 +76,24 @@ public class AuthorizationService {
             case LABEL:
                 checkAuthorizedToOperateOnLabel(owner, requester, operation, contentId);
                 break;
+            case BANK_ACCOUNT:
+                checkAuthorizedToOperateOnBankAccount(owner, requester, operation, contentId);
+                break;
+            default:
+        }
+    }
+
+    private void checkAuthorizedToOperateOnBankAccount(
+            String owner, String requester, Operation operation, Long contentId) {
+        switch (operation) {
+            case READ:
+            case DELETE:
+            case UPDATE:
+                if (!Objects.equals(owner, requester)) {
+                    throw new UnAuthorizedException("Bank account " + contentId + " is owner by " +
+                            owner + " while request is from " + requester);
+                }
+                break;
             default:
         }
     }
