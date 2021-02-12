@@ -1,21 +1,21 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.ledger.TransactionType;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.Random;
 
 @Entity
 @Table(name = "bank_account_transactions")
-public class BankAccountTransaction extends AuditModel {
+public class BankAccountTransaction extends NamedModel {
+    private static final Random RAND = new Random();
     @Id
     @GeneratedValue(generator = "bank_account_transaction_generator")
     @SequenceGenerator(name = "bank_account_transaction_generator", sequenceName = "public.bank_account_transactions_sequence", allocationSize = 2, initialValue = 100)
     private Long id;
-
-    @Column(name = "description", length = 600)
-    private String description;
 
     @NotNull
     @Column(nullable = false, updatable = false)
@@ -34,14 +34,6 @@ public class BankAccountTransaction extends AuditModel {
         this.id = id;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public BankAccount getBankAccount() {
         return bankAccount;
     }
@@ -56,5 +48,24 @@ public class BankAccountTransaction extends AuditModel {
 
     public void setAmount(Double amount) {
         this.amount = amount;
+    }
+
+    public Transaction toTransaction() {
+        Transaction t = new Transaction();
+        double amount = getAmount();
+        TransactionType transactionType = TransactionType.INCOME;
+        if (amount < 0) {
+            amount = -amount;
+            transactionType = TransactionType.EXPENSE;
+        }
+        t.setBankAccount(getBankAccount());
+        t.setAmount(amount);
+        t.setPayer(getBankAccount().getOwner());
+        t.setTransactionType(transactionType);
+        t.setStartTime(getCreatedAt());
+        t.setEndTime(getCreatedAt());
+        t.setName(getName());
+        t.setId(RAND.nextLong());
+        return t;
     }
 }

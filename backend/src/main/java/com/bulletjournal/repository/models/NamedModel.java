@@ -1,5 +1,7 @@
 package com.bulletjournal.repository.models;
 
+import org.apache.commons.lang3.StringUtils;
+
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotBlank;
@@ -19,6 +21,9 @@ public abstract class NamedModel extends AuditModel {
     }
 
     public void setName(String name) {
+        if (StringUtils.isBlank(name)) {
+            name = "Transaction by System";
+        }
         this.name = name;
     }
 

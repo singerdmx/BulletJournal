@@ -105,8 +105,9 @@ public class BankAccountDaoJpa {
     public List<Transaction> getTransactions(
             Long bankAccountId, ZonedDateTime startTime, ZonedDateTime endTime, String requester) {
         BankAccount bankAccount = getBankAccount(requester, bankAccountId);
-        List<BankAccountTransaction> bankAccountTransactions = this.bankAccountTransactionRepository
-                .findByBankAccount(bankAccount);
+        List<com.bulletjournal.repository.models.Transaction> bankAccountTransactions = this.bankAccountTransactionRepository
+                .findByBankAccount(bankAccount).stream()
+                .map(BankAccountTransaction::toTransaction).collect(Collectors.toList());
         return null;
     }
 
@@ -120,13 +121,13 @@ public class BankAccountDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void setBalance(String requester, Long bankAccountId, double balance, String description) {
+    public void setBalance(String requester, Long bankAccountId, double balance, String name) {
         BankAccount bankAccount = getBankAccount(requester, bankAccountId);
         double oldBalance = getBankAccountBalance(bankAccountId);
         double change = balance - oldBalance;
         BankAccountTransaction bankAccountTransaction = new BankAccountTransaction();
         bankAccountTransaction.setBankAccount(bankAccount);
-        bankAccountTransaction.setDescription(description);
+        bankAccountTransaction.setName(name);
         bankAccountTransaction.setAmount(change);
         bankAccount.setNetBalance(bankAccount.getNetBalance() + change);
         this.bankAccountTransactionRepository.save(bankAccountTransaction);
