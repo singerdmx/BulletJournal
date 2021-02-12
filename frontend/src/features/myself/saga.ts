@@ -331,8 +331,15 @@ function* getBankAccounts(action: PayloadAction<GetBankAccountsAction>) {
 function* addBankAccount(action: PayloadAction<AddBankAccountAction>) {
     try {
         const {name, accountType, accountNumber, description, onSuccess} = action.payload;
-        const data : BankAccount = yield call(createBankAccount, name, accountType, accountNumber, description);
-        onSuccess(data.id);
+        const bankAccount : BankAccount = yield call(createBankAccount, name, accountType, accountNumber, description);
+        const data = yield call(fetchBankAccounts);
+        const bankAccounts : BankAccount[] = yield data.json();
+        yield put(
+            myselfActions.myselfDataReceived({
+                bankAccounts: bankAccounts
+            })
+        );
+        onSuccess(bankAccount.id);
     } catch (error) {
         if (error.message === 'reload') {
             yield put(reloadReceived(true));

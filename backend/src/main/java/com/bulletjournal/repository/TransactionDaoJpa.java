@@ -15,6 +15,7 @@ import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.ledger.TransactionType;
 import com.bulletjournal.notifications.Event;
+import com.bulletjournal.redis.BankAccountBalanceRepository;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.google.common.collect.ImmutableList;
@@ -56,6 +57,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     private BankAccountDaoJpa bankAccountDaoJpa;
     @Autowired
     private BankAccountTransactionRepository bankAccountTransactionRepository;
+    @Autowired
+    private BankAccountBalanceRepository bankAccountBalanceRepository;
 
     @Override
     public JpaRepository getJpaRepository() {
@@ -247,6 +250,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         this.authorizationService.checkAuthorizedToOperateOnContent(transaction.getOwner(), requester,
                 ContentType.TRANSACTION, Operation.UPDATE, transactionId, transaction.getProject().getOwner());
 
+        double oldAmount = getTransactionNetAmount(transaction);
+
         DaoHelper.updateIfPresent(updateTransactionParams.hasName(), updateTransactionParams.getName(),
                 transaction::setName);
 
@@ -298,7 +303,12 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
             transaction.setLabels(updateTransactionParams.getLabels());
         }
 
-        this.transactionRepository.save(transaction);
+        transaction = this.transactionRepository.save(transaction);
+
+        double newAmount = getTransactionNetAmount(transaction);
+        if (transaction.hasBankAccount() && Math.abs(newAmount - oldAmount) > 0.00001) {
+            this.bankAccountBalanceRepository.deleteById(transaction.getBankAccount().getId());
+        }
         return Pair.of(events, transaction);
     }
 
@@ -479,9 +489,18 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
             throw new UnAuthorizedException("Only payer " + transaction.getOwner() + " can set bank account");
         }
 
+        if (transaction.hasBankAccount()) {
+            if (Objects.equals(transaction.getBankAccount().getId(), bankAccountId)) {
+                return transaction;
+            }
+            this.bankAccountBalanceRepository.deleteById(transaction.getBankAccount().getId());
+        }
+
         BankAccount bankAccount = this.bankAccountDaoJpa.getBankAccount(requester, bankAccountId);
         transaction.setBankAccount(bankAccount);
-        return this.transactionRepository.save(transaction);
+        transaction = this.transactionRepository.save(transaction);
+        this.bankAccountBalanceRepository.deleteById(bankAccountId);
+        return transaction;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

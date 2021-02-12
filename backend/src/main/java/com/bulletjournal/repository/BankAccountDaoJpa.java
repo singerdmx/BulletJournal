@@ -6,6 +6,8 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.CreateBankAccountParams;
 import com.bulletjournal.controller.models.UpdateBankAccountParams;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.redis.BankAccountBalanceRepository;
+import com.bulletjournal.redis.models.BankAccountBalance;
 import com.bulletjournal.repository.models.AuditModel;
 import com.bulletjournal.repository.models.BankAccount;
 import com.bulletjournal.repository.models.BankAccountTransaction;
@@ -30,6 +32,8 @@ public class BankAccountDaoJpa {
     private AuthorizationService authorizationService;
     @Autowired
     private BankAccountTransactionRepository bankAccountTransactionRepository;
+    @Autowired
+    private BankAccountBalanceRepository bankAccountBalanceRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.BankAccount> getBankAccounts(String requester) {
@@ -64,6 +68,7 @@ public class BankAccountDaoJpa {
         bankAccount.setDescription(createBankAccountParams.getDescription());
         bankAccount.setAccountNumber(createBankAccountParams.getAccountNumber());
         bankAccount = this.bankAccountRepository.save(bankAccount);
+        this.bankAccountBalanceRepository.save(new BankAccountBalance(bankAccount.getId(), 0));
         return bankAccount.toPresentationModel();
     }
 
@@ -102,11 +107,16 @@ public class BankAccountDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public double getBankAccountBalance(Long bankAccountId) {
+        if (this.bankAccountBalanceRepository.existsById(bankAccountId)) {
+            return this.bankAccountBalanceRepository.findById(bankAccountId).get().getBalance();
+        }
         BankAccount bankAccount = this.bankAccountRepository.findById(bankAccountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Bank Account " + bankAccountId + " not found"));
         // add recurring amount
-        return bankAccount.getNetBalance() +
+        double sum = bankAccount.getNetBalance() +
                 this.transactionRepository.getTransactionsAmountSumByBankAccount(bankAccountId);
+        this.bankAccountBalanceRepository.save(new BankAccountBalance(bankAccountId, sum));
+        return sum;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -123,5 +133,7 @@ public class BankAccountDaoJpa {
         bankAccountTransaction.setAmount(change);
         bankAccount.setNetBalance(bankAccount.getNetBalance() + change);
         this.bankAccountTransactionRepository.save(bankAccountTransaction);
+
+        this.bankAccountBalanceRepository.save(new BankAccountBalance(bankAccountId, balance));
     }
 }

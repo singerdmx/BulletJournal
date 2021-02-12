@@ -186,6 +186,10 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
         this.bankAccount = bankAccount;
     }
 
+    public boolean hasBankAccount() {
+        return this.bankAccount != null;
+    }
+
     @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
