@@ -1,7 +1,7 @@
 import {all, call, put, select, takeLatest} from 'redux-saga/effects';
 import {message} from 'antd';
 import {
-  actions as transactionsActions,
+  actions as transactionsActions, ChangeBankAccountBalanceAction,
   CreateContent,
   CreateTransaction,
   DeleteContent,
@@ -54,7 +54,7 @@ import {ContentType} from "../myBuJo/constants";
 import {recentItemsReceived} from "../recent/actions";
 import {setDisplayMore, updateTargetContent} from "../content/actions";
 import {reloadReceived} from "../myself/actions";
-import {fetchBankAccounts} from "../../apis/bankAccountApis";
+import {fetchBankAccounts, setAccountBalance} from "../../apis/bankAccountApis";
 import {actions as myselfActions} from "../myself/reducer";
 
 
@@ -767,6 +767,29 @@ function* shareTransactionByEmails(action: PayloadAction<ShareTransactionByEmail
   }
 }
 
+function* changeAccountBalance(action: PayloadAction<ChangeBankAccountBalanceAction>) {
+  try {
+    const {
+      bankAccount,
+      balance,
+      description
+    } = action.payload;
+    yield call(
+        setAccountBalance,
+        bankAccount.id,
+        balance,
+        description
+    );
+    yield call(message.success, `Account '${bankAccount.name}' balance is changed to ${balance}`);
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `changeAccountBalance Error Received: ${error}`);
+    }
+  }
+}
+
 export default function* transactionSagas() {
   yield all([
     yield takeLatest(
@@ -841,5 +864,8 @@ export default function* transactionSagas() {
     yield takeLatest(
       transactionsActions.RecurringTransactionsUpdate.type,
       recurringTransactionsUpdate),
+    yield takeLatest(
+        transactionsActions.ChangeBankAccountBalance.type,
+        changeAccountBalance),
   ]);
 }

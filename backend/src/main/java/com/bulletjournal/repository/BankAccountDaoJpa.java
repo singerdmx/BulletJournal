@@ -109,6 +109,9 @@ public class BankAccountDaoJpa {
         BankAccount bankAccount = getBankAccount(requester, bankAccountId);
         double oldBalance = getBankAccountBalance(bankAccountId);
         double change = balance - oldBalance;
+        if (Math.abs(change) < 0.000001) {
+            return;
+        }
         BankAccountTransaction bankAccountTransaction = new BankAccountTransaction();
         bankAccountTransaction.setBankAccount(bankAccount);
         bankAccountTransaction.setName(name);

@@ -1,6 +1,6 @@
 import { actions } from './reducer';
 import { History } from 'history';
-import {FrequencyType, LedgerSummaryType, Transaction} from './interface';
+import {BankAccount, FrequencyType, LedgerSummaryType, Transaction} from './interface';
 import {ProjectItemUIType} from "../project/constants";
 import { Content } from '../myBuJo/interface';
 
@@ -238,3 +238,6 @@ export const shareTransactionByEmail = (
     targetUser: targetUser,
     targetGroup: targetGroup,
   });
+
+export const changeAccountBalance = (bankAccount: BankAccount, balance: number, description: string) =>
+    actions.ChangeBankAccountBalance({bankAccount: bankAccount, balance: balance, description: description});

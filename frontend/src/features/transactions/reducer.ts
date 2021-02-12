@@ -3,7 +3,7 @@ import {
   Transaction,
   LedgerSummary,
   FrequencyType,
-  LedgerSummaryType,
+  LedgerSummaryType, BankAccount,
 } from './interface';
 import { History } from 'history';
 import { Content } from '../myBuJo/interface';
@@ -191,6 +191,12 @@ export type ShareTransactionByEmailAction = {
   targetGroup?: number,
 };
 
+export type ChangeBankAccountBalanceAction = {
+  bankAccount: BankAccount,
+  balance: number,
+  description: string
+};
+
 let initialState = {
   contents: [] as Array<Content>,
   transaction: undefined as Transaction | undefined,
@@ -338,6 +344,7 @@ const slice = createSlice({
         action: PayloadAction<UpdateTransactionBankAccountAction>
     ) => state,
     TransactionShareByEmail: (state, action: PayloadAction<ShareTransactionByEmailAction>) => state,
+    ChangeBankAccountBalance: (state, action: PayloadAction<ChangeBankAccountBalanceAction>) => state,
   },
 });
 
