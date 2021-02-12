@@ -71,8 +71,13 @@ public class BankAccountController {
     }
 
     @PostMapping(BANK_ACCOUNT_SET_BALANCE_ROUTE)
-    public void setBalance(@NotNull @PathVariable Long bankAccountId, @NotNull @Valid @RequestBody Double balance) {
+    public void setBalance(@NotNull @PathVariable Long bankAccountId,
+                           @NotNull @Valid @RequestBody SetBankAccountBalanceParams setBankAccountBalanceParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.bankAccountDaoJpa.setBalance(
+                username, bankAccountId,
+                setBankAccountBalanceParams.getBalance(),
+                setBankAccountBalanceParams.getDescription());
     }
 
     @GetMapping(BANK_ACCOUNT_TRANSACTIONS_ROUTE)

@@ -3,9 +3,12 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
-import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.CreateBankAccountParams;
+import com.bulletjournal.controller.models.Transaction;
+import com.bulletjournal.controller.models.UpdateBankAccountParams;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.models.BankAccount;
+import com.bulletjournal.repository.models.BankAccountTransaction;
 import com.bulletjournal.repository.utils.DaoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -29,6 +32,8 @@ public class BankAccountDaoJpa {
     @Lazy
     @Autowired
     private TransactionDaoJpa transactionDaoJpa;
+    @Autowired
+    private BankAccountTransactionRepository bankAccountTransactionRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.BankAccount> getBankAccounts(String requester) {
@@ -100,6 +105,8 @@ public class BankAccountDaoJpa {
     public List<Transaction> getTransactions(
             Long bankAccountId, ZonedDateTime startTime, ZonedDateTime endTime, String requester) {
         BankAccount bankAccount = getBankAccount(requester, bankAccountId);
+        List<BankAccountTransaction> bankAccountTransactions = this.bankAccountTransactionRepository
+                .findByBankAccount(bankAccount);
         return null;
     }
 
@@ -110,5 +117,18 @@ public class BankAccountDaoJpa {
         // add recurring amount
         return bankAccount.getNetBalance() +
                 this.transactionRepository.getTransactionsAmountSumByBankAccount(bankAccountId);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void setBalance(String requester, Long bankAccountId, double balance, String description) {
+        BankAccount bankAccount = getBankAccount(requester, bankAccountId);
+        double oldBalance = getBankAccountBalance(bankAccountId);
+        double change = balance - oldBalance;
+        BankAccountTransaction bankAccountTransaction = new BankAccountTransaction();
+        bankAccountTransaction.setBankAccount(bankAccount);
+        bankAccountTransaction.setDescription(description);
+        bankAccountTransaction.setAmount(change);
+        bankAccount.setNetBalance(bankAccount.getNetBalance() + change);
+        this.bankAccountTransactionRepository.save(bankAccountTransaction);
     }
 }

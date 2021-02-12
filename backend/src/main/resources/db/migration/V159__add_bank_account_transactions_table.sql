@@ -10,6 +10,7 @@ ALTER TABLE public.bank_account_transactions_sequence OWNER TO postgres;
 CREATE TABLE public.bank_account_transactions (
     id bigint PRIMARY KEY,
     amount double precision not null,
+    description varchar(600),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     bank_account bigint not null
