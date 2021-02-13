@@ -1,11 +1,12 @@
 package com.bulletjournal.controller;
 
-import com.bulletjournal.controller.models.*;
-import com.bulletjournal.controller.utils.TestHelpers;
+import com.bulletjournal.controller.models.BankAccount;
+import com.bulletjournal.controller.models.CreateBankAccountParams;
+import com.bulletjournal.controller.models.RequestParams;
+import com.bulletjournal.controller.models.UpdateBankAccountParams;
 import com.bulletjournal.ledger.BankAccountType;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.platform.commons.util.StringUtils;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 

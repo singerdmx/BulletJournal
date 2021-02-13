@@ -4,8 +4,8 @@ import com.bulletjournal.config.RateConfig;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.filters.rate.limiting.TokenBucket;
-import com.bulletjournal.redis.models.LockedUser;
 import com.bulletjournal.redis.RedisLockedUserRepository;
+import com.bulletjournal.redis.models.LockedUser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +23,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
