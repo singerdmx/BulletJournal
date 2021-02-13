@@ -220,7 +220,8 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
                 labels,
                 this.getLocation(),
                 this.getColor(),
-                this.getRecurrenceRule());
+                this.getRecurrenceRule(),
+                this.hasBankAccount() ? this.getBankAccount().toPresentationModel() : null);
     }
 
     @Override

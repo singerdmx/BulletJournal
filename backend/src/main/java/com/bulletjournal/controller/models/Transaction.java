@@ -62,7 +62,8 @@ public class Transaction extends ProjectItem {
                        List<Label> labels,
                        String location,
                        String color,
-                       String recurrenceRule) {
+                       String recurrenceRule,
+                       BankAccount bankAccount) {
         super(id, name, owner, project, labels, location);
         this.payer = payer;
         this.amount = amount;
@@ -74,6 +75,7 @@ public class Transaction extends ProjectItem {
         this.updatedAt = updatedAt;
         this.color = color;
         this.recurrenceRule = recurrenceRule;
+        this.bankAccount = bankAccount;
         getView(this);
     }
 
