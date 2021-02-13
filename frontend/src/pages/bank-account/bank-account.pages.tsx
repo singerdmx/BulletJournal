@@ -4,11 +4,11 @@ import {IState} from "../../store";
 import {connect} from "react-redux";
 import {getBankAccounts} from "../../features/myself/actions";
 import {BankAccount, Transaction} from "../../features/transactions/interface";
-import {useParams} from "react-router-dom";
+import {useHistory, useParams} from "react-router-dom";
 import BankAccountElem from "../../components/settings/bank-account";
 import {BackTop, Button, DatePicker, Empty, InputNumber, Popover} from "antd";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
-import {CalculatorOutlined, DeleteOutlined, EditOutlined, SaveOutlined} from "@ant-design/icons";
+import {BankOutlined, CalculatorOutlined, DeleteOutlined, EditOutlined, SaveOutlined} from "@ant-design/icons";
 import TextArea from "antd/es/input/TextArea";
 import {changeAccountBalance, getBankAccountTransactions} from "../../features/transactions/actions";
 import moment, {Moment} from "moment";
@@ -31,6 +31,7 @@ const BankAccountPage: React.FC<BankAccountProps> = (
         transactions,
         getBankAccountTransactions
     }) => {
+    const history = useHistory();
     const {bankAccountId} = useParams();
     const [account, setAccount] = useState<BankAccount | undefined>(undefined);
     const [balance, setBalance] = useState(0);
@@ -143,6 +144,12 @@ const BankAccountPage: React.FC<BankAccountProps> = (
             {getList()}
         </div>
         <Container>
+            <FloatButton
+                tooltip="Bank Accounts"
+                styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
+            >
+                <BankOutlined onClick={() => history.push('/bank')}/>
+            </FloatButton>
             <FloatButton
                 tooltip="Delete Account"
                 styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
