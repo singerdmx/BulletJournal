@@ -41,6 +41,7 @@ const systemUpdateRoute = "/api/system/updates"
 const tokenForCookieUrl = "/api/tokens/"
 const guestUsername = "Guest"
 const ssoLoginUrlPrefix = "/sso_login"
+const ssoLoginSuffix = "?ssoLogin=true"
 var guestToken = ""
 
 func main() {
@@ -314,6 +315,7 @@ func getApiToken(r *http.Request) (returnCookie string) {
 }
 
 func redirectToSSO(r *http.Request, w http.ResponseWriter) {
+	// you reach here when there is no auth cookie
 	redirectURL := r.URL.String()
 	if strings.HasPrefix(redirectURL, "/api") {
 		w.Header().Set("reload", "true")
@@ -327,6 +329,10 @@ func redirectToSSO(r *http.Request, w http.ResponseWriter) {
 		redirectURL = redirectURL[:(len(redirectURL) - 18)]
 		logger.Printf("redirectURL changed to %s", redirectURL)
 	}
+	toSSOProvider(r, w, redirectURL)
+}
+
+func toSSOProvider(r *http.Request, w http.ResponseWriter, redirectURL string) {
 	logger.Printf("Redirect %s to sso_provider", redirectURL)
 	ssoURL := config.SSOURLString + "/session/sso_provider?" + ssoPayload(config.SSOSecret, config.ProxyURLString, redirectURL)
 	deleteCookie(w)
