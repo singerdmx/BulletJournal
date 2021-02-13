@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { Form, Input, Modal, Select, Tooltip, Button } from 'antd';
+import { Form, Input, Modal, Select, Tooltip, Button, InputNumber } from 'antd';
 import {
   CreditCardOutlined,
   DollarCircleOutlined,
@@ -29,7 +29,7 @@ type Props = {
 const AddBankAccountModal: React.FC<Props> = (props) => {
   const [name, setName] = useState<string>('');
   const [accountType, setAccountType] = useState<string>('');
-  const [accountNumber, setAccountNumber] = useState<string>('');
+  const [accountNumber, setAccountNumber] = useState<number | undefined>(undefined);
   const [description, setDescription] = useState<string>('');
   const [visible, setVisible] = useState(false);
 
@@ -45,11 +45,11 @@ const AddBankAccountModal: React.FC<Props> = (props) => {
   const history = useHistory();
   const addBankAccount = () => {
     let type: BankAccountType = getBankAccountType(accountType);
-    props.addBankAccount(name, type, (id)=>(history.push(`/bank/${id}`)), accountNumber, description);
+    props.addBankAccount(name, type, (id)=>(history.push(`/bank/${id}`)), accountNumber?.toString(), description);
     setVisible(false);
     setName('');
     setDescription('');
-    setAccountNumber('');
+    setAccountNumber(0);
     setAccountType(BankAccountType.CHECKING_ACCOUNT);
   }
 
@@ -61,7 +61,7 @@ const AddBankAccountModal: React.FC<Props> = (props) => {
     setAccountType(accountType);
   };
 
-  const onChangeAccountNumber = (accountNumber: string) => {
+  const onChangeAccountNumber = (accountNumber: number | undefined) => {
     setAccountNumber(accountNumber);
   };
 
@@ -129,10 +129,12 @@ const AddBankAccountModal: React.FC<Props> = (props) => {
                   name="accountNumber"
                   style={{display: 'inline-block', width: '60%'}}
               >
-                <Input
+                <InputNumber
                     placeholder="Enter Account Number (Last 4 digits)"
                     value={accountNumber}
-                    onChange={(e) => onChangeAccountNumber(e.target.value)}
+                    parser={value => value ? value.replace(/\$\s?|(,*)/g, '') : 0}
+                    onChange={(e) => onChangeAccountNumber(e)}
+                    style={{display: 'inline-block', width: '100%'}}
                 />
               </Form.Item>
               <Form.Item name="Description">
@@ -158,7 +160,6 @@ const AddBankAccountModal: React.FC<Props> = (props) => {
         </Tooltip>
         {getModal()}
     </div>
-    
   )
 
   return getDiv();
