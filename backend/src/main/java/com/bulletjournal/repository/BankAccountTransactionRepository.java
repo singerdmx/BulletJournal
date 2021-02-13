@@ -14,8 +14,8 @@ import java.util.List;
 public interface BankAccountTransactionRepository extends JpaRepository<BankAccountTransaction, Long> {
     @Query(value = "SELECT transaction FROM BankAccountTransaction transaction WHERE " +
             "transaction.bankAccount = :bankAccount" +
-            " AND transaction.updatedAt >= :startTime" +
-            " AND transaction.updatedAt <= :endTime")
+            " AND transaction.createdAt >= :startTime" +
+            " AND transaction.createdAt <= :endTime")
     List<BankAccountTransaction> findBankAccountTransactionByBankAccountBetween(
             @Param("startTime") Timestamp startTime,
             @Param("endTime") Timestamp endTime,
