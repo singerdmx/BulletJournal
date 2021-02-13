@@ -264,6 +264,11 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
       );
     }
 
+    if(type === ProjectItemUIType.MANAGE_BANK_TRANSACTIONS && transaction.bankAccount){
+        const bankAccount = transaction.bankAccount;
+        yield getBankAccountTransactions({ payload: { bankAccountId: (bankAccount || {}).id, startDate: state.transaction.startDate, endDate: state.transaction.endDate }, type: 'GetBankAccountTransactionsAction' })
+    }
+
     if (type === ProjectItemUIType.TODAY) {
       yield put(
         getProjectItemsAfterUpdateSelect(

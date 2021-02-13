@@ -6,13 +6,15 @@ import {getBankAccounts} from "../../features/myself/actions";
 import {BankAccount, Transaction} from "../../features/transactions/interface";
 import {useHistory, useParams} from "react-router-dom";
 import BankAccountElem from "../../components/settings/bank-account";
-import {BackTop, Button, DatePicker, Empty, InputNumber, Popover} from "antd";
+import {BackTop, Button, DatePicker, Empty, InputNumber, List, Popover} from "antd";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 import {BankOutlined, CalculatorOutlined, DeleteOutlined, EditOutlined, SaveOutlined} from "@ant-design/icons";
 import TextArea from "antd/es/input/TextArea";
 import {changeAccountBalance, getBankAccountTransactions} from "../../features/transactions/actions";
 import moment, {Moment} from "moment";
 import {dateFormat} from "../../features/myBuJo/constants";
+import { ProjectItemUIType } from "../../features/project/constants";
+import TransactionItem from '../../components/project-item/transaction-item.component';
 const { RangePicker } = DatePicker;
 
 type BankAccountProps = {
@@ -37,10 +39,13 @@ const BankAccountPage: React.FC<BankAccountProps> = (
     const [balance, setBalance] = useState(0);
     const [memo, setMemo] = useState('');
     const [startDate, setStartDate] = useState(moment().startOf('month'));
-    const [endDate, setEndDate] = useState(moment().endOf('month'));
+	const [endDate, setEndDate] = useState(moment().endOf('month'));
 
     useEffect(() => {
         getBankAccounts();
+        if (bankAccountId) {
+            getBankAccountTransactions(parseInt(bankAccountId), startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD'));
+        }
     }, []);
 
     useEffect(() => {
@@ -65,7 +70,18 @@ const BankAccountPage: React.FC<BankAccountProps> = (
             return <Empty/>
         }
 
-        return <div></div>
+        return (<List className='transaction-list'>
+            {transactions.map((item) => (
+                <List.Item key={`${item.id} + ' ' + ${item.date}`} className='transaction-list-item'>
+                  <TransactionItem
+                    transaction={item}
+                    type={ProjectItemUIType.MANAGE_BANK_TRANSACTIONS}
+                    inProject={item.shared}
+                    showModal={() => {}}
+                  />
+                </List.Item>
+            ))}
+        </List>);
     }
 
     const onBalanceChange = (value: number | undefined) => {

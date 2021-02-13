@@ -6,8 +6,8 @@ import {getBankAccounts} from "../../features/myself/actions";
 import {BankAccount, BankAccountType} from "../../features/transactions/interface";
 import AddBankAccountModal from "../modals/add-bank.component";
 import BankAccountElem, {getBankAccountTypeIcon} from "./bank-account";
-import {Button, Col, Row, Statistic, Switch, Tooltip} from "antd";
-import {CheckOutlined, CloseOutlined, PlusCircleFilled} from "@ant-design/icons";
+import {Col, Row, Statistic, Switch} from "antd";
+import {CheckOutlined, CloseOutlined} from "@ant-design/icons";
 
 const LocaleCurrency = require('locale-currency');
 

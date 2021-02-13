@@ -96,6 +96,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
   // listening on the empty state working as componentDidmount
   useEffect(() => {
     taskId && getTask(parseInt(taskId));
+   // eslint-disable-next-line
   }, [taskId]);
 
   useEffect(() => {

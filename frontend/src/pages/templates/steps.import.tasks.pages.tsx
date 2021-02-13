@@ -95,6 +95,7 @@ const StepsImportTasksPage: React.FC<StepsImportTasksProps> = (
         } else {
             setProjectId(-1);
         }
+    // eslint-disable-next-line
     }, [projects]);
 
     useEffect(() => {

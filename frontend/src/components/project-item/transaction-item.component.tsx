@@ -118,6 +118,17 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
   };
 
   const getPaymentDateTime = () => {
+    if (transaction.id < 0 && transaction.createdAt){
+        const createdTime = moment(transaction.createdAt).format('YYYY-MM-DD HH:mm');
+        return (<Tooltip 
+                    title={createdTime}
+                    placement='bottom'
+                >
+                    <div className="project-item-time">
+                        {createdTime}
+                    </div>
+        </Tooltip>)
+    }
     if (!transaction.date) {
         if (transaction.recurrenceRule) {
             const s = convertToTextWithRRule(transaction.recurrenceRule);
@@ -157,12 +168,13 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
     const amount = `${transaction.amount} ${
       props.currency ? LocaleCurrency.getCurrency(props.currency) : ''
     }`;
+    let displayAmount = transaction.id > 0 ? transaction.amount : (transaction.amount).toFixed(2);
     switch (transaction.transactionType) {
       case 0:
         return (
           <Tooltip title={`Income ${amount}`}>
             <span className='transaction-item-income'>
-              <DollarOutlined /> {transaction.amount}
+              <DollarOutlined /> {displayAmount}
             </span>
           </Tooltip>
         );
@@ -170,7 +182,7 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
         return (
           <Tooltip title={`Expense ${amount}`}>
             <span className='transaction-item-expense'>
-              <DollarOutlined /> {transaction.amount}
+              <DollarOutlined /> {displayAmount}
             </span>
           </Tooltip>
         );
@@ -288,6 +300,7 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
                 <div className='project-item-owner'>
                     {getTransactionInfo(transaction)}
                 </div>
+                <div style={{ visibility: transaction.id > 0 ? 'inherit' : 'hidden' }}>
                 <Popover
                     arrowPointAtCenter
                     placement='rightTop'
@@ -306,6 +319,7 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
                             <MoreOutlined/>
                           </span>
                 </Popover>
+                </div>
             </div>
         </div>
   );
