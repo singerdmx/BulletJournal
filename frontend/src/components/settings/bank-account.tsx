@@ -17,6 +17,7 @@ import {IState} from "../../store";
 import {connect} from "react-redux";
 import {updateTransactionBankAccount} from "../../features/transactions/actions";
 import {useHistory} from "react-router-dom";
+import { deleteBankAccount } from '../../features/myself/actions';
 
 const {Meta} = Card;
 
@@ -70,6 +71,7 @@ type BankAccountProps = {
         transactionId: number,
         bankAccount: number | undefined
     ) => void;
+    deleteBankAccount: (id: number) => void;
 }
 
 const BankAccountElem: React.FC<BankAccountProps> = (
@@ -78,7 +80,8 @@ const BankAccountElem: React.FC<BankAccountProps> = (
         mode,
         transaction,
         currency,
-        updateTransactionBankAccount
+        updateTransactionBankAccount,
+        deleteBankAccount
     }) => {
     const history = useHistory();
 
@@ -122,7 +125,8 @@ const BankAccountElem: React.FC<BankAccountProps> = (
                         <EditOutlined key='Edit' title='Edit'/>
                     </Tooltip>,
                     <Tooltip title='Delete'>
-                        <DeleteOutlined key='Delete' title='Delete'/>
+                        <DeleteOutlined key='Delete' title='Delete'
+                                        onClick={() => deleteBankAccount(bankAccount.id)}/>
                     </Tooltip>
                 ]}
             >
@@ -179,6 +183,6 @@ const mapStateToProps = (state: IState) => ({
     currency: state.myself.currency
 });
 
-export default connect(mapStateToProps, {updateTransactionBankAccount})(
+export default connect(mapStateToProps, {updateTransactionBankAccount, deleteBankAccount})(
     BankAccountElem
 );

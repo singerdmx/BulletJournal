@@ -1,4 +1,4 @@
-import {doFetch, doPost} from './api-helper';
+import { doFetch, doPost, doDelete } from './api-helper';
 import {BankAccountType} from "../features/transactions/interface";
 
 export const fetchBankAccounts = () => {
@@ -51,3 +51,11 @@ export const setAccountBalance = (bankAccountId: number, balance: number, descri
             throw Error(err.message);
         });
 }
+
+export const deleteBankAccount = (bankAccountId: number) => {
+    return doDelete(`/api/bankAccounts/${bankAccountId}`)
+        .then(res => res)
+        .catch(err => {
+            throw Error(err.message);
+        });
+};

@@ -14,7 +14,8 @@ import {
     UnsubscribedCategory,
     UpdateCategorySubscription,
     UpdateExpandedMyself,
-    UpdateMyself
+    UpdateMyself,
+    DeleteBankAccountAction
 } from './reducer';
 import {IState} from '../../store';
 import {actions as settingsActions} from '../../components/settings/reducer';
@@ -34,7 +35,7 @@ import {
 import {SubscribedCategory} from "./interface";
 import {removeUserCategory, updateSubscription} from "../../apis/templates/categoryApis";
 import {SampleTask} from "../templates/interface";
-import {createBankAccount, fetchBankAccounts} from "../../apis/bankAccountApis";
+import {createBankAccount, fetchBankAccounts, deleteBankAccount} from "../../apis/bankAccountApis";
 import {BankAccount} from "../transactions/interface";
 
 function* myselfApiErrorAction(action: PayloadAction<MyselfApiErrorAction>) {
@@ -349,6 +350,26 @@ function* addBankAccount(action: PayloadAction<AddBankAccountAction>) {
     }
 }
 
+function* removeBankAccount(action: PayloadAction<DeleteBankAccountAction>) {
+    try {
+        const {bankAccountId} = action.payload;
+        const bankAccount : BankAccount = yield call(deleteBankAccount, bankAccountId);
+        const data = yield call(fetchBankAccounts);
+        const bankAccounts : BankAccount[] = yield data.json();
+        yield put(
+            myselfActions.myselfDataReceived({
+                bankAccounts: bankAccounts
+            })
+        );
+    } catch (error) {
+        if (error.message === 'reload') {
+            yield put(reloadReceived(true));
+        } else {
+            yield call(message.error, `addBankAccount Error Received: ${error}`);
+        }
+    }
+}
+
 export default function* myselfSagas() {
     yield all([
         yield takeLatest(
@@ -372,6 +393,7 @@ export default function* myselfSagas() {
         yield takeLatest(myselfActions.deleteMySampleTasks.type, deleteMySampleTasks),
         yield takeLatest(myselfActions.getMyBankAccounts.type, getBankAccounts),
         yield takeLatest(myselfActions.addMyBankAccount.type, addBankAccount),
+        yield takeLatest(myselfActions.deleteMyBankAccount.type, removeBankAccount),
     ]);
 }
 

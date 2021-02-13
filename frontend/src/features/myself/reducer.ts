@@ -103,6 +103,10 @@ export type AddBankAccountAction = {
     description?: string
 };
 
+export type DeleteBankAccountAction = {
+    bankAccountId: number
+};
+
 let initialState = {
     username: '',
     avatar: '',
@@ -204,6 +208,7 @@ const slice = createSlice({
         },
         getMyBankAccounts: (state, action: PayloadAction<GetBankAccountsAction>) => state,
         addMyBankAccount: (state, action: PayloadAction<AddBankAccountAction>) => state,
+        deleteMyBankAccount: (state, action: PayloadAction<DeleteBankAccountAction>) => state,
     },
 });
 
