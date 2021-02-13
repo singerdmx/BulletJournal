@@ -816,7 +816,7 @@ function* changeAccountBalance(action: PayloadAction<ChangeBankAccountBalanceAct
 function* getBankAccountTransactions(action: PayloadAction<GetBankAccountTransactionsAction>) {
   try {
     const state: IState = yield select();
-
+    const timezone = state.myself.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
     const {
       bankAccountId,
       startDate,
@@ -825,7 +825,7 @@ function* getBankAccountTransactions(action: PayloadAction<GetBankAccountTransac
     const data : Transaction[] = yield call(
         fetchBankAccountTransactions,
         bankAccountId,
-        state.myself.timezone,
+        timezone,
         startDate,
         endDate
     );

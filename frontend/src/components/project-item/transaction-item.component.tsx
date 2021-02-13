@@ -212,7 +212,7 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
 
     const getProjectItemContentDiv = () => {
         return <div className='project-item-content'>
-            <Link to={`/transaction/${transaction.id}`}>
+            <Link to={`/transaction/${transaction.id}`} className={transaction.id < 0 ? "disabled-link" : ''}>
                 <h3 className='project-item-name'>
                     <Tooltip
                         title={`Created by ${transaction.owner.alias}`}
@@ -249,8 +249,8 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
     }
 
     const handleClickChangeBgColor = (noteId: number) => {
-      history.push(`/transaction/${noteId}`);
-      updateTransactionColorSettingShown(true);
+        noteId > 0 && history.push(`/transaction/${noteId}`);
+        updateTransactionColorSettingShown(true);
     }
 
     const getProjectItemContentWithMenu = () => {
