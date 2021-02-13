@@ -22,6 +22,19 @@ const {Meta} = Card;
 
 const LocaleCurrency = require('locale-currency');
 
+export const getBankAccountType = (input: string) => {
+    switch (input) {
+        case 'CHECKING_ACCOUNT':
+            return BankAccountType.CHECKING_ACCOUNT;
+        case 'SAVING_ACCOUNT':
+            return BankAccountType.SAVING_ACCOUNT;
+        case 'CREDIT_CARD': 
+            return BankAccountType.CREDIT_CARD;
+        default:
+            throw Error(`Invalid BankAccountType ${input}`);
+    }
+}
+
 export const getBankAccountTypeIcon = (type: BankAccountType) => {
     switch (type) {
         case BankAccountType.CHECKING_ACCOUNT:

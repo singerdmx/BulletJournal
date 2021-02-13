@@ -4,6 +4,7 @@ import {connect} from "react-redux";
 import './bank.styles.less';
 import {getBankAccounts} from "../../features/myself/actions";
 import {BankAccount, BankAccountType} from "../../features/transactions/interface";
+import AddBankAccountModal from "../modals/add-bank.component";
 import BankAccountElem, {getBankAccountTypeIcon} from "./bank-account";
 import {Button, Col, Row, Statistic, Switch, Tooltip} from "antd";
 import {CheckOutlined, CloseOutlined, PlusCircleFilled} from "@ant-design/icons";
@@ -54,12 +55,8 @@ const BankPage: React.FC<BankProps> = (
 
     return <div>
         <div className='banks-banner'>
-            <div className='add-bank-account-button'>
-                <Tooltip placement='bottom' title='Add New Bank Account'>
-                    <Button type="primary" shape="round" icon={<PlusCircleFilled/>}>
-                        Add
-                    </Button>
-                </Tooltip>
+            <div className='add-bank-modal'>
+                <AddBankAccountModal />
             </div>
             <Row gutter={[1, 1]}>
                 {Object.values(BankAccountType).map(t => {
