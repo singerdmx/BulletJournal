@@ -520,4 +520,15 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
             return t.toPresentationModel(labels);
         }).collect(Collectors.toList());
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<Transaction> getRecurringTransactionsInBankAccount(
+            ZonedDateTime startTime, ZonedDateTime endTime, BankAccount bankAccount) {
+        return null;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public double getRecurringTransactionsAmountSum(BankAccount bankAccount) {
+        return 0;
+    }
 }
