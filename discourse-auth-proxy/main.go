@@ -42,6 +42,7 @@ const tokenForCookieUrl = "/api/tokens/"
 const guestUsername = "Guest"
 const ssoLoginUrlPrefix = "/sso_login"
 const ssoLoginSuffix = "?ssoLogin=true"
+const homePageUrl = "https://bulletjournal.us/home/index.html"
 var guestToken = ""
 
 func main() {
@@ -328,7 +329,16 @@ func redirectToSSO(r *http.Request, w http.ResponseWriter) {
 	if strings.HasSuffix(redirectURL, "?ignoreCookie=true") {
 		redirectURL = redirectURL[:(len(redirectURL) - 18)]
 		logger.Printf("redirectURL changed to %s", redirectURL)
+		toSSOProvider(r, w, redirectURL)
+		return
 	}
+	if !strings.HasSuffix(redirectURL, ssoLoginSuffix) {
+		http.Redirect(w, r, homePageUrl, http.StatusMovedPermanently)
+		return
+	}
+
+	redirectURL = redirectURL[:(len(redirectURL) - 14)]
+	logger.Printf("redirectURL changed to %s", redirectURL)
 	toSSOProvider(r, w, redirectURL)
 }
 
