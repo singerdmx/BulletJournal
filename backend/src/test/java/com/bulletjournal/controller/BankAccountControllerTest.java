@@ -1,9 +1,9 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.BankAccount;
-import com.bulletjournal.controller.models.CreateBankAccountParams;
+import com.bulletjournal.controller.models.params.CreateBankAccountParams;
 import com.bulletjournal.controller.models.RequestParams;
-import com.bulletjournal.controller.models.UpdateBankAccountParams;
+import com.bulletjournal.controller.models.params.UpdateBankAccountParams;
 import com.bulletjournal.ledger.BankAccountType;
 import org.junit.Before;
 import org.junit.Test;

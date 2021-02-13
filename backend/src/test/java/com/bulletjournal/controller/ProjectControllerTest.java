@@ -2,6 +2,7 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.params.*;
 import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.filters.rate.limiting.TokenBucket;
 import com.bulletjournal.hierarchy.HierarchyProcessorProcessorTest;

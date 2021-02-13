@@ -2,6 +2,9 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.params.CreateBankAccountParams;
+import com.bulletjournal.controller.models.params.SetBankAccountBalanceParams;
+import com.bulletjournal.controller.models.params.UpdateBankAccountParams;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.BankAccountDaoJpa;

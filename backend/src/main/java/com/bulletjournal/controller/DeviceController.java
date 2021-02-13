@@ -1,7 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.controller.models.AddDeviceTokenParams;
+import com.bulletjournal.controller.models.params.AddDeviceTokenParams;
 import com.bulletjournal.repository.DeviceTokenDaoJpa;
 import com.bulletjournal.repository.models.DeviceToken;
 import org.slf4j.Logger;

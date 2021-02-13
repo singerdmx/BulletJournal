@@ -2,7 +2,7 @@ package com.bulletjournal.calendars.google;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.Content;
-import com.bulletjournal.controller.models.CreateTaskParams;
+import com.bulletjournal.controller.models.params.CreateTaskParams;
 import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.controller.models.Task;
 import com.bulletjournal.controller.models.User;

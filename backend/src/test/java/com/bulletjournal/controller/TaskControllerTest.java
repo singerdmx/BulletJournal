@@ -2,6 +2,10 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.config.ContentRevisionConfig;
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.params.CreateContentParams;
+import com.bulletjournal.controller.models.params.CreateTaskParams;
+import com.bulletjournal.controller.models.params.UpdateContentParams;
+import com.bulletjournal.controller.models.params.UpdateTaskParams;
 import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.repository.TaskContentRepository;
 import com.bulletjournal.repository.TaskDaoJpa;

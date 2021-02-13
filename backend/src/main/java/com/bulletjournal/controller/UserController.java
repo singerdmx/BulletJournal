@@ -2,6 +2,9 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.params.AppInvitationParams;
+import com.bulletjournal.controller.models.params.ChangeAliasParams;
+import com.bulletjournal.controller.models.params.UpdateMyselfParams;
 import com.bulletjournal.messaging.MessagingService;
 import com.bulletjournal.redis.FirstTimeUserRepository;
 import com.bulletjournal.redis.models.FirstTimeUser;

@@ -5,7 +5,7 @@ import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.ProjectItem;
 import com.bulletjournal.controller.models.ProjectItems;
-import com.bulletjournal.controller.models.UpdateLabelParams;
+import com.bulletjournal.controller.models.params.UpdateLabelParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;

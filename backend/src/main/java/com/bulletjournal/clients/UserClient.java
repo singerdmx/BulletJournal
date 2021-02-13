@@ -1,7 +1,7 @@
 package com.bulletjournal.clients;
 
 import com.bulletjournal.config.SSOConfig;
-import com.bulletjournal.controller.models.UpdateMyselfParams;
+import com.bulletjournal.controller.models.params.UpdateMyselfParams;
 import com.bulletjournal.controller.models.User;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;

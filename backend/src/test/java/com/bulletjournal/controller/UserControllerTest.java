@@ -1,6 +1,6 @@
 package com.bulletjournal.controller;
 
-import com.bulletjournal.controller.models.ChangeAliasParams;
+import com.bulletjournal.controller.models.params.ChangeAliasParams;
 import com.bulletjournal.controller.models.User;
 import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.repository.UserDaoJpa;

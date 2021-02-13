@@ -1,6 +1,10 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.params.CreateContentParams;
+import com.bulletjournal.controller.models.params.CreateNoteParams;
+import com.bulletjournal.controller.models.params.CreateTaskParams;
+import com.bulletjournal.controller.models.params.CreateTransactionParams;
 import com.bulletjournal.controller.utils.TestHelpers;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;

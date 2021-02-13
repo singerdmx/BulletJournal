@@ -2,7 +2,7 @@ package com.bulletjournal.repository;
 
 import com.bulletjournal.authz.Role;
 import com.bulletjournal.controller.models.Theme;
-import com.bulletjournal.controller.models.UpdateMyselfParams;
+import com.bulletjournal.controller.models.params.UpdateMyselfParams;
 import com.bulletjournal.controller.models.UserPointActivity;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;

@@ -2,6 +2,7 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.config.RateConfig;
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.params.CreateTransactionParams;
 import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.filters.rate.limiting.TokenBucket;
 import com.bulletjournal.redis.RedisLockedUserRepository;

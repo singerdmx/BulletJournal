@@ -1,6 +1,6 @@
 package com.bulletjournal.controller;
 
-import com.bulletjournal.controller.models.AddDeviceTokenParams;
+import com.bulletjournal.controller.models.params.AddDeviceTokenParams;
 import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.messaging.MessagingService;
 import com.bulletjournal.messaging.firebase.FcmClient;

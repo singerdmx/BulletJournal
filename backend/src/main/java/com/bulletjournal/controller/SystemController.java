@@ -4,6 +4,7 @@ import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.params.CreateContactTopicParams;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.daemon.Reminder;
 import com.bulletjournal.daemon.models.ReminderRecord;

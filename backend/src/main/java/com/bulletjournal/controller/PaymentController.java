@@ -3,7 +3,7 @@ package com.bulletjournal.controller;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.PaymentConfig;
 import com.bulletjournal.controller.models.ConfirmPaymentIntent;
-import com.bulletjournal.controller.models.CreatePaymentParams;
+import com.bulletjournal.controller.models.params.CreatePaymentParams;
 import com.bulletjournal.daemon.Cleaner;
 import com.bulletjournal.repository.UserDaoJpa;
 import com.stripe.Stripe;

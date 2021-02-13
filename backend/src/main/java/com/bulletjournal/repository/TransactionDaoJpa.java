@@ -3,10 +3,10 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
-import com.bulletjournal.controller.models.CreateTransactionParams;
+import com.bulletjournal.controller.models.params.CreateTransactionParams;
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.ProjectType;
-import com.bulletjournal.controller.models.UpdateTransactionParams;
+import com.bulletjournal.controller.models.params.UpdateTransactionParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.es.ESUtil;
@@ -518,7 +518,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
                 this.getRecurringTransactionsInBankAccount(startTime, endTime, bankAccount);
 
         transactions.addAll(recurringTransactions);
-        return transactions.stream().map(t -> {
+        return transactions.stream().sorted(Comparator.comparing(Transaction::getStartTime)).map(t -> {
             List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
             return t.toPresentationModel(labels);
         }).collect(Collectors.toList());
@@ -527,7 +527,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Transaction> getRecurringTransactionsInBankAccount(
             ZonedDateTime startTime, ZonedDateTime endTime, BankAccount bankAccount) {
-        return null;
+        return Collections.emptyList();
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
