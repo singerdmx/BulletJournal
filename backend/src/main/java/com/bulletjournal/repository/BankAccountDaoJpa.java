@@ -13,6 +13,7 @@ import com.bulletjournal.repository.models.BankAccount;
 import com.bulletjournal.repository.models.BankAccountTransaction;
 import com.bulletjournal.repository.utils.DaoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +35,9 @@ public class BankAccountDaoJpa {
     private BankAccountTransactionRepository bankAccountTransactionRepository;
     @Autowired
     private BankAccountBalanceRepository bankAccountBalanceRepository;
+    @Lazy
+    @Autowired
+    private TransactionDaoJpa transactionDaoJpa;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.BankAccount> getBankAccounts(String requester) {
@@ -116,9 +120,9 @@ public class BankAccountDaoJpa {
         }
         BankAccount bankAccount = this.bankAccountRepository.findById(bankAccountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Bank Account " + bankAccountId + " not found"));
-        // add recurring amount
         double sum = bankAccount.getNetBalance() +
-                this.transactionRepository.getTransactionsAmountSumByBankAccount(bankAccountId);
+                this.transactionRepository.getTransactionsAmountSumByBankAccount(bankAccountId) +
+                this.transactionDaoJpa.getRecurringTransactionsAmountSum(bankAccount);
         this.bankAccountBalanceRepository.save(new BankAccountBalance(bankAccountId, sum));
         return sum;
     }

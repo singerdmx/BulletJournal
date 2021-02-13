@@ -514,7 +514,10 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
         transactions.addAll(bankAccountTransactions);
 
-        // TODO: add recurring
+        List<com.bulletjournal.repository.models.Transaction> recurringTransactions =
+                this.getRecurringTransactionsInBankAccount(startTime, endTime, bankAccount);
+
+        transactions.addAll(recurringTransactions);
         return transactions.stream().map(t -> {
             List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
             return t.toPresentationModel(labels);
