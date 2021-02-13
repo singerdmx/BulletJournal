@@ -18,6 +18,7 @@ import {connect} from "react-redux";
 import {updateTransactionBankAccount} from "../../features/transactions/actions";
 import {useHistory} from "react-router-dom";
 import { deleteBankAccount } from '../../features/myself/actions';
+import EditBankAccountModal from '../modals/edit-bank.component'
 
 const {Meta} = Card;
 
@@ -121,8 +122,9 @@ const BankAccountElem: React.FC<BankAccountProps> = (
                         <FileSearchOutlined key="View Transactions" title='View Transactions'
                                             onClick={() => history.push(`/bank/${bankAccount.id}`)}/>
                     </Tooltip>,
+                    
                     <Tooltip title='Edit'>
-                        <EditOutlined key='Edit' title='Edit'/>
+                        <EditBankAccountModal bankAccount={bankAccount} />
                     </Tooltip>,
                     <Tooltip title='Delete'>
                         <DeleteOutlined key='Delete' title='Delete'

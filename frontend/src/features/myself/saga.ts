@@ -15,7 +15,8 @@ import {
     UpdateCategorySubscription,
     UpdateExpandedMyself,
     UpdateMyself,
-    DeleteBankAccountAction
+    DeleteBankAccountAction,
+    UpdateBankAccountAction
 } from './reducer';
 import {IState} from '../../store';
 import {actions as settingsActions} from '../../components/settings/reducer';
@@ -35,7 +36,7 @@ import {
 import {SubscribedCategory} from "./interface";
 import {removeUserCategory, updateSubscription} from "../../apis/templates/categoryApis";
 import {SampleTask} from "../templates/interface";
-import {createBankAccount, fetchBankAccounts, deleteBankAccount} from "../../apis/bankAccountApis";
+import {createBankAccount, fetchBankAccounts, deleteBankAccount, updateBankAccount} from "../../apis/bankAccountApis";
 import {BankAccount} from "../transactions/interface";
 
 function* myselfApiErrorAction(action: PayloadAction<MyselfApiErrorAction>) {
@@ -370,6 +371,26 @@ function* removeBankAccount(action: PayloadAction<DeleteBankAccountAction>) {
     }
 }
 
+function* patchBankAccount(action: PayloadAction<UpdateBankAccountAction>) {
+    try {
+        const {id, name, accountType, accountNumber, description} = action.payload;
+        const bankAccount : BankAccount = yield call(updateBankAccount, id, name, accountType, accountNumber, description);
+        const data = yield call(fetchBankAccounts);
+        const bankAccounts : BankAccount[] = yield data.json();
+        yield put(
+            myselfActions.myselfDataReceived({
+                bankAccounts: bankAccounts
+            })
+        );
+    } catch (error) {
+        if (error.message === 'reload') {
+            yield put(reloadReceived(true));
+        } else {
+            yield call(message.error, `addBankAccount Error Received: ${error}`);
+        }
+    }
+}
+
 export default function* myselfSagas() {
     yield all([
         yield takeLatest(
@@ -394,6 +415,7 @@ export default function* myselfSagas() {
         yield takeLatest(myselfActions.getMyBankAccounts.type, getBankAccounts),
         yield takeLatest(myselfActions.addMyBankAccount.type, addBankAccount),
         yield takeLatest(myselfActions.deleteMyBankAccount.type, removeBankAccount),
+        yield takeLatest(myselfActions.updateMyBankAccount.type, patchBankAccount),
     ]);
 }
 

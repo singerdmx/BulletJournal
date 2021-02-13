@@ -4,33 +4,38 @@ import {
   CreditCardOutlined,
   DollarCircleOutlined,
   BankOutlined,
-  PlusCircleFilled
+  EditOutlined,
 } from '@ant-design/icons';
 import {connect} from 'react-redux';
 import './modals.styles.less';
-import { BankAccountType } from '../../features/transactions/interface';
-import { addBankAccount } from '../../features/myself/actions';
-import { useHistory } from 'react-router-dom';
+import { BankAccount, BankAccountType } from '../../features/transactions/interface';
+import { updateBankAccount } from '../../features/myself/actions';
 import { getBankAccountType } from '../settings/bank-account';
 
 const {TextArea} = Input;
 const {Option} = Select;
 
 type Props = {
-  addBankAccount: (
+  bankAccount: BankAccount;
+  updateBankAccount: (
+    id: number,
     name: string,
     accountType: BankAccountType,
-    onSuccess: (bankAccountId: number) => void,
     accountNumber?: string,
     description?: string
   ) => void;
 };
 
-const AddBankAccountModal: React.FC<Props> = (props) => {
-  const [name, setName] = useState<string>('');
-  const [accountType, setAccountType] = useState<string>('');
-  const [accountNumber, setAccountNumber] = useState<number | undefined>(undefined);
-  const [description, setDescription] = useState<string>('');
+const EditBankAccountModal: React.FC<Props> = (props) => {
+  
+  const bankAccount = props.bankAccount;
+  console.log(bankAccount);
+  console.log(bankAccount.name);
+  const [name, setName] = useState<string>(bankAccount.name);
+  const [accountType, setAccountType] = useState<string>(bankAccount.accountType);
+  const [accountNumber, setAccountNumber] = useState<number | undefined>(
+    bankAccount.accountNumber ? parseInt(bankAccount?.accountNumber) : undefined);
+  const [description, setDescription] = useState<string | undefined>(bankAccount.description);
   const [visible, setVisible] = useState(false);
 
   const [form] = Form.useForm();
@@ -42,15 +47,10 @@ const AddBankAccountModal: React.FC<Props> = (props) => {
     setVisible(true);
   };
 
-  const history = useHistory();
-  const addBankAccount = () => {
+  const updateBankAccount = (id: number) => {
     let type: BankAccountType = getBankAccountType(accountType);
-    props.addBankAccount(name, type, (id)=>(history.push(`/bank/${id}`)), accountNumber?.toString(), description);
+    props.updateBankAccount(id, name, type, accountNumber?.toString(), description);
     setVisible(false);
-    setName('');
-    setDescription('');
-    setAccountNumber(undefined);
-    setAccountType(BankAccountType.CHECKING_ACCOUNT);
   }
 
   const onChangeName = (name: string) => {
@@ -72,10 +72,10 @@ const AddBankAccountModal: React.FC<Props> = (props) => {
   const getModal = () => {
     return (
         <Modal
-            title="Add New Bank Account"
+            title="Edit Bank Account"
             destroyOnClose
             centered
-            okText="Create"
+            okText="Update"
             visible={visible}
             onCancel={onCancel}
             onOk={() => {
@@ -83,12 +83,19 @@ const AddBankAccountModal: React.FC<Props> = (props) => {
                   .validateFields()
                   .then((values) => {
                     form.resetFields();
-                    addBankAccount();
+                    updateBankAccount(bankAccount.id);
                   })
                   .catch((info) => console.log(info));
             }}
         >
-          <Form form={form}>
+          <Form form={form}
+                initialValues={{
+                  bankName: name,
+                  accountType: accountType,
+                  accountNumber: accountNumber,
+                  description: description
+                }}
+          >
             <Form.Item>
               <Form.Item
                   name="bankName"
@@ -132,12 +139,11 @@ const AddBankAccountModal: React.FC<Props> = (props) => {
                 <InputNumber
                     placeholder="Enter Account Number (Last 4 digits)"
                     value={accountNumber}
-                    parser={value => value ? value.replace(/\$\s?|(,*)/g, '') : 0}
                     onChange={(e) => onChangeAccountNumber(e)}
                     style={{display: 'inline-block', width: '100%'}}
                 />
               </Form.Item>
-              <Form.Item name="Description">
+              <Form.Item name="description">
                 <TextArea
                     placeholder="Enter Description"
                     autoSize
@@ -152,12 +158,8 @@ const AddBankAccountModal: React.FC<Props> = (props) => {
   };
 
   const getDiv = () => (
-    <div className='add-bank-account-button'>
-        <Tooltip placement='bottom' title='Add New Bank Account'>
-            <Button type="primary" shape="round" icon={<PlusCircleFilled/>} onClick={openModal}>
-                Add
-            </Button>
-        </Tooltip>
+    <div className='edit-bank-account-button'>
+        <EditOutlined key='Edit' title='Edit' onClick={openModal}/>
         {getModal()}
     </div>
   )
@@ -165,6 +167,6 @@ const AddBankAccountModal: React.FC<Props> = (props) => {
   return getDiv();
 };
 
-export default connect(null, {addBankAccount})(
-    AddBankAccountModal
+export default connect(null, {updateBankAccount})(
+  EditBankAccountModal
 );

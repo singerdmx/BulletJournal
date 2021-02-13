@@ -72,7 +72,20 @@ export const addBankAccount = (name: string,
     description: description
 });
 
-
 export const deleteBankAccount = (id: number) => actions.deleteMyBankAccount({
   bankAccountId: id
+});
+
+export const updateBankAccount = (
+  id: number,
+  name: string,
+  accountType: BankAccountType,
+  accountNumber?: string,
+  description?: string
+) => actions.updateMyBankAccount({
+  id: id,
+  name: name,
+  accountType: accountType,
+  accountNumber: accountNumber,
+  description: description
 });
