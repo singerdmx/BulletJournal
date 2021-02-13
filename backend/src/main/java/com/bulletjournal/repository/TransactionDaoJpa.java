@@ -504,11 +504,12 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     public List<com.bulletjournal.controller.models.Transaction> getBankAccountTransactions(
             Long bankAccountId, ZonedDateTime startTime, ZonedDateTime endTime, String requester) {
         BankAccount bankAccount = this.bankAccountDaoJpa.getBankAccount(requester, bankAccountId);
-        // TODO: use startTime and endTime
+        Timestamp start = Timestamp.from(startTime.toInstant());
+        Timestamp end = Timestamp.from(endTime.toInstant());
         List<com.bulletjournal.repository.models.Transaction> transactions = this.transactionRepository
-                .findByBankAccountAndRecurrenceRuleNotNull(bankAccount);
+                .findByBankAccountAndRecurrenceRuleNull(start, end, bankAccount);
         List<com.bulletjournal.repository.models.Transaction> bankAccountTransactions = this.bankAccountTransactionRepository
-                .findByBankAccount(bankAccount).stream()
+                .findBankAccountTransactionByBankAccountBetween(start, end, bankAccount).stream()
                 .map(BankAccountTransaction::toTransaction).collect(Collectors.toList());
 
         transactions.addAll(bankAccountTransactions);

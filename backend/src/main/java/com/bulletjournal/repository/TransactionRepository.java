@@ -63,5 +63,12 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
             "WHERE transactions.bank_account = :bank_account AND transactions.recurrence_rule IS NOT NULL", nativeQuery = true)
     double getTransactionsAmountSumByBankAccount(@Param("bank_account") Long bankAccount);
 
-    List<Transaction> findByBankAccountAndRecurrenceRuleNotNull(BankAccount bankAccount);
+    @Query(value = "SELECT transaction FROM Transaction transaction WHERE " +
+            "transaction.bankAccount = :bankAccount AND transaction.recurrenceRule IS NULL" +
+            " AND transaction.updatedAt >= :startTime" +
+            " AND transaction.updatedAt <= :endTime")
+    List<Transaction> findByBankAccountAndRecurrenceRuleNull(
+            @Param("startTime") Timestamp startTime,
+            @Param("endTime") Timestamp endTime,
+            @Param("bankAccount") BankAccount bankAccount);
 }
