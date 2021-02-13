@@ -67,6 +67,10 @@ public class BankAccountDaoJpa {
         bankAccount.setAccountType(createBankAccountParams.getAccountType());
         bankAccount.setDescription(createBankAccountParams.getDescription());
         bankAccount.setAccountNumber(createBankAccountParams.getAccountNumber());
+
+        // net balance is 0 when create ?
+        bankAccount.setNetBalance(0.0);
+
         bankAccount = this.bankAccountRepository.save(bankAccount);
         this.bankAccountBalanceRepository.save(new BankAccountBalance(bankAccount.getId(), 0));
         return bankAccount.toPresentationModel();
