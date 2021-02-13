@@ -17,10 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -60,7 +56,7 @@ public class BankAccountControllerTest {
 
     }
 
-    public BankAccount createBankAccount(String name, String number, String description, BankAccountType type) {
+    private BankAccount createBankAccount(String name, String number, String description, BankAccountType type) {
         CreateBankAccountParams accountParams =
                 new CreateBankAccountParams(name, number,
                         description, type);
@@ -91,7 +87,7 @@ public class BankAccountControllerTest {
         assertEquals(expected, created.length);
     }
 
-    public BankAccount testUpdateBankAccount(long bankAccountId, String name) {
+    private BankAccount testUpdateBankAccount(long bankAccountId, String name) {
         UpdateBankAccountParams updateBankAccountParams = new UpdateBankAccountParams();
         updateBankAccountParams.setAccountType(BankAccountType.CREDIT_CARD);
         updateBankAccountParams.setName(name);
@@ -108,7 +104,7 @@ public class BankAccountControllerTest {
         return updated;
     }
 
-    public void testDeleteBankAccount(long bankAccountId) {
+    private void testDeleteBankAccount(long bankAccountId) {
         ResponseEntity<?> deleteResponse = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + BankAccountController.BANK_ACCOUNT_ROUTE,
                 HttpMethod.DELETE,
