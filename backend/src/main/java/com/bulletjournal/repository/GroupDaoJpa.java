@@ -266,10 +266,10 @@ public class GroupDaoJpa implements Etaggable {
         }
 
         Event event = new Event(
-                requester,
+                group.getOwner(),
                 group.getId(),
                 group.getName());
-        return new JoinGroupResponseEvent(event, group.getOwner(), Action.ACCEPT);
+        return new JoinGroupResponseEvent(event, requester, Action.ACCEPT);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
