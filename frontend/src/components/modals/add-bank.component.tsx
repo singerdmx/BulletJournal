@@ -1,28 +1,23 @@
 import React, {useState} from 'react';
-import { Form, Input, Modal, Select, Tooltip, Button, InputNumber } from 'antd';
-import {
-  CreditCardOutlined,
-  DollarCircleOutlined,
-  BankOutlined,
-  PlusCircleFilled
-} from '@ant-design/icons';
+import {Button, Form, Input, InputNumber, Modal, Select, Tooltip} from 'antd';
+import {BankOutlined, CreditCardOutlined, DollarCircleOutlined, PlusCircleFilled} from '@ant-design/icons';
 import {connect} from 'react-redux';
 import './modals.styles.less';
-import { BankAccountType } from '../../features/transactions/interface';
-import { addBankAccount } from '../../features/myself/actions';
-import { useHistory } from 'react-router-dom';
-import { getBankAccountType } from '../settings/bank-account';
+import {BankAccountType} from '../../features/transactions/interface';
+import {addBankAccount} from '../../features/myself/actions';
+import {useHistory} from 'react-router-dom';
+import {getBankAccountType} from '../settings/bank-account';
 
 const {TextArea} = Input;
 const {Option} = Select;
 
 type Props = {
   addBankAccount: (
-    name: string,
-    accountType: BankAccountType,
-    onSuccess: (bankAccountId: number) => void,
-    accountNumber?: string,
-    description?: string
+      name: string,
+      accountType: BankAccountType,
+      onSuccess: (bankAccountId: number) => void,
+      accountNumber?: string,
+      description?: string
   ) => void;
 };
 
@@ -45,7 +40,7 @@ const AddBankAccountModal: React.FC<Props> = (props) => {
   const history = useHistory();
   const addBankAccount = () => {
     let type: BankAccountType = getBankAccountType(accountType);
-    props.addBankAccount(name, type, (id)=>(history.push(`/bank/${id}`)), accountNumber?.toString(), description);
+    props.addBankAccount(name, type, (id) => (console.log(`/bank/${id}`)), accountNumber?.toString(), description);
     setVisible(false);
     setName('');
     setDescription('');
@@ -152,14 +147,14 @@ const AddBankAccountModal: React.FC<Props> = (props) => {
   };
 
   const getDiv = () => (
-    <div className='add-bank-account-button'>
+      <div className='add-bank-account-button'>
         <Tooltip placement='bottom' title='Add New Bank Account'>
-            <Button type="primary" shape="round" icon={<PlusCircleFilled/>} onClick={openModal}>
-                Add
-            </Button>
+          <Button type="primary" shape="round" icon={<PlusCircleFilled/>} onClick={openModal}>
+            Add
+          </Button>
         </Tooltip>
         {getModal()}
-    </div>
+      </div>
   )
 
   return getDiv();
