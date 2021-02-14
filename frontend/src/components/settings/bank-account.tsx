@@ -6,7 +6,6 @@ import {
     CreditCardOutlined,
     DeleteOutlined, DollarCircleFilled,
     DollarCircleOutlined,
-    EditOutlined,
     FileSearchOutlined,
 } from "@ant-design/icons";
 import React from "react";

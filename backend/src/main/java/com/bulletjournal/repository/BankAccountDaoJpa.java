@@ -9,18 +9,15 @@ import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.redis.BankAccountBalanceRepository;
 import com.bulletjournal.redis.models.BankAccountBalance;
-import com.bulletjournal.repository.models.AuditModel;
 import com.bulletjournal.repository.models.BankAccount;
 import com.bulletjournal.repository.models.BankAccountTransaction;
 import com.bulletjournal.repository.models.Transaction;
-import com.bulletjournal.repository.utils.DaoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,7 +42,7 @@ public class BankAccountDaoJpa {
     public List<com.bulletjournal.controller.models.BankAccount> getBankAccounts(String requester) {
         List<BankAccount> bankAccounts = this.bankAccountRepository.findAllByOwner(requester);
         return bankAccounts.stream()
-                .sorted(Comparator.comparing(AuditModel::getUpdatedAt))
+                .sorted((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt()))
                 .map(b -> b.toPresentationModel(this))
                 .collect(Collectors.toList());
     }

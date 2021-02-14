@@ -248,13 +248,13 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
         </div>;
     }
 
-    const handleClickChangeBgColor = (noteId: number) => {
-        noteId > 0 && history.push(`/transaction/${noteId}`);
+    const handleClickChangeBgColor = (transactionId: number) => {
+        transactionId > 0 && history.push(`/transaction/${transactionId}`);
         updateTransactionColorSettingShown(true);
     }
 
     const getProjectItemContentWithMenu = () => {
-        if (inModal === true) {
+        if (inModal === true || transaction.id < 0) {
             return getProjectItemContentDiv()
         }
 

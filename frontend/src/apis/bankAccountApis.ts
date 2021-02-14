@@ -1,4 +1,4 @@
-import { doFetch, doPost, doDelete, doPatch } from './api-helper';
+import { doFetch, doPost, doDelete, doPut } from './api-helper';
 import {BankAccountType} from "../features/transactions/interface";
 
 export const fetchBankAccounts = () => {
@@ -73,7 +73,7 @@ export const updateBankAccount = (
             accountNumber: accountNumber,
             description: description
     });
-    return doPatch(`/api/bankAccounts/${bankAccountId}`, body)
+    return doPut(`/api/bankAccounts/${bankAccountId}`, body)
         .then(res => res.json())
         .catch(err => {
             throw Error(err.message);
