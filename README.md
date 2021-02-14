@@ -4,6 +4,8 @@
 
 <b>BulletJournal</b> is an open source platform for notebook keeping, ledger management, task/project management and coordination with speciality in personal organization, scheduling, reminders, to-do lists, notes sharing, multi-person ledger and team project collaboration.
 
+You can join [Slack Group] for discussion.
+
 ## Installation
 - Docker
 
@@ -30,7 +32,5 @@ Next, you can look into the `docker-compose.yml` for detailed config parameters.
 
 Open the browser and enter `https://localhost` to see the UI interface.
 Open the browser and enter `http://localhost:8080/swagger-ui.html` to see the API documentation.
-
-You can also join [Slack Group] for discussion.
 
 [Slack Group]: https://join.slack.com/t/bulletjournal1024/shared_invite/zt-fys7t9hi-ITVU5PGDen1rNRyCjdcQ2g
