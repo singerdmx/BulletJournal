@@ -131,7 +131,7 @@ const BankAccountElem: React.FC<BankAccountProps> = (
                 <Meta
                     style={{height: 65}}
                     title={<Statistic
-                        value={`${bankAccount.netBalance} ${LocaleCurrency.getCurrency(currency)}`}
+                        value={`${bankAccount.netBalance.toFixed(2)} ${LocaleCurrency.getCurrency(currency)}`}
                         valueStyle={{color: balanceColor}}
                     />}
                     description={description}
@@ -152,7 +152,7 @@ const BankAccountElem: React.FC<BankAccountProps> = (
         return <div className='bank-account-single' style={{color: color}}>
             {bankTitle}
             {'   '}
-            <Tag style={{color: balanceColor}}>{bankAccount.netBalance}</Tag>
+            <Tag style={{color: balanceColor}}>{bankAccount.netBalance.toFixed(2)}</Tag>
             <Switch
                 checkedChildren={<CheckOutlined/>}
                 unCheckedChildren={<CloseOutlined/>}
@@ -172,7 +172,7 @@ const BankAccountElem: React.FC<BankAccountProps> = (
     return <div className='bank-account-title' style={{color: color}}>
         {bankTitle}
         {'   '}
-        <span style={{color: balanceColor}}><DollarCircleFilled /> {bankAccount.netBalance} {LocaleCurrency.getCurrency(currency)}</span>
+        <span style={{color: balanceColor}}><DollarCircleFilled /> {bankAccount.netBalance.toFixed(2)} {LocaleCurrency.getCurrency(currency)}</span>
     </div>
 }
 
