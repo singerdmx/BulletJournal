@@ -13,6 +13,7 @@ export interface Group {
   owner: User;
   users: User[];
   default: boolean;
+  uid?: string;
 }
 
 export interface GroupsWithOwner {
