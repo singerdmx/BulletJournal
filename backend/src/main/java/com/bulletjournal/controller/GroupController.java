@@ -38,6 +38,7 @@ public class GroupController {
     protected static final String REMOVE_USER_GROUP_ROUTE = "/api/removeUserGroup";
     protected static final String REMOVE_USER_GROUPS_ROUTE = "/api/removeUserGroups";
     protected static final String CREATE_GROUP_SHARE_LINK = "/api/groups/{groupId}/links";
+    protected static final String DISABLE_GROUP_SHARE_LINK = "/api/groups/{groupId}/disableLink";
     protected static final String JOIN_GROUP_VIA_LINK = "/api/groups/{uid}/join";
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupController.class);
     @Autowired
@@ -208,6 +209,12 @@ public class GroupController {
         String uuid = RandomStringUtils.randomAlphanumeric(StringUtil.UUID_LENGTH);
         this.groupDaoJpa.createGroupShareLink(groupId, username, uuid);
         return uuid;
+    }
+
+    @PostMapping(DISABLE_GROUP_SHARE_LINK)
+    public void disableGroupShareLink(@NotNull @PathVariable Long groupId) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.groupDaoJpa.createGroupShareLink(groupId, username, null);
     }
 
     @PostMapping(JOIN_GROUP_VIA_LINK)
