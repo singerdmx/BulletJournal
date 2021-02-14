@@ -11,10 +11,12 @@ import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceAlreadyExistException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
+import com.bulletjournal.notifications.Action;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.informed.Informed;
 import com.bulletjournal.notifications.informed.InviteToJoinGroupEvent;
 import com.bulletjournal.notifications.informed.JoinGroupEvent;
+import com.bulletjournal.notifications.informed.JoinGroupResponseEvent;
 import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.factory.Etaggable;
 import com.bulletjournal.repository.models.*;
@@ -216,7 +218,7 @@ public class GroupDaoJpa implements Etaggable {
         Long groupId = addUserGroupParams.getGroupId();
         Group group = this.groupRepository.findById(groupId)
                 .orElseThrow(() -> new ResourceNotFoundException("Group " + groupId + " not found"));
-        if (!group.getUsers().stream().anyMatch(ug -> Objects.equals(ug.getUser().getName(), requester))) {
+        if (group.getUsers().stream().noneMatch(ug -> Objects.equals(ug.getUser().getName(), requester))) {
             throw new UnAuthorizedException("User " + requester + " not in group " + group.getName());
         }
         String username = addUserGroupParams.getUsername();
@@ -244,35 +246,30 @@ public class GroupDaoJpa implements Etaggable {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Informed> addUserGroupViaLink(
-            String username,
-            String uid) {
-
+    public JoinGroupResponseEvent addUserGroupViaLink(String requester, String uid) {
         Group group = this.groupRepository.getByUid(uid)
                 .orElseThrow(() -> new ResourceNotFoundException("Group " + uid + " not found"));
 
-        if (!group.getUsers().stream().anyMatch(ug -> Objects.equals(ug.getUser().getName(), username))) {
-            LOGGER.warn(username + "already in the group");
-            return Collections.emptyList();
+        if (group.getUsers().stream().anyMatch(ug -> Objects.equals(ug.getUser().getName(), requester))) {
+            LOGGER.warn(requester + " already in the group");
+            return null;
         }
 
-        User user = this.userDaoJpa.getByName(username);
+        User user = this.userDaoJpa.getByName(requester);
         UserGroupKey key = new UserGroupKey(user.getId(), group.getId());
         Optional<UserGroup> userGroup = this.userGroupRepository.findById(key);
         if (!userGroup.isPresent()) {
-            UserGroup ug = new UserGroup(user, group, false);
+            UserGroup ug = new UserGroup(user, group, true);
             this.userGroupRepository.save(ug);
             group.getUsers().add(ug);
             this.groupRepository.save(group);
         }
 
-        List<Informed> informeds = new ArrayList<>();
-        informeds.add(new JoinGroupEvent(new Event(username, group.getId(), group.getName()), username));
-        if (!Objects.equals(username, group.getOwner())) {
-            informeds.add(new InviteToJoinGroupEvent(
-                    new Event(group.getOwner(), group.getId(), group.getName()), username, username));
-        }
-        return informeds;
+        Event event = new Event(
+                requester,
+                group.getId(),
+                group.getName());
+        return new JoinGroupResponseEvent(event, group.getOwner(), Action.ACCEPT);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

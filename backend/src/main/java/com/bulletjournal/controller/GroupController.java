@@ -1,13 +1,17 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.Group;
+import com.bulletjournal.controller.models.GroupsWithOwner;
+import com.bulletjournal.controller.models.UserGroup;
 import com.bulletjournal.controller.models.params.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.BadRequestException;
-import com.bulletjournal.notifications.*;
+import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.informed.DeleteGroupEvent;
 import com.bulletjournal.notifications.informed.Informed;
+import com.bulletjournal.notifications.informed.JoinGroupResponseEvent;
 import com.bulletjournal.notifications.informed.RemoveUserFromGroupEvent;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
 import com.bulletjournal.redis.models.EtagType;
@@ -218,8 +222,13 @@ public class GroupController {
     }
 
     @PostMapping(JOIN_GROUP_VIA_LINK)
-    public void joinGroupViaLink(@NotNull @PathVariable String uid) {
+    public Group joinGroupViaLink(@NotNull @PathVariable String uid) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.groupDaoJpa.addUserGroupViaLink(username, uid);
+        JoinGroupResponseEvent joinGroupResponseEvent =
+                this.groupDaoJpa.addUserGroupViaLink(username, uid);
+        if (joinGroupResponseEvent != null) {
+            this.notificationService.inform(joinGroupResponseEvent);
+        }
+        return getGroup(joinGroupResponseEvent.getEvents().get(0).getContentId());
     }
 }
