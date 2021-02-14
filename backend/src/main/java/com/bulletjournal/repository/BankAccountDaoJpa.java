@@ -5,12 +5,14 @@ import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.params.CreateBankAccountParams;
 import com.bulletjournal.controller.models.params.UpdateBankAccountParams;
+import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.redis.BankAccountBalanceRepository;
 import com.bulletjournal.redis.models.BankAccountBalance;
 import com.bulletjournal.repository.models.AuditModel;
 import com.bulletjournal.repository.models.BankAccount;
 import com.bulletjournal.repository.models.BankAccountTransaction;
+import com.bulletjournal.repository.models.Transaction;
 import com.bulletjournal.repository.utils.DaoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -81,25 +83,26 @@ public class BankAccountDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public com.bulletjournal.controller.models.BankAccount partialUpdate(String requester, Long bankAccountId,
-                                                                         UpdateBankAccountParams updateBankAccountParams) {
+    public com.bulletjournal.controller.models.BankAccount update(String requester, Long bankAccountId,
+                                                                  UpdateBankAccountParams updateBankAccountParams) {
         BankAccount bankAccount = getBankAccount(requester, bankAccountId);
+
+        if (!updateBankAccountParams.hasName()) {
+            throw new BadRequestException("Name cannot be empty");
+        }
+        if (!updateBankAccountParams.hasAccountType()) {
+            throw new BadRequestException("Account type cannot be empty");
+        }
 
         // check access
         this.authorizationService.checkAuthorizedToOperateOnContent(
                 bankAccount.getOwner(), requester, ContentType.BANK_ACCOUNT,
                 Operation.UPDATE, bankAccountId);
 
-        DaoHelper.updateIfPresent(updateBankAccountParams.hasName(), updateBankAccountParams.getName(),
-                bankAccount::setName);
-
-        // description, account number, type
-        DaoHelper.updateIfPresent(updateBankAccountParams.hasDescription(), updateBankAccountParams.getDescription(),
-                bankAccount::setDescription);
-        DaoHelper.updateIfPresent(updateBankAccountParams.hasAccountNumber(), updateBankAccountParams.getAccountNumber(),
-                bankAccount::setAccountNumber);
-        DaoHelper.updateIfPresent(updateBankAccountParams.hasAccountType(), updateBankAccountParams.getAccountType(),
-                bankAccount::setAccountType);
+        bankAccount.setAccountNumber(updateBankAccountParams.getAccountNumber());
+        bankAccount.setName(updateBankAccountParams.getName());
+        bankAccount.setDescription(updateBankAccountParams.getDescription());
+        bankAccount.setAccountType(updateBankAccountParams.getAccountType());
 
         return this.bankAccountRepository.save(bankAccount).toPresentationModel(this);
     }
@@ -107,6 +110,10 @@ public class BankAccountDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void deleteBankAccount(String requester, Long bankAccountId) {
         BankAccount bankAccount = getBankAccount(requester, bankAccountId);
+        List<Transaction> transactions = this.transactionRepository.findByBankAccount(bankAccount);
+        for (Transaction t: transactions) {
+            t.setBankAccount(null);
+        }
         this.authorizationService.checkAuthorizedToOperateOnContent(bankAccount.getOwner(), requester, ContentType.BANK_ACCOUNT,
                 Operation.DELETE, bankAccountId);
 

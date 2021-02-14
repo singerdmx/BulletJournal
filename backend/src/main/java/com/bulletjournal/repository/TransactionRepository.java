@@ -71,4 +71,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
             @Param("startTime") Timestamp startTime,
             @Param("endTime") Timestamp endTime,
             @Param("bankAccount") BankAccount bankAccount);
+
+    List<Transaction> findByBankAccount(BankAccount bankAccount);
 }

@@ -95,7 +95,7 @@ public class BankAccountControllerTest {
         updateBankAccountParams.setName(name);
         ResponseEntity<BankAccount> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + BankAccountController.BANK_ACCOUNT_ROUTE,
-                HttpMethod.PATCH,
+                HttpMethod.PUT,
                 new HttpEntity<>(updateBankAccountParams),
                 BankAccount.class,
                 bankAccountId);

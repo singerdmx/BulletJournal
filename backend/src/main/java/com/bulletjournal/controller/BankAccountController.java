@@ -62,12 +62,12 @@ public class BankAccountController {
         return BankAccount.addOwnerAvatar(bankAccount, this.userClient);
     }
 
-    @PatchMapping(BANK_ACCOUNT_ROUTE)
+    @PutMapping(BANK_ACCOUNT_ROUTE)
     public BankAccount updateBankAccount(@NotNull @PathVariable Long bankAccountId,
                                          @Valid @RequestBody UpdateBankAccountParams bankAccountParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
-        return this.bankAccountDaoJpa.partialUpdate(username, bankAccountId, bankAccountParams);
+        return this.bankAccountDaoJpa.update(username, bankAccountId, bankAccountParams);
     }
 
     @DeleteMapping(BANK_ACCOUNT_ROUTE)
