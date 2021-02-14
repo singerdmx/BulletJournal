@@ -5,6 +5,7 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.models.params.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.BadRequestException;
+import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.notifications.informed.DeleteGroupEvent;
 import com.bulletjournal.notifications.informed.Informed;
@@ -12,6 +13,7 @@ import com.bulletjournal.notifications.informed.RemoveUserFromGroupEvent;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
 import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.GroupDaoJpa;
+import com.bulletjournal.repository.GroupRepository;
 import com.bulletjournal.util.StringUtil;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -43,6 +45,9 @@ public class GroupController {
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupController.class);
     @Autowired
     private GroupDaoJpa groupDaoJpa;
+
+    @Autowired
+    private GroupRepository groupRepository;
 
     @Autowired
     private UserClient userClient;
@@ -218,8 +223,10 @@ public class GroupController {
     }
 
     @PostMapping(JOIN_GROUP_VIA_LINK)
-    public void joinGroupViaLink(@NotNull @PathVariable String uid) {
+    public Group joinGroupViaLink(@NotNull @PathVariable String uid) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.groupDaoJpa.addUserGroupViaLink(username, uid);
+        com.bulletjournal.repository.models.Group group = this.groupRepository.getByUid(uid)
+                .orElseThrow(() -> new ResourceNotFoundException("Group " + uid + " not found"));
+        return addUserGroup(new AddUserGroupParams(group.getId(), username));
     }
 }

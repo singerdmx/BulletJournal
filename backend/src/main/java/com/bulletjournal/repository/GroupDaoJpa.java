@@ -244,38 +244,6 @@ public class GroupDaoJpa implements Etaggable {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public List<Informed> addUserGroupViaLink(
-            String username,
-            String uid) {
-
-        Group group = this.groupRepository.getByUid(uid)
-                .orElseThrow(() -> new ResourceNotFoundException("Group " + uid + " not found"));
-
-        if (!group.getUsers().stream().anyMatch(ug -> Objects.equals(ug.getUser().getName(), username))) {
-            LOGGER.warn(username + "already in the group");
-            return Collections.emptyList();
-        }
-
-        User user = this.userDaoJpa.getByName(username);
-        UserGroupKey key = new UserGroupKey(user.getId(), group.getId());
-        Optional<UserGroup> userGroup = this.userGroupRepository.findById(key);
-        if (!userGroup.isPresent()) {
-            UserGroup ug = new UserGroup(user, group, false);
-            this.userGroupRepository.save(ug);
-            group.getUsers().add(ug);
-            this.groupRepository.save(group);
-        }
-
-        List<Informed> informeds = new ArrayList<>();
-        informeds.add(new JoinGroupEvent(new Event(username, group.getId(), group.getName()), username));
-        if (!Objects.equals(username, group.getOwner())) {
-            informeds.add(new InviteToJoinGroupEvent(
-                    new Event(group.getOwner(), group.getId(), group.getName()), username, username));
-        }
-        return informeds;
-    }
-
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Group getGroup(Long id) {
         Group group = this.groupRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Group " + id + " not found"));
