@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { Form, Input, Modal, Select, Tooltip, Button, InputNumber } from 'antd';
+import { Form, Input, Modal, Select, Tooltip, InputNumber } from 'antd';
 import {
   CreditCardOutlined,
   DollarCircleOutlined,
@@ -11,12 +11,16 @@ import './modals.styles.less';
 import { BankAccount, BankAccountType } from '../../features/transactions/interface';
 import { updateBankAccount } from '../../features/myself/actions';
 import { getBankAccountType } from '../settings/bank-account';
+import {Button as FloatButton, darkColors, lightColors} from "react-floating-action-button";
+import bank from '../settings/bank';
+import { useEffect } from 'react';
 
 const {TextArea} = Input;
 const {Option} = Select;
 
-type Props = {
-  bankAccount: BankAccount;
+type BankProps = {
+  bankAccount: BankAccount | undefined;
+  mode: string;
   updateBankAccount: (
     id: number,
     name: string,
@@ -26,19 +30,28 @@ type Props = {
   ) => void;
 };
 
-const EditBankAccountModal: React.FC<Props> = (props) => {
-  
-  const bankAccount = props.bankAccount;
-  console.log(bankAccount);
-  console.log(bankAccount.name);
-  const [name, setName] = useState<string>(bankAccount.name);
-  const [accountType, setAccountType] = useState<string>(bankAccount.accountType);
+const EditBankAccountModal: React.FC<BankProps> = (props) => {
+  const bankAccount = props.bankAccount;  
+  const mode = props.mode;
+  const [name, setName] = useState<string>(bankAccount ? bankAccount.name : '');
+  const [accountType, setAccountType] = useState<string>(bankAccount ? bankAccount.accountType : '');
   const [accountNumber, setAccountNumber] = useState<number | undefined>(
-    bankAccount.accountNumber ? parseInt(bankAccount?.accountNumber) : undefined);
-  const [description, setDescription] = useState<string | undefined>(bankAccount.description);
+    bankAccount && bankAccount.accountNumber ? parseInt(bankAccount?.accountNumber) : undefined);
+  const [description, setDescription] = useState<string | undefined>(bankAccount?.description);
   const [visible, setVisible] = useState(false);
-
   const [form] = Form.useForm();
+  
+  useEffect(() => {
+    setName(bankAccount ? bankAccount.name : '');
+    setAccountType(bankAccount ? bankAccount.accountType : '');
+    setAccountNumber(bankAccount && bankAccount.accountNumber ? parseInt(bankAccount?.accountNumber) : undefined);
+    setDescription(bankAccount?.description);
+  }, [bankAccount]);
+
+  if (!bankAccount) {
+    return null;
+  }
+
   const onCancel = () => {
     setVisible(false);
     form.resetFields();
@@ -157,12 +170,32 @@ const EditBankAccountModal: React.FC<Props> = (props) => {
     );
   };
 
-  const getDiv = () => (
-    <div className='edit-bank-account-button'>
-        <EditOutlined key='Edit' title='Edit' onClick={openModal}/>
-        {getModal()}
-    </div>
-  )
+  const getDiv = () => {
+    switch (mode) {
+      case 'card':
+        return (
+        <>
+          <Tooltip title='Delete'>
+              <EditOutlined key='Edit' title='Edit' onClick={openModal}/>
+          </Tooltip>
+          {getModal()}
+        </>)
+      case 'float': 
+        return (
+          <>
+            <FloatButton
+              tooltip="Edit Account Info"
+              styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
+              onClick={openModal}
+            >
+                <EditOutlined />
+            </FloatButton>
+            {getModal()}
+          </>);
+      default:
+        return <>{getModal()}</>
+    }
+  }
 
   return getDiv();
 };

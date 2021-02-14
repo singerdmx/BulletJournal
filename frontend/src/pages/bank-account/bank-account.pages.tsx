@@ -15,6 +15,7 @@ import moment, {Moment} from "moment";
 import {dateFormat} from "../../features/myBuJo/constants";
 import { ProjectItemUIType } from "../../features/project/constants";
 import TransactionItem from '../../components/project-item/transaction-item.component';
+import EditBankAccount from '../../components/modals/edit-bank.component';
 const { RangePicker } = DatePicker;
 
 type BankAccountProps = {
@@ -172,12 +173,7 @@ const BankAccountPage: React.FC<BankAccountProps> = (
             >
                 <DeleteOutlined/>
             </FloatButton>
-            <FloatButton
-                tooltip="Edit Account Info"
-                styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
-            >
-                <EditOutlined/>
-            </FloatButton>
+            <EditBankAccount bankAccount={account} mode='float' />
             <Popover placement="leftTop" title='Enter Account Balance' content={getEnterBankBalanceDialog()}
                      trigger="click">
                 <FloatButton

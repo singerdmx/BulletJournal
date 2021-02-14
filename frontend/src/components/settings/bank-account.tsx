@@ -122,10 +122,7 @@ const BankAccountElem: React.FC<BankAccountProps> = (
                         <FileSearchOutlined key="View Transactions" title='View Transactions'
                                             onClick={() => history.push(`/bank/${bankAccount.id}`)}/>
                     </Tooltip>,
-                    
-                    <Tooltip title='Edit'>
-                        <EditBankAccountModal bankAccount={bankAccount} />
-                    </Tooltip>,
+                    <EditBankAccountModal bankAccount={bankAccount} mode='card' />,
                     <Tooltip title='Delete'>
                         <DeleteOutlined key='Delete' title='Delete'
                                         onClick={() => deleteBankAccount(bankAccount.id)}/>
