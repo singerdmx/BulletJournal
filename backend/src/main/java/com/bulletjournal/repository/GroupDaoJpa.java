@@ -13,10 +13,7 @@ import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.notifications.Action;
 import com.bulletjournal.notifications.Event;
-import com.bulletjournal.notifications.informed.Informed;
-import com.bulletjournal.notifications.informed.InviteToJoinGroupEvent;
-import com.bulletjournal.notifications.informed.JoinGroupEvent;
-import com.bulletjournal.notifications.informed.JoinGroupResponseEvent;
+import com.bulletjournal.notifications.informed.*;
 import com.bulletjournal.redis.models.EtagType;
 import com.bulletjournal.repository.factory.Etaggable;
 import com.bulletjournal.repository.models.*;
@@ -351,10 +348,19 @@ public class GroupDaoJpa implements Etaggable {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void setGroupShareLink(Long groupId, String requester, String uuid) {
+    public Informed setGroupShareLink(Long groupId, String requester, String uuid) {
         Group group = getGroup(groupId);
         this.authorizationService.validateRequesterInGroup(requester, group);
         group.setUid(uuid);
         this.groupRepository.save(group);
+
+        List<Event> events = new ArrayList<>();
+        for (UserGroup userGroup : group.getAcceptedUsers()) {
+            String targetUser = userGroup.getUser().getName();
+            if (!Objects.equals(targetUser, requester)) {
+                events.add(new Event(targetUser, userGroup.getGroup().getId(), userGroup.getGroup().getName()));
+            }
+        }
+        return uuid == null ? new DisableGroupShareEvent(events, requester) : new ShareGroupEvent(events, requester);
     }
 }

@@ -5,7 +5,7 @@ import {
   ContactsOutlined,
   DeleteOutlined, EditOutlined,
   EyeOutlined,
-  InfoCircleOutlined,
+  InfoCircleOutlined, LinkOutlined,
   PlusSquareOutlined,
   ShareAltOutlined,
   SolutionOutlined,
@@ -70,10 +70,14 @@ const TitleAvatar = ({source, type, originator}: titleAvatarProps) => {
       icon = <TagOutlined/>;
       break;
     case EventType.RevokeSharableEvent:
+    case EventType.DisableGroupShareEvent:
       icon = <StopOutlined/>;
       break;
     case EventType.NewSampleTaskEvent:
       icon = <AlertOutlined />;
+      break;
+    case EventType.ShareGroupEvent:
+      icon = <LinkOutlined />;
       break;
     default:
       icon = <EyeOutlined/>;
