@@ -207,18 +207,19 @@ public class GroupController {
     public String createGroupShareLink(@NotNull @PathVariable Long groupId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         String uuid = RandomStringUtils.randomAlphanumeric(StringUtil.UUID_LENGTH);
-        this.groupDaoJpa.createGroupShareLink(groupId, username, uuid);
+        this.groupDaoJpa.setGroupShareLink(groupId, username, uuid);
         return uuid;
     }
 
     @PostMapping(DISABLE_GROUP_SHARE_LINK)
     public void disableGroupShareLink(@NotNull @PathVariable Long groupId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        this.groupDaoJpa.createGroupShareLink(groupId, username, null);
+        this.groupDaoJpa.setGroupShareLink(groupId, username, null);
     }
 
     @PostMapping(JOIN_GROUP_VIA_LINK)
     public void joinGroupViaLink(@NotNull @PathVariable String uid) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.groupDaoJpa.addUserGroupViaLink(username, uid);
     }
 }

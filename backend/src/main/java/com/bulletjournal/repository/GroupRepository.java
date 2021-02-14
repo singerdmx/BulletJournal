@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface GroupRepository extends JpaRepository<Group, Long> {
@@ -13,4 +14,6 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
 
     @Query("SELECT g FROM Group g WHERE g.owner = ?1 AND g.defaultGroup = TRUE")
     List<Group> findDefaultGroup(String owner);
+
+    Optional<Group> getByUid(String uid);
 }
