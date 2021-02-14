@@ -16,6 +16,7 @@ import {dateFormat} from "../../features/myBuJo/constants";
 import { ProjectItemUIType } from "../../features/project/constants";
 import TransactionItem from '../../components/project-item/transaction-item.component';
 import EditBankAccount from '../../components/modals/edit-bank.component';
+import { deleteBankAccount } from '../../features/myself/actions';
 const { RangePicker } = DatePicker;
 
 type BankAccountProps = {
@@ -24,6 +25,7 @@ type BankAccountProps = {
     transactions: Transaction[];
     getBankAccountTransactions: (bankAccountId: number, startDate: string, endDate: string) => void;
     changeAccountBalance: (bankAccount: BankAccount, balance: number, description: string, onSuccess: Function) => void;
+    deleteBankAccount: (id: number) => void;
 }
 
 const BankAccountPage: React.FC<BankAccountProps> = (
@@ -32,7 +34,8 @@ const BankAccountPage: React.FC<BankAccountProps> = (
         getBankAccounts,
         changeAccountBalance,
         transactions,
-        getBankAccountTransactions
+        getBankAccountTransactions,
+        deleteBankAccount
     }) => {
     const history = useHistory();
     const {bankAccountId} = useParams();
@@ -132,6 +135,13 @@ const BankAccountPage: React.FC<BankAccountProps> = (
         setEndDate(e);
     }
 
+    const handleDelete = (id: number | undefined) => () =>{
+        if (id) {
+            deleteBankAccount(id);
+            history.push('/bank');
+        }
+    }
+
     return <div className='bank-account-page'>
         <BackTop/>
         <div className='bank-account-info'>
@@ -170,6 +180,7 @@ const BankAccountPage: React.FC<BankAccountProps> = (
             <FloatButton
                 tooltip="Delete Account"
                 styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
+                onClick={handleDelete(account?.id)}
             >
                 <DeleteOutlined/>
             </FloatButton>
@@ -195,5 +206,6 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
     getBankAccounts,
     changeAccountBalance,
-    getBankAccountTransactions
+    getBankAccountTransactions,
+    deleteBankAccount
 })(BankAccountPage);

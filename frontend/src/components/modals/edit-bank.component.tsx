@@ -175,7 +175,7 @@ const EditBankAccountModal: React.FC<BankProps> = (props) => {
       case 'card':
         return (
         <>
-          <Tooltip title='Delete'>
+          <Tooltip title='Edit'>
               <EditOutlined key='Edit' title='Edit' onClick={openModal}/>
           </Tooltip>
           {getModal()}
