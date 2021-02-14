@@ -3,6 +3,7 @@ package com.bulletjournal.authz;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.SharedProjectItemDaoJpa;
+import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import com.google.common.collect.ImmutableSet;
@@ -43,10 +44,14 @@ public class AuthorizationService {
             return;
         }
 
-        if (!project.getGroup().getAcceptedUsers()
+        validateRequesterInGroup(requester, project.getGroup());
+    }
+
+    public void validateRequesterInGroup(String requester, Group group) {
+        if (!group.getAcceptedUsers()
                 .stream().anyMatch(u -> Objects.equals(requester, u.getUser().getName()))) {
-            throw new UnAuthorizedException("User " + requester + " not in Project "
-                    + project.getName());
+            throw new UnAuthorizedException("User " + requester + " not in Group "
+                    + group.getName());
         }
     }
 

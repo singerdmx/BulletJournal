@@ -320,4 +320,12 @@ public class GroupDaoJpa implements Etaggable {
                 EtagGenerator.HashType.TO_HASHCODE,
                 groupList);
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void createGroupShareLink(Long groupId, String requester, String uuid) {
+        Group group = getGroup(groupId);
+        this.authorizationService.validateRequesterInGroup(requester, group);
+        group.setUid(uuid);
+        this.groupRepository.save(group);
+    }
 }

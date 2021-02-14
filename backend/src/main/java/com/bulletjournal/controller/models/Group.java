@@ -25,15 +25,19 @@ public class Group {
 
     private Boolean isDefault;
 
+    private String uid;
+
     public Group() {
     }
 
     public Group(Long id,
                  @NotBlank @Size(min = 1, max = 100) String name,
-                 @NotNull User owner) {
+                 @NotNull User owner,
+                 String uid) {
         this.id = id;
         this.name = name;
         this.owner = owner;
+        this.uid = uid;
     }
 
     public static List<Group> addOwnerAvatar(List<Group> groups, UserClient userClient) {
@@ -101,6 +105,14 @@ public class Group {
 
     public void setOwner(User owner) {
         this.owner = owner;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     @Override
