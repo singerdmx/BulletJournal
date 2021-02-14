@@ -1,17 +1,19 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, Form, Input, InputNumber, Modal, Select, Tooltip} from 'antd';
 import {BankOutlined, CreditCardOutlined, DollarCircleOutlined, PlusCircleFilled} from '@ant-design/icons';
 import {connect} from 'react-redux';
 import './modals.styles.less';
-import {BankAccountType} from '../../features/transactions/interface';
+import {BankAccount, BankAccountType} from '../../features/transactions/interface';
 import {addBankAccount} from '../../features/myself/actions';
 import {useHistory} from 'react-router-dom';
 import {getBankAccountType} from '../settings/bank-account';
+import {IState} from "../../store";
 
 const {TextArea} = Input;
 const {Option} = Select;
 
 type Props = {
+  bankAccounts: BankAccount[];
   addBankAccount: (
       name: string,
       accountType: BankAccountType,
@@ -36,6 +38,10 @@ const AddBankAccountModal: React.FC<Props> = (props) => {
   const openModal = () => {
     setVisible(true);
   };
+
+  useEffect(() => {
+    setVisible(props.bankAccounts.length === 0);
+  }, [props.bankAccounts]);
 
   const history = useHistory();
   const addBankAccount = () => {
@@ -160,6 +166,10 @@ const AddBankAccountModal: React.FC<Props> = (props) => {
   return getDiv();
 };
 
-export default connect(null, {addBankAccount})(
+const mapStateToProps = (state: IState) => ({
+  bankAccounts: state.myself.bankAccounts,
+});
+
+export default connect(mapStateToProps, {addBankAccount})(
     AddBankAccountModal
 );
