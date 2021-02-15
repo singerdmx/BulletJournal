@@ -543,7 +543,9 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         tsWithRRule.forEach(ts -> {
             ZonedDateTime startTime = ZonedDateTimeHelper.getZonedDateTime(bankAccount.getCreatedAt(), ts.getTimezone());
             List<Transaction> rts = DaoHelper.getRecurringTransaction(ts, startTime, endTime);
-            accountSum.updateAndGet(v -> v + rts.size() * rts.get(0).getAmount());
+            if(!rts.isEmpty()) {
+                accountSum.updateAndGet(v -> v + rts.size() * rts.get(0).getAmount());
+            }
         });
         return accountSum.get();
     }
