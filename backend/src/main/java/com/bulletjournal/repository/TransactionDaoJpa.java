@@ -471,15 +471,6 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         this.transactionRepository.save(transaction);
     }
 
-    private double getTransactionNetAmount(Transaction transaction) {
-        double amount = transaction.getAmount();
-        if (transaction.getTransactionType() == TransactionType.EXPENSE) {
-            amount = -amount;
-        }
-
-        return amount;
-    }
-
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Transaction setBankAccount(
             String requester, Long transactionId, Long bankAccountId) {
@@ -529,6 +520,10 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Transaction> getRecurringTransactionsInBankAccount(
             ZonedDateTime startTime, ZonedDateTime endTime, BankAccount bankAccount) {
+        final ZonedDateTime now = ZonedDateTime.now();
+        if (now.compareTo(endTime) < 0) {
+            endTime = now;
+        }
         List<com.bulletjournal.repository.models.Transaction> tsWithRRule = this.transactionRepository
                 .findByBankAccountAndRecurrenceRuleNotNull(bankAccount);
         return DaoHelper.getRecurringTransactions(tsWithRRule, startTime, endTime);
@@ -540,14 +535,14 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
         List<com.bulletjournal.repository.models.Transaction> tsWithRRule = this.transactionRepository
                 .findByBankAccountAndRecurrenceRuleNotNull(bankAccount);
-        ZonedDateTime endTime = ZonedDateTime.now();
+        final ZonedDateTime endTime = ZonedDateTime.now();
         tsWithRRule.forEach(ts -> {
             try {
                 BuJoRecurrenceRule rule = new BuJoRecurrenceRule(ts.getRecurrenceRule(), ts.getTimezone());
                 ZonedDateTime startTime = ZonedDateTimeHelper.getZonedDateTime(rule.getStart());
                 List<Transaction> rts = DaoHelper.getRecurringTransaction(ts, startTime, endTime);
                 if (!rts.isEmpty()) {
-                    accountSum.updateAndGet(v -> v + rts.size() * rts.get(0).getAmount());
+                    accountSum.updateAndGet(v -> v + rts.size() * rts.get(0).getNetAmount());
                 }
             } catch (Exception e) {
                 LOGGER.error("Error converting transaction's recurrence rule: {}", e.toString());

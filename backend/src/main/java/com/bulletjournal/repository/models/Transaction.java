@@ -193,6 +193,15 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
         return this.bankAccount != null;
     }
 
+    public double getNetAmount() {
+        double amount = this.getAmount();
+        if (this.getTransactionType() == TransactionType.EXPENSE) {
+            amount = -amount;
+        }
+
+        return amount;
+    }
+
     @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
