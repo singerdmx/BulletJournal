@@ -41,4 +41,9 @@ public abstract class NamedModel extends AuditModel {
     public int hashCode() {
         return Objects.hash(getId());
     }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 }

@@ -26,6 +26,9 @@ public class BankAccountTransaction extends NamedModel {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private BankAccount bankAccount;
 
+    @Column(name = "recurrence_rule")
+    private String recurrenceRule;
+
     public Long getId() {
         return id;
     }
@@ -50,6 +53,14 @@ public class BankAccountTransaction extends NamedModel {
         this.amount = amount;
     }
 
+    public String getRecurrenceRule() {
+        return recurrenceRule;
+    }
+
+    public void setRecurrenceRule(String recurrenceRule) {
+        this.recurrenceRule = recurrenceRule;
+    }
+
     public Transaction toTransaction() {
         Transaction t = new Transaction();
         double amount = getAmount();
@@ -70,5 +81,10 @@ public class BankAccountTransaction extends NamedModel {
         t.setCreatedAt(getCreatedAt());
         t.setUpdatedAt(getUpdatedAt());
         return t;
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

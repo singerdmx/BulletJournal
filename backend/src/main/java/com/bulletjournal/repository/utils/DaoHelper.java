@@ -2,6 +2,7 @@ package com.bulletjournal.repository.utils;
 
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.daemon.models.ReminderRecord;
+import com.bulletjournal.repository.models.BankAccountTransaction;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.Transaction;
 import com.bulletjournal.util.BuJoRecurrenceRule;
@@ -61,11 +62,51 @@ public class DaoHelper {
     }
 
     /**
+     * Fetch all recurring within [startTime, endTime] based on bank account transaction's recurrence rule.
+     *
+     * @param transaction the target transaction contains recurrence rule
+     * @param startTime   the requested time range starting time
+     * @param endTime     the requested time range ending time
+     * @return List<Task> - a list of task based on recurrence rule
+     */
+    public static List<Transaction> getRecurringBankAccountTransaction(BankAccountTransaction transaction, ZonedDateTime startTime, ZonedDateTime endTime) {
+        try {
+            DateTime startDateTime = ZonedDateTimeHelper.getDateTime(startTime);
+            DateTime endDateTime = ZonedDateTimeHelper.getDateTime(endTime);
+
+            List<Transaction> recurringTransactionsBetween = new ArrayList<>();
+            String recurrenceRule = transaction.getRecurrenceRule();
+
+            BuJoRecurrenceRule rule = new BuJoRecurrenceRule(recurrenceRule, ZonedDateTimeHelper.DEFAULT_TIME);
+            RecurrenceRuleIterator it = rule.getIterator();
+
+            while (it.hasNext()) {
+                DateTime currDateTime = it.nextDateTime();
+                if (currDateTime.after(endDateTime)) {
+                    break;
+                }
+                if (currDateTime.before(startDateTime)) {
+                    continue;
+                }
+                Transaction cloned = cloneBankAccountTransactionWithDateTime(transaction,
+                        ZonedDateTimeHelper.DEFAULT_TIME,
+                        currDateTime);
+                recurringTransactionsBetween.add(cloned);
+            }
+            return recurringTransactionsBetween;
+        } catch (InvalidRecurrenceRuleException | NumberFormatException e) {
+            throw new IllegalArgumentException("Recurrence rule format invalid");
+        } catch (CloneNotSupportedException e) {
+            throw new IllegalStateException("Clone new Task failed");
+        }
+    }
+
+    /**
      * Fetch all recurring within [startTime, endTime] based on transaction's recurrence rule
      *
      * @param transaction the target transaction contains recurrence rule
-     * @param startTime the requested time range starting time
-     * @param endTime   the requested time range ending time
+     * @param startTime   the requested time range starting time
+     * @param endTime     the requested time range ending time
      * @return List<Task> - a list of task based on recurrence rule
      */
     public static List<Transaction> getRecurringTransaction(Transaction transaction, ZonedDateTime startTime, ZonedDateTime endTime) {
@@ -160,6 +201,23 @@ public class DaoHelper {
     /**
      * Clone a new transaction and set RFC 5545 DateTime as its [DueDate, DueTime] and [StartTime, EndTime]
      * Only used for recurring transaction
+     *
+     * @param bankAccountTransaction the target bank account transaction needs to cloned
+     * @param timezone               the target timezone for cloned task's due date and due time
+     * @param currDateTime           the RFC 5545 DateTime Object contains timing information
+     * @return Transaction a transaction cloned from original task with new Due DateTime and Timezone
+     * @throws CloneNotSupportedException
+     */
+    private static Transaction cloneBankAccountTransactionWithDateTime(BankAccountTransaction bankAccountTransaction,
+                                                                       String timezone,
+                                                                       DateTime currDateTime) throws CloneNotSupportedException {
+        return cloneTransactionWithDateTime(bankAccountTransaction.toTransaction(), timezone, currDateTime);
+    }
+
+    /**
+     * Clone a new transaction and set RFC 5545 DateTime as its [DueDate, DueTime] and [StartTime, EndTime]
+     * Only used for recurring transaction
+     *
      * @param transaction  the target transaction needs to cloned
      * @param timezone     the target timezone for cloned task's due date and due time
      * @param currDateTime the RFC 5545 DateTime Object contains timing information
@@ -196,6 +254,7 @@ public class DaoHelper {
     /**
      * Clone a new task and set RFC 5545 DateTime as its [DueDate, DueTime] and [StartTime, EndTime]
      * Only used for recurring task
+     *
      * @param task         the target task needs to cloned
      * @param timezone     the target timezone for cloned task's due date and due time
      * @param currDateTime the RFC 5545 DateTime Object contains timing information

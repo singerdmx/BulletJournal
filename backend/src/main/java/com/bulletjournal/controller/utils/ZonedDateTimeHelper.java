@@ -27,6 +27,7 @@ public class ZonedDateTimeHelper {
     public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
     private static final String MIN_TIME = "00:00";
     private static final String MAX_TIME = "23:59";
+    private static final String DEFAULT_TIMEZONE = "America/Los_Angeles";
 
     public static String toDBTimestamp(ZonedDateTime zonedDateTime) {
         String res = Timestamp.from(zonedDateTime.toInstant()).toString();
@@ -63,6 +64,12 @@ public class ZonedDateTimeHelper {
         return Timestamp.from(dateTime.toInstant());
     }
 
+    /**
+     * Return ZonedDateTime from Timestamp and Default Timezone
+     */
+    public static ZonedDateTime toZonedDateTime(Timestamp ts) {
+        return getZonedDateTime(ts.toInstant().toEpochMilli() * 1000, DEFAULT_TIMEZONE);
+    }
 
     /**
      * Return ZonedDateTime from Timestamp and timezone
