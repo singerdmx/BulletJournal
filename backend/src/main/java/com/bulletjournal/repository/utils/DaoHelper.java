@@ -63,9 +63,23 @@ public class DaoHelper {
     /**
      * Fetch all recurring within [startTime, endTime] based on transaction's recurrence rule
      *
+     * @param transactions the target list of transaction contains recurrence rule
+     * @param startTime    the requested time range starting time
+     * @param endTime      the requested time range ending time
+     * @return List<Task> - a list of task based on recurrence rule
+     */
+    public static List<Transaction> getRecurringTransactions(List<Transaction> transactions, ZonedDateTime startTime, ZonedDateTime endTime) {
+        List<Transaction> result = new ArrayList<>();
+        transactions.forEach(ts -> result.addAll(getRecurringTransaction(ts, startTime, endTime)));
+        return result;
+    }
+
+    /**
+     * Fetch all recurring within [startTime, endTime] based on transaction's recurrence rule
+     *
      * @param transaction the target transaction contains recurrence rule
-     * @param startTime the requested time range starting time
-     * @param endTime   the requested time range ending time
+     * @param startTime   the requested time range starting time
+     * @param endTime     the requested time range ending time
      * @return List<Task> - a list of task based on recurrence rule
      */
     public static List<Transaction> getRecurringTransaction(Transaction transaction, ZonedDateTime startTime, ZonedDateTime endTime) {
@@ -160,6 +174,7 @@ public class DaoHelper {
     /**
      * Clone a new transaction and set RFC 5545 DateTime as its [DueDate, DueTime] and [StartTime, EndTime]
      * Only used for recurring transaction
+     *
      * @param transaction  the target transaction needs to cloned
      * @param timezone     the target timezone for cloned task's due date and due time
      * @param currDateTime the RFC 5545 DateTime Object contains timing information
@@ -196,6 +211,7 @@ public class DaoHelper {
     /**
      * Clone a new task and set RFC 5545 DateTime as its [DueDate, DueTime] and [StartTime, EndTime]
      * Only used for recurring task
+     *
      * @param task         the target task needs to cloned
      * @param timezone     the target timezone for cloned task's due date and due time
      * @param currDateTime the RFC 5545 DateTime Object contains timing information

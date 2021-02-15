@@ -63,9 +63,15 @@ public class ZonedDateTimeHelper {
         return Timestamp.from(dateTime.toInstant());
     }
 
+    /**
+     * Return ZonedDateTime from Timestamp and Timezone
+     */
+    public static ZonedDateTime getZonedDateTime(Timestamp ts, String timezone) {
+        return getZonedDateTime(ts.toInstant().toEpochMilli() * 1000, timezone);
+    }
 
     /**
-     * Return ZonedDateTime from Timestamp and timezone
+     * Return ZonedDateTime from Timestamp Second and Timezone
      */
     public static ZonedDateTime getZonedDateTime(long timestampSecond, String timezone) {
         return ZonedDateTime.ofInstant(Instant.ofEpochSecond(timestampSecond), ZoneId.of(timezone));

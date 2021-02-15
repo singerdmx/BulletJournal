@@ -3,9 +3,9 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
-import com.bulletjournal.controller.models.params.CreateTransactionParams;
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.ProjectType;
+import com.bulletjournal.controller.models.params.CreateTransactionParams;
 import com.bulletjournal.controller.models.params.UpdateTransactionParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
@@ -35,6 +35,7 @@ import javax.persistence.PersistenceContext;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Repository
@@ -527,11 +528,23 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Transaction> getRecurringTransactionsInBankAccount(
             ZonedDateTime startTime, ZonedDateTime endTime, BankAccount bankAccount) {
-        return Collections.emptyList();
+        List<com.bulletjournal.repository.models.Transaction> tsWithRRule = this.transactionRepository
+                .findByBankAccountAndRecurrenceRuleNotNull(bankAccount);
+        return DaoHelper.getRecurringTransactions(tsWithRRule, startTime, endTime);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public double getRecurringTransactionsAmountSum(BankAccount bankAccount) {
-        return 0;
+        AtomicReference<Double> accountSum = new AtomicReference<>(0.0);
+
+        List<com.bulletjournal.repository.models.Transaction> tsWithRRule = this.transactionRepository
+                .findByBankAccountAndRecurrenceRuleNotNull(bankAccount);
+        ZonedDateTime endTime = ZonedDateTime.now();
+        tsWithRRule.forEach(ts -> {
+            ZonedDateTime startTime = ZonedDateTimeHelper.getZonedDateTime(bankAccount.getCreatedAt(), ts.getTimezone());
+            List<Transaction> rts = DaoHelper.getRecurringTransaction(ts, startTime, endTime);
+            accountSum.updateAndGet(v -> v + rts.size() * rts.get(0).getAmount());
+        });
+        return accountSum.get();
     }
 }

@@ -76,5 +76,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
             @Param("endTime") Timestamp endTime,
             @Param("bankAccount") BankAccount bankAccount);
 
+    @Query(value = "SELECT transaction FROM Transaction transaction WHERE "
+            + "transaction.bankAccount = :bankAccount AND transaction.recurrenceRule IS NOT NULL")
+    List<Transaction> findByBankAccountAndRecurrenceRuleNotNull(@Param("bankAccount") BankAccount bankAccount);
+
     List<Transaction> findByBankAccount(BankAccount bankAccount);
 }
