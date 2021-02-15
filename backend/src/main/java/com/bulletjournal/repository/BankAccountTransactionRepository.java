@@ -20,8 +20,4 @@ public interface BankAccountTransactionRepository extends JpaRepository<BankAcco
             @Param("startTime") Timestamp startTime,
             @Param("endTime") Timestamp endTime,
             @Param("bankAccount") BankAccount bankAccount);
-
-    @Query(value = "SELECT transaction FROM BankAccountTransaction transaction WHERE " +
-            "transaction.bankAccount = :bankAccount AND transaction.recurrenceRule is not NULL")
-    List<BankAccountTransaction> findBankAccountTransactionsWithRecurrenceRule(@Param("bankAccount") BankAccount bankAccount);
 }

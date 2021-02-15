@@ -3,9 +3,9 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
+import com.bulletjournal.controller.models.params.CreateTransactionParams;
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.ProjectType;
-import com.bulletjournal.controller.models.params.CreateTransactionParams;
 import com.bulletjournal.controller.models.params.UpdateTransactionParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
@@ -527,17 +527,11 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<Transaction> getRecurringTransactionsInBankAccount(
             ZonedDateTime startTime, ZonedDateTime endTime, BankAccount bankAccount) {
-        List<Transaction> transactions = new ArrayList<>();
-        this.bankAccountTransactionRepository.findBankAccountTransactionsWithRecurrenceRule(bankAccount)
-                .forEach(t -> transactions.addAll(DaoHelper.getRecurringBankAccountTransaction(t, startTime, endTime)));
-        return transactions;
+        return Collections.emptyList();
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public double getRecurringTransactionsAmountSum(BankAccount bankAccount) {
-        ZonedDateTime startTime = ZonedDateTimeHelper.toZonedDateTime(bankAccount.getCreatedAt());
-        ZonedDateTime endTime = ZonedDateTimeHelper.getNow();
-        return getRecurringTransactionsInBankAccount(startTime, endTime, bankAccount)
-                .stream().mapToDouble(Transaction::getAmount).sum();
+        return 0;
     }
 }
