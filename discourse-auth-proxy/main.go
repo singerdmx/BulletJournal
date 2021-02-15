@@ -113,6 +113,11 @@ func authProxyHandler(handler http.Handler, config *Config) http.Handler {
 			logger.Printf("Request %s %s", r.Host, r.URL)
 		}
 
+		if r.URL.Path == "ads.txt" {
+			fmt.Fprintf(w, "google.com, pub-8783793954376932, DIRECT, f08c47fec0942fa0")
+			return
+		}
+
 		if r.Host == "home.bulletjournal.us" {
 			logger.Printf("Port 443: Bypassing Auth Proxy: %s", r.RequestURI)
 			handler.ServeHTTP(w, r)
