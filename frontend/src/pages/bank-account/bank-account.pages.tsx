@@ -84,6 +84,7 @@ const BankAccountPage: React.FC<BankAccountProps> = (
                         onDeleteSuccess={() => {
                             if (account) {
                                 getBankAccountTransactions(account.id, startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD'));
+                                getBankAccounts();
                             }
                         }}
                     />

@@ -344,6 +344,9 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         this.authorizationService.checkAuthorizedToOperateOnContent(transaction.getOwner(), requester,
                 ContentType.TRANSACTION, Operation.DELETE, projectId, project.getOwner());
 
+        if (transaction.hasBankAccount()) {
+            this.bankAccountBalanceRepository.deleteById(transaction.getBankAccount().getId());
+        }
         if (dateTime != null && StringUtils.isNotBlank(transaction.getRecurrenceRule())) {
             return deleteSingleRecurringTransaction(transaction, dateTime);
         }
