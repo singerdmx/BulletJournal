@@ -18,6 +18,7 @@ import com.bulletjournal.notifications.Event;
 import com.bulletjournal.redis.BankAccountBalanceRepository;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
+import com.bulletjournal.util.BuJoRecurrenceRule;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -541,10 +542,15 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
                 .findByBankAccountAndRecurrenceRuleNotNull(bankAccount);
         ZonedDateTime endTime = ZonedDateTime.now();
         tsWithRRule.forEach(ts -> {
-            ZonedDateTime startTime = ZonedDateTimeHelper.getZonedDateTime(bankAccount.getCreatedAt(), ts.getTimezone());
-            List<Transaction> rts = DaoHelper.getRecurringTransaction(ts, startTime, endTime);
-            if(!rts.isEmpty()) {
-                accountSum.updateAndGet(v -> v + rts.size() * rts.get(0).getAmount());
+            try {
+                BuJoRecurrenceRule rule = new BuJoRecurrenceRule(ts.getRecurrenceRule(), ts.getTimezone());
+                ZonedDateTime startTime = ZonedDateTimeHelper.getZonedDateTime(rule.getStart());
+                List<Transaction> rts = DaoHelper.getRecurringTransaction(ts, startTime, endTime);
+                if (!rts.isEmpty()) {
+                    accountSum.updateAndGet(v -> v + rts.size() * rts.get(0).getAmount());
+                }
+            } catch (Exception e) {
+                LOGGER.error("Error converting transaction's recurrence rule: {}", e.toString());
             }
         });
         return accountSum.get();
