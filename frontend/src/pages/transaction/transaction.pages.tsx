@@ -66,7 +66,7 @@ type TransactionProps = {
   currency: string;
   transaction: Transaction | undefined;
   contents: Content[];
-  deleteTransaction: (transactionId: number, type: ProjectItemUIType, dateTime?: string) => void;
+  deleteTransaction: (transactionId: number, onSuccess?: Function, type?: ProjectItemUIType, dateTime?: string) => void;
   updateTransactionContents: (transactionId: number, updateDisplayMore?: boolean) => void;
   getProject: (projectId: number) => void;
   updateTransactionColorSettingShown: (
@@ -346,7 +346,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
               okText="Yes"
               cancelText="No"
               onConfirm={() => {
-                deleteTransaction(transaction.id, ProjectItemUIType.PAGE);
+                deleteTransaction(transaction.id, undefined, ProjectItemUIType.PAGE);
                 setTimeout(() => history.goBack(), 500);
               }}
               className="group-setting"

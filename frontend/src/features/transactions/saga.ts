@@ -240,12 +240,14 @@ function* getTransaction(action: PayloadAction<GetTransaction>) {
 
 function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
   try {
-    const { transactionId, type, dateTime } = action.payload;
+    const { transactionId, type, dateTime, onSuccess } = action.payload;
     const state: IState = yield select();
     const transaction : Transaction = yield call(getTransactionById, transactionId);
     yield call(deleteTransactionById, transactionId, dateTime);
 
-    console.log(type);
+    if (onSuccess) {
+      onSuccess();
+    }
     if (type === ProjectItemUIType.PROJECT || type === ProjectItemUIType.PAYER || type === ProjectItemUIType.MANAGE_RECURRING) {
       const data = yield call(
         fetchTransactions,
@@ -262,11 +264,6 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
           ledgerSummary: ledgerSummary,
         })
       );
-    }
-
-    if(type === ProjectItemUIType.MANAGE_BANK_TRANSACTIONS && transaction.bankAccount){
-        const bankAccount = transaction.bankAccount;
-        yield getBankAccountTransactions({ payload: { bankAccountId: (bankAccount || {}).id, startDate: state.transaction.startDate, endDate: state.transaction.endDate }, type: 'GetBankAccountTransactionsAction' })
     }
 
     if (type === ProjectItemUIType.TODAY) {
@@ -315,7 +312,7 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
     }
 
     yield put(transactionsActions.transactionReceived({transaction: undefined}));
-    if (state.project.project && ![ProjectItemUIType.LABEL, ProjectItemUIType.TODAY, ProjectItemUIType.RECENT].includes(type)) {
+    if (state.project.project && type && ![ProjectItemUIType.LABEL, ProjectItemUIType.TODAY, ProjectItemUIType.RECENT].includes(type)) {
       yield put(projectLabelsUpdate(state.project.project.id, state.project.project.shared));
     }
     yield call(message.success, `Transaction '${transaction.name}' deleted successfully`);

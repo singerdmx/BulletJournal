@@ -93,8 +93,9 @@ export type TransactionAction = {
 
 export type DeleteTransaction = {
   transactionId: number;
-  type: ProjectItemUIType;
+  type?: ProjectItemUIType;
   dateTime?: string;
+  onSuccess?: Function;
 };
 
 export type DeleteTransactions = {

@@ -96,5 +96,4 @@ export enum ProjectItemUIType {
     PAGE,
     COMPLETE_TASK,
     MANAGE_RECURRING,
-    MANAGE_BANK_TRANSACTIONS
 }

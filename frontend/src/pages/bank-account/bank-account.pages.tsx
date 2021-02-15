@@ -2,22 +2,21 @@ import React, {useEffect, useState} from 'react';
 import './bank-account.styles.less';
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {getBankAccounts} from "../../features/myself/actions";
+import {deleteBankAccount, getBankAccounts} from "../../features/myself/actions";
 import {BankAccount, Transaction} from "../../features/transactions/interface";
 import {useHistory, useParams} from "react-router-dom";
 import BankAccountElem from "../../components/settings/bank-account";
 import {BackTop, Button, DatePicker, Empty, InputNumber, List, Popover} from "antd";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
-import {BankOutlined, CalculatorOutlined, DeleteOutlined, EditOutlined, SaveOutlined} from "@ant-design/icons";
+import {BankOutlined, CalculatorOutlined, DeleteOutlined, SaveOutlined} from "@ant-design/icons";
 import TextArea from "antd/es/input/TextArea";
 import {changeAccountBalance, getBankAccountTransactions} from "../../features/transactions/actions";
 import moment, {Moment} from "moment";
 import {dateFormat} from "../../features/myBuJo/constants";
-import { ProjectItemUIType } from "../../features/project/constants";
 import TransactionItem from '../../components/project-item/transaction-item.component';
 import EditBankAccount from '../../components/modals/edit-bank.component';
-import { deleteBankAccount } from '../../features/myself/actions';
-const { RangePicker } = DatePicker;
+
+const {RangePicker} = DatePicker;
 
 type BankAccountProps = {
     getBankAccounts: () => void;
@@ -43,7 +42,7 @@ const BankAccountPage: React.FC<BankAccountProps> = (
     const [balance, setBalance] = useState(0);
     const [memo, setMemo] = useState('');
     const [startDate, setStartDate] = useState(moment().startOf('month'));
-	const [endDate, setEndDate] = useState(moment().endOf('month'));
+    const [endDate, setEndDate] = useState(moment().endOf('month'));
 
     useEffect(() => {
         getBankAccounts();
@@ -77,12 +76,17 @@ const BankAccountPage: React.FC<BankAccountProps> = (
         return (<List className='transaction-list'>
             {transactions.map((item) => (
                 <List.Item key={`${item.id} + ' ' + ${item.date}`} className='transaction-list-item'>
-                  <TransactionItem
-                    transaction={item}
-                    type={ProjectItemUIType.MANAGE_BANK_TRANSACTIONS}
-                    inProject={item.shared}
-                    showModal={() => {}}
-                  />
+                    <TransactionItem
+                        transaction={item}
+                        inProject={item.shared}
+                        showModal={() => {
+                        }}
+                        onDeleteSuccess={() => {
+                            if (account) {
+                                getBankAccountTransactions(account.id, startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD'));
+                            }
+                        }}
+                    />
                 </List.Item>
             ))}
         </List>);
@@ -129,13 +133,13 @@ const BankAccountPage: React.FC<BankAccountProps> = (
     }
 
     const onTimeRangeChange = (value: any, formatString: [string, string]) => {
-        const s : Moment = value[0];
-        const e : Moment = value[1];
+        const s: Moment = value[0];
+        const e: Moment = value[1];
         setStartDate(s);
         setEndDate(e);
     }
 
-    const handleDelete = (id: number | undefined) => () =>{
+    const handleDelete = (id: number | undefined) => () => {
         if (id) {
             deleteBankAccount(id);
             history.push('/bank');
@@ -184,7 +188,7 @@ const BankAccountPage: React.FC<BankAccountProps> = (
             >
                 <DeleteOutlined/>
             </FloatButton>
-            <EditBankAccount bankAccount={account} mode='float' />
+            <EditBankAccount bankAccount={account} mode='float'/>
             <Popover placement="leftTop" title='Enter Account Balance' content={getEnterBankBalanceDialog()}
                      trigger="click">
                 <FloatButton

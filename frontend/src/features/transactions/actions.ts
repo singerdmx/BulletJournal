@@ -56,8 +56,8 @@ export const createTransaction = (
   });
 export const getTransaction = (transactionId: number) =>
   actions.TransactionGet({ transactionId: transactionId });
-export const deleteTransaction = (transactionId: number, type: ProjectItemUIType, dateTime?: string) =>
-  actions.TransactionDelete({ transactionId: transactionId, type: type, dateTime: dateTime });
+export const deleteTransaction = (transactionId: number, onSuccess?: Function, type?: ProjectItemUIType, dateTime?: string) =>
+  actions.TransactionDelete({ transactionId: transactionId, type: type, dateTime: dateTime, onSuccess: onSuccess });
 export const deleteTransactions = (
   projectId: number,
   transactions: Transaction[],

@@ -40,12 +40,13 @@ type TransactionProps = {
 type TransactionManageProps = {
   inModal?: boolean;
   transaction: Transaction;
-  type: ProjectItemUIType;
-  deleteTransaction: (transactionId: number, type: ProjectItemUIType, dateTime?: string) => void;
+  type?: ProjectItemUIType;
+  deleteTransaction: (transactionId: number, onSuccess?: Function, type?: ProjectItemUIType, dateTime?: string) => void;
+  onDeleteSuccess?: Function;
 };
 
 const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
-  const { transaction, deleteTransaction, inModal, type } = props;
+  const { transaction, deleteTransaction, inModal, type, onDeleteSuccess } = props;
 
     const getPopConfirmForDelete = (transaction: Transaction) => {
         if (!transaction.date || !transaction.recurrenceRule) {
@@ -56,7 +57,7 @@ const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
                 cancelText='No'
                 className='group-setting'
                 placement='bottom'
-                onConfirm={() => deleteTransaction(transaction.id, type)}
+                onConfirm={() => deleteTransaction(transaction.id, onDeleteSuccess, type)}
             >
                 <div className='popover-control-item'>
                     <span>Delete</span>
@@ -71,8 +72,8 @@ const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
             cancelText="Occurrence"
             className='group-setting'
             placement='bottom'
-            onConfirm={() => deleteTransaction(transaction.id, type)}
-            onCancel={() => deleteTransaction(transaction.id, type, transaction.date + ' ' + transaction.time)}
+            onConfirm={() => deleteTransaction(transaction.id, onDeleteSuccess, type)}
+            onCancel={() => deleteTransaction(transaction.id, onDeleteSuccess, type, transaction.date + ' ' + transaction.time)}
         >
             <div className='popover-control-item'>
                 <span>Delete</span>
@@ -108,7 +109,8 @@ const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
 };
 
 const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (props) => {
-  const { transaction, theme, deleteTransaction, inModal, inProject, showModal, type, setSelectedLabel, updateTransactionColorSettingShown } = props;
+  const { transaction, theme, deleteTransaction, inModal, inProject, showModal,
+      type, setSelectedLabel, updateTransactionColorSettingShown, onDeleteSuccess } = props;
   // hook history in router
   const history = useHistory();
   // jump to label searching page by label click
@@ -311,6 +313,7 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
                             type={type}
                             deleteTransaction={deleteTransaction}
                             inModal={inModal}
+                            onDeleteSuccess={onDeleteSuccess}
                         />
                     }
                     trigger='click'
