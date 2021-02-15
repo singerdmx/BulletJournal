@@ -113,7 +113,7 @@ func authProxyHandler(handler http.Handler, config *Config) http.Handler {
 			logger.Printf("Request %s %s", r.Host, r.URL)
 		}
 
-		if r.URL.Path == "ads.txt" {
+		if strings.HasPrefix(r.URL.Path, "/ads.txt") {
 			fmt.Fprintf(w, "google.com, pub-8783793954376932, DIRECT, f08c47fec0942fa0")
 			return
 		}
