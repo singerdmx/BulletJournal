@@ -1946,3 +1946,15 @@ Mobile
     height: auto !important;
   }
 }
+
+div.ads-div {
+  width: 80%;
+  margin-left: 10%;
+}
+
+@media only screen and (max-width: 600px) {
+  div.ads-div {
+    width: 100%;
+    margin-left: 0;
+  }
+}
