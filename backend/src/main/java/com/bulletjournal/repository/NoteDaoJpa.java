@@ -375,9 +375,5 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         System.out.println("Note name: " + note.getName());
 
         System.out.println(targetEmails);
-        System.out.println(params.generateExportHtml());
-
-        messagingService.sendExportedContentEmailsToUsers(requester, "note",
-            note.getName(), params.generateExportHtml(), targetEmails);
     }
 }

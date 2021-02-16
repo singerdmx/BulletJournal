@@ -1249,6 +1249,5 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         System.out.println("task name: " + task.getName());
 
         System.out.println(targetEmails);
-        System.out.println(params.generateExportHtml());
     }
 }
