@@ -492,7 +492,9 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         BankAccount bankAccount = this.bankAccountDaoJpa.getBankAccount(requester, bankAccountId);
         transaction.setBankAccount(bankAccount);
         transaction = this.transactionRepository.save(transaction);
-        this.bankAccountBalanceRepository.deleteById(bankAccountId);
+        if (bankAccountId != null) {
+            this.bankAccountBalanceRepository.deleteById(bankAccountId);
+        }
         return transaction;
     }
 

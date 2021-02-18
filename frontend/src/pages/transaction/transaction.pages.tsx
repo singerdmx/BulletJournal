@@ -242,7 +242,6 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
                 title='Recurring Transaction'
                 value={s}
                 valueStyle={{ fontSize: '21px' }}
-                prefix={<CreditCardOutlined />}
             />
           </Card>
         </Col>
