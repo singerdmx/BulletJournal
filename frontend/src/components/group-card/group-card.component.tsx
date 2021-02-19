@@ -1,6 +1,6 @@
 import React from "react";
-import {CheckOutlined, CloseOutlined, DeleteOutlined, SearchOutlined, UserOutlined} from "@ant-design/icons";
-import {Avatar, Badge, Button, Input, List, Popconfirm, Switch, Tooltip, Typography} from "antd";
+import {CloseOutlined, CopyOutlined, DeleteOutlined, SearchOutlined, UserOutlined} from "@ant-design/icons";
+import {Avatar, Badge, Button, Input, List, message, Popconfirm, Switch, Tooltip, Typography} from "antd";
 import {connect} from "react-redux";
 import {RouteComponentProps, withRouter} from "react-router";
 import {
@@ -19,6 +19,8 @@ import AddUser from "../modals/add-user.component";
 import {History} from "history";
 import {changeAlias} from "../../features/user/actions";
 import {onFilterUser} from "../../utils/Util";
+import './group-card.styles.less';
+import CopyToClipboard from "react-copy-to-clipboard";
 
 type GroupProps = {
   group: Group;
@@ -219,6 +221,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
       checked ? this.addGroupShareLink(group.id) : this.deleteGroupShareLink(group.id);
     }
 
+    const joinGroupUrl = `${window.location.protocol}//${window.location.host}/public/groups/${group.uid}`;
     return (
         <div className={`group-card ${this.props.multiple && 'multiple'}`}>
           <div className="group-title">
@@ -250,17 +253,33 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
           </div>
           <div className="invitation-generator">
             <div>
-              <Switch className="invitation-slider" size="small"
-                      checkedChildren={<CheckOutlined/>}
-                      unCheckedChildren={<CloseOutlined/>}
-                      checked={!!group.uid}
-                      onChange={(checked) => onInvitedChange(checked)}
-              />
+              <Tooltip title={`${!group.uid ? 'Click to share group via link' : 'Click to disable link'}`}>
+                <Switch className="invitation-slider" size="small"
+                        checked={!!group.uid}
+                        onChange={(checked) => onInvitedChange(checked)}
+                />
+              </Tooltip>
             </div>
             <div>
-              <span>
-                {!!group.uid ? "Share group via link" : "uid: " + group.uid}
-              </span>
+              {!group.uid ? 'Share group via link' : (
+                  <CopyToClipboard
+                      text={joinGroupUrl}
+                      onCopy={() => message.success(`Link Copied to Clipboard: ${joinGroupUrl}`)}
+                  >
+                          <span className='join-group-url'>
+                            {`${window.location.host}/public/groups/${group.uid}`}
+                            <Tooltip title='Share link to join group'>
+                            <Button
+                                type="default"
+                                size="small"
+                                style={{marginLeft: '6px'}}
+                                icon={<CopyOutlined/>}
+                            ></Button>
+                                                  </Tooltip>
+
+                          </span>
+                  </CopyToClipboard>
+              )}
             </div>
           </div>
           <div className="group-users">
