@@ -217,10 +217,11 @@ public class GroupController {
     }
 
     @PostMapping(DISABLE_GROUP_SHARE_LINK)
-    public void disableGroupShareLink(@NotNull @PathVariable Long groupId) {
+    public String disableGroupShareLink(@NotNull @PathVariable Long groupId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Informed informed = this.groupDaoJpa.setGroupShareLink(groupId, username, null);
         this.notificationService.inform(informed);
+        return null;
     }
 
     @PostMapping(JOIN_GROUP_VIA_LINK)

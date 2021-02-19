@@ -64,3 +64,23 @@ export const updateGroup = (groupId: number, name: string) => {
       throw Error(err.message);
     });
 };
+
+export const createGroupShareLink = (groupId: number) => {
+  const postBody = JSON.stringify({
+    groupId: groupId
+  });
+  return doPost(`/api/groups/${groupId}/links`, postBody)
+      .catch(err => {
+        throw Error(err.message);
+      });
+};
+
+export const disableGroupShareLink = (groupId: number) => {
+  const postBody = JSON.stringify({
+    groupId: groupId
+  });
+  return doPost(`/api/groups/${groupId}/disableLink`, postBody)
+      .catch(err => {
+        throw Error(err.message);
+      });
+};

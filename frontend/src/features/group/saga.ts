@@ -11,6 +11,8 @@ import {
   GroupUpdateAction,
   PatchGroupAction,
   RemoveUserGroupAction,
+  CreateGroupShareLinkAction,
+  DisableGroupShareLinkAction,
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -21,6 +23,8 @@ import {
   getGroup,
   removeUserGroup,
   updateGroup,
+  createGroupShareLink,
+  disableGroupShareLink,
 } from '../../apis/groupApis';
 import { IState } from '../../store';
 import { clearUser } from '../user/actions';
@@ -185,6 +189,40 @@ function* patchGroup(action: PayloadAction<PatchGroupAction>) {
   }
 }
 
+function* addGroupShareLink(action: PayloadAction<CreateGroupShareLinkAction>) {
+  try {
+    const { groupId } = action.payload;
+    yield call(createGroupShareLink, groupId);
+    yield all([
+      yield put(groupsActions.groupsUpdate({})),
+      yield put(groupsActions.getGroup({ groupId: groupId })),
+    ]);
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Create group uid fail: ${error}`);
+    }
+  }
+}
+
+function* deleteGroupShareLink(action: PayloadAction<DisableGroupShareLinkAction>) {
+  try {
+    const {groupId} = action.payload;
+    yield call(disableGroupShareLink, groupId);
+    yield all([
+      yield put(groupsActions.groupsUpdate({})),
+      yield put(groupsActions.getGroup({ groupId: groupId })),
+    ]);
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Disable group uid fail: ${error}`);
+    }
+  }
+}
+
 export default function* groupSagas() {
   yield all([
     yield takeLatest(
@@ -199,5 +237,7 @@ export default function* groupSagas() {
     yield takeLatest(groupsActions.getGroup.type, getUserGroup),
     yield takeLatest(groupsActions.patchGroup.type, patchGroup),
     yield takeLatest(groupsActions.groupUpdate.type, groupUpdate),
+    yield takeLatest(groupsActions.createGroupShareLink.type, addGroupShareLink),
+    yield takeLatest(groupsActions.disableGroupShareLink.type, deleteGroupShareLink)
   ]);
 }

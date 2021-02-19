@@ -1,9 +1,9 @@
-import React from "react";
-import { CloseOutlined, DeleteOutlined, UserOutlined, SearchOutlined } from "@ant-design/icons";
-import { Avatar, Badge, Button, Input, List, Popconfirm, Tooltip, Typography, } from "antd";
+import React, {useState} from "react";
+import {CloseOutlined, DeleteOutlined, UserOutlined, SearchOutlined, CheckOutlined} from "@ant-design/icons";
+import { Avatar, Badge, Button, Input, List, Popconfirm, Tooltip, Typography, Switch} from "antd";
 import { connect } from "react-redux";
 import { RouteComponentProps, withRouter } from "react-router";
-import { deleteGroup, getGroup, patchGroup, removeUserGroupByUsername, } from "../../features/group/actions";
+import { deleteGroup, getGroup, patchGroup, removeUserGroupByUsername, createGroupShareLink, disableGroupShareLink } from "../../features/group/actions";
 import { Group, User } from "../../features/group/interface";
 import { MyselfWithAvatar } from "../../features/myself/reducer";
 import { IState } from "../../store";
@@ -12,6 +12,7 @@ import AddUser from "../modals/add-user.component";
 import { History } from "history";
 import { changeAlias } from "../../features/user/actions";
 import { onFilterUser } from "../../utils/Util";
+import {BankAccount, BankAccountType} from "../../features/transactions/interface";
 
 type GroupProps = {
   group: Group;
@@ -30,11 +31,14 @@ type GroupProps = {
   ) => void;
   getGroup: (groupId: number) => void;
   patchGroup: (groupId: number, groupName: string) => void;
+  createGroupShareLink: (groupId: number) => void;
+  disableGroupShareLink: (groupId: number) => void;
 };
 
 type PathProps = RouteComponentProps;
 
 type GroupCardState = {
+  invited: boolean;
   users: User[];
   filter: string;
 };
@@ -51,11 +55,13 @@ const { Title, Text } = Typography;
 class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> {
 
   state: GroupCardState = {
+    invited: false,
     users: this.props.group.users,
     filter: ''
   };
 
   componentDidMount() {
+    this.setState({invited: false});
     if (this.props.group) {
       this.setState({users: this.props.group.users});
     } else {
@@ -89,6 +95,14 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
       this.props.group.name,
       this.props.history
     );
+  };
+
+  addGroupShareLink = (groupId: number) => {
+    this.props.createGroupShareLink(groupId);
+  };
+
+  deleteGroupShareLink = (groupId: number) => {
+    this.props.disableGroupShareLink(groupId);
   };
 
   titleChange = (content: string) => {
@@ -198,6 +212,11 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
       this.setState({ users: users });
     };
 
+    const onInvitedChange = () => {
+      this.state.invited? this.deleteGroupShareLink(group.id) : this.addGroupShareLink(group.id);
+      this.setState({ invited : !this.state.invited });
+    }
+
     return (
       <div className={`group-card ${this.props.multiple && 'multiple'}`}>
         <div className="group-title">
@@ -226,6 +245,16 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
               </Popconfirm>
             )}
           </h3>
+        </div>
+        <div className="invitation-generator">
+            <span className="invitation-status">
+              {this.state.invited? "uid: " + group.uid : "Share group via link"}
+            </span>
+          <Switch className="invitation-slider" size="small"
+                  checkedChildren={<CheckOutlined/>}
+                  unCheckedChildren={<CloseOutlined/>}
+                  onChange={() => onInvitedChange()}
+          />
         </div>
         <div className="group-users">
           <List
@@ -274,4 +303,6 @@ export default connect(mapStateToProps, {
   getGroup,
   patchGroup,
   changeAlias,
+  createGroupShareLink,
+  disableGroupShareLink,
 })(withRouter(GroupCard));

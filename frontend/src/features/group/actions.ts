@@ -30,3 +30,7 @@ export const getGroup = (groupId: number) =>
 export const patchGroup = (groupId: number, name: string) =>
   actions.patchGroup({ groupId: groupId, name: name });
 export const groupUpdate = () => actions.groupUpdate({});
+export const createGroupShareLink = (groupId: number) =>
+  actions.createGroupShareLink({ groupId: groupId});
+export const disableGroupShareLink = (groupId: number) =>
+  actions.disableGroupShareLink({ groupId: groupId});

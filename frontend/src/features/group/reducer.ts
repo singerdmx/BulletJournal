@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from 'redux-starter-kit';
 import { Group, GroupsWithOwner } from './interface';
-import {History} from "history";
+import { History } from "history";
 
 export type ApiErrorAction = {
   error: string;
@@ -50,6 +50,14 @@ export type PatchGroupAction = {
   name: string;
 };
 
+export type CreateGroupShareLinkAction = {
+  groupId: number;
+};
+
+export type DisableGroupShareLinkAction = {
+  groupId: number;
+};
+
 let initialState = {
   groups: [] as GroupsWithOwner[],
   group: undefined as Group | undefined
@@ -77,7 +85,9 @@ const slice = createSlice({
       state.group = group;
     },
     patchGroup: (state, action: PayloadAction<PatchGroupAction>) => state,
-    groupUpdate: (state, action: PayloadAction<GroupUpdateAction>) => state
+    groupUpdate: (state, action: PayloadAction<GroupUpdateAction>) => state,
+    createGroupShareLink: (state, action: PayloadAction<CreateGroupShareLinkAction>) => state,
+    disableGroupShareLink: (state, action: PayloadAction<DisableGroupShareLinkAction>) => state
   }
 });
 
