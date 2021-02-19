@@ -208,20 +208,20 @@ public class GroupController {
     }
 
     @PostMapping(CREATE_GROUP_SHARE_LINK)
-    public String createGroupShareLink(@NotNull @PathVariable Long groupId) {
+    public Group createGroupShareLink(@NotNull @PathVariable Long groupId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         String uuid = RandomStringUtils.randomAlphanumeric(StringUtil.UUID_LENGTH);
         Informed informed = this.groupDaoJpa.setGroupShareLink(groupId, username, uuid);
         this.notificationService.inform(informed);
-        return uuid;
+        return getGroup(groupId);
     }
 
     @PostMapping(DISABLE_GROUP_SHARE_LINK)
-    public String disableGroupShareLink(@NotNull @PathVariable Long groupId) {
+    public Group disableGroupShareLink(@NotNull @PathVariable Long groupId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Informed informed = this.groupDaoJpa.setGroupShareLink(groupId, username, null);
         this.notificationService.inform(informed);
-        return null;
+        return getGroup(groupId);
     }
 
     @PostMapping(JOIN_GROUP_VIA_LINK)

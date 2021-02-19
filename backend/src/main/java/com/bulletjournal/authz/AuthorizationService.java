@@ -44,12 +44,12 @@ public class AuthorizationService {
             return;
         }
 
-        validateRequesterInGroup(requester, project.getGroup());
+        validateRequesterInGroup(requester, project.getGroup(), true);
     }
 
-    public void validateRequesterInGroup(String requester, Group group) {
-        if (!group.getAcceptedUsers()
-                .stream().anyMatch(u -> Objects.equals(requester, u.getUser().getName()))) {
+    public void validateRequesterInGroup(String requester, Group group, boolean acceptedUserOnly) {
+        if ((acceptedUserOnly ? group.getAcceptedUsers() : group.getUsers())
+                .stream().noneMatch(u -> Objects.equals(requester, u.getUser().getName()))) {
             throw new UnAuthorizedException("User " + requester + " not in Group "
                     + group.getName());
         }

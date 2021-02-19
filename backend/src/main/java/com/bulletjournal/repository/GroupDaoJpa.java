@@ -350,7 +350,7 @@ public class GroupDaoJpa implements Etaggable {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Informed setGroupShareLink(Long groupId, String requester, String uuid) {
         Group group = getGroup(groupId);
-        this.authorizationService.validateRequesterInGroup(requester, group);
+        this.authorizationService.validateRequesterInGroup(requester, group, false);
         group.setUid(uuid);
         this.groupRepository.save(group);
 
