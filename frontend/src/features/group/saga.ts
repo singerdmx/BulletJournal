@@ -192,11 +192,9 @@ function* patchGroup(action: PayloadAction<PatchGroupAction>) {
 function* addGroupShareLink(action: PayloadAction<CreateGroupShareLinkAction>) {
   try {
     const { groupId } = action.payload;
-    yield call(createGroupShareLink, groupId);
-    yield all([
-      yield put(groupsActions.groupsUpdate({})),
-      yield put(groupsActions.getGroup({ groupId: groupId })),
-    ]);
+    const group = yield call(createGroupShareLink, groupId);
+    yield put(groupsActions.groupReceived({ group: group }));
+    yield put(groupsActions.groupsUpdate({}));
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
@@ -209,11 +207,9 @@ function* addGroupShareLink(action: PayloadAction<CreateGroupShareLinkAction>) {
 function* deleteGroupShareLink(action: PayloadAction<DisableGroupShareLinkAction>) {
   try {
     const {groupId} = action.payload;
-    yield call(disableGroupShareLink, groupId);
-    yield all([
-      yield put(groupsActions.groupsUpdate({})),
-      yield put(groupsActions.getGroup({ groupId: groupId })),
-    ]);
+    const group = yield call(disableGroupShareLink, groupId);
+    yield put(groupsActions.groupReceived({ group: group }));
+    yield put(groupsActions.groupsUpdate({}));
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));

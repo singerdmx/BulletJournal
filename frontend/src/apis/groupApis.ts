@@ -70,6 +70,7 @@ export const createGroupShareLink = (groupId: number) => {
     groupId: groupId
   });
   return doPost(`/api/groups/${groupId}/links`, postBody)
+      .then(res => res.json())
       .catch(err => {
         throw Error(err.message);
       });
@@ -80,6 +81,7 @@ export const disableGroupShareLink = (groupId: number) => {
     groupId: groupId
   });
   return doPost(`/api/groups/${groupId}/disableLink`, postBody)
+      .then(res => res.json())
       .catch(err => {
         throw Error(err.message);
       });
