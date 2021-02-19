@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import {CloseOutlined, DeleteOutlined, UserOutlined, SearchOutlined, CheckOutlined} from "@ant-design/icons";
 import { Avatar, Badge, Button, Input, List, Popconfirm, Tooltip, Typography, Switch} from "antd";
 import { connect } from "react-redux";
@@ -38,7 +38,6 @@ type GroupProps = {
 type PathProps = RouteComponentProps;
 
 type GroupCardState = {
-  invited: boolean;
   users: User[];
   filter: string;
 };
@@ -55,13 +54,11 @@ const { Title, Text } = Typography;
 class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> {
 
   state: GroupCardState = {
-    invited: false,
     users: this.props.group.users,
     filter: ''
   };
 
   componentDidMount() {
-    this.setState({invited: false});
     if (this.props.group) {
       this.setState({users: this.props.group.users});
     } else {
@@ -212,9 +209,8 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
       this.setState({ users: users });
     };
 
-    const onInvitedChange = () => {
-      this.state.invited? this.deleteGroupShareLink(group.id) : this.addGroupShareLink(group.id);
-      this.setState({ invited : !this.state.invited });
+    const onInvitedChange = (checked: boolean) => {
+      checked?  this.addGroupShareLink(group.id) : this.deleteGroupShareLink(group.id);
     }
 
     return (
@@ -247,14 +243,15 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
           </h3>
         </div>
         <div className="invitation-generator">
-            <span className="invitation-status">
-              {this.state.invited? "uid: " + group.uid : "Share group via link"}
-            </span>
           <Switch className="invitation-slider" size="small"
                   checkedChildren={<CheckOutlined/>}
                   unCheckedChildren={<CloseOutlined/>}
-                  onChange={() => onInvitedChange()}
+                  checked={!!group.uid}
+                  onChange={(checked) => onInvitedChange(checked)}
           />
+          <span className="invitation-status">
+              {!!group.uid? "Share group via link" : "uid: " + group.uid }
+          </span>
         </div>
         <div className="group-users">
           <List
