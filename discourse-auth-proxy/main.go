@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -53,6 +54,8 @@ func main() {
 			usage(err)
 		}
 	}
+
+	rand.Seed(time.Now().UnixNano())
 
 	dnssrv := httpproxy.NewDNSSRVBackend(config.OriginURL)
 	go dnssrv.Lookup(context.Background(), 50*time.Second, 10*time.Second, config.SRVAbandonAfter)
@@ -337,12 +340,14 @@ func redirectToSSO(r *http.Request, w http.ResponseWriter) {
 		toSSOProvider(r, w, redirectURL)
 		return
 	}
-	if !strings.HasSuffix(redirectURL, ssoLoginSuffix) {
+	if rand.Float64() < 0.5 && !strings.HasSuffix(redirectURL, ssoLoginSuffix) {
 		http.Redirect(w, r, homePageUrl, http.StatusMovedPermanently)
 		return
 	}
 
-	redirectURL = redirectURL[:(len(redirectURL) - 14)]
+	if strings.HasSuffix(redirectURL, ssoLoginSuffix) {
+		redirectURL = redirectURL[:(len(redirectURL) - 14)]
+	}
 	logger.Printf("redirectURL changed to %s", redirectURL)
 	toSSOProvider(r, w, redirectURL)
 }
