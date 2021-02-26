@@ -598,9 +598,5 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
                 }
             }
         }
-        System.out.println("Transaction owner: " + transaction.getOwner());
-        System.out.println("Transaction name: " + transaction.getName());
-
-        System.out.println(targetEmails);
     }
 }
