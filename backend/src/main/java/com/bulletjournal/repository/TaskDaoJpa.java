@@ -6,6 +6,7 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.models.params.CreateTaskParams;
 import com.bulletjournal.controller.models.params.UpdateTaskParams;
+import com.bulletjournal.controller.models.params.ExportProjectItemAsEmailParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.daemon.models.ReminderRecord;
@@ -30,6 +31,10 @@ import com.bulletjournal.templates.repository.model.SampleTask;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dmfs.rfc5545.DateTime;
@@ -54,6 +59,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 @Repository
 public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
@@ -97,6 +103,10 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Lazy
     @Autowired
     private UserDaoJpa userDaoJpa;
+
+    @Autowired
+    private Configuration freemarkerConfig;
+
 
     public static Task generateTask(String owner, Project project, CreateTaskParams createTaskParams) {
         return generateTask(owner, project, createTaskParams, null);
@@ -1216,7 +1226,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @throws ResourceNotFoundException if task item is not found
      */
     public void exportTaskAsEmail(Long taskId, ExportProjectItemAsEmailParams params,
-                                  String requester) {
+                                  String requester) throws IOException, TemplateException {
         Task task = getProjectItem(taskId, requester);
 
         List<String> targetEmails = new ArrayList<>();
@@ -1247,7 +1257,22 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         }
         System.out.println("task owner: " + task.getOwner());
         System.out.println("task name: " + task.getName());
+        Timestamp ts =task.getCreatedAt();
+        System.out.println(ts);
+
 
         System.out.println(targetEmails);
+        Map<String, Object> data = new HashMap<>();
+        data.put("task_owner", task.getOwner());
+        data.put("task_name", task.getName());
+        data.put("assignee", task.getAssignees().toString());
+        data.put("create_at", task.getCreatedAt());
+        data.put("location", task.getLocation());
+        data.put("due_date", task.getDueDate());
+        data.put("contents", params.getContents());
+        Template template = freemarkerConfig.getTemplate("TaskEmail.ftl");
+        String readyParsedTemplate = FreeMarkerTemplateUtils
+            .processTemplateIntoString(template, data);
+        System.out.println(readyParsedTemplate);
     }
 }

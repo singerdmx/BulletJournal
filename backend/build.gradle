@@ -41,6 +41,8 @@ dependencies {
     implementation 'io.grpc:grpc-stub'
     implementation 'io.grpc:grpc-protobuf'
     implementation "com.stripe:stripe-java:20.25.0"
+    implementation 'org.freemarker:freemarker:2.3.30'
+
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'

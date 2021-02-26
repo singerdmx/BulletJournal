@@ -20,6 +20,8 @@ import com.bulletjournal.repository.models.CompletedTask;
 import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.TaskContent;
+import freemarker.template.TemplateException;
+import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -403,7 +405,11 @@ public class TaskController {
             @NotNull @PathVariable Long taskId,
             @NotNull @RequestBody ExportProjectItemAsEmailParams exportProjectItemAsEmailParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        taskDaoJpa.exportTaskAsEmail(taskId, exportProjectItemAsEmailParams, username);
+        try {
+            taskDaoJpa.exportTaskAsEmail(taskId, exportProjectItemAsEmailParams, username);
+        } catch (IOException | TemplateException e) {
+            e.printStackTrace();
+        }
     }
 
     @PostMapping(TASK_EXPORT_ROUTE)
