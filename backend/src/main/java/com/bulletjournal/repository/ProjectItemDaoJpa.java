@@ -208,6 +208,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> Pair<ContentModel, T> addContent(Long projectItemId, String owner, K content) {
         T projectItem = getProjectItem(projectItemId, owner);
+        projectItem.setUpdatedAt(Timestamp.from(Instant.now()));
+        this.getJpaRepository().save(projectItem);
         populateContent(owner, content, projectItem);
         this.getContentJpaRepository().save(content);
         return Pair.of(content, projectItem);
@@ -264,6 +266,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         }
 
         this.contentUpdateLock.put(requester + "#" + contentId.toString(), requester, 1_000);
+        projectItem.setUpdatedAt(Timestamp.from(Instant.now()));
+        this.getJpaRepository().save(projectItem);
         return updateContent(requester, updateContentParams, projectItem, content, oldText);
     }
 
@@ -290,6 +294,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> T deleteContent(Long contentId, Long projectItemId, String requester) {
         T projectItem = getProjectItem(projectItemId, requester);
+        projectItem.setUpdatedAt(Timestamp.from(Instant.now()));
+        this.getJpaRepository().save(projectItem);
         K content = getContent(contentId, requester);
         Preconditions.checkState(Objects.equals(projectItem.getId(), content.getProjectItem().getId()),
                 "ProjectItem ID mismatch");
