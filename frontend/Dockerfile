@@ -12,10 +12,12 @@ COPY --from=build-stage /app/build/ /usr/share/nginx/html
 RUN mkdir -p /usr/share/nginx/html/public/items
 RUN mkdir -p /usr/share/nginx/html/public/notifications
 RUN mkdir -p /usr/share/nginx/html/public/sampleTasks
+RUN mkdir -p /usr/share/nginx/html/public/groups
 RUN mkdir -p /usr/share/nginx/html/tokens
 RUN ln -s /usr/share/nginx/html/static /usr/share/nginx/html/public/items/static
 RUN ln -s /usr/share/nginx/html/static /usr/share/nginx/html/public/sampleTasks/static
 RUN ln -s /usr/share/nginx/html/static /usr/share/nginx/html/public/notifications/static
+RUN ln -s /usr/share/nginx/html/static /usr/share/nginx/html/public/groups/static
 RUN ln -s /usr/share/nginx/html/static /usr/share/nginx/html/public/static
 RUN ln -s /usr/share/nginx/html/static /usr/share/nginx/html/tokens/static
 
