@@ -1,26 +1,21 @@
 // page display contents of tasks
 // react imports
 import React, {useEffect, useState} from 'react';
-import { useHistory, useParams } from 'react-router-dom';
-import { connect } from 'react-redux';
+import {useHistory, useParams} from 'react-router-dom';
+import {connect} from 'react-redux';
 // features
 //actions
-import {
-  completeTask, deleteContent,
-  deleteTask,
-  getTask,
-  updateTaskContents,
-} from '../../features/tasks/actions';
-import { IState } from '../../store';
+import {completeTask, deleteContent, deleteTask, getTask, updateTaskContents,} from '../../features/tasks/actions';
+import {IState} from '../../store';
 // antd imports
-import { Avatar, Badge, Popconfirm, Popover, Tooltip } from 'antd';
+import {Avatar, Badge, Popconfirm, Popover, Tooltip} from 'antd';
 import {
   CheckCircleTwoTone,
   DeleteTwoTone,
-  SyncOutlined,
-  UpSquareOutlined,
-  TeamOutlined,
   PlusOutlined,
+  SyncOutlined,
+  TeamOutlined,
+  UpSquareOutlined,
 } from '@ant-design/icons';
 // modals import
 import EditTask from '../../components/modals/edit-task.component';
@@ -29,21 +24,13 @@ import ShareProjectItem from '../../components/modals/share-project-item.compone
 
 import './task-page.styles.less';
 import 'braft-editor/dist/index.css';
-import {
-  ProjectItemUIType,
-  ProjectType,
-} from '../../features/project/constants';
+import {ProjectItemUIType, ProjectType,} from '../../features/project/constants';
 // components
-import TaskDetailPage, { TaskProps } from './task-detail.pages';
+import TaskDetailPage, {TaskProps} from './task-detail.pages';
 import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
 import LabelManagement from '../project/label-management.compoent';
-import {
-  Container,
-  Button as FloatButton,
-  lightColors,
-  darkColors,
-} from 'react-floating-action-button';
-import { getTaskAssigneesPopoverContent } from '../../components/project-item/task-item.component';
+import {Button as FloatButton, Container, darkColors, lightColors,} from 'react-floating-action-button';
+import {getTaskAssigneesPopoverContent} from '../../components/project-item/task-item.component';
 import {setDisplayMore, setDisplayRevision} from "../../features/content/actions";
 import {Content} from "../../features/myBuJo/interface";
 import {DeleteOutlined, EditOutlined, HighlightOutlined} from "@ant-design/icons/lib";
@@ -248,6 +235,36 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
     history.push(`/projects/${task.projectId}`);
   };
 
+  const getCompleteButton = () => {
+    if (!task.recurrenceRule) {
+      return <Tooltip title="Complete Task">
+        <div>
+          <CheckCircleTwoTone
+              twoToneColor="#52c41a"
+              onClick={() => handleCompleteTaskClick()}
+          />
+        </div>
+      </Tooltip>
+    }
+
+    return <Popconfirm
+        title="One Time Only or All Events"
+        okText="Series"
+        cancelText="Occurrence"
+        onConfirm={() => handleCompleteTaskClick()}
+        onCancel={() => history.push('/bujo/today')}
+        placement="bottom"
+    >
+      <Tooltip title="Complete Task">
+        <div>
+          <CheckCircleTwoTone
+              twoToneColor="#52c41a"
+          />
+        </div>
+      </Tooltip>
+    </Popconfirm>
+  }
+
   const taskOperation = () => {
     return (
       <div className="task-operation">
@@ -285,14 +302,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
             </div>
           </Popconfirm>
         </Tooltip>
-        <Tooltip title="Complete Task">
-          <div>
-            <CheckCircleTwoTone
-              twoToneColor="#52c41a"
-              onClick={() => handleCompleteTaskClick()}
-            />
-          </div>
-        </Tooltip>
+        {getCompleteButton()}
       </div>
     );
   };
