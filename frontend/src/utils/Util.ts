@@ -73,3 +73,12 @@ export function stringToRGB(str: string) {
 
     return colors[hash % colors.length];
 }
+
+export const swatchesPickerColors = [['#FCE9DA', '#FFCEC7', '#FFD0A6', '#E098AE'],
+    ['#EFEFF1', '#ECD4D4', '#CCDBE2', '#C9CBE0'],
+    ['#E9E1D4', '#F5DDAD', '#F1BCAE', '#C9DECF'],
+    ['#F2EEE5', '#E5C1C5', '#C3E2DD', '#6ECEDA'],
+    ['#D5E1DF', '#EACACB', '#E2B3A3', '#A3B6C5'],
+    ['#FDF2F0', '#F8DAE2', '#DEB3CF', '#B57FB3'],
+    ['#FAF0E4', '#EECFBB', '#F6B99D', '#CB8A90'],
+    ['#FEF5D4', '#FFD6AA', '#EFBAD6', '#DADAFC']]
