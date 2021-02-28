@@ -34,3 +34,5 @@ export const createGroupShareLink = (groupId: number) =>
   actions.createGroupShareLink({ groupId: groupId});
 export const disableGroupShareLink = (groupId: number) =>
   actions.disableGroupShareLink({ groupId: groupId});
+export const joinGroupViaLink = (groupUid: string) =>
+    actions.joinGroupViaLink({ groupUid: groupUid});

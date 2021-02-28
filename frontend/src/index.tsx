@@ -12,6 +12,7 @@ import TemplatesPage from './template';
 import TokenPage from "./Token";
 import PublicNotificationsPage from "./public-notifications";
 import PublicSampleTaskPage from "./public-sample-task.pages";
+import JoinGroupViaLinkPage from "./join-group-via-link";
 
 const store = createStore();
 
@@ -74,6 +75,7 @@ function listen() {
                             <Route exact path="/public/notifications/:id" component={PublicNotificationsPage}/>
                             <Route exact path="/public/sampleTasks/:taskId" component={PublicSampleTaskPage}/>
                             <Route exact path="/tokens/:token" component={TokenPage}/>
+                            <Route path="/public/groups/:groupUid" component={JoinGroupViaLinkPage}/>
                             <Route path="/public/templates">
                                 <HashRouter>
                                     <Route path="/" component={TemplatesPage}/>

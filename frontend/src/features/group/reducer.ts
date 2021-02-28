@@ -58,6 +58,10 @@ export type DisableGroupShareLinkAction = {
   groupId: number;
 };
 
+export type JoinGroupViaLinkAction = {
+  groupUid: string;
+};
+
 let initialState = {
   groups: [] as GroupsWithOwner[],
   group: undefined as Group | undefined
@@ -87,7 +91,8 @@ const slice = createSlice({
     patchGroup: (state, action: PayloadAction<PatchGroupAction>) => state,
     groupUpdate: (state, action: PayloadAction<GroupUpdateAction>) => state,
     createGroupShareLink: (state, action: PayloadAction<CreateGroupShareLinkAction>) => state,
-    disableGroupShareLink: (state, action: PayloadAction<DisableGroupShareLinkAction>) => state
+    disableGroupShareLink: (state, action: PayloadAction<DisableGroupShareLinkAction>) => state,
+    joinGroupViaLink: (state, action: PayloadAction<JoinGroupViaLinkAction>) => state
   }
 });
 

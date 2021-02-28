@@ -13,6 +13,7 @@ import {
   RemoveUserGroupAction,
   CreateGroupShareLinkAction,
   DisableGroupShareLinkAction,
+  JoinGroupViaLinkAction,
 } from './reducer';
 import { PayloadAction } from 'redux-starter-kit';
 import {
@@ -25,6 +26,7 @@ import {
   updateGroup,
   createGroupShareLink,
   disableGroupShareLink,
+  joinGroupViaLink,
 } from '../../apis/groupApis';
 import { IState } from '../../store';
 import { clearUser } from '../user/actions';
@@ -219,6 +221,21 @@ function* deleteGroupShareLink(action: PayloadAction<DisableGroupShareLinkAction
   }
 }
 
+function* joinGroupViaShareLink(action: PayloadAction<JoinGroupViaLinkAction>) {
+  try {
+    const {groupUid} = action.payload;
+    const group = yield call(joinGroupViaLink, groupUid);
+    yield put(groupsActions.groupReceived({group:group}));
+
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Join group via uid fail: ${error}`);
+    }
+  }
+}
+
 export default function* groupSagas() {
   yield all([
     yield takeLatest(
@@ -234,6 +251,7 @@ export default function* groupSagas() {
     yield takeLatest(groupsActions.patchGroup.type, patchGroup),
     yield takeLatest(groupsActions.groupUpdate.type, groupUpdate),
     yield takeLatest(groupsActions.createGroupShareLink.type, addGroupShareLink),
-    yield takeLatest(groupsActions.disableGroupShareLink.type, deleteGroupShareLink)
+    yield takeLatest(groupsActions.disableGroupShareLink.type, deleteGroupShareLink),
+    yield takeLatest(groupsActions.joinGroupViaLink.type, joinGroupViaShareLink),
   ]);
 }

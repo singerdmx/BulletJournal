@@ -86,3 +86,15 @@ export const disableGroupShareLink = (groupId: number) => {
         throw Error(err.message);
       });
 };
+
+export const joinGroupViaLink = (groupUid: string) => {
+    const postBody = JSON.stringify({
+        groupUid: groupUid
+    });
+    return doPost(`/api/groups/${groupUid}/join`, postBody)
+        .then(res => res.json())
+        .catch(err => {
+            throw Error(err.message);
+        });
+};
+
