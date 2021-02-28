@@ -19,6 +19,7 @@ import com.bulletjournal.repository.GroupDaoJpa;
 import com.bulletjournal.util.StringUtil;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -227,11 +228,12 @@ public class GroupController {
     @PostMapping(JOIN_GROUP_VIA_LINK)
     public Group joinGroupViaLink(@NotNull @PathVariable String uid) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        JoinGroupResponseEvent joinGroupResponseEvent =
+        Pair<JoinGroupResponseEvent, com.bulletjournal.repository.models.Group> result =
                 this.groupDaoJpa.addUserGroupViaLink(username, uid);
+        JoinGroupResponseEvent joinGroupResponseEvent = result.getLeft();
         if (joinGroupResponseEvent != null) {
             this.notificationService.inform(joinGroupResponseEvent);
         }
-        return getGroup(joinGroupResponseEvent.getEvents().get(0).getContentId());
+        return getGroup(result.getRight().getId());
     }
 }

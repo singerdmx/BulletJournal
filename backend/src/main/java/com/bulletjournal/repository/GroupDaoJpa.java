@@ -20,6 +20,7 @@ import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -243,13 +244,13 @@ public class GroupDaoJpa implements Etaggable {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public JoinGroupResponseEvent addUserGroupViaLink(String requester, String uid) {
+    public Pair<JoinGroupResponseEvent, Group> addUserGroupViaLink(String requester, String uid) {
         Group group = this.groupRepository.getByUid(uid)
                 .orElseThrow(() -> new ResourceNotFoundException("Group " + uid + " not found"));
 
         if (group.getUsers().stream().anyMatch(ug -> Objects.equals(ug.getUser().getName(), requester))) {
             LOGGER.warn(requester + " already in the group");
-            return null;
+            return Pair.of(null, group);
         }
 
         User user = this.userDaoJpa.getByName(requester);
@@ -266,7 +267,7 @@ public class GroupDaoJpa implements Etaggable {
                 group.getOwner(),
                 group.getId(),
                 group.getName());
-        return new JoinGroupResponseEvent(event, requester, Action.ACCEPT);
+        return Pair.of(new JoinGroupResponseEvent(event, requester, Action.ACCEPT), group);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
