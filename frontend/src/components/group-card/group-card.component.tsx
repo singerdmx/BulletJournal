@@ -267,7 +267,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
                       onCopy={() => message.success(`Link Copied to Clipboard: ${joinGroupUrl}`)}
                   >
                           <span className='join-group-url'>
-                            CopyLink
+                            Copy Link
                             <Tooltip title='Share link to join group'>
                             <Button
                                 type="default"
