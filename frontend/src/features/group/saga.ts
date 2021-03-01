@@ -1,37 +1,38 @@
-import { all, call, put, select, takeLatest } from 'redux-saga/effects';
-import { message } from 'antd';
+import {all, call, put, select, takeLatest} from 'redux-saga/effects';
+import {message} from 'antd';
 import {
   actions as groupsActions,
   AddUserGroupAction,
   ApiErrorAction,
+  CreateGroupShareLinkAction,
   DeleteGroupAction,
+  DisableGroupShareLinkAction,
   GetGroupAction,
   GroupCreateAction,
   GroupsAction,
   GroupUpdateAction,
+  JoinGroupViaLinkAction,
   PatchGroupAction,
   RemoveUserGroupAction,
-  CreateGroupShareLinkAction,
-  DisableGroupShareLinkAction,
-  JoinGroupViaLinkAction,
 } from './reducer';
-import { PayloadAction } from 'redux-starter-kit';
+import {PayloadAction} from 'redux-starter-kit';
 import {
   addGroup,
   addUserGroup,
+  createGroupShareLink,
   deleteGroup,
+  disableGroupShareLink,
   fetchGroups,
   getGroup,
+  joinGroupViaLink,
   removeUserGroup,
   updateGroup,
-  createGroupShareLink,
-  disableGroupShareLink,
-  joinGroupViaLink,
 } from '../../apis/groupApis';
-import { IState } from '../../store';
-import { clearUser } from '../user/actions';
-import { actions as SystemActions } from '../system/reducer';
+import {IState} from '../../store';
+import {clearUser} from '../user/actions';
+import {actions as SystemActions} from '../system/reducer';
 import {reloadReceived} from "../myself/actions";
+import {GroupsWithOwner} from "./interface";
 
 function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
   yield call(message.error, `Group Error Received: ${action.payload.error}`);
@@ -193,11 +194,28 @@ function* patchGroup(action: PayloadAction<PatchGroupAction>) {
 
 function* addGroupShareLink(action: PayloadAction<CreateGroupShareLinkAction>) {
   try {
-    yield call(message.info, 'Generating link to join group');
-    const { groupId } = action.payload;
+    const {groupId} = action.payload;
+    const state: IState = yield select();
+    let groups: GroupsWithOwner[] = JSON.parse(JSON.stringify(state.group.groups));
+    groups.forEach(g => {
+      g.groups.forEach(gp => {
+        if (gp.id === groupId) {
+          gp.uid = "uid";
+        }
+      })
+    });
+    yield put(groupsActions.groupsReceived({groups: groups}));
     const group = yield call(createGroupShareLink, groupId);
-    yield put(groupsActions.groupReceived({ group: group }));
-    yield put(groupsActions.groupsUpdate({}));
+    yield put(groupsActions.groupReceived({group: group}));
+    groups = JSON.parse(JSON.stringify(state.group.groups));
+    groups.forEach(g => {
+      g.groups.forEach(gp => {
+        if (gp.id === groupId) {
+          gp.uid = group.uid;
+        }
+      })
+    });
+    yield put(groupsActions.groupsReceived({groups: groups}));
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
@@ -209,11 +227,19 @@ function* addGroupShareLink(action: PayloadAction<CreateGroupShareLinkAction>) {
 
 function* deleteGroupShareLink(action: PayloadAction<DisableGroupShareLinkAction>) {
   try {
-    yield call(message.info, 'Disabling link to join group');
     const {groupId} = action.payload;
+    const state: IState = yield select();
+    const groups: GroupsWithOwner[] = JSON.parse(JSON.stringify(state.group.groups));
+    groups.forEach(g => {
+      g.groups.forEach(gp => {
+        if (gp.id === groupId) {
+          gp.uid = undefined;
+        }
+      })
+    });
+    yield put(groupsActions.groupsReceived({groups: groups}));
     const group = yield call(disableGroupShareLink, groupId);
     yield put(groupsActions.groupReceived({ group: group }));
-    yield put(groupsActions.groupsUpdate({}));
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
