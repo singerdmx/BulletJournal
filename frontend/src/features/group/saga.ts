@@ -193,6 +193,7 @@ function* patchGroup(action: PayloadAction<PatchGroupAction>) {
 
 function* addGroupShareLink(action: PayloadAction<CreateGroupShareLinkAction>) {
   try {
+    yield call(message.info, 'Generating link to join group');
     const { groupId } = action.payload;
     const group = yield call(createGroupShareLink, groupId);
     yield put(groupsActions.groupReceived({ group: group }));
@@ -208,6 +209,7 @@ function* addGroupShareLink(action: PayloadAction<CreateGroupShareLinkAction>) {
 
 function* deleteGroupShareLink(action: PayloadAction<DisableGroupShareLinkAction>) {
   try {
+    yield call(message.info, 'Disabling link to join group');
     const {groupId} = action.payload;
     const group = yield call(disableGroupShareLink, groupId);
     yield put(groupsActions.groupReceived({ group: group }));
