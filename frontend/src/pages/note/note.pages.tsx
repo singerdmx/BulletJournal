@@ -30,6 +30,7 @@ import {Content, ProjectItem} from "../../features/myBuJo/interface";
 import {getProject} from "../../features/project/actions";
 import {Project} from "../../features/project/interface";
 import NoteColorSettingDialog from '../../components/modals/note-color.component';
+import {resizeFloatButton} from "../../utils/Util";
 
 interface NotePageHandler {
     myself: string;
@@ -85,6 +86,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
         setDisplayMore(false);
         setDisplayRevision(false);
         getProject(note.projectId);
+        resizeFloatButton();
     }, [note]);
 
     // show drawer

@@ -13,7 +13,7 @@ import {User} from '../../features/group/interface';
 import {FieldTimeOutlined, FileAddOutlined} from '@ant-design/icons';
 import AddNote from "../modals/add-note.component";
 import {ProjectItemUIType} from "../../features/project/constants";
-import {includeProjectItem} from "../../utils/Util";
+import {includeProjectItem, resizeFloatButton} from "../../utils/Util";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 import NotesByOrder from "../modals/notes-by-order.component";
 import ProjectSettingDialog from "../../components/modals/project-setting.component";
@@ -179,6 +179,7 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
     useEffect(() => {
         if (project) {
             updateNotes(project.id);
+            resizeFloatButton();
         }
     }, [project]);
     const [notesByOrderShown, setNotesByOrderShown] = useState(false);

@@ -25,7 +25,7 @@ import {ProjectItemUIType} from "../../features/project/constants";
 import TasksByOrder from "../../components/modals/tasks-by-order.component";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 import {ProjectOutlined} from "@ant-design/icons/lib";
-import {includeProjectItem} from "../../utils/Util";
+import {includeProjectItem, resizeFloatButton} from "../../utils/Util";
 import ProjectSettingDialog from "../../components/modals/project-setting.component";
 
 type TasksProps = {
@@ -216,6 +216,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
   useEffect(() => {
     if (project) {
       updateTasks(project.id);
+      resizeFloatButton();
     }
   }, [project]);
 

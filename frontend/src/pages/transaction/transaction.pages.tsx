@@ -57,6 +57,7 @@ import TransactionColorSettingDialog from '../../components/modals/transaction-c
 import {convertToTextWithRRule} from "../../features/recurrence/actions";
 import BankList from "../../components/modals/bank-list.component";
 import BankAccountElem from "../../components/settings/bank-account";
+import {resizeFloatButton} from "../../utils/Util";
 
 const LocaleCurrency = require('locale-currency');
 
@@ -150,6 +151,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
     setDisplayMore(false);
     setDisplayRevision(false);
     getProject(transaction.projectId);
+    resizeFloatButton();
   }, [transaction]);
 
   if (!transaction) return null;

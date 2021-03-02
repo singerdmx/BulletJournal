@@ -82,3 +82,26 @@ export const swatchesPickerColors = [['#FCE9DA', '#FFCEC7', '#FFD0A6', '#E098AE'
     ['#FDF2F0', '#F8DAE2', '#DEB3CF', '#B57FB3'],
     ['#FAF0E4', '#EECFBB', '#F6B99D', '#CB8A90'],
     ['#FEF5D4', '#FFD6AA', '#EFBAD6', '#DADAFC']]
+
+export const resizeFloatButton = () => {
+    console.log('resizeFloatButton')
+    const button = document.querySelector("button.fab-item:last-child");
+    if (!button) {
+        console.log("button.fab-item:last-child not found");
+        return;
+    }
+
+    const b = button as HTMLElement;
+    setTimeout(() => resizeFloatButtonCall(b, true, 20), 1000);
+}
+
+const resizeFloatButtonCall = (button: HTMLElement, enlarge: boolean, count: number) => {
+    if (count <= 0) {
+        return;
+    }
+
+    button.style.width = enlarge ? '160px' : '';
+    button.style.height = enlarge ? '160px' : '';
+    button.style.fontSize = enlarge ? '120px' : '25px';
+    setTimeout(() => resizeFloatButtonCall(button, !enlarge, count - 1), 1000);
+}

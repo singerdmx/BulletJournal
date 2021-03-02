@@ -37,6 +37,7 @@ import {DeleteOutlined, EditOutlined, HighlightOutlined} from "@ant-design/icons
 import {getProject} from "../../features/project/actions";
 import {Project} from "../../features/project/interface";
 import {contentEditable} from "../note/note.pages";
+import {resizeFloatButton} from "../../utils/Util";
 
 interface TaskPageHandler {
   myself: string;
@@ -94,6 +95,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
     setDisplayMore(false);
     setDisplayRevision(false);
     getProject(task.projectId);
+    resizeFloatButton();
   }, [task]);
 
   if (!task) return null;
