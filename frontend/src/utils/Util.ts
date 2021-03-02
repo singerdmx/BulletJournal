@@ -92,7 +92,7 @@ export const resizeFloatButton = () => {
     }
 
     const b = button as HTMLElement;
-    setTimeout(() => resizeFloatButtonCall(b, true, 20), 1000);
+    setTimeout(() => resizeFloatButtonCall(b, true, 3), 1000);
 }
 
 const resizeFloatButtonCall = (button: HTMLElement, enlarge: boolean, count: number) => {
