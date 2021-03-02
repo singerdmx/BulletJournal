@@ -69,7 +69,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
     // get id of note from router
     const {noteId} = useParams();
     // state control drawer displaying
-    const [showEditor, setEditorShow] = useState(false);
+    const [showEditor, setEditorShow] = useState(true);
     const [labelEditable, setLabelEditable] = useState(false);
 
     // listening on the empty state working as componentDidmount

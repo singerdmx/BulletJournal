@@ -330,7 +330,6 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         this.noteRepository.save(note);
     }
 
-
     /**
      * export note as email
      *
@@ -369,5 +368,32 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
                 }
             }
         }
+    }
+
+    private static final String[] MONTHS = {"January", "February", "March"};
+    private static final String[] MONTH_COLORS = {
+            "{\"r\":238,\"g\":207,\"b\":187,\"a\":1}",
+            "{\"r\":246,\"g\":185,\"b\":157,\"a\":1}",
+            "{\"r\":203,\"g\":138,\"b\":144,\"a\":1}"};
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void createSampleNotes(
+            String username, Project noteProject) {
+        List<com.bulletjournal.controller.models.Note> notes = new ArrayList<>();
+        Note note = this.create(noteProject.getId(), username, new CreateNoteParams("Diary"));
+        this.setColor(username, note.getId(), "{\"r\":250,\"g\":240,\"b\":228,\"a\":1}");
+        notes.add(note.toPresentationModel());
+        for (int i = 0; i < MONTHS.length; i++) {
+            String month = MONTHS[i];
+            note = this.create(noteProject.getId(), username, new CreateNoteParams(month));
+            this.setColor(username, note.getId(), MONTH_COLORS[i]);
+            notes.get(0).addSubNote(note.toPresentationModel());
+            for (int j = 1; j <= 3; j++) {
+                note = this.create(noteProject.getId(), username, new CreateNoteParams(Integer.toString(i + 1) + "-" + j));
+                notes.get(0).getSubNotes().get(i).addSubNote(note.toPresentationModel());
+            }
+        }
+
+        this.updateUserNotes(noteProject.getId(), notes, username);
     }
 }

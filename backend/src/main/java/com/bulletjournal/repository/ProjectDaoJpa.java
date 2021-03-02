@@ -3,7 +3,9 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
-import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.ProjectType;
+import com.bulletjournal.controller.models.Projects;
+import com.bulletjournal.controller.models.ProjectsWithOwner;
 import com.bulletjournal.controller.models.params.CreateProjectParams;
 import com.bulletjournal.controller.models.params.UpdateProjectParams;
 import com.bulletjournal.controller.models.params.UpdateSharedProjectsOrderParams;
@@ -14,10 +16,6 @@ import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.ProjectRelationsProcessor;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.SampleProjectsCreation;
-import com.bulletjournal.repository.models.Group;
-import com.bulletjournal.repository.models.Project;
-import com.bulletjournal.repository.models.User;
-import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.google.common.collect.ImmutableList;
@@ -54,6 +52,8 @@ public class ProjectDaoJpa {
     private ProjectNotesRepository projectNotesRepository;
     @Autowired
     private ProjectTasksRepository projectTasksRepository;
+    @Autowired
+    private ProjectSettingRepository projectSettingRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Projects getProjects(String owner, List<Project> projects) {
@@ -194,30 +194,58 @@ public class ProjectDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void createSampleProjects(SampleProjectsCreation sampleProjectsCreation) {
+    public Pair<Project, Project> createSampleProjects(SampleProjectsCreation sampleProjectsCreation) {
+        long groupId = sampleProjectsCreation.getGroup().getId();
+        String username = sampleProjectsCreation.getUsername();
         CreateProjectParams sampleTodoProjectParams =
                 new CreateProjectParams("TODO List", ProjectType.TODO,
                         "Manage your tasks here",
-                        sampleProjectsCreation.getGroup().getId());
-        Project todoProject = this.create(sampleTodoProjectParams, sampleProjectsCreation.getUsername(), new ArrayList<>());
-        LOGGER.info("Sample todo list project {} created for user {}", todoProject.getId(),
-                sampleProjectsCreation.getUsername());
+                        groupId);
+        Project todoProject = this.create(sampleTodoProjectParams, sampleProjectsCreation.getUsername(), Collections.emptyList());
+        LOGGER.info("Sample todo list project {} created for user {}", todoProject.getId(), username);
+
+        CreateProjectParams sampleBeginnerProjectParams =
+                new CreateProjectParams("Beginner's Guide", ProjectType.TODO,
+                        "Step by Step Guide to Use BuJo",
+                        groupId);
+        Project beginnerProject = this.create(sampleBeginnerProjectParams, sampleProjectsCreation.getUsername(), Collections.emptyList());
+        LOGGER.info("Sample Beginner's Guide project {} created for user {}", beginnerProject.getId(), username);
 
         CreateProjectParams sampleNoteProjectParams =
                 new CreateProjectParams("Notes", ProjectType.NOTE,
                         "Add your notes here",
-                        sampleProjectsCreation.getGroup().getId());
-        Project noteProject = this.create(sampleNoteProjectParams, sampleProjectsCreation.getUsername(), new ArrayList<>());
-        LOGGER.info("Sample note project {} created for user {}", noteProject.getId(),
-                sampleProjectsCreation.getUsername());
+                        groupId);
+        Project noteProject = this.create(sampleNoteProjectParams, sampleProjectsCreation.getUsername(), Collections.emptyList());
+        LOGGER.info("Sample note project {} created for user {}", noteProject.getId(), username);
 
         CreateProjectParams sampleLedgerProjectParams =
                 new CreateProjectParams("Ledger", ProjectType.LEDGER,
                         "Track your transactions here",
-                        sampleProjectsCreation.getGroup().getId());
-        Project ledgerProject = this.create(sampleLedgerProjectParams, sampleProjectsCreation.getUsername(), new ArrayList<>());
-        LOGGER.info("Sample ledger project {} created for user {}", ledgerProject.getId(),
-                sampleProjectsCreation.getUsername());
+                        groupId);
+        Project ledgerProject = this.create(sampleLedgerProjectParams, sampleProjectsCreation.getUsername(), Collections.emptyList());
+        LOGGER.info("Sample ledger project {} created for user {}", ledgerProject.getId(), username);
+
+        CreateProjectParams sampleBillProjectParams =
+                new CreateProjectParams("Bill", ProjectType.LEDGER,
+                        null,
+                        groupId);
+        Project billProject = this.create(sampleBillProjectParams, sampleProjectsCreation.getUsername(), Collections.emptyList());
+        LOGGER.info("Sample Bill project {} created for user {}", billProject.getId(), username);
+
+        List<com.bulletjournal.controller.models.Project> projects = new ArrayList<>();
+        projects.add(todoProject.toPresentationModel());
+        projects.get(0).addSubProject(beginnerProject.toPresentationModel());
+        projects.add(noteProject.toPresentationModel());
+        projects.add(ledgerProject.toPresentationModel());
+        projects.get(2).addSubProject(billProject.toPresentationModel());
+        this.updateUserOwnedProjects(username, projects);
+
+        this.projectSettingRepository.save(new ProjectSetting(todoProject, "{\"r\":239,\"g\":239,\"b\":241,\"a\":1}", false));
+        this.projectSettingRepository.save(new ProjectSetting(beginnerProject, "{\"r\":236,\"g\":212,\"b\":212,\"a\":1}", false));
+        this.projectSettingRepository.save(new ProjectSetting(noteProject, "{\"r\":253,\"g\":242,\"b\":240,\"a\":1}", false));
+        this.projectSettingRepository.save(new ProjectSetting(ledgerProject, "{\"r\":254,\"g\":245,\"b\":212,\"a\":1}", false));
+        this.projectSettingRepository.save(new ProjectSetting(billProject, "{\"r\":218,\"g\":218,\"b\":252,\"a\":1}", false));
+        return Pair.of(beginnerProject, noteProject);
     }
 
     private List<Event> generateEvents(Group group, String requester, Project project) {

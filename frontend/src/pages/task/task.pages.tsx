@@ -75,7 +75,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
   // get id of task from router
   const { taskId } = useParams();
   // state control drawer displaying
-  const [showEditor, setEditorShow] = useState(false);
+  const [showEditor, setEditorShow] = useState(true);
   const [labelEditable, setLabelEditable] = useState(false);
   // hook history in router
   const history = useHistory();
