@@ -209,7 +209,7 @@ let initialState = {
   contents: [] as Array<Content>,
   transaction: undefined as Transaction | undefined,
   ledgerSummary: {} as LedgerSummary,
-  addTransactionVisible: false,
+  addTransactionVisible: true,
   //used for form
   startDate: '',
   endDate: '',

@@ -171,7 +171,7 @@ let initialState = {
   colorSettingShown: false,
   contents: [] as Array<Content>,
   notes: [] as Array<Note>,
-  addNoteVisible: false,
+  addNoteVisible: true,
   patchLoading: true,
   sharedUsers: [] as User[],
   sharedLinks: [] as SharableLink[],

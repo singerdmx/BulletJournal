@@ -130,7 +130,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   // get id of Transaction from router
   const { transactionId } = useParams();
   // state control drawer displaying
-  const [showEditor, setEditorShow] = useState(false);
+  const [showEditor, setEditorShow] = useState(true);
   const [labelEditable, setLabelEditable] = useState(false);
   const currencyType = LocaleCurrency.getCurrency(currency);
   // hook history in router

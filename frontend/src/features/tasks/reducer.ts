@@ -237,7 +237,7 @@ export type ShareTaskByEmailAction = {
 };
 
 let initialState = {
-  addTaskVisible: false,
+  addTaskVisible: true,
   contents: [] as Array<Content>,
   task: undefined as Task | undefined,
   tasks: [] as Array<Task>,
