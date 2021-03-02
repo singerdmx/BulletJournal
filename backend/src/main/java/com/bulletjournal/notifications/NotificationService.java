@@ -6,8 +6,10 @@ import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.notifications.informed.Informed;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
 import com.bulletjournal.repository.*;
+import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
 import com.bulletjournal.util.CustomThreadFactory;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,9 @@ public class NotificationService {
 
     @Autowired
     private ProjectDaoJpa projectDaoJpa;
+
+    @Autowired
+    private NoteDaoJpa noteDaoJpa;
 
     @Lazy
     @Autowired
@@ -250,15 +255,16 @@ public class NotificationService {
                     this.taskDaoJpa.addContent(batch.getProjectItems(), batch.getOwners(), batch.getContents());
                 }
             } catch (Exception ex) {
-                LOGGER.error("Error on Reminder", ex);
+                LOGGER.error("Error on ContentBatch", ex);
             }
 
             try {
                 for (SampleProjectsCreation sampleProjectsCreation : sampleProjectsCreations) {
-                    this.projectDaoJpa.createSampleProjects(sampleProjectsCreation);
+                    Pair<Project, Project> result = this.projectDaoJpa.createSampleProjects(sampleProjectsCreation);
+                    this.noteDaoJpa.createSampleNotes(sampleProjectsCreation.getUsername(), result.getRight());
                 }
             } catch (Exception ex) {
-                LOGGER.error("Error on Reminder", ex);
+                LOGGER.error("Error on SampleProjectsCreation", ex);
             }
 
             for (SampleTaskChange sampleTaskChange : sampleTaskChanges) {

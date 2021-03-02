@@ -23,8 +23,9 @@ public class ProjectSetting {
     public ProjectSetting() {
     }
 
-    public ProjectSetting(Long id, String color, boolean autoDelete) {
-        this.id = id;
+    public ProjectSetting(Project project, String color, boolean autoDelete) {
+        this.id = project.getId();
+        this.project = project;
         this.color = color;
         this.autoDelete = autoDelete;
     }
