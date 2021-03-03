@@ -1,6 +1,7 @@
 package com.bulletjournal.messaging;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.controller.models.Content;
 import com.bulletjournal.messaging.firebase.FcmClient;
 import com.bulletjournal.messaging.firebase.FcmMessageParams;
 import com.bulletjournal.messaging.mailjet.MailjetEmailClient;
@@ -13,6 +14,9 @@ import com.bulletjournal.repository.models.DeviceToken;
 import com.bulletjournal.repository.models.Notification;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.User;
+import freemarker.template.Configuration;
+import freemarker.template.TemplateException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 /**
  * Handle mobile device notification and email service
@@ -79,6 +84,9 @@ public class MessagingService {
 
     private UserClient userClient;
 
+    private Configuration freemarkerConfig;
+
+
     // JOIN GROUP PROPERTIES
     private static final String GROUP_INVITATION_BASE_URL =
         "http://bulletjournal.us/public/notifications/";
@@ -113,6 +121,9 @@ public class MessagingService {
     private static final Pattern GROUP_INVITATION_TITLE_PATTERN =  Pattern
         .compile("(?s)(?<=##).*?(?=##)");
 
+    // EXPORT CONTENT AS EMAIL PROPERTIES
+    private static final String HTML_CONTENT_PROPERTY = "html_content";
+    private static final String EXPORTED_HTML_CONTENT_HEADER_PROPERTY = "html_content_header";
 
     @Autowired
     public MessagingService(
@@ -121,7 +132,8 @@ public class MessagingService {
         DeviceTokenDaoJpa deviceTokenDaoJpa,
         UserDaoJpa userDaoJpa,
         UserAliasDaoJpa userAliasDaoJpa,
-        UserClient userClient
+        UserClient userClient,
+        Configuration freemarkerConfig
     ) {
         this.fcmClient = fcmClient;
         this.mailjetClient = mailjetClient;
@@ -129,6 +141,7 @@ public class MessagingService {
         this.userDaoJpa = userDaoJpa;
         this.userAliasDaoJpa = userAliasDaoJpa;
         this.userClient = userClient;
+        this.freemarkerConfig = freemarkerConfig;
     }
 
     public void sendEtagUpdateNotificationToUsers(Collection<String> usernames) {
@@ -253,6 +266,98 @@ public class MessagingService {
         return paramsList;
     }
 
+    /**
+     * Send exported task email to users
+     * @param requester export task as email requester
+     * @param task      task details
+     * @param contents  task contents details
+     * @param emails    target emails
+     */
+    public void sendExportedTaskEmailToUsers(
+        String requester, Task task, List<Content> contents, List<String> emails) {
+        if (requester == null) {
+            LOGGER.error("Export Task As Email: Invalid requester.");
+            return;
+        }
+        try {
+            Map<String, Object> data = new HashMap<>();
+            data.put("task_owner", task.getOwner());
+            data.put("task_name", task.getName());
+            data.put("assignee", task.getAssignees().toString());
+            data.put("create_at", task.getCreatedAt());
+            data.put("location", task.getLocation());
+            data.put("due_date", task.getDueDate());
+            data.put("contents", contents);
+            data.put("requester", requester);
+            data.put("requester_avatar", this.getAvatar(requester));
+            freemarker.template.Template template = freemarkerConfig.getTemplate("TaskEmail.ftl");
+            String htmlContent = FreeMarkerTemplateUtils.processTemplateIntoString(template, data);
+
+            String emailSubject = requester + " is sharing task <" +  task.getName() + "> with you.";
+            this.sendExportedHtmlContentEmailToUsers(emailSubject, "Task", htmlContent, emails);
+        }
+        catch (IOException | TemplateException e) {
+            LOGGER.error("sendExportedTaskEmailsToUsers failed", e);
+        }
+    }
+
+    /**
+     * Send exported html content to user
+     * @param emailSubject email title
+     * @param htmlContentHeader  html content header
+     * @param htmlContent  email html content
+     * @param emails       target users
+     */
+    public void sendExportedHtmlContentEmailToUsers(
+        String emailSubject, String htmlContentHeader, String htmlContent, List<String> emails
+    ) {
+        LOGGER.info("Sending exported content emails ...");
+        try {
+            List<MailjetEmailParams> emailParamsList = new ArrayList<>();
+            for (String email : new HashSet<>(emails)) {
+                MailjetEmailParams mailjetEmailParams =
+                    createEmailParamForExportedHtmlContentEmail(
+                        emailSubject, htmlContentHeader, htmlContent, email);
+
+                if (mailjetEmailParams != null) {
+                    emailParamsList.add(mailjetEmailParams);
+                }
+            }
+            mailjetClient.sendAllEmailAsync(emailParamsList);
+
+        } catch (Exception e) {
+            LOGGER.error("sendExportedContentEmailsToUsers failed", e);
+        }
+    }
+
+    /**
+     * Create email parameter for exported html content email
+     * @param emailSubject       email title
+     * @param htmlContentHeader  html content header
+     * @param htmlContent        email html content
+     * @param email              target user
+     * @return  mailjet email parameter
+     */
+    public MailjetEmailParams createEmailParamForExportedHtmlContentEmail(
+        String emailSubject, String htmlContentHeader, String htmlContent, String email) {
+
+        if (!this.isValidEmailAddr(email)) {
+            LOGGER.error("Invalid target email address: {}", email);
+            return null;
+        }
+
+        return new MailjetEmailParams(
+            Arrays.asList(new ImmutablePair(null, email)),
+            emailSubject,
+            null,
+            Template.EXPORT_CONTENT_AS_EMAIL,
+            HTML_CONTENT_PROPERTY,
+            htmlContent,
+            EXPORTED_HTML_CONTENT_HEADER_PROPERTY,
+            htmlContentHeader
+        );
+    }
+
     public void sendAppInvitationEmailsToUser(String inviter, List<String> emails) {
         LOGGER.info("Sending app invitation emails...");
         try {
@@ -357,7 +462,6 @@ public class MessagingService {
                 groupInviterAvatar
             );
     }
-
 
     private List<MailjetEmailParams> createEmailParamsForDueTask(
         Task task, Map<String, String> nameEmailMap

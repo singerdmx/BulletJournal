@@ -3,8 +3,9 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
-import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.params.CreateNoteParams;
+import com.bulletjournal.controller.models.params.ExportProjectItemAsEmailParams;
+import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.params.UpdateNoteParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
@@ -53,6 +54,11 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     private SharedProjectItemDaoJpa sharedProjectItemDaoJpa;
     @Autowired
     private SearchIndexDaoJpa searchIndexDaoJpa;
+    @Autowired
+    private UserDaoJpa userDaoJpa;
+    @Autowired
+    private GroupDaoJpa groupDaoJpa;
+
 
     @Override
     public JpaRepository getJpaRepository() {
@@ -322,6 +328,46 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
                 Operation.UPDATE, noteId, note.getProject().getOwner());
         note.setColor(color);
         this.noteRepository.save(note);
+    }
+
+    /**
+     * export note as email
+     *
+     * @param noteId note ID
+     * @param params exporting item parameter
+     * @param requester the username of action requester
+     */
+    public void exportNoteAsEmail(Long noteId,
+                                  ExportProjectItemAsEmailParams params,
+                                  String requester) {
+        Note note = this.getProjectItem(noteId, requester);
+
+        List<String> targetEmails = new ArrayList<>();
+        List<String> usernames = new ArrayList<>();
+        if (StringUtils.isNotBlank(params.getTargetUser())) {
+            usernames.add(params.getTargetUser());
+        }
+
+        if (params.getTargetGroup() != null) {
+            Group group = this.groupDaoJpa.getGroup(params.getTargetGroup());
+            for (UserGroup userGroup : group.getAcceptedUsers()) {
+                usernames.add(userGroup.getUser().getName());
+            }
+        }
+
+        if (params.getEmails() != null) {
+            targetEmails.addAll(params.getEmails());
+        }
+
+        if (!usernames.isEmpty()) {
+            List<User> targetUsers = userDaoJpa.getUsersByNames(new HashSet<>(usernames));
+            for (User user : targetUsers) {
+                String email = user.getEmail();
+                if (email != null) {
+                    targetEmails.add(email);
+                }
+            }
+        }
     }
 
     private static final String[] MONTHS = {"January", "February", "March"};

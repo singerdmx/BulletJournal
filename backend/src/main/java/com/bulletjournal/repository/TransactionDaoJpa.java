@@ -6,6 +6,7 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.params.CreateTransactionParams;
+import com.bulletjournal.controller.models.params.ExportProjectItemAsEmailParams;
 import com.bulletjournal.controller.models.params.UpdateTransactionParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
@@ -61,6 +62,9 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     private BankAccountTransactionRepository bankAccountTransactionRepository;
     @Autowired
     private BankAccountBalanceRepository bankAccountBalanceRepository;
+    private UserDaoJpa userDaoJpa;
+    @Autowired
+    private GroupDaoJpa groupDaoJpa;
 
     @Override
     public JpaRepository getJpaRepository() {
@@ -539,11 +543,12 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         AtomicReference<Double> accountSum = new AtomicReference<>(0.0);
 
         List<com.bulletjournal.repository.models.Transaction> tsWithRRule = this.transactionRepository
-                .findByBankAccountAndRecurrenceRuleNotNull(bankAccount);
+            .findByBankAccountAndRecurrenceRuleNotNull(bankAccount);
         final ZonedDateTime endTime = ZonedDateTime.now();
         tsWithRRule.forEach(ts -> {
             try {
-                BuJoRecurrenceRule rule = new BuJoRecurrenceRule(ts.getRecurrenceRule(), ts.getTimezone());
+                BuJoRecurrenceRule rule = new BuJoRecurrenceRule(ts.getRecurrenceRule(),
+                    ts.getTimezone());
                 ZonedDateTime startTime = ZonedDateTimeHelper.getZonedDateTime(rule.getStart());
                 List<Transaction> rts = DaoHelper.getRecurringTransaction(ts, startTime, endTime);
                 if (!rts.isEmpty()) {
@@ -554,5 +559,44 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
             }
         });
         return accountSum.get();
+    }
+
+    /**
+     * export transaction as email
+     *
+     * @param transactionId transaction ID
+     * @param params exporting item parameter
+     * @param requester the username of action requester
+     */
+    public void exportTransactionAsEmail(Long transactionId,
+                                         ExportProjectItemAsEmailParams params,
+                                         String requester) {
+        Transaction transaction = this.getProjectItem(transactionId, requester);
+        List<String> targetEmails = new ArrayList<>();
+        List<String> usernames = new ArrayList<>();
+        if (StringUtils.isNotBlank(params.getTargetUser())) {
+            usernames.add(params.getTargetUser());
+        }
+
+        if (params.getTargetGroup() != null) {
+            Group group = this.groupDaoJpa.getGroup(params.getTargetGroup());
+            for (UserGroup userGroup : group.getAcceptedUsers()) {
+                usernames.add(userGroup.getUser().getName());
+            }
+        }
+
+        if (params.getEmails() != null) {
+            targetEmails.addAll(params.getEmails());
+        }
+
+        if (!usernames.isEmpty()) {
+            List<User> targetUsers = userDaoJpa.getUsersByNames(new HashSet<>(usernames));
+            for (User user : targetUsers) {
+                String email = user.getEmail();
+                if (email != null) {
+                    targetEmails.add(email);
+                }
+            }
+        }
     }
 }

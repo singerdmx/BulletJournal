@@ -6,50 +6,50 @@ import java.util.List;
 
 public class ExportProjectItemAsEmailParams {
 
-    private Long targetGroup;
+  private Long targetGroup;
 
-    private String targetUser;
+  private String targetUser;
 
-    private List<String> emails;
+  private List<String> emails;
 
-    private List<Content> contents;
+  private List<Content> contents;
 
-    public ExportProjectItemAsEmailParams() {
-    }
+  public ExportProjectItemAsEmailParams() {
+  }
 
-    public ExportProjectItemAsEmailParams(String targetUser) {
-        this.targetUser = targetUser;
-    }
+  public ExportProjectItemAsEmailParams(String targetUser) {
+    this.targetUser = targetUser;
+  }
 
-    public Long getTargetGroup() {
-        return targetGroup;
-    }
+  public Long getTargetGroup() {
+    return targetGroup;
+  }
 
-    public void setTargetGroup(Long targetGroup) {
-        this.targetGroup = targetGroup;
-    }
+  public void setTargetGroup(Long targetGroup) {
+    this.targetGroup = targetGroup;
+  }
 
-    public String getTargetUser() {
-        return targetUser;
-    }
+  public String getTargetUser() {
+    return targetUser;
+  }
 
-    public void setTargetUser(String targetUser) {
-        this.targetUser = targetUser;
-    }
+  public void setTargetUser(String targetUser) {
+    this.targetUser = targetUser;
+  }
 
-    public List<String> getEmails() {
-        return emails;
-    }
+  public List<String> getEmails() {
+    return emails;
+  }
 
-    public void setEmails(List<String> emails) {
-        this.emails = emails;
-    }
+  public void setEmails(List<String> emails) {
+    this.emails = emails;
+  }
 
-    public List<Content> getContents() {
-        return contents;
-    }
+  public List<Content> getContents() {
+    return contents;
+  }
 
-    public void setContents(List<Content> contents) {
-        this.contents = contents;
-    }
+  public void setContents(List<Content> contents) {
+    this.contents = contents;
+  }
 }
