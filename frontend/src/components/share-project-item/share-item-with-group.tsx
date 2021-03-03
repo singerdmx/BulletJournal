@@ -162,7 +162,7 @@ const ShareProjectItemWithGroup: React.FC<GroupProps & ProjectItemProps> = (
                     .catch((info) => console.log(info))
                 }
               />
-            </Tooltip>},
+            </Tooltip>}
             <Tooltip title='Send email'>
                 <SendOutlined 
                   onClick={()=> {
