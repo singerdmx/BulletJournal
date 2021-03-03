@@ -86,7 +86,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
         setDisplayMore(false);
         setDisplayRevision(false);
         getProject(note.projectId);
-        resizeFloatButton();
+        resizeFloatButton(4);
     }, [note]);
 
     // show drawer

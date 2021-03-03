@@ -179,7 +179,7 @@ const NoteTree: React.FC<RouteComponentProps & NotesProps> = (props) => {
     useEffect(() => {
         if (project) {
             updateNotes(project.id);
-            resizeFloatButton();
+            resizeFloatButton(2);
         }
     }, [project]);
     const [notesByOrderShown, setNotesByOrderShown] = useState(false);

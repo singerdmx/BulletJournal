@@ -160,7 +160,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
           labelsToKeep,
           labelsToRemove
       );
-      resizeFloatButton();
+      resizeFloatButton(2);
     }
   }, [labelsToRemove, labelsToKeep]);
 

@@ -151,7 +151,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
     setDisplayMore(false);
     setDisplayRevision(false);
     getProject(transaction.projectId);
-    resizeFloatButton();
+    resizeFloatButton(4);
   }, [transaction]);
 
   if (!transaction) return null;

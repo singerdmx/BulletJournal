@@ -95,7 +95,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
     setDisplayMore(false);
     setDisplayRevision(false);
     getProject(task.projectId);
-    resizeFloatButton();
+    resizeFloatButton(4);
   }, [task]);
 
   if (!task) return null;

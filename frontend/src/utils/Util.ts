@@ -83,7 +83,7 @@ export const swatchesPickerColors = [['#FCE9DA', '#FFCEC7', '#FFD0A6', '#E098AE'
     ['#FAF0E4', '#EECFBB', '#F6B99D', '#CB8A90'],
     ['#FEF5D4', '#FFD6AA', '#EFBAD6', '#DADAFC']]
 
-export const resizeFloatButton = () => {
+export const resizeFloatButton = (count: number) => {
     console.log('resizeFloatButton')
     const button = document.querySelector("button.fab-item:last-child");
     if (!button) {
@@ -92,7 +92,7 @@ export const resizeFloatButton = () => {
     }
 
     const b = button as HTMLElement;
-    setTimeout(() => resizeFloatButtonCall(b, true, 4), 1000);
+    setTimeout(() => resizeFloatButtonCall(b, true, count), 1000);
 }
 
 const resizeFloatButtonCall = (button: HTMLElement, enlarge: boolean, count: number) => {

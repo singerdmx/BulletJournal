@@ -216,7 +216,7 @@ const TaskTree: React.FC<TasksProps> = (props) => {
   useEffect(() => {
     if (project) {
       updateTasks(project.id);
-      resizeFloatButton();
+      resizeFloatButton(2);
     }
   }, [project]);
 

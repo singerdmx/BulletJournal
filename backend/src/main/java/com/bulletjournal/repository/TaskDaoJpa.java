@@ -1232,21 +1232,37 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         Task task1 = this.create(beginnerProject.getId(), username,
                 new CreateTaskParams("01- Create a new BuJo \"Mom\"", ImmutableList.of(username), user.getTimezone()));
         tasks.add(task1.toPresentationModel());
-        Task childTask1 = this.create(beginnerProject.getId(), username,
-                new CreateTaskParams("01-01 Child Task 1", ImmutableList.of(username), user.getTimezone()));
-        tasks.get(0).addSubTask(childTask1.toPresentationModel());
-        Task childTask2 = this.create(beginnerProject.getId(), username,
-                new CreateTaskParams("01-02 Child Task 2", ImmutableList.of(username), user.getTimezone()));
-        tasks.get(0).addSubTask(childTask2.toPresentationModel());
+        this.addContent(task1.getId(), username, new TaskContent(
+                "{\"delta\":{\"ops\":[{\"insert\":\"Create a new BuJo task called \\\"\"},{\"attributes\":{\"bold\":true},\"insert\":\"Mom\"},{\"insert\":\"\\\"\\n\\nChoose the default group.\\n\\n\"},{\"insert\":{\"image\":\"https://user-images.githubusercontent.com/122956/109781146-82980100-7bbc-11eb-8dc3-ae80c8d56c5c.png\"}},{\"insert\":\"\\n\\n\\n\\nHint:\\nDo you see the \\\"+\\\"  on the right corner of the page?\\nYou can always add new content with this icon or edit the existing content with the icon above.\\n\"},{\"attributes\":{\"width\":\"252\"},\"insert\":{\"image\":\"https://user-images.githubusercontent.com/122956/109782041-50d36a00-7bbd-11eb-899d-9df3460c2e2f.png\"}},{\"insert\":\"\\n\"}]}}"));
         Task task2 = this.create(beginnerProject.getId(), username,
                 new CreateTaskParams("02- Create a new task under Mom", ImmutableList.of(username), user.getTimezone()));
         tasks.add(task2.toPresentationModel());
+        this.addContent(task2.getId(), username, new TaskContent(
+                "{\"delta\":{\"ops\":[{\"insert\":\"Create a new task and enter task name as \\\"\"},{\"attributes\":{\"bold\":true},\"insert\":\"Mother's day\"},{\"insert\":\"\\\"\\nSet the date as \"},{\"attributes\":{\"bold\":true},\"insert\":\"recurring\"},{\"insert\":\" on the \"},{\"attributes\":{\"bold\":true},\"insert\":\"Second Sunday of May \"},{\"insert\":\"and repeat it as \"},{\"attributes\":{\"bold\":true},\"insert\":\"YEARLY\"},{\"insert\":\"\\n\\n\\n\\n \"},{\"attributes\":{\"width\":\"335\",\"style\":\"\"},\"insert\":{\"image\":\"https://user-images.githubusercontent.com/122956/109782996-57161600-7bbe-11eb-9909-72bdb300e640.png\"}},{\"insert\":\"\\n\"}]}}"));
+        Task childTask1 = this.create(beginnerProject.getId(), username,
+                new CreateTaskParams("01-01 Child Task 1", ImmutableList.of(username), user.getTimezone()));
+        tasks.get(1).addSubTask(childTask1.toPresentationModel());
+        Task childTask2 = this.create(beginnerProject.getId(), username,
+                new CreateTaskParams("01-02 Child Task 2", ImmutableList.of(username), user.getTimezone()));
+        tasks.get(1).addSubTask(childTask2.toPresentationModel());
         Task task3 = this.create(beginnerProject.getId(), username,
                 new CreateTaskParams("03- Create a new BuJo \"Family\"", ImmutableList.of(username), user.getTimezone()));
         tasks.add(task3.toPresentationModel());
         Task task4 = this.create(beginnerProject.getId(), username,
                 new CreateTaskParams("04- Drag \"Mom\" and drop under \"Family\"", ImmutableList.of(username), user.getTimezone()));
         tasks.add(task4.toPresentationModel());
+        this.addContent(task4.getId(), username, new TaskContent(
+                "{\"delta\":{\"ops\":[{\"insert\":\"Here is what the structure looks like:\\n\\n\\n\"},{\"attributes\":{\"width\":\"194\",\"style\":\"\"},\"insert\":{\"image\":\"https://user-images.githubusercontent.com/122956/109783787-39957c00-7bbf-11eb-810b-cb15787ace6b.png\"}},{\"insert\":\"\\n\"}]}}"));
+        Task task5 = this.create(beginnerProject.getId(), username,
+                new CreateTaskParams("05- Explore other features", ImmutableList.of(username), user.getTimezone()));
+        tasks.add(task5.toPresentationModel());
+        this.addContent(task5.getId(), username, new TaskContent(
+                "{\"delta\":{\"ops\":[{\"insert\":\"\uD83C\uDF89 Congratulations! \uD83C\uDF89\\n\\nNow you’ve completed all the beginner's tasks and get to know the basic function of our TODO BuJo.\\n\\nFeel free to explore more features and start your own journey in Bullet Journal!\\n\\n\"}]}}"));
+        Task task6 = this.create(beginnerProject.getId(), username,
+                new CreateTaskParams("01-01 Drag and drop me under the Task 01", ImmutableList.of(username), user.getTimezone()));
+        tasks.add(task6.toPresentationModel());
+        this.addContent(task6.getId(), username, new TaskContent(
+                "{\"delta\":{\"ops\":[{\"insert\":\"If you see this structure, then you did right!\\n\"},{\"insert\":{\"image\":\"https://user-images.githubusercontent.com/122956/109784867-5c746000-7bc0-11eb-92fb-191afaa1629b.png\"}},{\"insert\":\"\\n\"}]}}"));
         this.updateUserTasks(beginnerProject.getId(), tasks, username);
     }
 }
