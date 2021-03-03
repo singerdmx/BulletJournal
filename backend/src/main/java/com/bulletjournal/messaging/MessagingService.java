@@ -281,10 +281,12 @@ public class MessagingService {
         }
         try {
             Map<String, Object> data = new HashMap<>();
+
             data.put("task_owner", task.getOwner());
             data.put("task_name", task.getName());
-            data.put("assignee", task.getAssignees().toString());
+            data.put("assignee", getConcatenatedAlias(task.getAssignees()));
             data.put("create_at", task.getCreatedAt());
+            data.put("update_at", task.getUpdatedAt());
             data.put("location", task.getLocation());
             data.put("due_date", task.getDueDate());
             data.put("contents", contents);
@@ -541,5 +543,21 @@ public class MessagingService {
             ret.put(username, userAliasDaoJpa.getAliases(username));
         }
         return ret;
+    }
+
+    /**
+     * concatenate username alias (using comma as delimiter)
+     */
+    private String getConcatenatedAlias(List<String> usernames) {
+        if (usernames == null) {
+            return "";
+        }
+        Map<String, Map<String, String>> aliasMap = this.getAliasMap(usernames);
+        List<String> aliases = new ArrayList<>();
+        for (String username : usernames) {
+            String alias = aliasMap.get(username).getOrDefault(username, username);
+           aliases.add(alias);
+        }
+        return aliases.stream().sorted().collect(Collectors.joining(", "));
     }
 }
