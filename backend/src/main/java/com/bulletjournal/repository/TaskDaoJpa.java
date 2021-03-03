@@ -21,10 +21,8 @@ import com.bulletjournal.messaging.MessagingService;
 import com.bulletjournal.notifications.ContentBatch;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.informed.UpdateTaskAssigneeEvent;
-import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.Task;
-import com.bulletjournal.repository.models.User;
 import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
@@ -1223,35 +1221,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     public void exportTaskAsEmail(
         Long taskId, ExportProjectItemAsEmailParams params, String requester) {
         Task task = getProjectItem(taskId, requester);
-
-        List<String> targetEmails = new ArrayList<>();
-        List<String> usernames = new ArrayList<>();
-        if (StringUtils.isNotBlank(params.getTargetUser())) {
-            usernames.add(params.getTargetUser());
-        }
-
-        if (params.getTargetGroup() != null) {
-            Group group = this.groupDaoJpa.getGroup(params.getTargetGroup());
-            for (UserGroup userGroup : group.getAcceptedUsers()) {
-                usernames.add(userGroup.getUser().getName());
-            }
-        }
-
-        if (params.getEmails() != null) {
-            targetEmails.addAll(params.getEmails());
-        }
-
-        if (!usernames.isEmpty()) {
-            List<User> targetUsers = userDaoJpa.getUsersByNames(new HashSet<>(usernames));
-            for (User user : targetUsers) {
-                String email = user.getEmail();
-                if (email != null) {
-                    targetEmails.add(email);
-                }
-            }
-        }
-
-        messagingService.sendExportedTaskEmailToUsers(
-            requester, task, params.getContents(), targetEmails);
+        Set<String>  targetEmails = getExportProjectItemAsEmailTargetEmails(params);
+        messagingService.sendExportedTaskEmailToUsers(requester, task, params.getContents(), targetEmails);
     }
 }

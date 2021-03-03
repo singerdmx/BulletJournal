@@ -7,6 +7,7 @@ import com.bulletjournal.config.ContentRevisionConfig;
 import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.params.ExportProjectItemAsEmailParams;
 import com.bulletjournal.controller.models.params.RevokeProjectItemSharableParams;
 import com.bulletjournal.controller.models.params.ShareProjectItemParams;
 import com.bulletjournal.controller.models.params.UpdateContentParams;
@@ -72,6 +73,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     protected NotificationService notificationService;
     @Autowired
     private DaemonServiceClient daemonServiceClient;
+    @Autowired
+    private UserDaoJpa userDaoJpa;
 
     private final MapWithExpiration contentUpdateLock = new MapWithExpiration();
 
@@ -451,6 +454,42 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             throw new UnAuthorizedException("Not in project");
         }
         return items;
+    }
+
+    /**
+     * Get export project item as email target emails
+     * @param params ExportProjectItemAsEmailParams
+     * @return target emails
+     */
+    public Set<String> getExportProjectItemAsEmailTargetEmails(ExportProjectItemAsEmailParams params) {
+        Set<String> targetEmails = new HashSet<>();
+        Set<String> usernames = new HashSet<>();
+
+        if (StringUtils.isNotBlank(params.getTargetUser())) {
+            usernames.add(params.getTargetUser());
+        }
+
+        if (params.getTargetGroup() != null) {
+            Group group = this.groupDaoJpa.getGroup(params.getTargetGroup());
+            for (UserGroup userGroup : group.getAcceptedUsers()) {
+                usernames.add(userGroup.getUser().getName());
+            }
+        }
+
+        if (params.getEmails() != null) {
+            targetEmails.addAll(params.getEmails());
+        }
+
+        if (!usernames.isEmpty()) {
+            List<com.bulletjournal.repository.models.User> targetUsers = userDaoJpa.getUsersByNames(usernames);
+            for (com.bulletjournal.repository.models.User user : targetUsers) {
+                String email = user.getEmail();
+                if (email != null && !email.endsWith("@anon.1o24bbs.com")) {
+                    targetEmails.add(email);
+                }
+            }
+        }
+        return targetEmails;
     }
 }
 

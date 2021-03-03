@@ -573,31 +573,6 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
                                          ExportProjectItemAsEmailParams params,
                                          String requester) {
         Transaction transaction = this.getProjectItem(transactionId, requester);
-        List<String> targetEmails = new ArrayList<>();
-        List<String> usernames = new ArrayList<>();
-        if (StringUtils.isNotBlank(params.getTargetUser())) {
-            usernames.add(params.getTargetUser());
-        }
-
-        if (params.getTargetGroup() != null) {
-            Group group = this.groupDaoJpa.getGroup(params.getTargetGroup());
-            for (UserGroup userGroup : group.getAcceptedUsers()) {
-                usernames.add(userGroup.getUser().getName());
-            }
-        }
-
-        if (params.getEmails() != null) {
-            targetEmails.addAll(params.getEmails());
-        }
-
-        if (!usernames.isEmpty()) {
-            List<User> targetUsers = userDaoJpa.getUsersByNames(new HashSet<>(usernames));
-            for (User user : targetUsers) {
-                String email = user.getEmail();
-                if (email != null) {
-                    targetEmails.add(email);
-                }
-            }
-        }
+        Set<String> targetEmails = this.getExportProjectItemAsEmailTargetEmails(params);
     }
 }
