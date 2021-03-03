@@ -3,10 +3,12 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
-import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.ProjectType;
+import com.bulletjournal.controller.models.ReminderSetting;
+import com.bulletjournal.controller.models.TaskStatus;
 import com.bulletjournal.controller.models.params.CreateTaskParams;
-import com.bulletjournal.controller.models.params.UpdateTaskParams;
 import com.bulletjournal.controller.models.params.ExportProjectItemAsEmailParams;
+import com.bulletjournal.controller.models.params.UpdateTaskParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.daemon.models.ReminderRecord;
@@ -21,13 +23,11 @@ import com.bulletjournal.messaging.MessagingService;
 import com.bulletjournal.notifications.ContentBatch;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.informed.UpdateTaskAssigneeEvent;
-import com.bulletjournal.repository.models.Project;
-import com.bulletjournal.repository.models.Task;
-import com.bulletjournal.repository.models.UserGroup;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.bulletjournal.templates.repository.model.SampleTask;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.lang3.StringUtils;
@@ -1219,9 +1219,34 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
      * @throws ResourceNotFoundException if task item is not found
      */
     public void exportTaskAsEmail(
-        Long taskId, ExportProjectItemAsEmailParams params, String requester) {
+            Long taskId, ExportProjectItemAsEmailParams params, String requester) {
         Task task = getProjectItem(taskId, requester);
-        Set<String>  targetEmails = getExportProjectItemAsEmailTargetEmails(params);
+        Set<String> targetEmails = getExportProjectItemAsEmailTargetEmails(params);
         messagingService.sendExportedTaskEmailToUsers(requester, task, params.getContents(), targetEmails);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void createSampleTasks(String username, Project beginnerProject) {
+        List<com.bulletjournal.controller.models.Task> tasks = new ArrayList<>();
+        User user = this.userDaoJpa.getByName(username);
+        Task task1 = this.create(beginnerProject.getId(), username,
+                new CreateTaskParams("01- Create a new BuJo \"Mom\"", ImmutableList.of(username), user.getTimezone()));
+        tasks.add(task1.toPresentationModel());
+        Task childTask1 = this.create(beginnerProject.getId(), username,
+                new CreateTaskParams("01-01 Child Task 1", ImmutableList.of(username), user.getTimezone()));
+        tasks.get(0).addSubTask(childTask1.toPresentationModel());
+        Task childTask2 = this.create(beginnerProject.getId(), username,
+                new CreateTaskParams("01-02 Child Task 2", ImmutableList.of(username), user.getTimezone()));
+        tasks.get(0).addSubTask(childTask2.toPresentationModel());
+        Task task2 = this.create(beginnerProject.getId(), username,
+                new CreateTaskParams("02- Create a new task under Mom", ImmutableList.of(username), user.getTimezone()));
+        tasks.add(task2.toPresentationModel());
+        Task task3 = this.create(beginnerProject.getId(), username,
+                new CreateTaskParams("03- Create a new BuJo \"Family\"", ImmutableList.of(username), user.getTimezone()));
+        tasks.add(task3.toPresentationModel());
+        Task task4 = this.create(beginnerProject.getId(), username,
+                new CreateTaskParams("04- Drag \"Mom\" and drop under \"Family\"", ImmutableList.of(username), user.getTimezone()));
+        tasks.add(task4.toPresentationModel());
+        this.updateUserTasks(beginnerProject.getId(), tasks, username);
     }
 }

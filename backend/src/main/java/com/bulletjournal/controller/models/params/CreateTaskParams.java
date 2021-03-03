@@ -37,6 +37,13 @@ public class CreateTaskParams {
     public CreateTaskParams() {
     }
 
+    public CreateTaskParams(@NotBlank @Size(min = 1, max = 100) String name, List<String> assignees,
+                            @NotBlank @Size(min = 1, max = 100) String timezone) {
+        this.name = name;
+        this.assignees = assignees;
+        this.timezone = timezone;
+    }
+
     public CreateTaskParams(
             @NotBlank @Size(min = 1, max = 100) String name, String dueDate, String dueTime,
             Integer duration, ReminderSetting reminderSetting, List<String> assignees,

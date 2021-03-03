@@ -261,6 +261,7 @@ public class NotificationService {
             try {
                 for (SampleProjectsCreation sampleProjectsCreation : sampleProjectsCreations) {
                     Pair<Project, Project> result = this.projectDaoJpa.createSampleProjects(sampleProjectsCreation);
+                    this.taskDaoJpa.createSampleTasks(sampleProjectsCreation.getUsername(), result.getLeft());
                     this.noteDaoJpa.createSampleNotes(sampleProjectsCreation.getUsername(), result.getRight());
                 }
             } catch (Exception ex) {
