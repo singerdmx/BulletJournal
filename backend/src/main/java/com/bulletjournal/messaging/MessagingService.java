@@ -274,7 +274,7 @@ public class MessagingService {
      * @param emails    target emails
      */
     public void sendExportedTaskEmailToUsers(
-        String requester, Task task, List<Content> contents, List<String> emails) {
+        String requester, Task task, List<Content> contents, Set<String> emails) {
         if (requester == null) {
             LOGGER.error("Export Task As Email: Invalid requester.");
             return;
@@ -309,12 +309,12 @@ public class MessagingService {
      * @param emails       target users
      */
     public void sendExportedHtmlContentEmailToUsers(
-        String emailSubject, String htmlContentHeader, String htmlContent, List<String> emails
+        String emailSubject, String htmlContentHeader, String htmlContent, Set<String> emails
     ) {
         LOGGER.info("Sending exported content emails ...");
         try {
             List<MailjetEmailParams> emailParamsList = new ArrayList<>();
-            for (String email : new HashSet<>(emails)) {
+            for (String email : emails) {
                 MailjetEmailParams mailjetEmailParams =
                     createEmailParamForExportedHtmlContentEmail(
                         emailSubject, htmlContentHeader, htmlContent, email);
