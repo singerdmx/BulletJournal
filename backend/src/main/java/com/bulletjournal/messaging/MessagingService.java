@@ -123,7 +123,6 @@ public class MessagingService {
 
     // EXPORT CONTENT AS EMAIL PROPERTIES
     private static final String HTML_CONTENT_PROPERTY = "html_content";
-    private static final String EXPORTED_HTML_CONTENT_HEADER_PROPERTY = "html_content_header";
 
     @Autowired
     public MessagingService(
@@ -296,7 +295,7 @@ public class MessagingService {
             String htmlContent = FreeMarkerTemplateUtils.processTemplateIntoString(template, data);
 
             String emailSubject = requester + " is sharing task <" +  task.getName() + "> with you.";
-            this.sendExportedHtmlContentEmailToUsers(emailSubject, "Task", htmlContent, emails);
+            this.sendExportedHtmlContentEmailToUsers(emailSubject, htmlContent, emails);
         }
         catch (IOException | TemplateException e) {
             LOGGER.error("sendExportedTaskEmailsToUsers failed", e);
@@ -306,12 +305,11 @@ public class MessagingService {
     /**
      * Send exported html content to user
      * @param emailSubject email title
-     * @param htmlContentHeader  html content header
      * @param htmlContent  email html content
      * @param emails       target users
      */
     public void sendExportedHtmlContentEmailToUsers(
-        String emailSubject, String htmlContentHeader, String htmlContent, Set<String> emails
+        String emailSubject, String htmlContent, Set<String> emails
     ) {
         LOGGER.info("Sending exported content emails ...");
         try {
@@ -319,7 +317,7 @@ public class MessagingService {
             for (String email : emails) {
                 MailjetEmailParams mailjetEmailParams =
                     createEmailParamForExportedHtmlContentEmail(
-                        emailSubject, htmlContentHeader, htmlContent, email);
+                        emailSubject, htmlContent, email);
 
                 if (mailjetEmailParams != null) {
                     emailParamsList.add(mailjetEmailParams);
@@ -335,13 +333,12 @@ public class MessagingService {
     /**
      * Create email parameter for exported html content email
      * @param emailSubject       email title
-     * @param htmlContentHeader  html content header
      * @param htmlContent        email html content
      * @param email              target user
      * @return  mailjet email parameter
      */
     public MailjetEmailParams createEmailParamForExportedHtmlContentEmail(
-        String emailSubject, String htmlContentHeader, String htmlContent, String email) {
+        String emailSubject, String htmlContent, String email) {
 
         if (!this.isValidEmailAddr(email)) {
             LOGGER.error("Invalid target email address: {}", email);
@@ -354,9 +351,7 @@ public class MessagingService {
             null,
             Template.EXPORT_CONTENT_AS_EMAIL,
             HTML_CONTENT_PROPERTY,
-            htmlContent,
-            EXPORTED_HTML_CONTENT_HEADER_PROPERTY,
-            htmlContentHeader
+            htmlContent
         );
     }
 
