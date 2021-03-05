@@ -14,9 +14,6 @@ import com.bulletjournal.repository.models.DeviceToken;
 import com.bulletjournal.repository.models.Notification;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.User;
-import freemarker.template.Configuration;
-import freemarker.template.TemplateException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 /**
  * Handle mobile device notification and email service
@@ -84,9 +80,6 @@ public class MessagingService {
 
     private UserClient userClient;
 
-    private Configuration freemarkerConfig;
-
-
     // JOIN GROUP PROPERTIES
     private static final String GROUP_INVITATION_BASE_URL =
         "http://bulletjournal.us/public/notifications/";
@@ -123,7 +116,6 @@ public class MessagingService {
 
     // EXPORT CONTENT AS EMAIL PROPERTIES
     private static final String HTML_CONTENT_PROPERTY = "html_content";
-    private static final String EXPORTED_HTML_CONTENT_HEADER_PROPERTY = "html_content_header";
 
     @Autowired
     public MessagingService(
@@ -132,8 +124,7 @@ public class MessagingService {
         DeviceTokenDaoJpa deviceTokenDaoJpa,
         UserDaoJpa userDaoJpa,
         UserAliasDaoJpa userAliasDaoJpa,
-        UserClient userClient,
-        Configuration freemarkerConfig
+        UserClient userClient
     ) {
         this.fcmClient = fcmClient;
         this.mailjetClient = mailjetClient;
@@ -141,7 +132,6 @@ public class MessagingService {
         this.userDaoJpa = userDaoJpa;
         this.userAliasDaoJpa = userAliasDaoJpa;
         this.userClient = userClient;
-        this.freemarkerConfig = freemarkerConfig;
     }
 
     public void sendEtagUpdateNotificationToUsers(Collection<String> usernames) {
@@ -275,43 +265,17 @@ public class MessagingService {
      */
     public void sendExportedTaskEmailToUsers(
         String requester, Task task, List<Content> contents, Set<String> emails) {
-        if (requester == null) {
-            LOGGER.error("Export Task As Email: Invalid requester.");
-            return;
-        }
-        try {
-            Map<String, Object> data = new HashMap<>();
 
-            data.put("task_owner", task.getOwner());
-            data.put("task_name", task.getName());
-            data.put("assignee", getConcatenatedAlias(task.getAssignees()));
-            data.put("create_at", task.getCreatedAt());
-            data.put("update_at", task.getUpdatedAt());
-            data.put("location", task.getLocation());
-            data.put("due_date", task.getDueDate());
-            data.put("contents", contents);
-            data.put("requester", requester);
-            data.put("requester_avatar", this.getAvatar(requester));
-            freemarker.template.Template template = freemarkerConfig.getTemplate("TaskEmail.ftl");
-            String htmlContent = FreeMarkerTemplateUtils.processTemplateIntoString(template, data);
-
-            String emailSubject = requester + " is sharing task <" +  task.getName() + "> with you.";
-            this.sendExportedHtmlContentEmailToUsers(emailSubject, "Task", htmlContent, emails);
-        }
-        catch (IOException | TemplateException e) {
-            LOGGER.error("sendExportedTaskEmailsToUsers failed", e);
-        }
     }
 
     /**
      * Send exported html content to user
      * @param emailSubject email title
-     * @param htmlContentHeader  html content header
      * @param htmlContent  email html content
      * @param emails       target users
      */
     public void sendExportedHtmlContentEmailToUsers(
-        String emailSubject, String htmlContentHeader, String htmlContent, Set<String> emails
+        String emailSubject, String htmlContent, Set<String> emails
     ) {
         LOGGER.info("Sending exported content emails ...");
         try {
@@ -319,7 +283,7 @@ public class MessagingService {
             for (String email : emails) {
                 MailjetEmailParams mailjetEmailParams =
                     createEmailParamForExportedHtmlContentEmail(
-                        emailSubject, htmlContentHeader, htmlContent, email);
+                        emailSubject, htmlContent, email);
 
                 if (mailjetEmailParams != null) {
                     emailParamsList.add(mailjetEmailParams);
@@ -335,13 +299,12 @@ public class MessagingService {
     /**
      * Create email parameter for exported html content email
      * @param emailSubject       email title
-     * @param htmlContentHeader  html content header
      * @param htmlContent        email html content
      * @param email              target user
      * @return  mailjet email parameter
      */
     public MailjetEmailParams createEmailParamForExportedHtmlContentEmail(
-        String emailSubject, String htmlContentHeader, String htmlContent, String email) {
+        String emailSubject, String htmlContent, String email) {
 
         if (!this.isValidEmailAddr(email)) {
             LOGGER.error("Invalid target email address: {}", email);
@@ -354,9 +317,7 @@ public class MessagingService {
             null,
             Template.EXPORT_CONTENT_AS_EMAIL,
             HTML_CONTENT_PROPERTY,
-            htmlContent,
-            EXPORTED_HTML_CONTENT_HEADER_PROPERTY,
-            htmlContentHeader
+            htmlContent
         );
     }
 
@@ -545,19 +506,5 @@ public class MessagingService {
         return ret;
     }
 
-    /**
-     * concatenate username alias (using comma as delimiter)
-     */
-    private String getConcatenatedAlias(List<String> usernames) {
-        if (usernames == null) {
-            return "";
-        }
-        Map<String, Map<String, String>> aliasMap = this.getAliasMap(usernames);
-        List<String> aliases = new ArrayList<>();
-        for (String username : usernames) {
-            String alias = aliasMap.get(username).getOrDefault(username, username);
-           aliases.add(alias);
-        }
-        return aliases.stream().sorted().collect(Collectors.joining(", "));
-    }
+
 }
