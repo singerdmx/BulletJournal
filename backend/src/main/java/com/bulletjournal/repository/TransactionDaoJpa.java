@@ -3,6 +3,7 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
+import com.bulletjournal.controller.models.Content;
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.params.CreateTransactionParams;
@@ -21,6 +22,8 @@ import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.bulletjournal.util.BuJoRecurrenceRule;
 import com.google.common.collect.ImmutableList;
+import freemarker.template.TemplateException;
+import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dmfs.rfc5545.DateTime;
@@ -574,5 +577,12 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
                                          String requester) {
         Transaction transaction = this.getProjectItem(transactionId, requester);
         Set<String> targetEmails = this.getExportProjectItemAsEmailTargetEmails(params);
+    }
+
+    @Override
+    public <T extends ProjectItemModel> String generateProjectItemHtml(
+        String requester, T projectItem, List<Content> contents
+    ) throws IOException, TemplateException {
+        return "";
     }
 }

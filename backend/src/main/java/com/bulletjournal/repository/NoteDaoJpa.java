@@ -3,6 +3,7 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
+import com.bulletjournal.controller.models.Content;
 import com.bulletjournal.controller.models.params.CreateNoteParams;
 import com.bulletjournal.controller.models.params.ExportProjectItemAsEmailParams;
 import com.bulletjournal.controller.models.ProjectType;
@@ -18,6 +19,8 @@ import com.bulletjournal.hierarchy.NoteRelationsProcessor;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
+import freemarker.template.TemplateException;
+import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -342,6 +345,13 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
                                   String requester) {
         Note note = this.getProjectItem(noteId, requester);
         Set<String> targetEmails = this.getExportProjectItemAsEmailTargetEmails(params);
+    }
+
+    @Override
+    public <T extends ProjectItemModel> String generateProjectItemHtml(
+        String requester, T projectItem, List<Content> contents
+    ) throws IOException, TemplateException {
+        return "";
     }
 
     private static final String[] MONTHS = {"January", "February", "March"};
