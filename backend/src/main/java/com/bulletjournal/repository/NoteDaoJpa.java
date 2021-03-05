@@ -347,21 +347,25 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     public void exportNoteAsEmail(Long noteId,
                                   ExportProjectItemAsEmailParams params,
                                   String requester) {
+        if (requester == null) {
+            LOGGER.error("Export Note As Email: Invalid requester.");
+            return;
+        }
         Note note = this.getProjectItem(noteId, requester);
         Set<String> targetEmails = this.getExportProjectItemAsEmailTargetEmails(params);
 
         try {
             String emailSubject = requester + " is sharing note <" +  note.getName() + "> with you.";
-            String html = generateProjectItemHtml(requester, note, params.getContents());
+            String html = generateProjectItemHtmlString(requester, note, params.getContents());
             messagingService.sendExportedHtmlContentEmailToUsers(emailSubject, html, targetEmails);
         }
         catch (IOException | TemplateException e) {
-            LOGGER.error("sendExportedTaskEmailsToUsers failed", e);
+            LOGGER.error("exportNoteAsEmail failed", e);
         }
     }
 
     @Override
-    public <T extends ProjectItemModel> String generateProjectItemHtml(
+    public <T extends ProjectItemModel> String generateProjectItemHtmlString(
         String requester, T projectItem, List<Content> contents
     ) throws IOException, TemplateException {
         Note note = (Note) projectItem;

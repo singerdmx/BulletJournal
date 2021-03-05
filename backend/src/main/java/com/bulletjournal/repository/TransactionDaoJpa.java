@@ -576,21 +576,25 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     public void exportTransactionAsEmail(Long transactionId,
                                          ExportProjectItemAsEmailParams params,
                                          String requester) {
+        if (requester == null) {
+            LOGGER.error("Export Transaction As Email: Invalid requester.");
+            return;
+        }
         Transaction transaction = this.getProjectItem(transactionId, requester);
         Set<String> targetEmails = this.getExportProjectItemAsEmailTargetEmails(params);
 
         try {
-            String emailSubject = requester + " is sharing task <" +  transaction.getName() + "> with you.";
-            String html = generateProjectItemHtml(requester, transaction, params.getContents());
+            String emailSubject = requester + " is sharing transaction <" +  transaction.getName() + "> with you.";
+            String html = generateProjectItemHtmlString(requester, transaction, params.getContents());
             messagingService.sendExportedHtmlContentEmailToUsers(emailSubject, html, targetEmails);
         }
         catch (IOException | TemplateException e) {
-            LOGGER.error("sendExportedTaskEmailsToUsers failed", e);
+            LOGGER.error("exportTransactionAsEmail failed", e);
         }
     }
 
     @Override
-    public <T extends ProjectItemModel> String generateProjectItemHtml(
+    public <T extends ProjectItemModel> String generateProjectItemHtmlString(
         String requester, T projectItem, List<Content> contents
     ) throws IOException, TemplateException {
         Transaction transaction = (Transaction) projectItem;

@@ -506,7 +506,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         return targetEmails;
     }
 
-    abstract <T extends ProjectItemModel> String generateProjectItemHtml(
+    abstract <T extends ProjectItemModel> String generateProjectItemHtmlString(
         String requester, T projectItem, List<Content> contents)
         throws IOException, TemplateException;
 

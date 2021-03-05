@@ -36,7 +36,7 @@
           <li style="margin-left: 30px"><b>Payer:</b> ${payer}</li>
         </#if>
         <#if amount?has_content>
-          <li style="margin-left: 30px"><b>Amount:</b> ${amount}</li>
+          <li style="margin-left: 30px"><b>Amount(USD):</b> ${amount}</li>
         </#if>
         <#if date?has_content>
           <li style="margin-left: 30px"><b>Date:</b> ${date}</li>

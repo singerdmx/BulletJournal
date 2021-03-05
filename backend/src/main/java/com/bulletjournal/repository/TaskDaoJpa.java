@@ -20,7 +20,6 @@ import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.TaskRelationsProcessor;
-import com.bulletjournal.messaging.MessagingService;
 import com.bulletjournal.notifications.ContentBatch;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.informed.UpdateTaskAssigneeEvent;
@@ -1230,16 +1229,16 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         try {
             String emailSubject = requester + " is sharing task <" +  task.getName() + "> with you.";
-            String html = generateProjectItemHtml(requester, task, params.getContents());
+            String html = generateProjectItemHtmlString(requester, task, params.getContents());
             messagingService.sendExportedHtmlContentEmailToUsers(emailSubject, html, targetEmails);
         }
         catch (IOException | TemplateException e) {
-            LOGGER.error("sendExportedTaskEmailsToUsers failed", e);
+            LOGGER.error("exportTaskAsEmail failed", e);
         }
     }
 
     @Override
-    public <T extends ProjectItemModel> String generateProjectItemHtml(
+    public <T extends ProjectItemModel> String generateProjectItemHtmlString(
         String requester, T projectItem, List<Content> contents
     ) throws IOException, TemplateException {
         Task task = (Task) projectItem;
