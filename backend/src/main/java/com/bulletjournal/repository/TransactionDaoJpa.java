@@ -42,6 +42,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 @Repository
 public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
@@ -577,12 +578,39 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
                                          String requester) {
         Transaction transaction = this.getProjectItem(transactionId, requester);
         Set<String> targetEmails = this.getExportProjectItemAsEmailTargetEmails(params);
+
+        try {
+            String emailSubject = requester + " is sharing task <" +  transaction.getName() + "> with you.";
+            String html = generateProjectItemHtml(requester, transaction, params.getContents());
+            messagingService.sendExportedHtmlContentEmailToUsers(emailSubject, html, targetEmails);
+        }
+        catch (IOException | TemplateException e) {
+            LOGGER.error("sendExportedTaskEmailsToUsers failed", e);
+        }
     }
 
     @Override
     public <T extends ProjectItemModel> String generateProjectItemHtml(
         String requester, T projectItem, List<Content> contents
     ) throws IOException, TemplateException {
-        return "";
+        Transaction transaction = (Transaction) projectItem;
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("transaction_owner", transaction.getOwner());
+        data.put("transaction_name", transaction.getName());
+        data.put("create_at", transaction.getCreatedAt());
+        data.put("update_at", transaction.getUpdatedAt());
+        data.put("location", transaction.getLocation());
+        data.put("amount", transaction.getAmount());
+        data.put("payer", transaction.getPayer());
+        data.put("contents", contents);
+        data.put("date", transaction.getDate());
+        data.put("start_time", transaction.getStartTime());
+        data.put("end_time", transaction.getEndTime());
+        data.put("requester", requester);
+        data.put("requester_avatar", this.getAvatar(requester));
+        freemarker.template.Template template = freemarkerConfig.getTemplate("TransactionEmail.ftl");
+
+        return FreeMarkerTemplateUtils.processTemplateIntoString(template, data);
     }
 }
