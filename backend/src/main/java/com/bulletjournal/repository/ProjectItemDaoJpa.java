@@ -16,6 +16,7 @@ import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
+import com.bulletjournal.messaging.MessagingService;
 import com.bulletjournal.notifications.Auditable;
 import com.bulletjournal.notifications.ContentBatch;
 import com.bulletjournal.notifications.Event;
@@ -61,6 +62,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     protected LabelDaoJpa labelDaoJpa;
     @Autowired
     protected Configuration freemarkerConfig;
+    @Autowired
+    protected MessagingService messagingService;
     @Autowired
     private AuthorizationService authorizationService;
     @Autowired
@@ -533,7 +536,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         if (user.getAvatar() != null) {
             return user.getAvatar();
         }
-        return "";
+        return "non_avatar_found";
     }
 }
 

@@ -102,9 +102,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Autowired
     private UserDaoJpa userDaoJpa;
 
-    @Autowired
-    private MessagingService messagingService;
-
     public static Task generateTask(String owner, Project project, CreateTaskParams createTaskParams) {
         return generateTask(owner, project, createTaskParams, null);
     }
@@ -1259,10 +1256,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         data.put("requester", requester);
         data.put("requester_avatar", this.getAvatar(requester));
         freemarker.template.Template template = freemarkerConfig.getTemplate("TaskEmail.ftl");
-        String htmlContent = FreeMarkerTemplateUtils.processTemplateIntoString(template, data);
 
-//        String emailSubject = requester + " is sharing task <" +  task.getName() + "> with you.";
-        return htmlContent;
+        return FreeMarkerTemplateUtils.processTemplateIntoString(template, data);
     }
 
 

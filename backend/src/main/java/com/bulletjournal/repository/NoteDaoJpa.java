@@ -23,6 +23,8 @@ import freemarker.template.TemplateException;
 import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.retry.annotation.Backoff;
@@ -37,9 +39,11 @@ import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 @Repository
 public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(NoteDaoJpa.class);
 
     @PersistenceContext
     EntityManager entityManager;
@@ -345,13 +349,35 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
                                   String requester) {
         Note note = this.getProjectItem(noteId, requester);
         Set<String> targetEmails = this.getExportProjectItemAsEmailTargetEmails(params);
+
+        try {
+            String emailSubject = requester + " is sharing note <" +  note.getName() + "> with you.";
+            String html = generateProjectItemHtml(requester, note, params.getContents());
+            messagingService.sendExportedHtmlContentEmailToUsers(emailSubject, html, targetEmails);
+        }
+        catch (IOException | TemplateException e) {
+            LOGGER.error("sendExportedTaskEmailsToUsers failed", e);
+        }
     }
 
     @Override
     public <T extends ProjectItemModel> String generateProjectItemHtml(
         String requester, T projectItem, List<Content> contents
     ) throws IOException, TemplateException {
-        return "";
+        Note note = (Note) projectItem;
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("note_owner", note.getOwner());
+        data.put("note_name", note.getName());
+        data.put("create_at", note.getCreatedAt());
+        data.put("update_at", note.getUpdatedAt());
+        data.put("location", note.getLocation());
+        data.put("contents", contents);
+        data.put("requester", requester);
+        data.put("requester_avatar", this.getAvatar(requester));
+        freemarker.template.Template template = freemarkerConfig.getTemplate("NoteEmail.ftl");
+
+        return FreeMarkerTemplateUtils.processTemplateIntoString(template, data);
     }
 
     private static final String[] MONTHS = {"January", "February", "March"};

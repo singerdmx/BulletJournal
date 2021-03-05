@@ -27,17 +27,14 @@
       </div>
       <hr style="width: 98%;text-align:center;margin-left: auto;margin-right: auto;"/>
       <list style="margin-top: 15px; font-size: 17px">
-        <li style="margin-left: 30px"><b>Note created by:</b> ${task_owner}</li>
+        <li style="margin-left: 30px"><b>Note created by:</b> ${note_owner}</li>
         <li style="margin-left: 30px"><b>Create
             time:</b> ${create_at?date?string("yyyy-MM-dd hh:mm:ss")}</li>
         <li style="margin-left: 30px"><b>Update
             time:</b> ${update_at?date?string("yyyy-MM-dd hh:mm:ss")}</li>
-          <#if status?has_content>
-            <li style="margin-left: 30px"><b>Status:</b> ${status}</li>
-          </#if>
-          <#if location?has_content>
-            <li style="margin-left: 30px"><b>Location:</b> ${location}</li>
-          </#if>
+        <#if location?has_content>
+          <li style="margin-left: 30px"><b>Location:</b> ${location}</li>
+        </#if>
       </list>
         <#if contents?has_content>
             <#list contents as content>
