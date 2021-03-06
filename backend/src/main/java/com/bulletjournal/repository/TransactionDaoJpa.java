@@ -321,7 +321,6 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         if (transaction.hasBankAccount()) {
             this.bankAccountBalanceRepository.deleteById(transaction.getBankAccount().getId());
         }
-        // TODO: when mobile has this, remove `updateTransactionParams.hasBankAccountId()`
         if (updateTransactionParams.hasBankAccountId() && Objects.equals(requester, transaction.getPayer())) {
             transaction = this.setBankAccount(requester, transactionId, updateTransactionParams.getBankAccountId());
         }

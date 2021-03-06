@@ -178,7 +178,7 @@ public class UpdateTransactionParams {
     }
 
     public Long getBankAccountId() {
-        return bankAccountId;
+        return bankAccountId < 0 ? null : bankAccountId;
     }
 
     public void setBankAccountId(Long bankAccountId) {

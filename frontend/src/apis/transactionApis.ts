@@ -152,7 +152,7 @@ export const updateTransaction = (
     location: location,
     labels: labels,
     recurrenceRule: recurrenceRule,
-    bankAccountId: bankAccountId
+    bankAccountId: bankAccountId ? bankAccountId : -1 // because mobile does not pass bankAccountId
   });
   return doPatch(`/api/transactions/${transactionId}`, patchBody)
     .then((res) => res.json())
