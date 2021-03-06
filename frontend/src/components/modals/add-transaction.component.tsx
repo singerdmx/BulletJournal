@@ -185,6 +185,7 @@ const AddTransaction: React.FC<
     return (
       <Select defaultValue={props.myself} style={{ marginLeft: '-8px' }} onChange={() => {
         setBankAccountVisible(form.getFieldValue('payerName') === props.myself);
+        form.setFields([{ name: 'bankAccountId', value: undefined }]);
       }}>
         {props.group.users
           .filter((u) => u.accepted)
