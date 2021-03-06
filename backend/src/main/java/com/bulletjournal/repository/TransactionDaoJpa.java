@@ -319,6 +319,11 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         if (updateTransactionParams.hasBankAccountId() && Objects.equals(requester, transaction.getPayer())) {
             transaction = this.setBankAccount(requester, transactionId, updateTransactionParams.getBankAccountId());
         }
+        if (transaction.hasBankAccount() && !Objects.equals(
+                transaction.getPayer(), transaction.getBankAccount().getOwner())) {
+            transaction = this.setBankAccount(transaction.getBankAccount().getOwner(),
+                    transactionId, null);
+        }
         return Pair.of(events, transaction);
     }
 

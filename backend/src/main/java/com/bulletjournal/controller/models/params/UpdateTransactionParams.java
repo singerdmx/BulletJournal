@@ -178,7 +178,10 @@ public class UpdateTransactionParams {
     }
 
     public Long getBankAccountId() {
-        return bankAccountId < 0 ? null : bankAccountId;
+        if (this.bankAccountId == null) {
+            return null;
+        }
+        return this.bankAccountId < 0 ? null : this.bankAccountId;
     }
 
     public void setBankAccountId(Long bankAccountId) {
