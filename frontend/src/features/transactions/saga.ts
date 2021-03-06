@@ -44,7 +44,7 @@ import {
   updateContent,
   updateTransaction,
 } from '../../apis/transactionApis';
-import {BankAccount, LedgerSummary, Transaction} from './interface';
+import {BankAccount, LedgerSummary, Transaction, TransactionView} from './interface';
 import {getProjectItemsAfterUpdateSelect} from '../myBuJo/actions';
 import {updateRecurringTransactions, updateTransactionContents} from './actions';
 import {Content, ProjectItems, Revision} from '../myBuJo/interface';
@@ -823,7 +823,7 @@ function* getBankAccountTransactions(action: PayloadAction<GetBankAccountTransac
       startDate,
       endDate
     } = action.payload;
-    const data : Transaction[] = yield call(
+    const data : TransactionView[] = yield call(
         fetchBankAccountTransactions,
         bankAccountId,
         timezone,
