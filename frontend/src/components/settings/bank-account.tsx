@@ -113,9 +113,12 @@ const BankAccountElem: React.FC<BankAccountProps> = (
                     <img
                         alt={bankAccount.accountType}
                         src={image}
+                        onClick={() => history.push(`/bank/${bankAccount.id}`)}
                     />
                 }
-                title={<span style={{color: color}}>{bankAccount.name}</span>}
+                title={<span style={{color: color}} onClick={() => history.push(`/bank/${bankAccount.id}`)}>
+                    {bankAccount.name}
+                </span>}
                 actions={[
                     <Tooltip title='View Transactions'>
                         <FileSearchOutlined key="View Transactions" title='View Transactions'
@@ -130,10 +133,12 @@ const BankAccountElem: React.FC<BankAccountProps> = (
             >
                 <Meta
                     style={{height: 65}}
-                    title={<Statistic
+                    title={<div onClick={() => history.push(`/bank/${bankAccount.id}`)}>
+                        <Statistic
                         value={`${bankAccount.netBalance.toFixed(2)} ${LocaleCurrency.getCurrency(currency)}`}
                         valueStyle={{color: balanceColor}}
-                    />}
+                        />
+                    </div>}
                     description={description}
                 />
             </Card>

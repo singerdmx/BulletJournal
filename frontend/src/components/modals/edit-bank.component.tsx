@@ -35,8 +35,8 @@ const EditBankAccountModal: React.FC<BankProps> = (props) => {
   const mode = props.mode;
   const [name, setName] = useState<string>(bankAccount ? bankAccount.name : '');
   const [accountType, setAccountType] = useState<string>(bankAccount ? bankAccount.accountType : '');
-  const [accountNumber, setAccountNumber] = useState<number | undefined>(
-    bankAccount && bankAccount.accountNumber ? parseInt(bankAccount?.accountNumber) : undefined);
+  const [accountNumber, setAccountNumber] = useState<string | undefined>(
+    bankAccount ? bankAccount.accountNumber : undefined);
   const [description, setDescription] = useState<string | undefined>(bankAccount?.description);
   const [visible, setVisible] = useState(false);
   const [form] = Form.useForm();
@@ -44,7 +44,7 @@ const EditBankAccountModal: React.FC<BankProps> = (props) => {
   useEffect(() => {
     setName(bankAccount ? bankAccount.name : '');
     setAccountType(bankAccount ? bankAccount.accountType : '');
-    setAccountNumber(bankAccount && bankAccount.accountNumber ? parseInt(bankAccount?.accountNumber) : undefined);
+    setAccountNumber(bankAccount ? bankAccount.accountNumber : undefined);
     setDescription(bankAccount?.description);
   }, [bankAccount]);
 
@@ -74,7 +74,7 @@ const EditBankAccountModal: React.FC<BankProps> = (props) => {
     setAccountType(accountType);
   };
 
-  const onChangeAccountNumber = (accountNumber: number | undefined) => {
+  const onChangeAccountNumber = (accountNumber: string) => {
     setAccountNumber(accountNumber);
   };
 
@@ -149,10 +149,10 @@ const EditBankAccountModal: React.FC<BankProps> = (props) => {
                   name="accountNumber"
                   style={{display: 'inline-block', width: '60%'}}
               >
-                <InputNumber
+                <Input
                     placeholder="Enter Account Number (Last 4 digits)"
                     value={accountNumber}
-                    onChange={(e) => onChangeAccountNumber(e)}
+                    onChange={(e) => onChangeAccountNumber(e.target.value)}
                     style={{display: 'inline-block', width: '100%'}}
                 />
               </Form.Item>

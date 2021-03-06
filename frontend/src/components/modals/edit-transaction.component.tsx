@@ -270,10 +270,7 @@ const EditTransaction: React.FC<
               <InputNumber
                 value={amount}
                 onChange={(e: any) => setAmount(e)}
-                style={{ width: 160 }}
-                formatter={(value) =>
-                  `${LocaleCurrency.getCurrency(props.currency)} ${value}`
-                }
+                style={{ width: 150 }}
                 parser={(value) => {
                   return value ? value.replace(/^[A-Za-z]+\s?/g, '') : 0;
                 }}
@@ -282,7 +279,7 @@ const EditTransaction: React.FC<
 
             <Form.Item
               name='transactionType'
-              style={{ marginLeft: 15 }}
+              style={{ marginLeft: 25 }}
               colon={false}
             >
               <Radio.Group

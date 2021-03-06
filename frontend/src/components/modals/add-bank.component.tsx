@@ -26,7 +26,7 @@ type Props = {
 const AddBankAccountModal: React.FC<Props> = (props) => {
   const [name, setName] = useState<string>('');
   const [accountType, setAccountType] = useState<string>('');
-  const [accountNumber, setAccountNumber] = useState<number | undefined>(undefined);
+  const [accountNumber, setAccountNumber] = useState<string | undefined>(undefined);
   const [description, setDescription] = useState<string>('');
   const [visible, setVisible] = useState(false);
 
@@ -62,7 +62,7 @@ const AddBankAccountModal: React.FC<Props> = (props) => {
     setAccountType(accountType);
   };
 
-  const onChangeAccountNumber = (accountNumber: number | undefined) => {
+  const onChangeAccountNumber = (accountNumber: string) => {
     setAccountNumber(accountNumber);
   };
 
@@ -130,11 +130,10 @@ const AddBankAccountModal: React.FC<Props> = (props) => {
                   name="accountNumber"
                   style={{display: 'inline-block', width: '60%'}}
               >
-                <InputNumber
+                <Input
                     placeholder="Enter Account Number (Last 4 digits)"
                     value={accountNumber}
-                    parser={value => value ? value.replace(/\$\s?|(,*)/g, '') : 0}
-                    onChange={(e) => onChangeAccountNumber(e)}
+                    onChange={(e) => onChangeAccountNumber(e.target.value)}
                     style={{display: 'inline-block', width: '100%'}}
                 />
               </Form.Item>

@@ -271,10 +271,7 @@ const AddTransaction: React.FC<
               rules={[{ required: true, message: 'Missing Amount!' }]}
             >
               <InputNumber
-                style={{ width: 160 }}
-                formatter={(value) =>
-                  `${LocaleCurrency.getCurrency(props.currency)} ${value}`
-                }
+                style={{ width: 150 }}
                 parser={(value) => {
                   return value ? value.replace(/^[A-Za-z]+\s?/g, '') : 0;
                 }}
@@ -283,7 +280,7 @@ const AddTransaction: React.FC<
 
             <Form.Item
               name='transactionType'
-              style={{ marginLeft: 15 }}
+              style={{ marginLeft: 25 }}
               colon={false}
               rules={[{ required: true, message: 'Missing Type!' }]}
             >
