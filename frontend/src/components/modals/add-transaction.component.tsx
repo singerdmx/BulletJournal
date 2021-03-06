@@ -109,6 +109,7 @@ const AddTransaction: React.FC<
   const [manageRecurringTransDialogVisible, setManageRecurringTransDialogVisible] = useState(false);
   const { projectId } = useParams();
   const [recurrent, setRecurrent] = useState(false);
+  const [bankAccountVisible, setBankAccountVisible] = useState(true);
   const [location, setLocation] = useState('');
 
   const addTransaction = (values: any) => {
@@ -182,7 +183,9 @@ const AddTransaction: React.FC<
       return null;
     }
     return (
-      <Select defaultValue={props.myself} style={{ marginLeft: '-8px' }}>
+      <Select defaultValue={props.myself} style={{ marginLeft: '-8px' }} onChange={() => {
+        setBankAccountVisible(form.getFieldValue('payerName') === props.myself);
+      }}>
         {props.group.users
           .filter((u) => u.accepted)
           .map((user) => {
@@ -395,7 +398,7 @@ const AddTransaction: React.FC<
             </Form.Item>
           </div>
           {/* Bank Account */}
-          <div>
+          {bankAccountVisible && <div>
             <Form.Item name="bankAccountId" label={
               <Tooltip title="Click to go to bank page to create bank account">
                 <span style={{cursor: 'pointer'}} onClick={() => history.push('/bank')}>
@@ -411,7 +414,7 @@ const AddTransaction: React.FC<
                 })}
               </Select>
             </Form.Item>
-          </div>
+          </div>}
         </Form>
       </Modal>
     );
