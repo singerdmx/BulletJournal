@@ -3,12 +3,10 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.clients.DaemonServiceClient;
-import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.ContentRevisionConfig;
 import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
-import com.bulletjournal.controller.models.params.ExportProjectItemAsEmailParams;
 import com.bulletjournal.controller.models.params.RevokeProjectItemSharableParams;
 import com.bulletjournal.controller.models.params.ShareProjectItemParams;
 import com.bulletjournal.controller.models.params.UpdateContentParams;
@@ -33,9 +31,6 @@ import com.bulletjournal.util.DeltaContent;
 import com.bulletjournal.util.MapWithExpiration;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
-import freemarker.template.Configuration;
-import freemarker.template.TemplateException;
-import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -61,8 +56,6 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     @Autowired
     protected LabelDaoJpa labelDaoJpa;
     @Autowired
-    protected Configuration freemarkerConfig;
-    @Autowired
     protected MessagingService messagingService;
     @Autowired
     private AuthorizationService authorizationService;
@@ -82,12 +75,6 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     protected NotificationService notificationService;
     @Autowired
     private DaemonServiceClient daemonServiceClient;
-    @Autowired
-    private UserDaoJpa userDaoJpa;
-    @Autowired
-    private UserAliasDaoJpa userAliasDaoJpa;
-    @Autowired
-    private UserClient userClient;
 
     private final MapWithExpiration contentUpdateLock = new MapWithExpiration();
 
@@ -469,74 +456,4 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         }
         return items;
     }
-
-    /**
-     * Get export project item as email target emails
-     * @param params ExportProjectItemAsEmailParams
-     * @return target emails
-     */
-    public Set<String> getExportProjectItemAsEmailTargetEmails(ExportProjectItemAsEmailParams params) {
-        Set<String> targetEmails = new HashSet<>();
-        Set<String> usernames = new HashSet<>();
-
-        if (StringUtils.isNotBlank(params.getTargetUser())) {
-            usernames.add(params.getTargetUser());
-        }
-
-        if (params.getTargetGroup() != null) {
-            Group group = this.groupDaoJpa.getGroup(params.getTargetGroup());
-            for (UserGroup userGroup : group.getAcceptedUsers()) {
-                usernames.add(userGroup.getUser().getName());
-            }
-        }
-
-        if (params.getEmails() != null) {
-            targetEmails.addAll(params.getEmails());
-        }
-
-        if (!usernames.isEmpty()) {
-            List<com.bulletjournal.repository.models.User> targetUsers = userDaoJpa.getUsersByNames(usernames);
-            for (com.bulletjournal.repository.models.User user : targetUsers) {
-                String email = user.getEmail();
-                if (email != null && !email.endsWith("@anon.1o24bbs.com")) {
-                    targetEmails.add(email);
-                }
-            }
-        }
-        return targetEmails;
-    }
-
-    abstract <T extends ProjectItemModel> String generateProjectItemHtmlString(
-        String requester, T projectItem, List<Content> contents)
-        throws IOException, TemplateException;
-
-    /**
-     * concatenate username alias (using comma as delimiter)
-     */
-    protected String getConcatenatedAlias(List<String> usernames) {
-        if (usernames == null) {
-            return "";
-        }
-
-        Map<String, Map<String, String>> aliasMap = new HashMap<>();
-        for (String username : usernames) {
-            aliasMap.put(username, userAliasDaoJpa.getAliases(username));
-        }
-
-        List<String> aliases = new ArrayList<>();
-        for (String username : usernames) {
-            String alias = aliasMap.get(username).getOrDefault(username, username);
-            aliases.add(alias);
-        }
-        return aliases.stream().sorted().collect(Collectors.joining(", "));
-    }
-
-    protected String getAvatar(String username) {
-        com.bulletjournal.controller.models.User user = userClient.getUser(username);
-        if (user.getAvatar() != null) {
-            return user.getAvatar();
-        }
-        return "non_avatar_found";
-    }
 }
-

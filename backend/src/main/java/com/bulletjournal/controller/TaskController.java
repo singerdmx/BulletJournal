@@ -8,11 +8,14 @@ import com.bulletjournal.controller.models.params.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.es.ESUtil;
 import com.bulletjournal.exceptions.UnAuthorizedException;
+import com.bulletjournal.messaging.FreeMarkerClient;
+import com.bulletjournal.messaging.MessagingService;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.notifications.informed.Informed;
 import com.bulletjournal.notifications.informed.RemoveTaskEvent;
 import com.bulletjournal.notifications.informed.SetTaskStatusEvent;
 import com.bulletjournal.notifications.informed.UpdateTaskAssigneeEvent;
+import com.bulletjournal.repository.GroupDaoJpa;
 import com.bulletjournal.repository.ProjectDaoJpa;
 import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.TaskRepository;
@@ -20,6 +23,8 @@ import com.bulletjournal.repository.models.CompletedTask;
 import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.TaskContent;
+import freemarker.template.TemplateException;
+import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -82,6 +87,16 @@ public class TaskController {
 
     @Autowired
     private UserClient userClient;
+
+    @Autowired
+    private GroupDaoJpa groupDaoJpa;
+
+    @Autowired
+    private FreeMarkerClient freeMarkerClient;
+
+    @Autowired
+    private MessagingService messagingService;
+
 
     @GetMapping(TASKS_ROUTE)
     public ResponseEntity<List<Task>> getTasks(@NotNull @PathVariable Long projectId,
@@ -401,9 +416,21 @@ public class TaskController {
     @PostMapping(TASK_EXPORT_EMAIL_ROUTE)
     public void exportTaskAsEmail(
             @NotNull @PathVariable Long taskId,
-            @NotNull @RequestBody ExportProjectItemAsEmailParams exportProjectItemAsEmailParams) {
+            @NotNull @RequestBody ExportProjectItemAsEmailParams params) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        taskDaoJpa.exportTaskAsEmail(taskId, exportProjectItemAsEmailParams, username);
+        Set<String> targetEmails =
+            groupDaoJpa.getEmails(params.getTargetGroup(), params.getTargetUser());
+        targetEmails.addAll(params.getEmails());
+
+        com.bulletjournal.repository.models.Task task =  taskDaoJpa.getProjectItem(taskId, username);
+        try {
+            String html = freeMarkerClient.convertProjectItemIntoHtmlString(task, username, params.getContents());
+            String emailSubject = username + " is sharing task <" +  task.getName() + "> with you.";
+            messagingService.sendExportedHtmlContentEmailToUsers(emailSubject, html, targetEmails);
+        }
+        catch (IOException | TemplateException e) {
+          LOGGER.error("Failed to convert task into HTML string");
+        }
     }
 
     @PostMapping(TASK_EXPORT_ROUTE)

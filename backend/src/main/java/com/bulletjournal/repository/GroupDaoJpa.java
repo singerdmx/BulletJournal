@@ -364,4 +364,34 @@ public class GroupDaoJpa implements Etaggable {
         }
         return uuid == null ? new DisableGroupShareEvent(events, requester) : new ShareGroupEvent(events, requester);
     }
+
+    /**
+     * get given group user && given username emails
+     */
+    public Set<String> getEmails(Long groupId, String username) {
+        Set<String> targetEmails = new HashSet<>();
+
+        Set<String> usernames = new HashSet<>();
+        if (username != null) {
+            usernames.add(username);
+        }
+
+        if (groupId != null) {
+            Group group = this.getGroup(groupId);
+            for (UserGroup userGroup : group.getAcceptedUsers()) {
+                usernames.add(userGroup.getUser().getName());
+            }
+        }
+
+        if (!usernames.isEmpty()) {
+            List<User> targetUsers = userDaoJpa.getUsersByNames(usernames);
+            for (User user : targetUsers) {
+                String email = user.getEmail();
+                if (email != null && !email.endsWith("@anon.1o24bbs.com")) {
+                    targetEmails.add(email);
+                }
+            }
+        }
+        return targetEmails;
+    }
 }

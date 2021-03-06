@@ -3,9 +3,7 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
-import com.bulletjournal.controller.models.Content;
 import com.bulletjournal.controller.models.params.CreateNoteParams;
-import com.bulletjournal.controller.models.params.ExportProjectItemAsEmailParams;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.params.UpdateNoteParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
@@ -19,8 +17,6 @@ import com.bulletjournal.hierarchy.NoteRelationsProcessor;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
-import freemarker.template.TemplateException;
-import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -39,7 +35,6 @@ import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 @Repository
 public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
@@ -335,53 +330,6 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
                 Operation.UPDATE, noteId, note.getProject().getOwner());
         note.setColor(color);
         this.noteRepository.save(note);
-    }
-
-    /**
-     * export note as email
-     *
-     * @param noteId note ID
-     * @param params exporting item parameter
-     * @param requester the username of action requester
-     */
-    public void exportNoteAsEmail(Long noteId,
-                                  ExportProjectItemAsEmailParams params,
-                                  String requester) {
-        if (requester == null) {
-            LOGGER.error("Export Note As Email: Invalid requester.");
-            return;
-        }
-        Note note = this.getProjectItem(noteId, requester);
-        Set<String> targetEmails = this.getExportProjectItemAsEmailTargetEmails(params);
-
-        try {
-            String emailSubject = requester + " is sharing note <" +  note.getName() + "> with you.";
-            String html = generateProjectItemHtmlString(requester, note, params.getContents());
-            messagingService.sendExportedHtmlContentEmailToUsers(emailSubject, html, targetEmails);
-        }
-        catch (IOException | TemplateException e) {
-            LOGGER.error("exportNoteAsEmail failed", e);
-        }
-    }
-
-    @Override
-    public <T extends ProjectItemModel> String generateProjectItemHtmlString(
-        String requester, T projectItem, List<Content> contents
-    ) throws IOException, TemplateException {
-        Note note = (Note) projectItem;
-        Map<String, Object> data = new HashMap<>();
-
-        data.put("note_owner", note.getOwner());
-        data.put("note_name", note.getName());
-        data.put("create_at", note.getCreatedAt());
-        data.put("update_at", note.getUpdatedAt());
-        data.put("location", note.getLocation());
-        data.put("contents", contents);
-        data.put("requester", requester);
-        data.put("requester_avatar", this.getAvatar(requester));
-        freemarker.template.Template template = freemarkerConfig.getTemplate("NoteEmail.ftl");
-
-        return FreeMarkerTemplateUtils.processTemplateIntoString(template, data);
     }
 
     private static final String[] MONTHS = {"January", "February", "March"};

@@ -3,12 +3,10 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
-import com.bulletjournal.controller.models.Content;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.controller.models.TaskStatus;
 import com.bulletjournal.controller.models.params.CreateTaskParams;
-import com.bulletjournal.controller.models.params.ExportProjectItemAsEmailParams;
 import com.bulletjournal.controller.models.params.UpdateTaskParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
@@ -30,8 +28,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import freemarker.template.TemplateException;
-import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dmfs.rfc5545.DateTime;
@@ -56,7 +52,6 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 @Repository
 public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
@@ -1208,57 +1203,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 labels
         );
     }
-
-
-    /**
-     * export task as email
-     *
-     * @param taskId task id
-     * @param params exporting item parameter
-     * @param requester the username of action requester
-     * @throws ResourceNotFoundException if task item is not found
-     */
-    public void exportTaskAsEmail(
-            Long taskId, ExportProjectItemAsEmailParams params, String requester) {
-        if (requester == null) {
-            LOGGER.error("Export Task As Email: Invalid requester.");
-            return;
-        }
-        Task task = getProjectItem(taskId, requester);
-        Set<String> targetEmails = getExportProjectItemAsEmailTargetEmails(params);
-
-        try {
-            String emailSubject = requester + " is sharing task <" +  task.getName() + "> with you.";
-            String html = generateProjectItemHtmlString(requester, task, params.getContents());
-            messagingService.sendExportedHtmlContentEmailToUsers(emailSubject, html, targetEmails);
-        }
-        catch (IOException | TemplateException e) {
-            LOGGER.error("exportTaskAsEmail failed", e);
-        }
-    }
-
-    @Override
-    public <T extends ProjectItemModel> String generateProjectItemHtmlString(
-        String requester, T projectItem, List<Content> contents
-    ) throws IOException, TemplateException {
-        Task task = (Task) projectItem;
-        Map<String, Object> data = new HashMap<>();
-
-        data.put("task_owner", task.getOwner());
-        data.put("task_name", task.getName());
-        data.put("assignee", this.getConcatenatedAlias(task.getAssignees()));
-        data.put("create_at", task.getCreatedAt());
-        data.put("update_at", task.getUpdatedAt());
-        data.put("location", task.getLocation());
-        data.put("due_date", task.getDueDate());
-        data.put("contents", contents);
-        data.put("requester", requester);
-        data.put("requester_avatar", this.getAvatar(requester));
-        freemarker.template.Template template = freemarkerConfig.getTemplate("TaskEmail.ftl");
-
-        return FreeMarkerTemplateUtils.processTemplateIntoString(template, data);
-    }
-
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void createSampleTasks(String username, Project beginnerProject) {

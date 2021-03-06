@@ -3,11 +3,9 @@ package com.bulletjournal.repository;
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
 import com.bulletjournal.contents.ContentType;
-import com.bulletjournal.controller.models.Content;
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.params.CreateTransactionParams;
-import com.bulletjournal.controller.models.params.ExportProjectItemAsEmailParams;
 import com.bulletjournal.controller.models.params.UpdateTransactionParams;
 import com.bulletjournal.controller.utils.ProjectItemsGrouper;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
@@ -22,7 +20,6 @@ import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.bulletjournal.util.BuJoRecurrenceRule;
 import com.google.common.collect.ImmutableList;
-import freemarker.template.TemplateException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dmfs.rfc5545.DateTime;
@@ -33,11 +30,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -571,57 +566,5 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
             }
         });
         return accountSum.get();
-    }
-
-    /**
-     * export transaction as email
-     *
-     * @param transactionId transaction ID
-     * @param params exporting item parameter
-     * @param requester the username of action requester
-     */
-    public void exportTransactionAsEmail(Long transactionId,
-                                         ExportProjectItemAsEmailParams params,
-                                         String requester) {
-        if (requester == null) {
-            LOGGER.error("Export Transaction As Email: Invalid requester.");
-            return;
-        }
-        Transaction transaction = this.getProjectItem(transactionId, requester);
-        Set<String> targetEmails = this.getExportProjectItemAsEmailTargetEmails(params);
-
-        try {
-            String emailSubject = requester + " is sharing transaction <" +  transaction.getName() + "> with you.";
-            String html = generateProjectItemHtmlString(requester, transaction, params.getContents());
-            messagingService.sendExportedHtmlContentEmailToUsers(emailSubject, html, targetEmails);
-        }
-        catch (IOException | TemplateException e) {
-            LOGGER.error("exportTransactionAsEmail failed", e);
-        }
-    }
-
-    @Override
-    public <T extends ProjectItemModel> String generateProjectItemHtmlString(
-        String requester, T projectItem, List<Content> contents
-    ) throws IOException, TemplateException {
-        Transaction transaction = (Transaction) projectItem;
-        Map<String, Object> data = new HashMap<>();
-
-        data.put("transaction_owner", transaction.getOwner());
-        data.put("transaction_name", transaction.getName());
-        data.put("create_at", transaction.getCreatedAt());
-        data.put("update_at", transaction.getUpdatedAt());
-        data.put("location", transaction.getLocation());
-        data.put("amount", transaction.getAmount());
-        data.put("payer", transaction.getPayer());
-        data.put("contents", contents);
-        data.put("date", transaction.getDate());
-        data.put("start_time", transaction.getStartTime());
-        data.put("end_time", transaction.getEndTime());
-        data.put("requester", requester);
-        data.put("requester_avatar", this.getAvatar(requester));
-        freemarker.template.Template template = freemarkerConfig.getTemplate("TransactionEmail.ftl");
-
-        return FreeMarkerTemplateUtils.processTemplateIntoString(template, data);
     }
 }
