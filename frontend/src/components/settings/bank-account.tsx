@@ -16,7 +16,7 @@ import {IState} from "../../store";
 import {connect} from "react-redux";
 import {updateTransactionBankAccount} from "../../features/transactions/actions";
 import {useHistory} from "react-router-dom";
-import { deleteBankAccount } from '../../features/myself/actions';
+import {deleteBankAccount, getBankAccounts} from '../../features/myself/actions';
 import EditBankAccountModal from '../modals/edit-bank.component'
 
 const {Meta} = Card;
@@ -67,6 +67,7 @@ type BankAccountProps = {
     mode: string;
     currency: string;
     transaction: Transaction | undefined;
+    getBankAccounts: () => void;
     updateTransactionBankAccount: (
         transactionId: number,
         bankAccount: number | undefined
@@ -81,7 +82,8 @@ const BankAccountElem: React.FC<BankAccountProps> = (
         transaction,
         currency,
         updateTransactionBankAccount,
-        deleteBankAccount
+        deleteBankAccount,
+        getBankAccounts
     }) => {
     const history = useHistory();
 
@@ -124,7 +126,8 @@ const BankAccountElem: React.FC<BankAccountProps> = (
                         <FileSearchOutlined key="View Transactions" title='View Transactions'
                                             onClick={() => history.push(`/bank/${bankAccount.id}`)}/>
                     </Tooltip>,
-                    <EditBankAccountModal bankAccount={bankAccount} mode='card' />,
+                    <EditBankAccountModal bankAccount={bankAccount} mode='card'
+                                          onChangeBalanceSuccess={getBankAccounts} />,
                     <Tooltip title='Delete'>
                         <DeleteOutlined key='Delete' title='Delete'
                                         onClick={() => deleteBankAccount(bankAccount.id)}/>
@@ -139,7 +142,7 @@ const BankAccountElem: React.FC<BankAccountProps> = (
                         valueStyle={{color: balanceColor}}
                         />
                     </div>}
-                    description={description}
+                    description={<span onClick={() => history.push(`/bank/${bankAccount.id}`)}>{description}</span>}
                 />
             </Card>
         </div>
@@ -186,6 +189,10 @@ const mapStateToProps = (state: IState) => ({
     currency: state.myself.currency
 });
 
-export default connect(mapStateToProps, {updateTransactionBankAccount, deleteBankAccount})(
+export default connect(mapStateToProps, {
+    updateTransactionBankAccount,
+    deleteBankAccount,
+    getBankAccounts
+})(
     BankAccountElem
 );

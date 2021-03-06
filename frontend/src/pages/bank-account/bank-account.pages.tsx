@@ -189,7 +189,12 @@ const BankAccountPage: React.FC<BankAccountProps> = (
             >
                 <DeleteOutlined/>
             </FloatButton>
-            <EditBankAccount bankAccount={account} mode='float'/>
+            <EditBankAccount bankAccount={account} mode='float'
+                             onChangeBalanceSuccess={() => {
+                                 if (account) {
+                                     getBankAccountTransactions(account.id, startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD'));
+                                 }
+                             }}/>
             <Popover placement="leftTop" title='Enter Account Balance' content={getEnterBankBalanceDialog()}
                      trigger="click">
                 <FloatButton

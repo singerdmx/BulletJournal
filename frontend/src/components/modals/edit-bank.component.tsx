@@ -14,6 +14,7 @@ import { getBankAccountType } from '../settings/bank-account';
 import {Button as FloatButton, darkColors, lightColors} from "react-floating-action-button";
 import bank from '../settings/bank';
 import { useEffect } from 'react';
+import {changeAccountBalance} from "../../features/transactions/actions";
 
 const {TextArea} = Input;
 const {Option} = Select;
@@ -21,6 +22,8 @@ const {Option} = Select;
 type BankProps = {
   bankAccount: BankAccount | undefined;
   mode: string;
+  onChangeBalanceSuccess: Function;
+  changeAccountBalance: (bankAccount: BankAccount, balance: number, description: string, onSuccess: Function) => void;
   updateBankAccount: (
     id: number,
     name: string,
@@ -38,14 +41,16 @@ const EditBankAccountModal: React.FC<BankProps> = (props) => {
   const [accountNumber, setAccountNumber] = useState<string | undefined>(
     bankAccount ? bankAccount.accountNumber : undefined);
   const [description, setDescription] = useState<string | undefined>(bankAccount?.description);
+  const [netBalance, setNetBalance] = useState(bankAccount ? bankAccount.netBalance : 0);
   const [visible, setVisible] = useState(false);
   const [form] = Form.useForm();
-  
+
   useEffect(() => {
     setName(bankAccount ? bankAccount.name : '');
     setAccountType(bankAccount ? bankAccount.accountType : '');
     setAccountNumber(bankAccount ? bankAccount.accountNumber : undefined);
     setDescription(bankAccount?.description);
+    setNetBalance(bankAccount ? bankAccount.netBalance : 0);
   }, [bankAccount]);
 
   if (!bankAccount) {
@@ -63,6 +68,9 @@ const EditBankAccountModal: React.FC<BankProps> = (props) => {
   const updateBankAccount = (id: number) => {
     let type: BankAccountType = getBankAccountType(accountType);
     props.updateBankAccount(id, name, type, accountNumber?.toString(), description);
+    if (netBalance != bankAccount.netBalance) {
+      props.changeAccountBalance(bankAccount, netBalance, '', props.onChangeBalanceSuccess);
+    }
     setVisible(false);
   }
 
@@ -80,6 +88,12 @@ const EditBankAccountModal: React.FC<BankProps> = (props) => {
 
   const onChangeDescription = (description: string) => {
     setDescription(description);
+  };
+
+  const onChangeBalance = (balance: number | undefined) => {
+    if (balance) {
+      setNetBalance(balance);
+    }
   };
 
   const getModal = () => {
@@ -106,7 +120,8 @@ const EditBankAccountModal: React.FC<BankProps> = (props) => {
                   bankName: name,
                   accountType: accountType,
                   accountNumber: accountNumber,
-                  description: description
+                  description: description,
+                  balance: netBalance
                 }}
           >
             <Form.Item>
@@ -164,6 +179,17 @@ const EditBankAccountModal: React.FC<BankProps> = (props) => {
                     onChange={(e) => onChangeDescription(e.target.value)}
                 />
               </Form.Item>
+              <Form.Item
+                  name="balance"
+                  label='Current Balance'
+                  style={{display: 'inline-block', width: '60%'}}
+              >
+                <InputNumber
+                    value={netBalance}
+                    onChange={(e) => onChangeBalance(e)}
+                    style={{display: 'inline-block', width: '100%'}}
+                />
+              </Form.Item>
             </Form.Item>
           </Form>
         </Modal>
@@ -200,6 +226,6 @@ const EditBankAccountModal: React.FC<BankProps> = (props) => {
   return getDiv();
 };
 
-export default connect(null, {updateBankAccount})(
+export default connect(null, {updateBankAccount, changeAccountBalance})(
   EditBankAccountModal
 );
