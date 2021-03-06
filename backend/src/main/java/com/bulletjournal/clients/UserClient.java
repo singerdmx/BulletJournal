@@ -225,4 +225,17 @@ public class UserClient {
             this.userDaoJpa.updateMyself(user.getName(), params);
         }
     }
+
+    /**
+     * get user avatar
+     * @param username given username
+     * @return avatar link; "NONE" if no avatar found
+     */
+    public String getAvatar(String username) {
+        User user = this.getUser(username);
+        if (user.getAvatar() != null) {
+            return user.getAvatar();
+        }
+        return "NONE";
+    };
 }

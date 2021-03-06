@@ -1,7 +1,5 @@
 package com.bulletjournal.messaging;
 
-import static com.bulletjournal.messaging.util.FunctionUtil.getAvatar;
-
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.Content;
 import com.bulletjournal.messaging.firebase.FcmClient;
@@ -330,7 +328,7 @@ public class MessagingService {
             for (String email : new HashSet<>(emails)) {
                 MailjetEmailParams mailjetEmailParams =
                     createEmailPramsForAppInvitation(
-                        inviter, getAvatar.apply(userClient, inviter), email);
+                        inviter, userClient.getAvatar(inviter), email);
                 if (mailjetEmailParams != null) {
                     emailParamsList.add(mailjetEmailParams);
                 }
@@ -438,7 +436,7 @@ public class MessagingService {
         Map<String, String> avatarMap = getAvatarMap(assignees);
         String taskUrl = BASE_TASK_URL + task.getId();
         String ownerName = task.getOwner();
-        String ownerAvatar = getAvatar.apply(userClient, ownerName);
+        String ownerAvatar = userClient.getAvatar(ownerName);
         for (String receiver : assignees) {
             if (!nameEmailMap.containsKey(receiver)) {
                 continue;
@@ -485,7 +483,7 @@ public class MessagingService {
     private Map<String, String> getAvatarMap(List<String> usernames) {
         Map<String, String> ret = new HashMap<>();
         for (String username : usernames) {
-            ret.put(username, getAvatar.apply(userClient, username));
+            ret.put(username, userClient.getAvatar(username));
         }
         return ret;
     }

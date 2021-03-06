@@ -6,6 +6,8 @@ import com.bulletjournal.redis.RedisUserAliasesRepository;
 import com.bulletjournal.redis.models.UserAliases;
 import com.bulletjournal.repository.models.UserAlias;
 import com.google.gson.Gson;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -74,5 +76,23 @@ public class UserAliasDaoJpa {
         }
         user.setAlias(aliases.getOrDefault(user.getName(), user.getName()));
         return user;
+
+    }
+
+    /**
+     * get list of user aliases
+     * @return list of aliases; return username if alias is not existed.
+     */
+    public List<String> getAliases(List<String> usernames) {
+        List<String> aliases = new ArrayList<>();
+        if (usernames == null) {
+            return aliases;
+        }
+
+        for (String username : usernames) {
+            String alias = this.getAliases(username).getOrDefault(username, username);
+            aliases.add(alias);
+        }
+        return aliases;
     }
 }

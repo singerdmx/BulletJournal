@@ -1,10 +1,8 @@
 package com.bulletjournal.messaging;
 
-import static com.bulletjournal.messaging.util.FunctionUtil.getAliases;
-import static com.bulletjournal.messaging.util.FunctionUtil.getAvatar;
-
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.Content;
+import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.UserAliasDaoJpa;
 import com.bulletjournal.repository.models.Note;
 import com.bulletjournal.repository.models.ProjectItemModel;
@@ -18,12 +16,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 @Component
 public class FreeMarkerClient {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(FreeMarkerClient.class);
   private final Configuration freemarkerConfig;
   private final UserClient userClient;
   private final UserAliasDaoJpa userAliasDaoJpa;
@@ -46,7 +47,7 @@ public class FreeMarkerClient {
     Map<String, Object> data = new HashMap<>();
     String templateName = "";
     data.put("requester", requester);
-    data.put("requester_avatar", getAvatar.apply(userClient, requester));
+    data.put("requester_avatar", userClient.getAvatar(requester));
     data.put("contents", contents);
 
     switch (projectItem.getContentType()) {
@@ -54,7 +55,7 @@ public class FreeMarkerClient {
         templateName = "TaskEmail.ftl";
 
         Task task = (Task) projectItem;
-        List<String> assignees = getAliases.apply(userAliasDaoJpa, task.getAssignees());
+        List<String> assignees = userAliasDaoJpa.getAliases(task.getAssignees());
         data.put("assignee", assignees.stream().sorted().collect(Collectors.joining(", ")));
         data.put("task_owner", task.getOwner());
         data.put("task_name", task.getName());
@@ -90,7 +91,8 @@ public class FreeMarkerClient {
         data.put("end_time", transaction.getEndTime());
         break;
       default:
-        break;
+        LOGGER.error("convertProjectItemIntoHtmlString failed. Unrecognized project item content type");
+        throw new ResourceNotFoundException("convertProjectItemIntoHtmlString failed. Unrecognized project item content type");
     }
     return this.generateHtml(templateName, data);
   }
