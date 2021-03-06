@@ -13,6 +13,8 @@ import com.bulletjournal.ledger.FrequencyType;
 import com.bulletjournal.ledger.LedgerSummary;
 import com.bulletjournal.ledger.LedgerSummaryCalculator;
 import com.bulletjournal.ledger.LedgerSummaryType;
+import com.bulletjournal.messaging.FreeMarkerClient;
+import com.bulletjournal.messaging.MessagingService;
 import com.bulletjournal.notifications.Auditable;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.NotificationService;
@@ -20,14 +22,19 @@ import com.bulletjournal.notifications.RemoveElasticsearchDocumentEvent;
 import com.bulletjournal.notifications.informed.Informed;
 import com.bulletjournal.notifications.informed.RemoveTransactionEvent;
 import com.bulletjournal.notifications.informed.UpdateTransactionPayerEvent;
+import com.bulletjournal.repository.GroupDaoJpa;
 import com.bulletjournal.repository.ProjectDaoJpa;
 import com.bulletjournal.repository.TransactionDaoJpa;
 import com.bulletjournal.repository.TransactionRepository;
 import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.TransactionContent;
+import freemarker.template.TemplateException;
+import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -48,6 +55,8 @@ import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 
 @RestController
 public class TransactionController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TransactionController.class);
+
     protected static final String TRANSACTIONS_ROUTE = "/api/projects/{projectId}/transactions";
     protected static final String RECURRING_TRANSACTIONS_ROUTE = "/api/projects/{projectId}/recurringTransactions";
     protected static final String TRANSACTION_ROUTE = "/api/transactions/{transactionId}";
@@ -79,6 +88,15 @@ public class TransactionController {
 
     @Autowired
     private UserClient userClient;
+
+    @Autowired
+    private FreeMarkerClient freeMarkerClient;
+
+    @Autowired
+    private MessagingService messagingService;
+
+    @Autowired
+    private GroupDaoJpa groupDaoJpa;
 
     @GetMapping(RECURRING_TRANSACTIONS_ROUTE)
     public List<Transaction> getRecurringTransactions(@NotNull @PathVariable Long projectId) {
@@ -419,9 +437,22 @@ public class TransactionController {
     @PostMapping(TRANSACTION_EXPORT_EMAIL_ROUTE)
     public void exportTransactionAsEmail(
             @NotNull @PathVariable Long transactionId,
-            @NotNull @RequestBody ExportProjectItemAsEmailParams exportProjectItemAsEmailParams) {
+            @NotNull @RequestBody ExportProjectItemAsEmailParams params) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        transactionDaoJpa.exportTransactionAsEmail(
-            transactionId, exportProjectItemAsEmailParams, username);
+
+        Set<String> targetEmails =
+            groupDaoJpa.getEmails(params.getTargetGroup(), params.getTargetUser());
+        targetEmails.addAll(params.getEmails());
+
+        com.bulletjournal.repository.models.Transaction transaction =
+            transactionDaoJpa.getProjectItem(transactionId, username);
+        try {
+            String html = freeMarkerClient.convertProjectItemIntoHtmlString(transaction, username, params.getContents());
+            String emailSubject = username + " is sharing transaction <" +  transaction.getName() + "> with you.";
+            messagingService.sendExportedHtmlContentEmailToUsers(emailSubject, html, targetEmails);
+        }
+        catch (IOException | TemplateException e) {
+            LOGGER.error("Failed to convert transaction into HTML string");
+        }
     }
 }

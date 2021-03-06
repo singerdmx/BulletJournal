@@ -1,5 +1,7 @@
 package com.bulletjournal.messaging;
 
+import static com.bulletjournal.messaging.util.FunctionUtil.getAvatar;
+
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.Content;
 import com.bulletjournal.messaging.firebase.FcmClient;
@@ -327,7 +329,8 @@ public class MessagingService {
             List<MailjetEmailParams> emailParamsList = new ArrayList<>();
             for (String email : new HashSet<>(emails)) {
                 MailjetEmailParams mailjetEmailParams =
-                    createEmailPramsForAppInvitation(inviter, this.getAvatar(inviter), email);
+                    createEmailPramsForAppInvitation(
+                        inviter, getAvatar.apply(userClient, inviter), email);
                 if (mailjetEmailParams != null) {
                     emailParamsList.add(mailjetEmailParams);
                 }
@@ -435,7 +438,7 @@ public class MessagingService {
         Map<String, String> avatarMap = getAvatarMap(assignees);
         String taskUrl = BASE_TASK_URL + task.getId();
         String ownerName = task.getOwner();
-        String ownerAvatar = getAvatar(ownerName);
+        String ownerAvatar = getAvatar.apply(userClient, ownerName);
         for (String receiver : assignees) {
             if (!nameEmailMap.containsKey(receiver)) {
                 continue;
@@ -482,17 +485,9 @@ public class MessagingService {
     private Map<String, String> getAvatarMap(List<String> usernames) {
         Map<String, String> ret = new HashMap<>();
         for (String username : usernames) {
-            ret.put(username, getAvatar(username));
+            ret.put(username, getAvatar.apply(userClient, username));
         }
         return ret;
-    }
-
-    private String getAvatar(String username) {
-        com.bulletjournal.controller.models.User user = userClient.getUser(username);
-        if (user.getAvatar() != null) {
-            return user.getAvatar();
-        }
-        return NONE_STRING;
     }
 
     /**
@@ -505,6 +500,4 @@ public class MessagingService {
         }
         return ret;
     }
-
-
 }

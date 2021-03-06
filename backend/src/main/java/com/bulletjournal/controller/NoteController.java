@@ -7,17 +7,25 @@ import com.bulletjournal.controller.models.*;
 import com.bulletjournal.controller.models.params.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.es.ESUtil;
+import com.bulletjournal.messaging.FreeMarkerClient;
+import com.bulletjournal.messaging.MessagingService;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.notifications.informed.Informed;
 import com.bulletjournal.notifications.informed.RemoveNoteEvent;
+import com.bulletjournal.repository.GroupDaoJpa;
 import com.bulletjournal.repository.NoteDaoJpa;
 import com.bulletjournal.repository.NoteRepository;
 import com.bulletjournal.repository.ProjectDaoJpa;
 import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.NoteContent;
 import com.bulletjournal.repository.models.ProjectItemModel;
+import freemarker.template.TemplateException;
+import java.io.IOException;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -37,6 +45,7 @@ import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
 
 @RestController
 public class NoteController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(NoteController.class);
 
     protected static final String NOTES_ROUTE = "/api/projects/{projectId}/notes";
     protected static final String NOTE_ROUTE = "/api/notes/{noteId}";
@@ -67,6 +76,15 @@ public class NoteController {
 
     @Autowired
     private NoteRepository noteRepository;
+
+    @Autowired
+    private FreeMarkerClient freeMarkerClient;
+
+    @Autowired
+    private MessagingService messagingService;
+
+    @Autowired
+    private GroupDaoJpa groupDaoJpa;
 
     @GetMapping(NOTES_ROUTE)
     public ResponseEntity<List<Note>> getNotes(@NotNull @PathVariable Long projectId,
@@ -334,8 +352,20 @@ public class NoteController {
     @PostMapping(NOTE_EXPORT_EMAIL_ROUTE)
     public void exportNoteAsEmail(
             @NotNull @PathVariable Long noteId,
-            @NotNull @RequestBody ExportProjectItemAsEmailParams exportProjectItemAsEmailParams) {
+            @NotNull @RequestBody ExportProjectItemAsEmailParams params) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        noteDaoJpa.exportNoteAsEmail(noteId, exportProjectItemAsEmailParams, username);
+        Set<String> targetEmails =
+            groupDaoJpa.getEmails(params.getTargetGroup(), params.getTargetUser());
+        targetEmails.addAll(params.getEmails());
+
+        com.bulletjournal.repository.models.Note note = noteDaoJpa.getProjectItem(noteId, username);
+        try {
+            String html = freeMarkerClient.convertProjectItemIntoHtmlString(note, username, params.getContents());
+            String emailSubject = username + " is sharing note <" +  note.getName() + "> with you.";
+            messagingService.sendExportedHtmlContentEmailToUsers(emailSubject, html, targetEmails);
+        }
+        catch (IOException | TemplateException e) {
+            LOGGER.error("Failed to convert note into HTML string");
+        }
     }
 }
