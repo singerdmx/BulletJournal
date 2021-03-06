@@ -79,6 +79,17 @@ const BankAccountPage: React.FC<BankAccountProps> = (
         }
     }, [startDate, endDate]);
 
+    useEffect(() => {
+        setTransactionsOnFilterAndSort(transactions);
+        let tmp = [...transactionsOnFilterAndSort];
+        tmp.sort(sortTransactionByTimeAscending);
+        setTransactionsOnFilterAndSort(tmp);
+        let arr = [...typesFilter];
+        arr.push(0);
+        arr.push(1);
+        setTypesFilter(arr);
+    }, [transactions]);
+
     const getList = () => {
         if (transactions.length === 0) {
             return <Empty/>
@@ -208,7 +219,7 @@ const BankAccountPage: React.FC<BankAccountProps> = (
                 key="2"
             >
                 <span>Sort by  </span>
-                <Select defaultValue="timeAscending" style={{ width: 180 }} onChange={onSortChange}>
+                <Select value="timeAscending" style={{ width: 180 }} onChange={onSortChange}>
                     <Option value="timeAscending">Time: Oldest to Newest</Option>
                     <Option value="timeDescending">Time: Newest to Oldest</Option>
                     <Option value="amountAscending">Amount: Low to High</Option>
