@@ -37,6 +37,8 @@ public class CreateTransactionParams {
 
     private String recurrenceRule;
 
+    private Long bankAccountId;
+
     public CreateTransactionParams() {
     }
 
@@ -135,5 +137,17 @@ public class CreateTransactionParams {
 
     public boolean hasRecurrenceRule() {
         return StringUtils.isNotBlank(this.recurrenceRule);
+    }
+
+    public Long getBankAccountId() {
+        return bankAccountId;
+    }
+
+    public void setBankAccountId(Long bankAccountId) {
+        this.bankAccountId = bankAccountId;
+    }
+
+    public boolean hasBankAccountId() {
+        return this.bankAccountId != null;
     }
 }

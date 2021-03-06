@@ -76,6 +76,7 @@ export type CreateTransaction = {
   labels: number[];
   time?: string;
   recurrenceRule?: string;
+  bankAccountId?: number;
   onSuccess?: Function;
 };
 

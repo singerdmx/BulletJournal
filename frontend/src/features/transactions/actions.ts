@@ -38,6 +38,7 @@ export const createTransaction = (
   date?: string,
   time?: string,
   recurrenceRule?: string,
+  bankAccountId?: number,
   onSuccess?: Function
 ) =>
   actions.TransactionsCreate({
@@ -52,6 +53,7 @@ export const createTransaction = (
     labels: labels,
     time: time,
     recurrenceRule: recurrenceRule,
+    bankAccountId: bankAccountId,
     onSuccess: onSuccess
   });
 export const getTransaction = (transactionId: number) =>

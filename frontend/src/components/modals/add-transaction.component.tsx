@@ -38,10 +38,11 @@ import {Button as FloatButton, Container, darkColors, lightColors} from "react-f
 import {useHistory} from "react-router-dom";
 import {PlusCircleTwoTone} from "@ant-design/icons/lib";
 import ProjectSettingDialog from "../../components/modals/project-setting.component";
-import {Transaction} from "../../features/transactions/interface";
+import {BankAccount, Transaction} from "../../features/transactions/interface";
 import {ProjectItemUIType} from "../../features/project/constants";
 import TransactionItem from "../project-item/transaction-item.component";
 import SearchBar from '../map-search-bar/search-bar.component';
+import BankAccountElem from "../settings/bank-account";
 
 
 const { Option } = Select;
@@ -85,12 +86,14 @@ interface TransactionCreateFormProps {
     date?: string,
     time?: string,
     recurrenceRule?: string,
+    bankAccountId?: number,
     onSuccess?: Function
   ) => void;
   updateExpandedMyself: (updateSettings: boolean) => void;
   currency: string;
   timezone: string;
   myself: string;
+  bankAccounts: BankAccount[];
   updateTransactionVisible: (visible: boolean) => void;
   addTransactionVisible: boolean;
   labelsUpdate: (projectId: number | undefined) => void;
@@ -110,8 +113,8 @@ const AddTransaction: React.FC<
 
   const addTransaction = (values: any) => {
     //convert time object to format string
-    const date_value = values.date ? values.date.format(dateFormat) : undefined;
-    const time_value = values.time ? values.time.format('HH:mm') : undefined;
+    const dateValue = values.date ? values.date.format(dateFormat) : undefined;
+    const timeValue = values.time ? values.time.format('HH:mm') : undefined;
     const payerName = values.payerName ? values.payerName : props.myself;
     const timezone = values.timezone ? values.timezone : props.timezone;
     const recurrence = recurrent ? props.rRuleString : undefined;
@@ -126,9 +129,10 @@ const AddTransaction: React.FC<
         timezone,
         location,
         values.labels,
-        date_value,
-        time_value,
+        dateValue,
+        timeValue,
         recurrence,
+        values.bankAccountId,
         () => {
           if (recurrence) {
             openManageRecurringTransDialog();
@@ -390,6 +394,24 @@ const AddTransaction: React.FC<
               </Select>
             </Form.Item>
           </div>
+          {/* Bank Account */}
+          <div>
+            <Form.Item name="bankAccountId" label={
+              <Tooltip title="Click to go to bank page to create bank account">
+                <span style={{cursor: 'pointer'}} onClick={() => history.push('/bank')}>
+                  Bank Accounts&nbsp;<PlusCircleTwoTone />
+                </span>
+              </Tooltip>
+            }>
+              <Select allowClear={true}>
+                {props.bankAccounts.map((account) => {
+                  return <Option value={account.id} key={account.id}>
+                    <BankAccountElem bankAccount={account} mode='dropdown'/>
+                  </Option>
+                })}
+              </Select>
+            </Form.Item>
+          </div>
         </Form>
       </Modal>
     );
@@ -447,6 +469,7 @@ const mapStateToProps = (state: IState) => ({
   labelOptions: state.label.labelOptions,
   recurringTransactions: state.transaction.recurringTransactions,
   rRuleString: state.rRule.rRuleString,
+  bankAccounts: state.myself.bankAccounts,
 });
 
 export default connect(mapStateToProps, {

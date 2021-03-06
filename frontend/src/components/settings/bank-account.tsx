@@ -177,11 +177,21 @@ const BankAccountElem: React.FC<BankAccountProps> = (
         </div>
     }
 
-    return <div className='bank-account-title' style={{color: color}}>
-        {bankTitle}
-        {'   '}
-        <span style={{color: balanceColor}}><DollarCircleFilled /> {bankAccount.netBalance.toFixed(2)} {LocaleCurrency.getCurrency(currency)}</span>
-    </div>
+    if (mode === 'title') {
+        return <div className='bank-account-title' style={{color: color}}>
+            {bankTitle}
+            {'   '}
+            <span style={{color: balanceColor}}><DollarCircleFilled /> {bankAccount.netBalance.toFixed(2)} {LocaleCurrency.getCurrency(currency)}</span>
+        </div>
+    }
+
+    if (mode === 'dropdown') {
+        return <div className='bank-account-dropdown' style={{color: color}}>
+            {bankTitle}
+        </div>
+    }
+
+    return <div/>
 }
 
 const mapStateToProps = (state: IState) => ({

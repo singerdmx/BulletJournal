@@ -105,7 +105,8 @@ export const createTransaction = (
   date?: string,
   time?: string,
   recurrenceRule?: string,
-  labels?: number[]) => {
+  labels?: number[],
+  bankAccountId?: number) => {
   const postBody = JSON.stringify({
     amount: amount,
     name: name,
@@ -116,7 +117,8 @@ export const createTransaction = (
     labels: labels,
     timezone: timezone,
     location: location,
-    recurrenceRule: recurrenceRule
+    recurrenceRule: recurrenceRule,
+    bankAccountId: bankAccountId
   });
   return doPost(`/api/projects/${projectId}/transactions`, postBody)
     .then((res) => res.json())

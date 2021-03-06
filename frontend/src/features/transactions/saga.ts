@@ -137,6 +137,7 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
       labels,
       time,
       recurrenceRule,
+      bankAccountId,
       onSuccess
   } = action.payload;
     yield call(
@@ -152,6 +153,7 @@ function* transactionCreate(action: PayloadAction<CreateTransaction>) {
       time,
       recurrenceRule,
       labels,
+      bankAccountId
     );
 
     const state: IState = yield select();

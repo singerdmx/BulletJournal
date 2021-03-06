@@ -161,7 +161,7 @@ public class TransactionController {
     public Transaction createTransaction(@NotNull @PathVariable Long projectId,
                                          @Valid @RequestBody CreateTransactionParams createTransactionParams) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        com.bulletjournal.repository.models.Transaction createdTransaction = transactionDaoJpa.create(projectId,
+        com.bulletjournal.repository.models.Transaction createdTransaction = this.transactionDaoJpa.create(projectId,
                 username, createTransactionParams);
         String projectName = createdTransaction.getProject().getName();
 
@@ -170,6 +170,11 @@ public class TransactionController {
                         + "##",
                 username, createdTransaction.getId(), Timestamp.from(Instant.now()),
                 ContentAction.ADD_TRANSACTION));
+
+        if (createTransactionParams.hasBankAccountId()) {
+            this.transactionDaoJpa.setBankAccount(username,
+                    createdTransaction.getId(), createTransactionParams.getBankAccountId());
+        }
         return createdTransaction.toPresentationModel();
     }
 
