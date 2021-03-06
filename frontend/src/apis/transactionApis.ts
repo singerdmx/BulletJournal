@@ -138,7 +138,8 @@ export const updateTransaction = (
   timezone?: string,
   location?: string,
   labels?: number[],
-  recurrenceRule?: string
+  recurrenceRule?: string,
+  bankAccountId?: number
 ) => {
   const patchBody = JSON.stringify({
     amount: amount,
@@ -150,7 +151,8 @@ export const updateTransaction = (
     timezone: timezone,
     location: location,
     labels: labels,
-    recurrenceRule: recurrenceRule
+    recurrenceRule: recurrenceRule,
+    bankAccountId: bankAccountId
   });
   return doPatch(`/api/transactions/${transactionId}`, patchBody)
     .then((res) => res.json())

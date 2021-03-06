@@ -26,6 +26,8 @@ public class UpdateTransactionParams {
 
     private String recurrenceRule;
 
+    private Long bankAccountId;
+
     public UpdateTransactionParams() {
     }
 
@@ -173,5 +175,17 @@ public class UpdateTransactionParams {
 
     public boolean hasRecurrenceRule() {
         return StringUtils.isNotBlank(this.recurrenceRule );
+    }
+
+    public Long getBankAccountId() {
+        return bankAccountId;
+    }
+
+    public void setBankAccountId(Long bankAccountId) {
+        this.bankAccountId = bankAccountId;
+    }
+
+    public boolean hasBankAccountId() {
+        return this.bankAccountId != null;
     }
 }

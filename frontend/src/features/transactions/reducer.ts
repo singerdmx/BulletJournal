@@ -121,6 +121,7 @@ export type PatchTransaction = {
   location?: string;
   labels?: number[];
   recurrenceRule?: string;
+  bankAccountId?: number;
 };
 
 export type MoveTransaction = {

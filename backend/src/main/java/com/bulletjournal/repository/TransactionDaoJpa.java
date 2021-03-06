@@ -23,7 +23,6 @@ import com.bulletjournal.repository.utils.DaoHelper;
 import com.bulletjournal.util.BuJoRecurrenceRule;
 import com.google.common.collect.ImmutableList;
 import freemarker.template.TemplateException;
-import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dmfs.rfc5545.DateTime;
@@ -34,15 +33,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
-import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 @Repository
 public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
@@ -199,7 +199,11 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
             transaction.setEndTime(Timestamp.from(ZonedDateTimeHelper.getEndTime(date, time, timezone).toInstant()));
         }
 
-        return this.transactionRepository.save(transaction);
+        transaction = this.transactionRepository.save(transaction);
+        if (createTransaction.hasBankAccountId() && Objects.equals(owner, transaction.getPayer())) {
+            this.setBankAccount(owner, transaction.getId(), createTransaction.getBankAccountId());
+        }
+        return transaction;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -316,6 +320,10 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
         if (transaction.hasBankAccount()) {
             this.bankAccountBalanceRepository.deleteById(transaction.getBankAccount().getId());
+        }
+        // TODO: when mobile has this, remove `updateTransactionParams.hasBankAccountId()`
+        if (updateTransactionParams.hasBankAccountId() && Objects.equals(requester, transaction.getPayer())) {
+            transaction = this.setBankAccount(requester, transactionId, updateTransactionParams.getBankAccountId());
         }
         return Pair.of(events, transaction);
     }

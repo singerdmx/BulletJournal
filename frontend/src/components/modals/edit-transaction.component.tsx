@@ -16,7 +16,7 @@ import { connect } from 'react-redux';
 import { RouteComponentProps, withRouter, useParams } from 'react-router';
 import { IState } from '../../store';
 import './modals.styles.less';
-import { Transaction } from '../../features/transactions/interface';
+import {BankAccount, Transaction} from '../../features/transactions/interface';
 import { Project } from '../../features/project/interface';
 import { Group } from '../../features/group/interface';
 import { updateExpandedMyself } from '../../features/myself/actions';
@@ -33,6 +33,7 @@ import {convertToTextWithRRule, updateTransactionRruleString} from '../../featur
 import ReactRRuleGenerator from '../../features/recurrence/RRuleGenerator';
 import moment from 'moment';
 import SearchBar from '../map-search-bar/search-bar.component';
+import BankAccountElem from "../settings/bank-account";
 
 const { Option } = Select;
 const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -73,11 +74,13 @@ interface TransactionEditFormProps {
     date?: string,
     time?: string,
     recurrenceRule?: string,
-    labels?: number[]
+    labels?: number[],
+    bankAccountId?: number
   ) => void;
   currency: string;
   myself: string;
   labelOptions: Label[];
+  bankAccounts: BankAccount[];
   labelsUpdate: (projectId: number | undefined) => void;
   rRuleString: any;
   updateTransactionRruleString: (transaction: Transaction) => void;
@@ -102,7 +105,9 @@ const EditTransaction: React.FC<
   const [transactionDateRequired, setTransactionDateRequired] = useState(false);
   const [transactionType, setTransactionType] = useState(transaction.transactionType);
   const [transTimezone, setTransTimezone] = useState(transaction.timezone);
+  const [bankAccountId, setBankAccountId] = useState<number | undefined>(transaction.bankAccount?.id);
   const [location, setLocation] = useState(transaction.location || '');
+  const [bankAccountVisible, setBankAccountVisible] = useState(transaction.payer.name === props.myself);
   const { projectId } = useParams();
 
   useEffect(() => {
@@ -120,7 +125,7 @@ const EditTransaction: React.FC<
     let dateValue = values.date
       ? values.date.format(dateFormat)
       : transaction.date;
-    const time_value = values.time ? values.time.format('HH:mm') : undefined;
+    const timeValue = values.time ? values.time.format('HH:mm') : undefined;
     let recurrence = props.rRuleString;
     if (recurrent) {
       dateValue = null;
@@ -137,9 +142,10 @@ const EditTransaction: React.FC<
       values.timezone,
       location,
       dateValue,
-      time_value,
+      timeValue,
       recurrence,
       values.labels,
+      bankAccountId
     );
     setVisible(false);
   };
@@ -175,7 +181,12 @@ const EditTransaction: React.FC<
       <Select
         style={{ marginLeft: '-8px' }}
         value={payerName}
-        onChange={(e: any) => setPayerName(e)}
+        onChange={(e: any) => {
+          setPayerName(e);
+          const isPayerMyself = form.getFieldValue('payerName') === props.myself;
+          setBankAccountVisible(isPayerMyself);
+          form.setFields([{ name: 'bankAccountId', value: isPayerMyself ? props.transaction.bankAccount?.id : undefined }]);
+        }}
       >
         {props.group.users
           .filter((u) => u.accepted)
@@ -232,6 +243,7 @@ const EditTransaction: React.FC<
             amount: amount,
             transactionType: transactionType,
             timezone: transTimezone,
+            bankAccountId: bankAccountId
           }}
         >
           {/* transaction name */}
@@ -410,6 +422,25 @@ const EditTransaction: React.FC<
               </Select>
             </Form.Item>
           </div>
+          {/* Bank Account */}
+          {bankAccountVisible && <div>
+            <Form.Item name="bankAccountId" label={
+              <Tooltip title="Click to go to bank page to create bank account">
+                <span style={{cursor: 'pointer'}} onClick={() => history.push('/bank')}>
+                  Bank Accounts&nbsp;<PlusCircleTwoTone />
+                </span>
+              </Tooltip>
+            }>
+              <Select allowClear={true} value={bankAccountId}
+                      onChange={(e: any) => setBankAccountId(e)}>
+                {props.bankAccounts.map((account) => {
+                  return <Option value={account.id} key={account.id}>
+                    <BankAccountElem bankAccount={account} mode='dropdown'/>
+                  </Option>
+                })}
+              </Select>
+            </Form.Item>
+          </div>}
         </Form>
       </Modal>
     );
@@ -446,6 +477,7 @@ const mapStateToProps = (state: IState) => ({
   labelOptions: state.label.labelOptions,
   myself: state.myself.username,
   rRuleString: state.rRule.rRuleString,
+  bankAccounts: state.myself.bankAccounts,
 });
 
 export default connect(mapStateToProps, {

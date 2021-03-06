@@ -171,10 +171,6 @@ public class TransactionController {
                 username, createdTransaction.getId(), Timestamp.from(Instant.now()),
                 ContentAction.ADD_TRANSACTION));
 
-        if (createTransactionParams.hasBankAccountId()) {
-            this.transactionDaoJpa.setBankAccount(username,
-                    createdTransaction.getId(), createTransactionParams.getBankAccountId());
-        }
         return createdTransaction.toPresentationModel();
     }
 

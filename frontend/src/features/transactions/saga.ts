@@ -392,7 +392,8 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
       timezone,
       location,
       labels,
-      recurrenceRule
+      recurrenceRule,
+      bankAccountId
     } = action.payload;
     const data = yield call(
       updateTransaction,
@@ -406,7 +407,8 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
       timezone,
       location,
       labels,
-      recurrenceRule
+      recurrenceRule,
+      bankAccountId
     );
     const projectId = data.projectId;
     const state: IState = yield select();

@@ -82,6 +82,7 @@ export const patchTransaction = (
   time?: string,
   recurrenceRule?: string,
   labels?: number[],
+  bankAccountId?: number
 ) =>
   actions.TransactionPatch({
     transactionId: transactionId,
@@ -94,7 +95,8 @@ export const patchTransaction = (
     timezone: timezone,
     location: location,
     labels: labels,
-    recurrenceRule: recurrenceRule
+    recurrenceRule: recurrenceRule,
+    bankAccountId: bankAccountId
   });
 export const setTransactionLabels = (transactionId: number, labels: number[]) =>
   actions.TransactionSetLabels({
