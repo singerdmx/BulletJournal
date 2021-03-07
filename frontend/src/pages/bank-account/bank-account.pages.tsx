@@ -3,10 +3,10 @@ import './bank-account.styles.less';
 import {IState} from "../../store";
 import {connect} from "react-redux";
 import {deleteBankAccount, getBankAccounts} from "../../features/myself/actions";
-import {BankAccount, BankAccountType, Transaction, TransactionView} from "../../features/transactions/interface";
+import {BankAccount, TransactionView} from "../../features/transactions/interface";
 import {useHistory, useParams} from "react-router-dom";
 import BankAccountElem from "../../components/settings/bank-account";
-import {BackTop, Button, Col, DatePicker, Empty, InputNumber, List, Popover, Switch, Tabs, Select} from "antd";
+import {BackTop, Button, DatePicker, Empty, InputNumber, List, Popover, Switch, Tabs, Select} from "antd";
 import {Button as FloatButton, Container, darkColors, lightColors} from "react-floating-action-button";
 import {
     BankOutlined,
@@ -15,7 +15,6 @@ import {
     SaveOutlined,
     FilterOutlined,
     SortAscendingOutlined,
-    SortDescendingOutlined,
     CheckOutlined, CloseOutlined
 } from "@ant-design/icons";
 import TextArea from "antd/es/input/TextArea";
@@ -53,6 +52,7 @@ const BankAccountPage: React.FC<BankAccountProps> = (
     const [startDate, setStartDate] = useState(moment().startOf('month'));
     const [endDate, setEndDate] = useState(moment().endOf('month'));
     const [typesFilter, setTypesFilter] = useState([0, 1]);
+    const [sortMethod, setSortMethod] = useState('timeAscending');
     const [transactionsOnFilterAndSort, setTransactionsOnFilterAndSort] = useState(transactions);
 
     useEffect(() => {
@@ -81,13 +81,8 @@ const BankAccountPage: React.FC<BankAccountProps> = (
 
     useEffect(() => {
         setTransactionsOnFilterAndSort(transactions);
-        let tmp = [...transactionsOnFilterAndSort];
-        tmp.sort(sortTransactionByTimeAscending);
-        setTransactionsOnFilterAndSort(tmp);
-        let arr = [...typesFilter];
-        arr.push(0);
-        arr.push(1);
-        setTypesFilter(arr);
+        setTypesFilter([0, 1]);
+        setSortMethod('timeAscending');
     }, [transactions]);
 
     const getList = () => {
@@ -155,7 +150,8 @@ const BankAccountPage: React.FC<BankAccountProps> = (
     }
 
     function onSortChange(sortMethod: string) {
-        let tmp = [...transactionsOnFilterAndSort];
+        setSortMethod(sortMethod);
+        const tmp = [...transactionsOnFilterAndSort];
 
         if (sortMethod === "amountAscending") {
             tmp.sort((a, b) => a.amount - b.amount);
@@ -219,7 +215,7 @@ const BankAccountPage: React.FC<BankAccountProps> = (
                 key="2"
             >
                 <span>Sort by  </span>
-                <Select value="timeAscending" style={{ width: 180 }} onChange={onSortChange}>
+                <Select value={sortMethod} style={{ width: 180 }} onChange={onSortChange}>
                     <Option value="timeAscending">Time: Oldest to Newest</Option>
                     <Option value="timeDescending">Time: Newest to Oldest</Option>
                     <Option value="amountAscending">Amount: Low to High</Option>
