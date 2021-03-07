@@ -47,7 +47,13 @@ public class ProjectItemsGrouper {
         ZonedDateTime z2 = ZonedDateTimeHelper.getEndTime(t2.getDueDate(), t2.getDueTime(), t2.getTimezone());
         return z1.compareTo(z2);
     };
-    public static final Comparator<Task> TASK_BY_STATUS_COMPARATOR = Comparator.comparingInt(Task::getIntStatus);
+    public static final Comparator<Task> TASK_BY_STATUS_COMPARATOR = (t1, t2) -> {
+        if (t1.getIntStatus() != t2.getIntStatus()) {
+            return Integer.compare(t1.getIntStatus(), t2.getIntStatus());
+        }
+
+        return TASK_COMPARATOR.compare(t1, t2);
+    };
     public static final Comparator<Note> NOTE_COMPARATOR = Comparator.comparing(AuditModel::getUpdatedAt);
     public static final Comparator<Note> NOTE_COMPARATOR_REVERSE_ORDER =
             (a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt());
