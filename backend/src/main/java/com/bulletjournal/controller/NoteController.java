@@ -9,6 +9,7 @@ import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.es.ESUtil;
 import com.bulletjournal.messaging.FreeMarkerClient;
 import com.bulletjournal.messaging.MessagingService;
+import com.bulletjournal.messaging.PdfConverter;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.notifications.informed.Informed;
 import com.bulletjournal.notifications.informed.RemoveNoteEvent;
@@ -20,6 +21,7 @@ import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.NoteContent;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import freemarker.template.TemplateException;
+
 import java.io.IOException;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
@@ -28,8 +30,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,6 +65,7 @@ public class NoteController {
     protected static final String CONTENTS_ROUTE = "/api/notes/{noteId}/contents";
     protected static final String CONTENT_REVISIONS_ROUTE = "/api/notes/{noteId}/contents/{contentId}/revisions/{revisionId}";
     protected static final String NOTE_EXPORT_EMAIL_ROUTE = "/api/notes/{noteId}/exportEmail";
+    protected static final String NOTE_EXPORT_PDF_ROUTE = "/api/notes/{noteId}/exportPdf";
 
     @Autowired
     private NoteDaoJpa noteDaoJpa;
@@ -368,4 +373,36 @@ public class NoteController {
             LOGGER.error("Failed to convert note into HTML string");
         }
     }
+
+  @PostMapping(NOTE_EXPORT_PDF_ROUTE)
+  public ResponseEntity<Object> exportNoteAsPdf(
+          @NotNull @PathVariable Long noteId, @NotNull @RequestBody ExportProjectItemParams params) {
+      String username = MDC.get(UserClient.USER_NAME_KEY);
+      com.bulletjournal.repository.models.Note note = noteDaoJpa.getProjectItem(noteId, username);
+      try {
+          String html = freeMarkerClient.convertProjectItemIntoPdfHtml(note, params.getContents());
+//          ByteArrayOutputStream os = new ByteArrayOutputStream();
+//          PdfRendererBuilder builder = new PdfRendererBuilder();
+//          Document document = Jsoup.parse(html);
+//          document.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
+//          document.outputSettings().escapeMode(Entities.EscapeMode.xhtml);
+//          builder.withHtmlContent(document.html(), null);
+//          builder.toStream(os);
+//          builder.run();
+//          ByteArrayResource resource = new ByteArrayResource(os.toByteArray());
+          ByteArrayResource resource = PdfConverter.projectItemHtmlToPdf(html);
+
+          HttpHeaders headers = new HttpHeaders();
+          headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=note.pdf");
+          return ResponseEntity.status(HttpStatus.OK)
+                  .headers(headers)
+                  .contentLength(resource.contentLength())
+                  .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                  .body(resource);
+      }
+      catch (IOException | TemplateException e) {
+          LOGGER.error("Failed to convert note into HTML string - " + e);
+          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to get note as PDF.");
+      }
+  }
 }
