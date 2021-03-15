@@ -90,6 +90,13 @@ const BankAccountPage: React.FC<BankAccountProps> = (
             return <Empty/>
         }
 
+        function refreshPage() {
+            if (account) {
+                getBankAccountTransactions(account.id, startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD'));
+                getBankAccounts();
+            }
+        }
+
         return (<List className='transaction-list'>
             {transactionsOnFilterAndSort.map((item) => (
                 <List.Item key={`${item.id} + ' ' + ${item.date}`} className='transaction-list-item'>
@@ -99,16 +106,10 @@ const BankAccountPage: React.FC<BankAccountProps> = (
                         showModal={() => {
                         }}
                         onUpdateSuccess={() => {
-                            if (account) {
-                                getBankAccountTransactions(account.id, startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD'));
-                                getBankAccounts();
-                            }
+                            refreshPage();
                         }}
                         onDeleteSuccess={() => {
-                            if (account) {
-                                getBankAccountTransactions(account.id, startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD'));
-                                getBankAccounts();
-                            }
+                            refreshPage();
                         }}
                     />
                 </List.Item>

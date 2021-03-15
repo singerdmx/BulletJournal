@@ -416,6 +416,7 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
 
     if (onSuccess) {
       onSuccess();
+      return;
     }
 
     //update transaction project page's detail transaction
