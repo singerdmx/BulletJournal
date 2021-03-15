@@ -75,8 +75,10 @@ interface TransactionEditFormProps {
     time?: string,
     recurrenceRule?: string,
     labels?: number[],
-    bankAccountId?: number
+    bankAccountId?: number,
+    onSuccess?: Function
   ) => void;
+  onUpdateSuccess?: Function;
   currency: string;
   myself: string;
   labelOptions: Label[];
@@ -89,7 +91,7 @@ interface TransactionEditFormProps {
 const EditTransaction: React.FC<
   RouteComponentProps & TransactionProps & TransactionEditFormProps
 > = (props) => {
-  const { mode, transaction } = props;
+  const { mode, transaction, onUpdateSuccess } = props;
   const [form] = Form.useForm();
   const history = useHistory();
   const [visible, setVisible] = useState(false);
@@ -145,7 +147,8 @@ const EditTransaction: React.FC<
       timeValue,
       recurrence,
       values.labels,
-      bankAccountId
+      bankAccountId,
+      onUpdateSuccess
     );
     setVisible(false);
   };

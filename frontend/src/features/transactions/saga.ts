@@ -393,7 +393,8 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
       location,
       labels,
       recurrenceRule,
-      bankAccountId
+      bankAccountId,
+      onSuccess,
     } = action.payload;
     const data = yield call(
       updateTransaction,
@@ -412,6 +413,11 @@ function* patchTransaction(action: PayloadAction<PatchTransaction>) {
     );
     const projectId = data.projectId;
     const state: IState = yield select();
+
+    if (onSuccess) {
+      onSuccess();
+    }
+
     //update transaction project page's detail transaction
     if (state.transaction.timezone) {
       const updateData = yield call(

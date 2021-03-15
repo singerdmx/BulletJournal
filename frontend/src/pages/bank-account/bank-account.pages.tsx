@@ -98,6 +98,12 @@ const BankAccountPage: React.FC<BankAccountProps> = (
                         inProject={item.shared}
                         showModal={() => {
                         }}
+                        onUpdateSuccess={() => {
+                            if (account) {
+                                getBankAccountTransactions(account.id, startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD'));
+                                getBankAccounts();
+                            }
+                        }}
                         onDeleteSuccess={() => {
                             if (account) {
                                 getBankAccountTransactions(account.id, startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD'));

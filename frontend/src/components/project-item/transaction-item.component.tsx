@@ -43,10 +43,11 @@ type TransactionManageProps = {
   type?: ProjectItemUIType;
   deleteTransaction: (transactionId: number, onSuccess?: Function, type?: ProjectItemUIType, dateTime?: string) => void;
   onDeleteSuccess?: Function;
+  onUpdateSuccess?: Function;
 };
 
 const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
-  const { transaction, deleteTransaction, inModal, type, onDeleteSuccess } = props;
+  const { transaction, deleteTransaction, inModal, type, onDeleteSuccess, onUpdateSuccess } = props;
 
     const getPopConfirmForDelete = (transaction: Transaction) => {
         if (!transaction.date || !transaction.recurrenceRule) {
@@ -92,7 +93,11 @@ const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <EditTransaction transaction={transaction} mode='div' />
+      <EditTransaction
+          transaction={transaction}
+          mode='div'
+          onUpdateSuccess={onUpdateSuccess}
+      />
       <MoveProjectItem
         type={ProjectType.LEDGER}
         projectItemId={transaction.id}
@@ -110,7 +115,7 @@ const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
 
 const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (props) => {
   const { transaction, theme, deleteTransaction, inModal, inProject, showModal,
-      type, setSelectedLabel, updateTransactionColorSettingShown, onDeleteSuccess } = props;
+      type, setSelectedLabel, updateTransactionColorSettingShown, onDeleteSuccess, onUpdateSuccess } = props;
   // hook history in router
   const history = useHistory();
   // jump to label searching page by label click
@@ -314,6 +319,7 @@ const TransactionItem: React.FC<TransactionProps & TransactionManageProps> = (pr
                             deleteTransaction={deleteTransaction}
                             inModal={inModal}
                             onDeleteSuccess={onDeleteSuccess}
+                            onUpdateSuccess={onUpdateSuccess}
                         />
                     }
                     trigger='click'
