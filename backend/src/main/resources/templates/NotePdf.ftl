@@ -5,7 +5,6 @@
         @page {
             size: A4;
             margin: 10%;
-            /*size: letter landscape;*/
             @top-center {
                 content: element(header_center);
             }

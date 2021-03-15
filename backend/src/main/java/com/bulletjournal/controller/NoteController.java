@@ -381,15 +381,6 @@ public class NoteController {
       com.bulletjournal.repository.models.Note note = noteDaoJpa.getProjectItem(noteId, username);
       try {
           String html = freeMarkerClient.convertProjectItemIntoPdfHtml(note, params.getContents());
-//          ByteArrayOutputStream os = new ByteArrayOutputStream();
-//          PdfRendererBuilder builder = new PdfRendererBuilder();
-//          Document document = Jsoup.parse(html);
-//          document.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
-//          document.outputSettings().escapeMode(Entities.EscapeMode.xhtml);
-//          builder.withHtmlContent(document.html(), null);
-//          builder.toStream(os);
-//          builder.run();
-//          ByteArrayResource resource = new ByteArrayResource(os.toByteArray());
           ByteArrayResource resource = PdfConverter.projectItemHtmlToPdf(html);
 
           HttpHeaders headers = new HttpHeaders();
