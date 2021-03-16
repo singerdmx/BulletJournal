@@ -106,15 +106,16 @@ public class FreeMarkerClient {
     String templateName = "";
     data.put("contents", contents);
 
+    templateName = "ProjectItemPdf.ftl";
     switch (projectItem.getContentType()) {
       case NOTE:
-        templateName = "NotePdf.ftl";
         Note note = (Note) projectItem;
         data.put("note_owner", note.getOwner());
         data.put("note_name", note.getName());
         data.put("create_at", note.getCreatedAt());
         data.put("update_at", note.getUpdatedAt());
         data.put("location", note.getLocation());
+        data.put("is_note", true);
         break;
       default:
         LOGGER.error(
