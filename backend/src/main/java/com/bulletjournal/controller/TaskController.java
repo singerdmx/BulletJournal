@@ -438,7 +438,7 @@ public class TaskController {
     }
 
     @PostMapping(TASK_EXPORT_PDF_ROUTE)
-    public ResponseEntity<Object> exportNoteAsPdf(
+    public ResponseEntity<Object> exportTaskAsPdf(
             @NotNull @PathVariable Long taskId, @NotNull @RequestBody ExportProjectItemParams params) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         com.bulletjournal.repository.models.Task task = taskDaoJpa.getProjectItem(taskId, username);
