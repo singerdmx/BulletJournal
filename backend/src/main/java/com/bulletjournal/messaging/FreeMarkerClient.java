@@ -98,6 +98,34 @@ public class FreeMarkerClient {
   }
 
   /**
+   * convert given project item to HTML for PDF conversion using.
+   */
+  public <T extends ProjectItemModel> String convertProjectItemIntoPdfHtml(
+      T projectItem, List<Content> contents) throws IOException, TemplateException {
+    Map<String, Object> data = new HashMap<>();
+    String templateName = "";
+    data.put("contents", contents);
+
+    switch (projectItem.getContentType()) {
+      case NOTE:
+        templateName = "NotePdf.ftl";
+        Note note = (Note) projectItem;
+        data.put("note_owner", note.getOwner());
+        data.put("note_name", note.getName());
+        data.put("create_at", note.getCreatedAt());
+        data.put("update_at", note.getUpdatedAt());
+        data.put("location", note.getLocation());
+        break;
+      default:
+        LOGGER.error(
+            "ConvertProjectItemIntoPdfHtml failed. Unrecognized project item content type");
+        throw new ResourceNotFoundException(
+            "ConvertProjectItemIntoPdfHtml failed. Unrecognized project item content type");
+    }
+    return this.generateHtml(templateName, data);
+  }
+
+  /**
    * generate HTML by template name && data
    *
    * @param templateName template name
