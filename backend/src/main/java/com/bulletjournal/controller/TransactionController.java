@@ -15,6 +15,7 @@ import com.bulletjournal.ledger.LedgerSummaryCalculator;
 import com.bulletjournal.ledger.LedgerSummaryType;
 import com.bulletjournal.messaging.FreeMarkerClient;
 import com.bulletjournal.messaging.MessagingService;
+import com.bulletjournal.messaging.PdfConverter;
 import com.bulletjournal.notifications.Auditable;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.NotificationService;
@@ -37,8 +38,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -70,6 +73,8 @@ public class TransactionController {
     protected static final String CONTENTS_ROUTE = "/api/transactions/{transactionId}/contents";
     protected static final String CONTENT_REVISIONS_ROUTE = "/api/transactions/{transactionId}/contents/{contentId}/revisions/{revisionId}";
     protected static final String TRANSACTION_EXPORT_EMAIL_ROUTE = "/api/transactions/{transactionId}/exportEmail";
+    protected static final String TRANSACTION_EXPORT_PDF_ROUTE = "/api/transactions/{transactionId}/exportPdf";
+
 
     @Autowired
     private LedgerSummaryCalculator ledgerSummaryCalculator;
@@ -453,6 +458,29 @@ public class TransactionController {
         }
         catch (IOException | TemplateException e) {
             LOGGER.error("Failed to convert transaction into HTML string");
+        }
+    }
+
+    @PostMapping(TRANSACTION_EXPORT_PDF_ROUTE)
+    public ResponseEntity<Object> exportNoteAsPdf(
+            @NotNull @PathVariable Long transactionId, @NotNull @RequestBody ExportProjectItemParams params) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        com.bulletjournal.repository.models.Transaction transaction = transactionDaoJpa.getProjectItem(transactionId, username);
+        try {
+            String html = freeMarkerClient.convertProjectItemIntoPdfHtml(transaction, params.getContents());
+            ByteArrayResource resource = PdfConverter.projectItemHtmlToPdf(html);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=transaction.pdf");
+            return ResponseEntity.status(HttpStatus.OK)
+                    .headers(headers)
+                    .contentLength(resource.contentLength())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
+        }
+        catch (IOException | TemplateException e) {
+            LOGGER.error("Failed to convert transaction into HTML string - " + e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to get transaction as PDF.");
         }
     }
 }

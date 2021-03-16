@@ -10,6 +10,7 @@ import com.bulletjournal.es.ESUtil;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.messaging.FreeMarkerClient;
 import com.bulletjournal.messaging.MessagingService;
+import com.bulletjournal.messaging.PdfConverter;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.notifications.informed.Informed;
 import com.bulletjournal.notifications.informed.RemoveTaskEvent;
@@ -31,8 +32,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,6 +66,7 @@ public class TaskController {
     protected static final String SHARE_TASK_ROUTE = "/api/tasks/{taskId}/share";
     protected static final String TASK_EXPORT_EMAIL_ROUTE = "/api/tasks/{taskId}/exportEmail";
     protected static final String TASK_EXPORT_ROUTE = "/api/tasks/{taskId}/export";
+    protected static final String TASK_EXPORT_PDF_ROUTE = "/api/tasks/{taskId}/exportPdf";
     protected static final String GET_SHARABLES_ROUTE = "/api/tasks/{taskId}/sharables";
     protected static final String REVOKE_SHARABLE_ROUTE = "/api/tasks/{taskId}/revokeSharable";
     protected static final String REMOVE_SHARED_ROUTE = "/api/tasks/{taskId}/removeShared";
@@ -430,6 +434,29 @@ public class TaskController {
         }
         catch (IOException | TemplateException e) {
           LOGGER.error("Failed to convert task into HTML string");
+        }
+    }
+
+    @PostMapping(TASK_EXPORT_PDF_ROUTE)
+    public ResponseEntity<Object> exportNoteAsPdf(
+            @NotNull @PathVariable Long taskId, @NotNull @RequestBody ExportProjectItemParams params) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        com.bulletjournal.repository.models.Task task = taskDaoJpa.getProjectItem(taskId, username);
+        try {
+            String html = freeMarkerClient.convertProjectItemIntoPdfHtml(task, params.getContents());
+            ByteArrayResource resource = PdfConverter.projectItemHtmlToPdf(html);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=task.pdf");
+            return ResponseEntity.status(HttpStatus.OK)
+                    .headers(headers)
+                    .contentLength(resource.contentLength())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
+        }
+        catch (IOException | TemplateException e) {
+            LOGGER.error("Failed to convert task into HTML string - " + e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to get task as PDF.");
         }
     }
 
