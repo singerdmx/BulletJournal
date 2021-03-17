@@ -25,6 +25,18 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 public class FreeMarkerClient {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FreeMarkerClient.class);
+  // Templates
+  private static final String NOTE_EMAIL_TEMPLATE = "NoteEmail.ftl";
+  private static final String TASK_EMAIL_TEMPLATE = "TaskEmail.ftl";
+  private static final String TRANSACTION_EMAIL_TEMPLATE = "TransactionEmail.ftl";
+  private static final String PROJECT_ITEM_PDF_TEMPLATE = "ProjectItemPdf.ftl";
+
+  // PDF Templates Properties
+  private static final String PROJECT_ITEM_TYPE_DATA_PROPERTY = "project_item_type";
+  private static final String NOTE_TYPE_PROPERTY = "note";
+  private static final String TASK_TYPE_PROPERTY = "task";
+  private static final String TRANSACTION_TYPE_PROPERTY = "transaction";
+
   private final Configuration freemarkerConfig;
   private final UserClient userClient;
   private final UserAliasDaoJpa userAliasDaoJpa;
@@ -52,43 +64,19 @@ public class FreeMarkerClient {
 
     switch (projectItem.getContentType()) {
       case TASK:
-        templateName = "TaskEmail.ftl";
-
+        templateName = TASK_EMAIL_TEMPLATE;
         Task task = (Task) projectItem;
-        List<String> assignees = userAliasDaoJpa.getAliases(task.getAssignees());
-        data.put("assignee", assignees.stream().sorted().collect(Collectors.joining(", ")));
-        data.put("task_owner", task.getOwner());
-        data.put("task_name", task.getName());
-        data.put("create_at", task.getCreatedAt());
-        data.put("update_at", task.getUpdatedAt());
-        data.put("location", task.getLocation());
-        data.put("due_date", task.getDueDate());
+        this.addTaskInfoToDataModel(data, task);
         break;
       case NOTE:
-        templateName = "NoteEmail.ftl";
-
+        templateName = NOTE_EMAIL_TEMPLATE;
         Note note = (Note) projectItem;
-        data.put("note_owner", note.getOwner());
-        data.put("note_name", note.getName());
-        data.put("create_at", note.getCreatedAt());
-        data.put("update_at", note.getUpdatedAt());
-        data.put("location", note.getLocation());
+        this.addNoteInfoToDataModel(data, note);
         break;
       case TRANSACTION:
-        templateName = "TransactionEmail.ftl";
-
+        templateName = TRANSACTION_EMAIL_TEMPLATE;
         Transaction transaction = (Transaction) projectItem;
-        data.put("transaction_owner", transaction.getOwner());
-        data.put("transaction_name", transaction.getName());
-        data.put("create_at", transaction.getCreatedAt());
-        data.put("update_at", transaction.getUpdatedAt());
-        data.put("location", transaction.getLocation());
-        data.put("amount", transaction.getAmount());
-        data.put("payer", transaction.getPayer());
-        data.put("contents", contents);
-        data.put("date", transaction.getDate());
-        data.put("start_time", transaction.getStartTime());
-        data.put("end_time", transaction.getEndTime());
+        this.addTransactionInfoToDataModel(data, transaction);
         break;
       default:
         LOGGER.error("convertProjectItemIntoHtmlString failed. Unrecognized project item content type");
@@ -103,18 +91,23 @@ public class FreeMarkerClient {
   public <T extends ProjectItemModel> String convertProjectItemIntoPdfHtml(
       T projectItem, List<Content> contents) throws IOException, TemplateException {
     Map<String, Object> data = new HashMap<>();
-    String templateName = "";
     data.put("contents", contents);
 
     switch (projectItem.getContentType()) {
       case NOTE:
-        templateName = "NotePdf.ftl";
         Note note = (Note) projectItem;
-        data.put("note_owner", note.getOwner());
-        data.put("note_name", note.getName());
-        data.put("create_at", note.getCreatedAt());
-        data.put("update_at", note.getUpdatedAt());
-        data.put("location", note.getLocation());
+        data.put(PROJECT_ITEM_TYPE_DATA_PROPERTY, NOTE_TYPE_PROPERTY);
+        this.addNoteInfoToDataModel(data, note);
+        break;
+      case TASK:
+        Task task = (Task) projectItem;
+        data.put(PROJECT_ITEM_TYPE_DATA_PROPERTY, TASK_TYPE_PROPERTY);
+        this.addTaskInfoToDataModel(data, task);
+        break;
+      case TRANSACTION:
+        Transaction transaction = (Transaction) projectItem;
+        data.put(PROJECT_ITEM_TYPE_DATA_PROPERTY, TRANSACTION_TYPE_PROPERTY);
+        this.addTransactionInfoToDataModel(data, transaction);
         break;
       default:
         LOGGER.error(
@@ -122,7 +115,7 @@ public class FreeMarkerClient {
         throw new ResourceNotFoundException(
             "ConvertProjectItemIntoPdfHtml failed. Unrecognized project item content type");
     }
-    return this.generateHtml(templateName, data);
+    return this.generateHtml(PROJECT_ITEM_PDF_TEMPLATE, data);
   }
 
   /**
@@ -139,4 +132,46 @@ public class FreeMarkerClient {
     Template template = freemarkerConfig.getTemplate(templateName);
     return FreeMarkerTemplateUtils.processTemplateIntoString(template, data);
   }
+
+  /**
+   * Add task information to data model
+   */
+  private void addTaskInfoToDataModel(Map<String, Object> dataModel, Task task) {
+    List<String> assignees = userAliasDaoJpa.getAliases(task.getAssignees());
+    dataModel.put("assignee", assignees.stream().sorted().collect(Collectors.joining(", ")));
+    dataModel.put("task_owner", task.getOwner());
+    dataModel.put("task_name", task.getName());
+    dataModel.put("create_at", task.getCreatedAt());
+    dataModel.put("update_at", task.getUpdatedAt());
+    dataModel.put("location", task.getLocation());
+    dataModel.put("due_date", task.getDueDate());
+  }
+
+  /**
+   * Add note information to data model
+   */
+  private void addNoteInfoToDataModel(Map<String, Object> dataModel, Note note) {
+    dataModel.put("note_owner", note.getOwner());
+    dataModel.put("note_name", note.getName());
+    dataModel.put("create_at", note.getCreatedAt());
+    dataModel.put("update_at", note.getUpdatedAt());
+    dataModel.put("location", note.getLocation());
+  }
+
+  /**
+   * Add transaction information to data model
+   */
+  private void addTransactionInfoToDataModel(Map<String, Object> dataModel, Transaction transaction) {
+    dataModel.put("transaction_owner", transaction.getOwner());
+    dataModel.put("transaction_name", transaction.getName());
+    dataModel.put("create_at", transaction.getCreatedAt());
+    dataModel.put("update_at", transaction.getUpdatedAt());
+    dataModel.put("location", transaction.getLocation());
+    dataModel.put("amount", transaction.getAmount());
+    dataModel.put("payer", transaction.getPayer());
+    dataModel.put("date", transaction.getDate());
+    dataModel.put("start_time", transaction.getStartTime());
+    dataModel.put("end_time", transaction.getEndTime());
+  }
+
 }
