@@ -61,10 +61,6 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     private BankAccountTransactionRepository bankAccountTransactionRepository;
     @Autowired
     private BankAccountBalanceRepository bankAccountBalanceRepository;
-    @Autowired
-    private UserDaoJpa userDaoJpa;
-    @Autowired
-    private GroupDaoJpa groupDaoJpa;
 
     @Override
     public JpaRepository getJpaRepository() {

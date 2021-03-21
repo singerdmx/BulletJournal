@@ -56,11 +56,6 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     private SharedProjectItemDaoJpa sharedProjectItemDaoJpa;
     @Autowired
     private SearchIndexDaoJpa searchIndexDaoJpa;
-    @Autowired
-    private UserDaoJpa userDaoJpa;
-    @Autowired
-    private GroupDaoJpa groupDaoJpa;
-
 
     @Override
     public JpaRepository getJpaRepository() {

@@ -89,9 +89,6 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Autowired
     private SearchIndexDaoJpa searchIndexDaoJpa;
 
-    @Autowired
-    private GroupDaoJpa groupDaoJpa;
-
     @Lazy
     @Autowired
     private UserDaoJpa userDaoJpa;
