@@ -125,7 +125,7 @@ const EditTransaction: React.FC<
   useEffect(() => {
     setLocation(transaction.location || '');
   }, [transaction]);
-  
+
   const editTransaction = (values: any) => {
     //convert time object to format string
     let dateValue = values.date
