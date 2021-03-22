@@ -128,6 +128,10 @@ const EditTask: React.FC<
     }
   }, [projectId]);
 
+  useEffect(() => {
+    setLocation(task.location || '');
+  }, [task]);
+
   const updateTask = (values: any) => {
     // "undefined" means user didn't change it
     // "null" means user cleared it

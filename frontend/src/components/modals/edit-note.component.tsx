@@ -41,6 +41,10 @@ const EditNote: React.FC<NoteProps> = (props) => {
     }
   }, [projectId]);
 
+  useEffect(() => {
+    setLocation(note.location || '');
+  }, [note]);
+
   const handleCancel = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.stopPropagation();
     setVisible(false);
