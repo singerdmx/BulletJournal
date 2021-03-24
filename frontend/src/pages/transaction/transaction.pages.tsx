@@ -21,7 +21,6 @@ import ShareProjectItem from '../../components/modals/share-project-item.compone
 // antd imports
 import {Avatar, BackTop, Card, Col, Divider, message, Popconfirm, Row, Statistic, Tag, Tooltip,} from 'antd';
 import {
-  BankTwoTone,
   BgColorsOutlined,
   CreditCardOutlined,
   DeleteTwoTone,

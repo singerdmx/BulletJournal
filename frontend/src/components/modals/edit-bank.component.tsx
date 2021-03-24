@@ -12,7 +12,6 @@ import { BankAccount, BankAccountType } from '../../features/transactions/interf
 import { updateBankAccount } from '../../features/myself/actions';
 import { getBankAccountType } from '../settings/bank-account';
 import {Button as FloatButton, darkColors, lightColors} from "react-floating-action-button";
-import bank from '../settings/bank';
 import { useEffect } from 'react';
 import {changeAccountBalance} from "../../features/transactions/actions";
 
@@ -68,7 +67,7 @@ const EditBankAccountModal: React.FC<BankProps> = (props) => {
   const updateBankAccount = (id: number) => {
     let type: BankAccountType = getBankAccountType(accountType);
     props.updateBankAccount(id, name, type, accountNumber?.toString(), description);
-    if (netBalance != bankAccount.netBalance) {
+    if (netBalance !== bankAccount.netBalance) {
       props.changeAccountBalance(bankAccount, netBalance, '', props.onChangeBalanceSuccess);
     }
     setVisible(false);

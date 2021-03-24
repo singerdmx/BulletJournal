@@ -36,23 +36,6 @@ import SearchBar from '../map-search-bar/search-bar.component';
 import BankAccountElem from "../settings/bank-account";
 
 const { Option } = Select;
-const currentZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-const currentCountry = currentZone && currentZone.split('/')[0];
-zones.sort((a, b) => {
-  if (currentZone && currentZone === a) {
-    return -1;
-  }
-  if (
-    currentCountry &&
-    a.includes(currentCountry) &&
-    !b.includes(currentCountry)
-  ) {
-    return -1;
-  }
-  return 0;
-});
-
-const LocaleCurrency = require('locale-currency'); //currency code
 
 type TransactionProps = {
   mode: string;
@@ -387,7 +370,7 @@ const EditTransaction: React.FC<
                   placeholder='Select Time Zone'
                   defaultValue={transaction.timezone}
                 >
-                  {zones.map((zone: string, index: number) => (
+                  {zones.map((zone: string) => (
                     <Option key={zone} value={zone}>
                       <Tooltip title={zone} placement='right'>
                         {<span>{zone}</span>}

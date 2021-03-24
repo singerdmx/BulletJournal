@@ -1,11 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Form, Input, InputNumber, Modal, Select, Tooltip} from 'antd';
+import {Button, Form, Input, Modal, Select, Tooltip} from 'antd';
 import {BankOutlined, CreditCardOutlined, DollarCircleOutlined, PlusCircleFilled} from '@ant-design/icons';
 import {connect} from 'react-redux';
 import './modals.styles.less';
 import {BankAccount, BankAccountType} from '../../features/transactions/interface';
 import {addBankAccount} from '../../features/myself/actions';
-import {useHistory} from 'react-router-dom';
 import {getBankAccountType} from '../settings/bank-account';
 import {IState} from "../../store";
 
@@ -43,7 +42,6 @@ const AddBankAccountModal: React.FC<Props> = (props) => {
     setVisible(props.bankAccounts.length === 0);
   }, [props.bankAccounts]);
 
-  const history = useHistory();
   const addBankAccount = () => {
     let type: BankAccountType = getBankAccountType(accountType);
     props.addBankAccount(name, type, (id) => (console.log(`/bank/${id}`)), accountNumber?.toString(), description);

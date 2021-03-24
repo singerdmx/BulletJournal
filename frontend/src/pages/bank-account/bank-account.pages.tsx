@@ -145,7 +145,7 @@ const BankAccountPage: React.FC<BankAccountProps> = (
             timeB = b.paymentTime;
         }
 
-        if (timeA != undefined && timeB != undefined) {
+        if (timeA !== undefined && timeB !== undefined) {
             if (timeA < timeB) {
                 return -1;
             }

@@ -354,7 +354,7 @@ function* addBankAccount(action: PayloadAction<AddBankAccountAction>) {
 function* removeBankAccount(action: PayloadAction<DeleteBankAccountAction>) {
     try {
         const {bankAccountId} = action.payload;
-        const bankAccount : BankAccount = yield call(deleteBankAccount, bankAccountId);
+        yield call(deleteBankAccount, bankAccountId);
         const data = yield call(fetchBankAccounts);
         const bankAccounts : BankAccount[] = yield data.json();
         yield put(
@@ -374,7 +374,7 @@ function* removeBankAccount(action: PayloadAction<DeleteBankAccountAction>) {
 function* patchBankAccount(action: PayloadAction<UpdateBankAccountAction>) {
     try {
         const {id, name, accountType, accountNumber, description} = action.payload;
-        const bankAccount : BankAccount = yield call(updateBankAccount, id, name, accountType, accountNumber, description);
+        yield call(updateBankAccount, id, name, accountType, accountNumber, description);
         const data = yield call(fetchBankAccounts);
         const bankAccounts : BankAccount[] = yield data.json();
         yield put(
