@@ -15,7 +15,7 @@ import com.bulletjournal.ledger.LedgerSummaryCalculator;
 import com.bulletjournal.ledger.LedgerSummaryType;
 import com.bulletjournal.messaging.FreeMarkerClient;
 import com.bulletjournal.messaging.MessagingService;
-import com.bulletjournal.messaging.PdfConverter;
+import com.bulletjournal.messaging.OpenHtmlConverter;
 import com.bulletjournal.notifications.Auditable;
 import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.NotificationService;
@@ -468,7 +468,7 @@ public class TransactionController {
         com.bulletjournal.repository.models.Transaction transaction = transactionDaoJpa.getProjectItem(transactionId, username);
         try {
             String html = freeMarkerClient.convertProjectItemIntoPdfHtml(transaction, params.getContents());
-            ByteArrayResource resource = PdfConverter.projectItemHtmlToPdf(html);
+            ByteArrayResource resource = OpenHtmlConverter.projectItemHtmlToPdf(html);
 
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=transaction.pdf");

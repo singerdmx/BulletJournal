@@ -10,7 +10,7 @@ import com.bulletjournal.es.ESUtil;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.messaging.FreeMarkerClient;
 import com.bulletjournal.messaging.MessagingService;
-import com.bulletjournal.messaging.PdfConverter;
+import com.bulletjournal.messaging.OpenHtmlConverter;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.notifications.informed.Informed;
 import com.bulletjournal.notifications.informed.RemoveTaskEvent;
@@ -444,7 +444,7 @@ public class TaskController {
         com.bulletjournal.repository.models.Task task = taskDaoJpa.getProjectItem(taskId, username);
         try {
             String html = freeMarkerClient.convertProjectItemIntoPdfHtml(task, params.getContents());
-            ByteArrayResource resource = PdfConverter.projectItemHtmlToPdf(html);
+            ByteArrayResource resource = OpenHtmlConverter.projectItemHtmlToPdf(html);
 
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=task.pdf");
