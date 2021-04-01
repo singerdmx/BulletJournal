@@ -66,6 +66,7 @@ public class NoteController {
     protected static final String CONTENT_REVISIONS_ROUTE = "/api/notes/{noteId}/contents/{contentId}/revisions/{revisionId}";
     protected static final String NOTE_EXPORT_EMAIL_ROUTE = "/api/notes/{noteId}/exportEmail";
     protected static final String NOTE_EXPORT_PDF_ROUTE = "/api/notes/{noteId}/exportPdf";
+    protected static final String NOTE_EXPORT_IMAGE_ROUTE = "/api/notes/{noteId}/exportImage";
 
     @Autowired
     private NoteDaoJpa noteDaoJpa;
@@ -395,5 +396,28 @@ public class NoteController {
           LOGGER.error("Failed to convert note into HTML string - " + e);
           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to get note as PDF.");
       }
+  }
+
+  @PostMapping(NOTE_EXPORT_IMAGE_ROUTE)
+  public ResponseEntity<Object> exportNoteAsImage(
+      @NotNull @PathVariable Long noteId, @NotNull @RequestBody ExportProjectItemParams params) {
+    String username = MDC.get(UserClient.USER_NAME_KEY);
+    com.bulletjournal.repository.models.Note note = noteDaoJpa.getProjectItem(noteId, username);
+    try {
+      String html = freeMarkerClient.convertProjectItemIntoImageHtml(note, params.getContents());
+      ByteArrayResource resource = OpenHtmlConverter.projectItemHtmlToImageForMobile(html);
+
+      HttpHeaders headers = new HttpHeaders();
+      headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=note.png");
+      return ResponseEntity.status(HttpStatus.OK)
+          .headers(headers)
+          .contentLength(resource.contentLength())
+          .contentType(MediaType.APPLICATION_OCTET_STREAM)
+          .body(resource);
+    } catch (Exception e) {
+      LOGGER.error("Failed to convert note into HTML string - " + e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Failed to get note as image.");
+    }
   }
 }

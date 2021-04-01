@@ -32,7 +32,7 @@ public class OpenHtmlConverter {
   /**
    * convert project item as `png` image
    */
-  public static ByteArrayResource projectItemHtmlToImage(String html) throws Exception {
+  public static ByteArrayResource projectItemHtmlToImage(String html, double scale) throws Exception {
     ByteArrayOutputStream os = new ByteArrayOutputStream();
 
     IMAGE_BUILDER.withHtmlContent(htmlToXhtml(html), null);
@@ -40,13 +40,21 @@ public class OpenHtmlConverter {
     IMAGE_BUILDER.useEnvironmentFonts(true);
 
     BufferedImagePageProcessor bufferedImagePageProcessor = new BufferedImagePageProcessor(
-            BufferedImage.TYPE_INT_RGB, 50.0);
+            BufferedImage.TYPE_INT_RGB, scale);
 
     IMAGE_BUILDER.toSinglePage(bufferedImagePageProcessor);
     IMAGE_BUILDER.runFirstPage();
 
     ImageIO.write(bufferedImagePageProcessor.getPageImages().get(0), "png", os);
     return new ByteArrayResource(os.toByteArray());
+  }
+
+  public static ByteArrayResource projectItemHtmlToImageForMobile(String html) throws Exception {
+      return projectItemHtmlToImage(html, 10);
+  }
+
+  public static ByteArrayResource projectItemHtmlToImageForPC(String html) throws Exception {
+    return projectItemHtmlToImage(html, 50);
   }
 
   /**
