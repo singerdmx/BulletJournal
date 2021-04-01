@@ -65,7 +65,7 @@ public class TaskController {
     protected static final String MOVE_TASK_ROUTE = "/api/tasks/{taskId}/move";
     protected static final String SHARE_TASK_ROUTE = "/api/tasks/{taskId}/share";
     protected static final String TASK_EXPORT_EMAIL_ROUTE = "/api/tasks/{taskId}/exportEmail";
-    protected static final String TASK_EXPORT_ROUTE = "/api/tasks/{taskId}/export";
+    protected static final String TASK_EXPORT_IMAGE_ROUTE = "/api/tasks/{taskId}/exportImage";
     protected static final String TASK_EXPORT_PDF_ROUTE = "/api/tasks/{taskId}/exportPdf";
     protected static final String GET_SHARABLES_ROUTE = "/api/tasks/{taskId}/sharables";
     protected static final String REVOKE_SHARABLE_ROUTE = "/api/tasks/{taskId}/revokeSharable";
@@ -460,9 +460,34 @@ public class TaskController {
         }
     }
 
-    @PostMapping(TASK_EXPORT_ROUTE)
-    public void exportTask(@NotNull @PathVariable Long taskId,
-                           @NotNull @RequestBody ExportProjectItemParams exportProjectItemParams) {
+    @PostMapping(TASK_EXPORT_IMAGE_ROUTE)
+    public ResponseEntity<Object> exportTaskAsImage(
+        @NotNull @PathVariable Long taskId,
+        @NotNull @RequestBody ExportProjectItemAsImageParams params) {
+      String username = MDC.get(UserClient.USER_NAME_KEY);
+      com.bulletjournal.repository.models.Task task = taskDaoJpa.getProjectItem(taskId, username);
+
+      try {
+        String html = freeMarkerClient.convertProjectItemIntoPdfHtml(task, params.getContents());
+        ByteArrayResource resource;
+        if (params.isMobile()) {
+          resource = OpenHtmlConverter.projectItemHtmlToImageForMobile(html);
+        } else {
+          resource = OpenHtmlConverter.projectItemHtmlToImageForPC(html);
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=task.png");
+        return ResponseEntity.status(HttpStatus.OK)
+            .headers(headers)
+            .contentLength(resource.contentLength())
+            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+            .body(resource);
+      } catch (Exception e) {
+        LOGGER.error("Failed to convert task into HTML string - " + e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("Failed to get task as image.");
+      }
     }
 
     @GetMapping(GET_SHARABLES_ROUTE)

@@ -400,12 +400,18 @@ public class NoteController {
 
   @PostMapping(NOTE_EXPORT_IMAGE_ROUTE)
   public ResponseEntity<Object> exportNoteAsImage(
-      @NotNull @PathVariable Long noteId, @NotNull @RequestBody ExportProjectItemParams params) {
+      @NotNull @PathVariable Long noteId,
+      @NotNull @RequestBody ExportProjectItemAsImageParams params) {
     String username = MDC.get(UserClient.USER_NAME_KEY);
     com.bulletjournal.repository.models.Note note = noteDaoJpa.getProjectItem(noteId, username);
     try {
       String html = freeMarkerClient.convertProjectItemIntoImageHtml(note, params.getContents());
-      ByteArrayResource resource = OpenHtmlConverter.projectItemHtmlToImageForMobile(html);
+      ByteArrayResource resource;
+      if (params.isMobile()) {
+        resource = OpenHtmlConverter.projectItemHtmlToImageForMobile(html);
+      } else {
+        resource = OpenHtmlConverter.projectItemHtmlToImageForPC(html);
+      }
 
       HttpHeaders headers = new HttpHeaders();
       headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=note.png");
