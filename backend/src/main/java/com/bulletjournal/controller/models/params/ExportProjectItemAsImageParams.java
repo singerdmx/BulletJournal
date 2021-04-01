@@ -9,7 +9,8 @@ public class ExportProjectItemAsImageParams {
 
   private boolean isMobile;
 
-  public ExportProjectItemAsImageParams() {}
+  public ExportProjectItemAsImageParams() {
+  }
 
   public List<Content> getContents() {
     return contents;

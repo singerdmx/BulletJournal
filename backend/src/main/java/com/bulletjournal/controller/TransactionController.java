@@ -74,6 +74,7 @@ public class TransactionController {
     protected static final String CONTENT_REVISIONS_ROUTE = "/api/transactions/{transactionId}/contents/{contentId}/revisions/{revisionId}";
     protected static final String TRANSACTION_EXPORT_EMAIL_ROUTE = "/api/transactions/{transactionId}/exportEmail";
     protected static final String TRANSACTION_EXPORT_PDF_ROUTE = "/api/transactions/{transactionId}/exportPdf";
+    protected static final String TRANSACTION_EXPORT_IMAGE_ROUTE = "/api/transactions/{transactionId}/exportImage";
 
 
     @Autowired
@@ -481,6 +482,34 @@ public class TransactionController {
         catch (IOException | TemplateException e) {
             LOGGER.error("Failed to convert transaction into HTML string - " + e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to get transaction as PDF.");
+        }
+    }
+
+    @PostMapping(TRANSACTION_EXPORT_IMAGE_ROUTE)
+    public ResponseEntity<Object> exportTransactionAsPdf(
+            @NotNull @PathVariable Long transactionId, @NotNull @RequestBody ExportProjectItemAsImageParams params) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        com.bulletjournal.repository.models.Transaction transaction = transactionDaoJpa.getProjectItem(transactionId, username);
+        try {
+            String html = freeMarkerClient.convertProjectItemIntoPdfHtml(transaction, params.getContents());
+            ByteArrayResource resource;
+            if (params.isMobile()) {
+                resource = OpenHtmlConverter.projectItemHtmlToImageForMobile(html);
+            } else {
+                resource = OpenHtmlConverter.projectItemHtmlToImageForPC(html);
+            }
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=transaction.png");
+            return ResponseEntity.status(HttpStatus.OK)
+                    .headers(headers)
+                    .contentLength(resource.contentLength())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
+        }
+        catch (Exception e) {
+            LOGGER.error("Failed to convert transaction into HTML string - " + e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to get transaction as image.");
         }
     }
 }

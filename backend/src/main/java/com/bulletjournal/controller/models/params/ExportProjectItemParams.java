@@ -1,7 +1,6 @@
 package com.bulletjournal.controller.models.params;
 
 import com.bulletjournal.controller.models.Content;
-import com.bulletjournal.controller.models.ExportType;
 
 import java.util.List;
 
