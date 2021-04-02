@@ -42,8 +42,9 @@ dependencies {
     implementation 'io.grpc:grpc-protobuf'
     implementation "com.stripe:stripe-java:20.25.0"
     implementation 'org.freemarker:freemarker:2.3.30'
-    implementation 'com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.6'
+    implementation 'com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.8'
     implementation 'org.jsoup:jsoup:1.13.1'
+    implementation 'com.openhtmltopdf:openhtmltopdf-java2d:1.0.8'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'

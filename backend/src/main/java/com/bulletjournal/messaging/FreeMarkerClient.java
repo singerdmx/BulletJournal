@@ -30,6 +30,7 @@ public class FreeMarkerClient {
   private static final String TASK_EMAIL_TEMPLATE = "TaskEmail.ftl";
   private static final String TRANSACTION_EMAIL_TEMPLATE = "TransactionEmail.ftl";
   private static final String PROJECT_ITEM_PDF_TEMPLATE = "ProjectItemPdf.ftl";
+  private static final String PROJECT_ITEM_IMAGE_TEMPLATE = "ProjectItemImage.ftl";
 
   // PDF Templates Properties
   private static final String PROJECT_ITEM_TYPE_DATA_PROPERTY = "project_item_type";
@@ -116,6 +117,39 @@ public class FreeMarkerClient {
             "ConvertProjectItemIntoPdfHtml failed. Unrecognized project item content type");
     }
     return this.generateHtml(PROJECT_ITEM_PDF_TEMPLATE, data);
+  }
+
+  /**
+   * convert given project item to HTML for PDF conversion using.
+   */
+  public <T extends ProjectItemModel> String convertProjectItemIntoImageHtml(
+          T projectItem, List<Content> contents) throws IOException, TemplateException {
+    Map<String, Object> data = new HashMap<>();
+    data.put("contents", contents);
+
+    switch (projectItem.getContentType()) {
+      case NOTE:
+        Note note = (Note) projectItem;
+        data.put(PROJECT_ITEM_TYPE_DATA_PROPERTY, NOTE_TYPE_PROPERTY);
+        this.addNoteInfoToDataModel(data, note);
+        break;
+      case TASK:
+        Task task = (Task) projectItem;
+        data.put(PROJECT_ITEM_TYPE_DATA_PROPERTY, TASK_TYPE_PROPERTY);
+        this.addTaskInfoToDataModel(data, task);
+        break;
+      case TRANSACTION:
+        Transaction transaction = (Transaction) projectItem;
+        data.put(PROJECT_ITEM_TYPE_DATA_PROPERTY, TRANSACTION_TYPE_PROPERTY);
+        this.addTransactionInfoToDataModel(data, transaction);
+        break;
+      default:
+        LOGGER.error(
+                "ConvertProjectItemIntoPdfHtml failed. Unrecognized project item content type");
+        throw new ResourceNotFoundException(
+                "ConvertProjectItemIntoPdfHtml failed. Unrecognized project item content type");
+    }
+    return this.generateHtml(PROJECT_ITEM_IMAGE_TEMPLATE, data);
   }
 
   /**
