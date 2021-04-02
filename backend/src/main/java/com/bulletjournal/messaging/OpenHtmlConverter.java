@@ -50,11 +50,11 @@ public class OpenHtmlConverter {
   }
 
   public static ByteArrayResource projectItemHtmlToImageForMobile(String html) throws Exception {
-      return projectItemHtmlToImage(html, 10);
+      return projectItemHtmlToImage(html, 1);
   }
 
   public static ByteArrayResource projectItemHtmlToImageForPC(String html) throws Exception {
-    return projectItemHtmlToImage(html, 50);
+    return projectItemHtmlToImage(html, 10);
   }
 
   /**

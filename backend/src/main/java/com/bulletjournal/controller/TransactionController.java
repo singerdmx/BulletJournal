@@ -491,7 +491,7 @@ public class TransactionController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         com.bulletjournal.repository.models.Transaction transaction = transactionDaoJpa.getProjectItem(transactionId, username);
         try {
-            String html = freeMarkerClient.convertProjectItemIntoPdfHtml(transaction, params.getContents());
+            String html = freeMarkerClient.convertProjectItemIntoImageHtml(transaction, params.getContents());
             ByteArrayResource resource;
             if (params.isMobile()) {
                 resource = OpenHtmlConverter.projectItemHtmlToImageForMobile(html);

@@ -468,7 +468,7 @@ public class TaskController {
       com.bulletjournal.repository.models.Task task = taskDaoJpa.getProjectItem(taskId, username);
 
       try {
-        String html = freeMarkerClient.convertProjectItemIntoPdfHtml(task, params.getContents());
+        String html = freeMarkerClient.convertProjectItemIntoImageHtml(task, params.getContents());
         ByteArrayResource resource;
         if (params.isMobile()) {
           resource = OpenHtmlConverter.projectItemHtmlToImageForMobile(html);
