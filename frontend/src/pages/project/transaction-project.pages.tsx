@@ -13,7 +13,7 @@ import {
 } from 'recharts';
 import { IState } from '../../store';
 import { connect } from 'react-redux';
-import { Carousel, DatePicker, Form, List, Radio, Result, Select, Tooltip } from 'antd';
+import {Carousel, DatePicker, Empty, Form, List, Radio, Result, Select, Tooltip} from 'antd';
 import moment from 'moment';
 import { dateFormat } from '../../features/myBuJo/constants';
 import './project.styles.less';
@@ -25,6 +25,7 @@ import {
   LedgerSummary,
   LedgerSummaryType,
   TransactionsSummary,
+  TransactionView,
 } from '../../features/transactions/interface';
 import TransactionItem from '../../components/project-item/transaction-item.component';
 import './transaction.styles.less';
@@ -65,6 +66,7 @@ type TransactionProps = {
   currency: string;
   project: Project | undefined;
   timezone: string;
+  frequencyType: FrequencyType;
   ledgerSummary: LedgerSummary;
   labelsToKeep: number[];
   labelsToRemove: number[];
@@ -119,6 +121,12 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     transactionsSummaries,
   } = ledgerSummary;
   const { transactions = [] } = ledgerSummary;
+  const [typesFilter, setTypesFilter] = useState([0, 1]);
+  const [sortMethod, setSortMethod] = useState('timeAscending');
+  const changeTypesFilter = (typesFilter:number[])=> {setTypesFilter(typesFilter)};
+  const changeSortMethod = (sortMethod:string) => {setSortMethod(sortMethod)};
+  const [transactionsOnFilterAndSort, setTransactionsOnFilterAndSort] = useState(transactions);
+  const [refreshTypesFilterAndSortMethod, setRefreshTypesFilterAndSortMethod] = useState(0);
 
   const refreshTransactions = (
     values: any,
@@ -278,6 +286,62 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
     }
   }, [ledgerSummary]);
 
+  useEffect(() => {
+    setTransactionsOnFilterAndSort(transactions);
+  }, [ledgerSummary]);
+
+  useEffect(() => {
+    const tmp: TransactionView[] = [];
+    transactions.forEach(transaction => {
+      if (typesFilter.includes(transaction.transactionType)) {
+        tmp.push(transaction);
+      }
+    });
+    setTransactionsOnFilterAndSort(tmp);
+  },[typesFilter]);
+
+  useEffect(() => {
+    const tmp = [...transactionsOnFilterAndSort];
+
+    if (sortMethod === "amountAscending") {
+      tmp.sort((a, b) => a.amount - b.amount);
+    } else if (sortMethod === "amountDescending") {
+      tmp.sort((a, b) => b.amount - a.amount);
+    } else {
+      tmp.sort(sortTransactionByTimeAscending);
+      if (sortMethod === "timeDescending") {
+        tmp.reverse();
+      }
+    }
+    setTransactionsOnFilterAndSort(tmp);
+  }, [sortMethod]);
+
+  const sortTransactionByTimeAscending = (a: TransactionView, b: TransactionView) => {
+    let timeA;
+    let timeB;
+    if (a.id < 0 && a.createdAt) {
+      timeA = a.createdAt;
+    } else {
+      timeA = a.paymentTime;
+    }
+
+    if (b.id < 0 && b.createdAt) {
+      timeB = b.createdAt;
+    } else {
+      timeB = b.paymentTime;
+    }
+
+    if (timeA !== undefined && timeB !== undefined) {
+      if (timeA < timeB) {
+        return -1;
+      }
+      if (timeA > timeB) {
+        return 1;
+      }
+    }
+    return 0;
+  }
+
   const getDefault = () => {
     return (
       <LedgerSummaries
@@ -379,6 +443,50 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
 
   if (!project) {
     return null;
+  }
+
+  const getList = () => {
+    if (transactions.length === 0) {
+      return <Empty/>
+    }
+
+    function refreshPage() {
+      if (project) {
+        updateTransactions(
+            project.id,
+            props.timezone ? props.timezone : currentZone,
+            LedgerSummaryType.DEFAULT,
+            // TODO: how to get current FrequencyType?
+            props.frequencyType,
+            startDate,
+            endDate,
+            labelsToKeep,
+            labelsToRemove
+        );
+        setSortMethod('timeAscending');
+        setTypesFilter([0,1]);
+        setRefreshTypesFilterAndSortMethod(prev => prev+1);
+      }
+    };
+
+    return <List className='transaction-list'>
+      {transactionsOnFilterAndSort.map((item) => (
+          <List.Item key={`${item.id} + ' ' + ${item.date}`} className='transaction-list-item'>
+            <TransactionItem
+                transaction={item}
+                type={ProjectItemUIType.PROJECT}
+                inProject={!project.shared}
+                showModal={props.showModal}
+                onUpdateSuccess={() => {
+                  refreshPage();
+                }}
+                onDeleteSuccess={() => {
+                  refreshPage();
+                }}
+            />
+          </List.Item>
+      ))}
+    </List>
   }
 
   return (
@@ -657,20 +765,9 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
             </div>
           </div>
         )}
-
-      <List className='transaction-list'>
-        {transactions.map((item) => (
-          <List.Item key={`${item.id} + ' ' + ${item.date}`} className='transaction-list-item'>
-            <TransactionItem
-              transaction={item}
-              type={ProjectItemUIType.PROJECT}
-              inProject={!project.shared}
-              showModal={props.showModal}
-            />
-          </List.Item>
-        ))}
-      </List>
+      {getList()}
       {getAddTransactionButton()}
+      <AddTransaction mode="icon" changeTypesFilter={changeTypesFilter} changeSortMethod={changeSortMethod} refreshTypesFilterAndSortMethod={refreshTypesFilterAndSortMethod}/>
     </div>
   );
 };
@@ -678,6 +775,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
 const mapStateToProps = (state: IState) => ({
   project: state.project.project,
   timezone: state.settings.timezone,
+  frequencyType: state.transaction.frequencyType,
   ledgerSummary: state.transaction.ledgerSummary,
   currency: state.myself.currency,
 });

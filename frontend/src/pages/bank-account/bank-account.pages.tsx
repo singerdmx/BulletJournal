@@ -174,7 +174,6 @@ const BankAccountPage: React.FC<BankAccountProps> = (
         setTransactionsOnFilterAndSort(tmp);
     }
 
-
     function onFilterChange(checked: boolean, t: number) {
         let arr = [...typesFilter]
         if (checked) {

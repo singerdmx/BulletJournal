@@ -478,7 +478,6 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
         );
         break;
       case ProjectType.LEDGER:
-        createContent = <AddTransaction mode="icon"/>;
         projectContent = (
             <TransactionProject
                 showModal={(user: User) => {

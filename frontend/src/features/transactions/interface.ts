@@ -52,7 +52,7 @@ export interface LedgerSummary {
   income: number;
   startDate: string;
   endDate: string;
-  transactions: Transaction[];
+  transactions:TransactionView[];
   transactionsSummaries: TransactionsSummary[];
 }
 

@@ -12,8 +12,11 @@ import {
   Select,
   TimePicker,
   Tooltip,
+  Popover,
+  Switch,
+  Tabs,
 } from 'antd';
-import {PlusOutlined, SyncOutlined, EnvironmentOutlined, BankOutlined} from '@ant-design/icons';
+import {PlusOutlined, SyncOutlined, EnvironmentOutlined, BankOutlined, FilterOutlined, CheckOutlined, CloseOutlined, SortAscendingOutlined} from '@ant-design/icons';
 import {connect} from 'react-redux';
 import {RouteComponentProps, useParams, withRouter} from 'react-router';
 import {
@@ -52,6 +55,9 @@ type TransactionProps = {
   myself: string;
   recurringTransactions: Transaction[];
   updateRecurringTransactions: (projectId: number) => void;
+  changeTypesFilter?: (typesFilter: number[]) => void;
+  changeSortMethod?: (sortMethod: string) => void;
+  refreshTypesFilterAndSortMethod?: number;
 };
 
 interface TransactionCreateFormProps {
@@ -93,6 +99,8 @@ const AddTransaction: React.FC<
   const [recurrent, setRecurrent] = useState(false);
   const [bankAccountVisible, setBankAccountVisible] = useState(true);
   const [location, setLocation] = useState('');
+  const [typesFilter, setTypesFilter] = useState([0, 1]);
+  const [sortMethod, setSortMethod] = useState('timeAscending');
 
   const addTransaction = (values: any) => {
     //convert time object to format string
@@ -136,6 +144,11 @@ const AddTransaction: React.FC<
     }
     setManageRecurringTransDialogVisible(true);
   }
+
+  useEffect(() => {
+    setSortMethod('timeAscending');
+    setTypesFilter([0,1]);
+  },[props.refreshTypesFilterAndSortMethod])
 
   useEffect(() => {
     props.updateExpandedMyself(true);
@@ -310,8 +323,8 @@ const AddTransaction: React.FC<
             <div style={{ display: 'flex' }}>
               <div style={{ display: 'flex', flex: 1 }}>
                 <Tooltip title="Select Date" placement="left">
-                  <Form.Item 
-                    name="date" 
+                  <Form.Item
+                    name="date"
                     style={{ width: '100%' }}
                     rules={[{ required: true, message: 'Missing Date!' }]}>
                     <DatePicker
@@ -412,8 +425,63 @@ const AddTransaction: React.FC<
       </div>
     );
   }
+    const {TabPane} = Tabs;
 
-  return (
+    const getFilterAndSorter = () => {
+        return <Tabs defaultActiveKey="1">
+            <TabPane
+                tab={<span><FilterOutlined/>Filter</span>}
+                key="1"
+            >
+                <div>
+                    <Switch size="small"
+                            checkedChildren={<CheckOutlined/>}
+                            unCheckedChildren={<CloseOutlined/>}
+                            checked={typesFilter.includes(0)}
+                            onChange={(checked) => onFilterChange(checked, 0)}/>
+                    <span>  Income</span>
+                </div>
+                <div>
+                    <Switch size="small"
+                            checkedChildren={<CheckOutlined/>}
+                            unCheckedChildren={<CloseOutlined/>}
+                            checked={typesFilter.includes(1)}
+                            onChange={(checked) => onFilterChange(checked, 1)}/>
+                    <span>  Expense</span>
+                </div>
+            </TabPane>
+            <TabPane
+                tab={<span><SortAscendingOutlined/>Sort</span>}
+                key="2"
+            >
+                <span>Sort by  </span>
+                <Select value={sortMethod} style={{width: 180}} onChange={onSortChange}>
+                    <Option value="timeAscending">Time: Oldest to Newest</Option>
+                    <Option value="timeDescending">Time: Newest to Oldest</Option>
+                    <Option value="amountAscending">Amount: Low to High</Option>
+                    <Option value="amountDescending">Amount: High to Low</Option>
+                </Select>
+            </TabPane>
+        </Tabs>
+    }
+
+    function onSortChange(sortMethod: string) {
+        setSortMethod(sortMethod);
+        props.changeSortMethod?.(sortMethod);
+    }
+
+    function onFilterChange(checked: boolean, t: number) {
+        let arr = [...typesFilter]
+        if (checked) {
+            arr.push(t);
+        } else {
+            arr = arr.filter(e => e !== t);
+        }
+        setTypesFilter(arr);
+        props.changeTypesFilter?.(arr);
+    }
+
+    return (
     <div>
       <Container>
         <FloatButton
@@ -432,6 +500,15 @@ const AddTransaction: React.FC<
         </FloatButton>
         {getManageRecurringTransactionsModal()}
         {props.project && props.project.owner.name === props.myself && <ProjectSettingDialog />}
+        <Popover placement="leftTop" title='Filter/Sort' content={getFilterAndSorter()}
+                 trigger="click">
+          <FloatButton
+              tooltip="Filter/Sort"
+              styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
+          >
+            <FilterOutlined/>
+          </FloatButton>
+        </Popover>
         <FloatButton
             tooltip="Add New Transaction"
             onClick={openNewTranDialogModal}

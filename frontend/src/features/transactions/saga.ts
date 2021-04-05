@@ -249,6 +249,7 @@ function* deleteTransaction(action: PayloadAction<DeleteTransaction>) {
 
     if (onSuccess) {
       onSuccess();
+      return;
     }
     if (type === ProjectItemUIType.PROJECT || type === ProjectItemUIType.PAYER || type === ProjectItemUIType.MANAGE_RECURRING) {
       const data = yield call(
