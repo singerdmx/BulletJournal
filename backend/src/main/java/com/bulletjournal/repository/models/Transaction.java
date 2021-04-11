@@ -77,6 +77,9 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
     @OnDelete(action = OnDeleteAction.CASCADE)
     private BankAccount bankAccount;
 
+    @Column(length = 10485760, name = "contents_order")
+    private String contentsOrder;
+
     public Long getId() {
         return id;
     }
@@ -200,6 +203,16 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
         }
 
         return amount;
+    }
+
+    @Override
+    public String getContentsOrder() {
+        return contentsOrder;
+    }
+
+    @Override
+    public void setContentsOrder(String contentsOrder) {
+        this.contentsOrder = contentsOrder;
     }
 
     @Override

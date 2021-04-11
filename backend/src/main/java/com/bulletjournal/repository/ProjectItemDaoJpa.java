@@ -396,6 +396,14 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         content.setRevisions(GSON.toJson(revisionList));
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public <T extends ProjectItemModel> void setContentsOrder(
+            String requester, Long projectItemId, List<Long> contentsOrder) {
+        T projectItem = getProjectItem(projectItemId, requester);
+        projectItem.setContentsOrder(GSON.toJson(contentsOrder));
+        this.getJpaRepository().save(projectItem);
+    }
+
     /**
      * Get Contents for project
      *
@@ -405,8 +413,23 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public <T extends ProjectItemModel> List<K> getContents(Long projectItemId, String requester) {
         T projectItem = getProjectItem(projectItemId, requester);
-        return this.findContents(projectItem).stream().sorted((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt()))
+        List<K> contents = this.findContents(projectItem);
+        String contentsOrder = projectItem.getContentsOrder();
+        if (contentsOrder == null) {
+            return contents.stream().sorted((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt()))
+                    .collect(Collectors.toList());
+        }
+
+        List<Long> order = Arrays.asList(GSON.fromJson(contentsOrder, Long[].class));
+        Set<Long> set = new HashSet<>(order);
+        List<K> notInOrderContents = contents.stream()
+                .filter(c -> !set.contains(c.getId())).sorted((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt()))
                 .collect(Collectors.toList());
+        List<K> inOrderContents = contents.stream()
+                .filter(c -> set.contains(c.getId())).sorted(Comparator.comparingInt(a -> order.indexOf(a.getId())))
+                .collect(Collectors.toList());
+        notInOrderContents.addAll(inOrderContents);
+        return notInOrderContents;
     }
 
     abstract <T extends ProjectItemModel> List<T> findRecentProjectItemsBetween(Timestamp startTime, Timestamp endTime, List projects);

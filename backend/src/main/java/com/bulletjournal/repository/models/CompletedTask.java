@@ -70,6 +70,16 @@ public class CompletedTask extends TaskModel {
     }
 
     @Override
+    public void setContentsOrder(String contentsOrder) {
+        throw new IllegalStateException("setContentsOrder not implemented");
+    }
+
+    @Override
+    public String getContentsOrder() {
+        throw new IllegalStateException("getContentsOrder not implemented");
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof CompletedTask)) return false;

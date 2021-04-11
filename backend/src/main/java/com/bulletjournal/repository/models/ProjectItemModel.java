@@ -135,6 +135,10 @@ public abstract class ProjectItemModel<T extends ProjectItem> extends AuditModel
 
     public abstract ContentType getContentType();
 
+    public abstract String getContentsOrder();
+
+    public abstract void setContentsOrder(String contentsOrder);
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -40,6 +40,8 @@ public class Task extends TaskModel {
     @Column(name = "completed_slots", columnDefinition = "TEXT")
     private String completedSlots;
 
+    @Column(length = 10485760, name = "contents_order")
+    private String contentsOrder;
 
     @Override
     public Long getId() {
@@ -81,6 +83,16 @@ public class Task extends TaskModel {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    @Override
+    public String getContentsOrder() {
+        return contentsOrder;
+    }
+
+    @Override
+    public void setContentsOrder(String contentsOrder) {
+        this.contentsOrder = contentsOrder;
     }
 
     @Override

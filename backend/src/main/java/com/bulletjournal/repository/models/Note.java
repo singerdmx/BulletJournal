@@ -26,6 +26,9 @@ public class Note extends ProjectItemModel<com.bulletjournal.controller.models.N
     @Column
     private String color;
 
+    @Column(length = 10485760, name = "contents_order")
+    private String contentsOrder;
+
     public Long getId() {
         return id;
     }
@@ -40,6 +43,16 @@ public class Note extends ProjectItemModel<com.bulletjournal.controller.models.N
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    @Override
+    public String getContentsOrder() {
+        return contentsOrder;
+    }
+
+    @Override
+    public void setContentsOrder(String contentsOrder) {
+        this.contentsOrder = contentsOrder;
     }
 
     @Override

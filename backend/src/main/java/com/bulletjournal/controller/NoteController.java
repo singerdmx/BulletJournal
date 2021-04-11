@@ -64,6 +64,7 @@ public class NoteController {
     protected static final String CONTENT_ROUTE = "/api/notes/{noteId}/contents/{contentId}";
     protected static final String CONTENTS_ROUTE = "/api/notes/{noteId}/contents";
     protected static final String CONTENT_REVISIONS_ROUTE = "/api/notes/{noteId}/contents/{contentId}/revisions/{revisionId}";
+    protected static final String SET_CONTENTS_ORDER_ROUTE = "/api/notes/{noteId}/contents/setOrder";
     protected static final String NOTE_EXPORT_EMAIL_ROUTE = "/api/notes/{noteId}/exportEmail";
     protected static final String NOTE_EXPORT_PDF_ROUTE = "/api/notes/{noteId}/exportPdf";
     protected static final String NOTE_EXPORT_IMAGE_ROUTE = "/api/notes/{noteId}/exportImage";
@@ -353,6 +354,12 @@ public class NoteController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         Revision revision = this.noteDaoJpa.getContentRevision(username, noteId, contentId, revisionId);
         return Revision.addAvatar(revision, this.userClient);
+    }
+
+    @PostMapping(SET_CONTENTS_ORDER_ROUTE)
+    public void setContentsOrder(@NotNull @PathVariable Long noteId, @NotNull @RequestBody List<Long> order) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.noteDaoJpa.setContentsOrder(username, noteId, order);
     }
 
     @PostMapping(NOTE_EXPORT_EMAIL_ROUTE)
