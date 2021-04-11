@@ -467,7 +467,7 @@ const TransactionProject: React.FC<TransactionProps> = (props) => {
         setTypesFilter([0,1]);
         setRefreshTypesFilterAndSortMethod(prev => prev+1);
       }
-    };
+    }
 
     return <List className='transaction-list'>
       {transactionsOnFilterAndSort.map((item) => (
