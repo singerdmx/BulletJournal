@@ -72,6 +72,7 @@ public class TransactionController {
     protected static final String CONTENT_ROUTE = "/api/transactions/{transactionId}/contents/{contentId}";
     protected static final String CONTENTS_ROUTE = "/api/transactions/{transactionId}/contents";
     protected static final String CONTENT_REVISIONS_ROUTE = "/api/transactions/{transactionId}/contents/{contentId}/revisions/{revisionId}";
+    protected static final String SET_CONTENTS_ORDER_ROUTE = "/api/transactions/{transactionId}/contents/setOrder";
     protected static final String TRANSACTION_EXPORT_EMAIL_ROUTE = "/api/transactions/{transactionId}/exportEmail";
     protected static final String TRANSACTION_EXPORT_PDF_ROUTE = "/api/transactions/{transactionId}/exportPdf";
     protected static final String TRANSACTION_EXPORT_IMAGE_ROUTE = "/api/transactions/{transactionId}/exportImage";
@@ -438,6 +439,12 @@ public class TransactionController {
         Revision revision = this.transactionDaoJpa.getContentRevision(username, transactionId, contentId,
                 revisionId);
         return Revision.addAvatar(revision, this.userClient);
+    }
+
+    @PostMapping(SET_CONTENTS_ORDER_ROUTE)
+    public void setContentsOrder(@NotNull @PathVariable Long transactionId, @NotNull @RequestBody List<Long> order) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.transactionDaoJpa.setContentsOrder(username, transactionId, order);
     }
 
     @PostMapping(TRANSACTION_EXPORT_EMAIL_ROUTE)

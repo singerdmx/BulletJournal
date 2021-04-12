@@ -64,6 +64,7 @@ public class TaskController {
     protected static final String TASK_SET_LABELS_ROUTE = "/api/tasks/{taskId}/setLabels";
     protected static final String MOVE_TASK_ROUTE = "/api/tasks/{taskId}/move";
     protected static final String SHARE_TASK_ROUTE = "/api/tasks/{taskId}/share";
+    protected static final String SET_CONTENTS_ORDER_ROUTE = "/api/tasks/{taskId}/contents/setOrder";
     protected static final String TASK_EXPORT_EMAIL_ROUTE = "/api/tasks/{taskId}/exportEmail";
     protected static final String TASK_EXPORT_IMAGE_ROUTE = "/api/tasks/{taskId}/exportImage";
     protected static final String TASK_EXPORT_PDF_ROUTE = "/api/tasks/{taskId}/exportPdf";
@@ -415,6 +416,12 @@ public class TaskController {
         Informed inform = this.taskDaoJpa.shareProjectItem(taskId, shareProjectItemParams, username);
         this.notificationService.inform(inform);
         return null;
+    }
+
+    @PostMapping(SET_CONTENTS_ORDER_ROUTE)
+    public void setContentsOrder(@NotNull @PathVariable Long taskId, @NotNull @RequestBody List<Long> order) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.taskDaoJpa.setContentsOrder(username, taskId, order);
     }
 
     @PostMapping(TASK_EXPORT_EMAIL_ROUTE)
