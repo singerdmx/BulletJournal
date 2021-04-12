@@ -287,12 +287,17 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     }
 
     private void adjustContentText(String newText, K content) {
-        DeltaContent newContent = new DeltaContent(newText);
-        // call grpc to get html string from delta
-        String htmlString = this.daemonServiceClient.convertDeltaToHtml(newContent.getDeltaOpsString());
-        LOGGER.info("htmlString: {}", htmlString);
-        newContent.setHtml(htmlString);
-        content.setText(newContent.toJSON());
+        try {
+            DeltaContent newContent = new DeltaContent(newText);
+            // call grpc to get html string from delta
+            String htmlString = this.daemonServiceClient.convertDeltaToHtml(newContent.getDeltaOpsString());
+            LOGGER.info("htmlString: {}", htmlString);
+            newContent.setHtml(htmlString);
+            content.setText(newContent.toJSON());
+        } catch (Exception ex) {
+            LOGGER.error("Fail to adjustContentText: {}", newText);
+            content.setText(newText);
+        }
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
