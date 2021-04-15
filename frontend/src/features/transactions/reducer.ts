@@ -195,6 +195,11 @@ export type ShareTransactionByEmailAction = {
   targetGroup?: number,
 };
 
+export type ShareTransactionByPdfAction = {
+  transactionId: number,
+  contents: Content[],
+}
+
 export type ChangeBankAccountBalanceAction = {
   bankAccount: BankAccount,
   balance: number,
@@ -355,6 +360,7 @@ const slice = createSlice({
         action: PayloadAction<UpdateTransactionBankAccountAction>
     ) => state,
     TransactionShareByEmail: (state, action: PayloadAction<ShareTransactionByEmailAction>) => state,
+    TransactionShareByPdf: (state, action: PayloadAction<ShareTransactionByPdfAction>) => state,
     ChangeBankAccountBalance: (state, action: PayloadAction<ChangeBankAccountBalanceAction>) => state,
     GetBankAccountTransactions: (state, action: PayloadAction<GetBankAccountTransactionsAction>) => state,
   },

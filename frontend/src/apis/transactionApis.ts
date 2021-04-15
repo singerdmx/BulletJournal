@@ -313,3 +313,32 @@ export const shareTransactionByEmail = (
       throw Error(err);
     });
 };
+
+export const shareTransactionByPdf = (
+    transactionId: number,
+    contents: Content[],
+) => {
+  const Delta = Quill.import('delta');
+  let contentsHTML : Content[] = [];
+  contents.forEach((content) => {
+    let contentHTML = {...content};
+    contentHTML['text'] = createHTML(new Delta(JSON.parse(content.text)['delta']));
+    contentsHTML.push(contentHTML);
+  })
+  const postBody = JSON.stringify({
+    contents: contentsHTML,
+    "mobile": false,
+  });
+  return doPost(`/api/transactions/${transactionId}/exportPdf`, postBody)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.download = 'transaction'+transactionId+'.pdf';
+        link.click();
+      })
+      .catch((err) => {
+        throw Error(err);
+      });
+};

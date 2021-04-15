@@ -11,7 +11,8 @@ import {
   deleteTransaction,
   getTransaction,
   updateTransactionColorSettingShown,
-  updateTransactionContents
+  updateTransactionContents,
+  shareTransactionByPdf,
 } from '../../features/transactions/actions';
 import {dateFormat} from '../../features/myBuJo/constants';
 // modals import
@@ -19,13 +20,27 @@ import EditTransaction from '../../components/modals/edit-transaction.component'
 import MoveProjectItem from '../../components/modals/move-project-item.component';
 import ShareProjectItem from '../../components/modals/share-project-item.component';
 // antd imports
-import {Avatar, BackTop, Card, Col, Divider, message, Popconfirm, Row, Statistic, Tag, Tooltip,} from 'antd';
 import {
-  BgColorsOutlined,
+  Avatar,
+  BackTop,
+  Card,
+  Col,
+  Divider,
+  message,
+  Popconfirm,
+  Popover,
+  Row, Select,
+  Statistic, Switch,
+  Tabs,
+  Tag,
+  Tooltip,
+} from 'antd';
+import {
+  BgColorsOutlined, CheckOutlined, CloseOutlined,
   CreditCardOutlined,
   DeleteTwoTone,
-  DollarCircleOutlined,
-  PlusOutlined,
+  DollarCircleOutlined, FileImageOutlined, FilePdfOutlined, FilterOutlined,
+  PlusOutlined, SortAscendingOutlined,
   SyncOutlined,
   UpSquareOutlined,
 } from '@ant-design/icons';
@@ -71,6 +86,10 @@ type TransactionProps = {
   getProject: (projectId: number) => void;
   updateTransactionColorSettingShown: (
     visible: boolean
+  ) => void;
+  shareTransactionByPdf: (
+      transactionId: number,
+      contents: Content[],
   ) => void;
 };
 
@@ -185,12 +204,43 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
 
   const bankAccount = transaction?.bankAccount;
 
+  const exportAsImageOrPdf = () => {
+    return <div className="export">
+      <div><FilePdfOutlined /> Export as Pdf</div>
+      <div><FileImageOutlined /> Export as Image</div>
+    </div>
+  }
+
+  const downloadProjectItemByPdf= () => {
+    props.shareTransactionByPdf(transaction.id, contents);
+  };
+
   const createContentElem = (
     <Container>
+      {/*Work for Export As Pdf*/}
+      <FloatButton  tooltip="Export"
+                    styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
+                    onClick={()=> {
+                            downloadProjectItemByPdf();
+                    }}
+      >
+        <FilePdfOutlined />
+      </FloatButton>
+      {/*TODO*/}
+      <Popover placement="leftTop" title='Export Transaction' content={exportAsImageOrPdf()}
+               trigger="click">
+        <FloatButton
+            tooltip="Export"
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
+        >
+          <FilePdfOutlined />
+        </FloatButton>
+      </Popover>
       <FloatButton
           tooltip="Go to Parent BuJo"
           onClick={() => history.push(`/projects/${transaction.projectId}`)}
           styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
+
       >
         <UpSquareOutlined/>
       </FloatButton>
@@ -420,4 +470,5 @@ export default connect(mapStateToProps, {
   setDisplayRevision,
   getProject,
   updateTransactionColorSettingShown,
+  shareTransactionByPdf,
 })(TransactionPage);
