@@ -245,13 +245,17 @@ export const shareTransactionByEmail = (
     targetGroup: targetGroup,
   });
 
-export const shareTransactionByPdf = (
+export const exportTransaction = (
     transactionId: number,
     contents: Content[],
+    exportType: string,
+    fileName: string
 ) =>
-    actions.TransactionShareByPdf({
+    actions.ExportTransaction({
         transactionId: transactionId,
         contents: contents,
+        exportType: exportType,
+        fileName: fileName
     });
 
 export const changeAccountBalance = (bankAccount: BankAccount, balance: number, description: string, onSuccess: Function) =>

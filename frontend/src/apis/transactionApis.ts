@@ -314,12 +314,14 @@ export const shareTransactionByEmail = (
     });
 };
 
-export const shareTransactionByPdf = (
+export const exportTransactionAsPdfOrImage = (
     transactionId: number,
     contents: Content[],
+    exportType: string,
+    fileName: string
 ) => {
   const Delta = Quill.import('delta');
-  let contentsHTML : Content[] = [];
+  let contentsHTML: Content[] = [];
   contents.forEach((content) => {
     let contentHTML = {...content};
     contentHTML['text'] = createHTML(new Delta(JSON.parse(content.text)['delta']));
@@ -329,13 +331,13 @@ export const shareTransactionByPdf = (
     contents: contentsHTML,
     "mobile": false,
   });
-  return doPost(`/api/transactions/${transactionId}/exportPdf`, postBody)
+  return doPost(`/api/transactions/${transactionId}/export${exportType}`, postBody)
       .then((res) => res.blob())
       .then((blob) => {
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
         link.href = url;
-        link.download = 'transaction'+transactionId+'.pdf';
+        link.download = fileName;
         link.click();
       })
       .catch((err) => {

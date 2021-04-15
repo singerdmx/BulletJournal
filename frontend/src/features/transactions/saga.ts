@@ -14,7 +14,7 @@ import {
   PatchTransaction,
   SetTransactionLabels,
   ShareTransaction,
-  ShareTransactionByEmailAction, ShareTransactionByPdfAction,
+  ShareTransactionByEmailAction, ExportTransaction,
   TransactionApiErrorAction,
   UpdateRecurringTransactions, UpdateTransactionBankAccountAction,
   UpdateTransactionColorAction,
@@ -40,7 +40,7 @@ import {
   putTransactionBankAccount,
   setTransactionLabels,
   shareTransactionByEmail,
-  shareTransactionByPdf,
+  exportTransactionAsPdfOrImage,
   shareTransactionWithOther,
   updateContent,
   updateTransaction,
@@ -782,23 +782,26 @@ function* shareTransactionByEmails(action: PayloadAction<ShareTransactionByEmail
   }
 }
 
-function* shareTransactionByPdfs(action: PayloadAction<ShareTransactionByPdfAction>) {
+function* exportTransaction(action: PayloadAction<ExportTransaction>) {
   try {
     const {
       transactionId,
       contents,
+      exportType,
+      fileName
     } = action.payload;
     yield call(
-        shareTransactionByPdf,
+        exportTransactionAsPdfOrImage,
         transactionId,
         contents,
+        exportType,
+        fileName
     );
-    yield call(message.success, 'Image sent');
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
     } else {
-      yield call(message.error, `Transaction Share By Pdf Error Received: ${error}`);
+      yield call(message.error, `Export Transaction Error Received: ${error}`);
     }
   }
 }
@@ -943,8 +946,8 @@ export default function* transactionSagas() {
       transactionsActions.TransactionShareByEmail.type, 
       shareTransactionByEmails),
     yield takeLatest(
-        transactionsActions.TransactionShareByPdf.type,
-        shareTransactionByPdfs),
+        transactionsActions.ExportTransaction.type,
+        exportTransaction),
     yield takeLatest(
       transactionsActions.RecurringTransactionsUpdate.type,
       recurringTransactionsUpdate),

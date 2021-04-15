@@ -10,9 +10,9 @@ import {
   deleteContent,
   deleteTransaction,
   getTransaction,
+  exportTransaction,
   updateTransactionColorSettingShown,
   updateTransactionContents,
-  shareTransactionByPdf,
 } from '../../features/transactions/actions';
 import {dateFormat} from '../../features/myBuJo/constants';
 // modals import
@@ -23,24 +23,27 @@ import ShareProjectItem from '../../components/modals/share-project-item.compone
 import {
   Avatar,
   BackTop,
+  Button,
   Card,
   Col,
   Divider,
   message,
   Popconfirm,
   Popover,
-  Row, Select,
-  Statistic, Switch,
-  Tabs,
+  Row,
+  Statistic,
   Tag,
   Tooltip,
 } from 'antd';
 import {
-  BgColorsOutlined, CheckOutlined, CloseOutlined,
+  BgColorsOutlined,
   CreditCardOutlined,
   DeleteTwoTone,
-  DollarCircleOutlined, FileImageOutlined, FilePdfOutlined, FilterOutlined,
-  PlusOutlined, SortAscendingOutlined,
+  DollarCircleOutlined,
+  ExportOutlined,
+  FileImageOutlined,
+  FilePdfOutlined,
+  PlusOutlined,
   SyncOutlined,
   UpSquareOutlined,
 } from '@ant-design/icons';
@@ -87,9 +90,11 @@ type TransactionProps = {
   updateTransactionColorSettingShown: (
     visible: boolean
   ) => void;
-  shareTransactionByPdf: (
+  exportTransaction: (
       transactionId: number,
       contents: Content[],
+      exportType: string,
+      fileName: string
   ) => void;
 };
 
@@ -144,6 +149,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
     deleteContent,
     getProject,
     updateTransactionColorSettingShown,
+    exportTransaction
   } = props;
 
   // get id of Transaction from router
@@ -206,36 +212,13 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
 
   const exportAsImageOrPdf = () => {
     return <div className="export">
-      <div><FilePdfOutlined /> Export as Pdf</div>
-      <div><FileImageOutlined /> Export as Image</div>
+      <Button onClick={() => exportTransaction(transaction.id, contents, "Pdf", transaction!.name + ".pdf")}><FilePdfOutlined/>PDF</Button>
+      <Button onClick={() => exportTransaction(transaction.id, contents, "Image", transaction!.name + ".png")}><FileImageOutlined/>Image</Button>
     </div>
   }
 
-  const downloadProjectItemByPdf= () => {
-    props.shareTransactionByPdf(transaction.id, contents);
-  };
-
   const createContentElem = (
     <Container>
-      {/*Work for Export As Pdf*/}
-      <FloatButton  tooltip="Export"
-                    styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
-                    onClick={()=> {
-                            downloadProjectItemByPdf();
-                    }}
-      >
-        <FilePdfOutlined />
-      </FloatButton>
-      {/*TODO*/}
-      <Popover placement="leftTop" title='Export Transaction' content={exportAsImageOrPdf()}
-               trigger="click">
-        <FloatButton
-            tooltip="Export"
-            styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
-        >
-          <FilePdfOutlined />
-        </FloatButton>
-      </Popover>
       <FloatButton
           tooltip="Go to Parent BuJo"
           onClick={() => history.push(`/projects/${transaction.projectId}`)}
@@ -273,6 +256,15 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
       >
         <EditOutlined />
       </FloatButton>}
+      <Popover placement="left" title='Export Transaction' content={exportAsImageOrPdf()}
+               trigger="click">
+        <FloatButton
+            tooltip="Export"
+            styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
+        >
+          <ExportOutlined />
+        </FloatButton>
+      </Popover>
       <FloatButton
         tooltip="Add Content"
         onClick={createHandler}
@@ -470,5 +462,5 @@ export default connect(mapStateToProps, {
   setDisplayRevision,
   getProject,
   updateTransactionColorSettingShown,
-  shareTransactionByPdf,
+  exportTransaction,
 })(TransactionPage);
