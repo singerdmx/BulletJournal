@@ -515,7 +515,7 @@ public class TransactionController {
                     .body(resource);
         }
         catch (Exception e) {
-            LOGGER.error("Failed to convert transaction into HTML string - " + e);
+            LOGGER.error("Failed to convert transaction into HTML string", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to get transaction as image.");
         }
     }
