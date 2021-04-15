@@ -12,6 +12,7 @@ RUN  --mount=type=cache,target=/root/.gradle ./gradlew clean build -x test
 RUN mkdir -p build/dependency && (cd build/dependency; jar -xf ../libs/*.jar)
 
 FROM openjdk:8-jdk-alpine
+RUN apk add --no-cache fontconfig ttf-dejavu
 VOLUME /tmp
 ARG DEPENDENCY=/workspace/app/build/dependency
 COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
