@@ -790,6 +790,8 @@ function* exportTransaction(action: PayloadAction<ExportTransaction>) {
       exportType,
       fileName
     } = action.payload;
+    yield call(message.success, `Exporting ${exportType.toUpperCase()}`);
+
     yield call(
         exportTransactionAsPdfOrImage,
         transactionId,

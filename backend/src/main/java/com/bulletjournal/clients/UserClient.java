@@ -86,7 +86,11 @@ public class UserClient {
             username = (String) userInfo.get("username");
             user = getUser(username, userInfo);
         } catch (HttpClientErrorException ex) {
-            throw new ResourceNotFoundException("Unable to find user " + username, ex);
+            LOGGER.error("Unable to find user " + username);
+            // User could be deleted, use dummy user "Guest"
+            return new User(8038, "Guest",
+                    "https://1o24bbs.com/user_avatar/1o24bbs.com/guest/37/16651_2.png",
+                    "https://1o24bbs.com/user_avatar/1o24bbs.com/guest/75/16651_2.png");
         }
 
         try {
