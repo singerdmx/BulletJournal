@@ -31,11 +31,20 @@ public class OpenHtmlConverter {
 
   /**
    * convert project item as `png` image
+   * <p>
+   * <b>Note</b>
+   *  Converted project item image won't contain any [img] tag.
+   *  - `openhtmltopdf-java2d` image converter only supports limit image format,
+   *  - image inside [img] may cause unexpected error when export project item as image
+   * </p>
    */
   public static ByteArrayResource projectItemHtmlToImage(String html, double scale) throws Exception {
     ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-    IMAGE_BUILDER.withHtmlContent(htmlToXhtml(html), null);
+    String htmlWithoutImage = htmlToXhtml(html)
+            .replaceAll("<img .*? ((/>)|(</img>))", "");
+
+    IMAGE_BUILDER.withHtmlContent(htmlWithoutImage, null);
     IMAGE_BUILDER.useFastMode();
     IMAGE_BUILDER.useEnvironmentFonts(true);
 
@@ -54,7 +63,7 @@ public class OpenHtmlConverter {
   }
 
   public static ByteArrayResource projectItemHtmlToImageForPC(String html) throws Exception {
-    return projectItemHtmlToImage(html, 10);
+    return projectItemHtmlToImage(html, 5);
   }
 
   /**
