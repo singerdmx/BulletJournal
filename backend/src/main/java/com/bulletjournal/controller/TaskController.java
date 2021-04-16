@@ -470,7 +470,7 @@ public class TaskController {
     @PostMapping(TASK_EXPORT_IMAGE_ROUTE)
     public ResponseEntity<Object> exportTaskAsImage(
         @NotNull @PathVariable Long taskId,
-        @NotNull @RequestBody ExportProjectItemAsImageParams params) {
+        @NotNull @RequestBody ExportProjectItemParams params) {
       String username = MDC.get(UserClient.USER_NAME_KEY);
       com.bulletjournal.repository.models.Task task = taskDaoJpa.getProjectItem(taskId, username);
 

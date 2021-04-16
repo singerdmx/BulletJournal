@@ -408,7 +408,7 @@ public class NoteController {
   @PostMapping(NOTE_EXPORT_IMAGE_ROUTE)
   public ResponseEntity<Object> exportNoteAsImage(
       @NotNull @PathVariable Long noteId,
-      @NotNull @RequestBody ExportProjectItemAsImageParams params) {
+      @NotNull @RequestBody ExportProjectItemParams params) {
     String username = MDC.get(UserClient.USER_NAME_KEY);
     com.bulletjournal.repository.models.Note note = noteDaoJpa.getProjectItem(noteId, username);
     try {

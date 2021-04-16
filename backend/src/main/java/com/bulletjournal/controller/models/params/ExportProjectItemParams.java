@@ -8,6 +8,8 @@ public class ExportProjectItemParams {
 
     private List<Content> contents;
 
+    private boolean isMobile;
+
     public ExportProjectItemParams() {
     }
 
@@ -17,5 +19,13 @@ public class ExportProjectItemParams {
 
     public void setContents(List<Content> contents) {
         this.contents = contents;
+    }
+
+    public boolean isMobile() {
+        return isMobile;
+    }
+
+    public void setMobile(boolean mobile) {
+        isMobile = mobile;
     }
 }

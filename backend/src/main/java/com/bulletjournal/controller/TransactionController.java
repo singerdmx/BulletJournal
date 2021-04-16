@@ -493,8 +493,8 @@ public class TransactionController {
     }
 
     @PostMapping(TRANSACTION_EXPORT_IMAGE_ROUTE)
-    public ResponseEntity<Object> exportTransactionAsPdf(
-            @NotNull @PathVariable Long transactionId, @NotNull @RequestBody ExportProjectItemAsImageParams params) {
+    public ResponseEntity<Object> exportTransactionAsImage(
+            @NotNull @PathVariable Long transactionId, @NotNull @RequestBody ExportProjectItemParams params) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         com.bulletjournal.repository.models.Transaction transaction = transactionDaoJpa.getProjectItem(transactionId, username);
         try {

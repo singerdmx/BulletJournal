@@ -1,18 +1,14 @@
 package com.bulletjournal.controller.models.params;
 
-import com.bulletjournal.controller.models.Content;
-
 import java.util.List;
 
-public class ExportProjectItemAsEmailParams {
+public class ExportProjectItemAsEmailParams extends ExportProjectItemParams {
 
   private Long targetGroup;
 
   private String targetUser;
 
   private List<String> emails;
-
-  private List<Content> contents;
 
   public ExportProjectItemAsEmailParams() {
   }
@@ -43,13 +39,5 @@ public class ExportProjectItemAsEmailParams {
 
   public void setEmails(List<String> emails) {
     this.emails = emails;
-  }
-
-  public List<Content> getContents() {
-    return contents;
-  }
-
-  public void setContents(List<Content> contents) {
-    this.contents = contents;
   }
 }
