@@ -1,11 +1,6 @@
 package com.bulletjournal.controller;
 
-import com.bulletjournal.calendars.google.CalendarWatchedProject;
-import com.bulletjournal.calendars.google.Converter;
-import com.bulletjournal.calendars.google.CreateGoogleCalendarEventsParams;
-import com.bulletjournal.calendars.google.GoogleCalendarEvent;
-import com.bulletjournal.calendars.google.Util;
-import com.bulletjournal.calendars.google.WatchCalendarParams;
+import com.bulletjournal.calendars.google.*;
 import com.bulletjournal.clients.GoogleCalClient;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.config.GoogleCalConfig;
@@ -22,11 +17,7 @@ import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
-import com.google.api.services.calendar.model.CalendarList;
-import com.google.api.services.calendar.model.CalendarListEntry;
-import com.google.api.services.calendar.model.Channel;
-import com.google.api.services.calendar.model.Event;
-import com.google.api.services.calendar.model.Events;
+import com.google.api.services.calendar.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,15 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.validation.Valid;
@@ -54,12 +37,7 @@ import java.net.URI;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -185,7 +163,7 @@ public class GoogleCalendarController {
         String text = e.getContent().getBaseText();
         if (StringUtils.isNotBlank(e.getContent().getText())) {
             List<String> l = Arrays.stream(e.getContent().getText().split(System.lineSeparator()))
-                    .map(s -> "<p>" + s + "</p>").collect(Collectors.toList());
+                    .map(s -> s.isEmpty() ? "<br/>" : "<p>" + s + "</p>").collect(Collectors.toList());
             String html = StringUtils.join(l, "");
             text = "{\"delta\":{\"ops\":" + text + "},\"$$$html$$$\":\"" + html + "\"}";
         }
