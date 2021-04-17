@@ -42,27 +42,31 @@ interface ContentEditorHandler {
         noteId: number,
         contentId: number,
         text: string,
-        diff: string
+        diff: string,
+        includeEtag: boolean
     ) => void;
     createTaskContent: (taskId: number, text: string) => void;
     patchTaskContent: (
         taskId: number,
         contentId: number,
         text: string,
-        diff: string
+        diff: string,
+        includeEtag: boolean
     ) => void;
     patchSampleTaskContent: (
         taskId: number,
         contentId: number,
         text: string,
-        diff: string
+        diff: string,
+        includeEtag: boolean
     ) => void;
     createTransactionContent: (transactionId: number, text: string) => void;
     patchTransactionContent: (
         transactionId: number,
         contentId: number,
         text: string,
-        diff: string
+        diff: string,
+        includeEtag: boolean
     ) => void;
     afterFinish: Function;
 }
@@ -265,7 +269,8 @@ const ContentEditor: React.FC<ContentEditorProps & ContentEditorHandler> = (
                 projectItemId,
                 content.id,
                 JSON.stringify(editorContent),
-                JSON.stringify(diff)
+                JSON.stringify(diff),
+                true
             );
         }
         afterFinish();

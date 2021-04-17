@@ -201,8 +201,8 @@ export const updateContent = (
   noteId: number,
   contentId: number,
   text: string,
-  etag: string,
   diff: string,
+  etag?: string
 ) => {
   const patchBody = JSON.stringify({
     text: text,

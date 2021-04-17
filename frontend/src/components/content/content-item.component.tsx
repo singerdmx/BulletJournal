@@ -37,25 +37,29 @@ type ContentProps = {
       noteId: number,
       contentId: number,
       text: string,
-      diff: string
+      diff: string,
+      includeEtag: boolean
   ) => void;
   patchTaskContent: (
       taskId: number,
       contentId: number,
       text: string,
-      diff: string
+      diff: string,
+      includeEtag: boolean
   ) => void;
   patchSampleTaskContent: (
       taskId: number,
       contentId: number,
       text: string,
-      diff: string
+      diff: string,
+      includeEtag: boolean
   ) => void;
   patchTransactionContent: (
       transactionId: number,
       contentId: number,
       text: string,
-      diff: string
+      diff: string,
+      includeEtag: boolean
   ) => void;
 };
 
@@ -133,7 +137,8 @@ const ContentItem: React.FC<ContentProps> = ({
         projectItem.id,
         content.id,
         JSON.stringify({delta: newDelta}),
-        JSON.stringify(diff)
+        JSON.stringify(diff),
+        false
     );
   }
 

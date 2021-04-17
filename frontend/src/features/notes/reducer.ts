@@ -80,6 +80,7 @@ export type PatchContent = {
   contentId: number;
   text: string;
   diff: string;
+  includeEtag: boolean;
 };
 
 export type SetNoteLabels = {

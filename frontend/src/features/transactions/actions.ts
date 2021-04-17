@@ -162,14 +162,14 @@ export const patchContent = (
   contentId: number,
   text: string,
   diff: string,
-  mdiff?: string
+  includeEtag: boolean
 ) =>
   actions.TransactionContentPatch({
     transactionId: transactionId,
     contentId: contentId,
     text: text,
     diff: diff,
-    mdiff: mdiff
+    includeEtag: includeEtag
   });
 
 export const updateTransactionForm = (

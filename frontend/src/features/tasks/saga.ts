@@ -1081,11 +1081,12 @@ function* taskContentRevisionUpdate(
 
 function* patchContent(action: PayloadAction<PatchContent>) {
   try {
-    const {taskId, contentId, text, diff} = action.payload;
+    const {taskId, contentId, text, diff, includeEtag} = action.payload;
     const state: IState = yield select();
     const order = state.task.contents.map(c => c.id);
 
-    const contents: Content[] = yield call(updateContent, taskId, contentId, text, state.content.content!.etag, diff);
+    const contents: Content[] = yield call(updateContent, taskId, contentId, text,
+        diff, includeEtag ? state.content.content!.etag : undefined);
     contents.sort((a: Content, b: Content) => {
       return order.findIndex((o) => o === a.id) - order.findIndex((o) => o === b.id);
     });

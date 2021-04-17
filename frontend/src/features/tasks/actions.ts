@@ -148,19 +148,21 @@ export const createContent = (taskId: number, text: string) =>
 
 export const deleteContent = (taskId: number, contentId: number) =>
   actions.TaskContentDelete({ taskId: taskId, contentId: contentId });
-export const patchContent = (taskId: number, contentId: number, text: string, diff: string) =>
+export const patchContent = (taskId: number, contentId: number, text: string, diff: string, includeEtag: boolean) =>
   actions.TaskContentPatch({
     taskId: taskId,
     contentId: contentId,
     text: text,
     diff: diff,
+    includeEtag: includeEtag
   });
-export const patchSampleTaskContent = (taskId: number, contentId: number, text: string, diff: string) =>
+export const patchSampleTaskContent = (taskId: number, contentId: number, text: string, diff: string, includeEtag: boolean) =>
     actions.SampleTaskContentPatch({
         taskId: taskId,
         contentId: contentId,
         text: text,
         diff: diff,
+        includeEtag: includeEtag
     });
 export const updateLoadingCompletedTask = (loadingCompletedTask: boolean) =>
   actions.updateLoadingCompletedTask({

@@ -38,13 +38,13 @@ interface RevisionContentHandler {
     contentId: number,
     revisionId: number
   ) => void;
-  patchNoteContent: (noteId: number, contentId: number, text: string, diff: string) => void;
+  patchNoteContent: (noteId: number, contentId: number, text: string, diff: string, includeEtag: boolean) => void;
   updateTaskContentRevision: (
     taskId: number,
     contentId: number,
     revisionId: number
   ) => void;
-  patchTaskContent: (taskId: number, contentId: number, text: string, diff: string) => void;
+  patchTaskContent: (taskId: number, contentId: number, text: string, diff: string, includeEtag: boolean) => void;
   updateTransactionContentRevision: (
     transactionId: number,
     contentId: number,
@@ -54,7 +54,8 @@ interface RevisionContentHandler {
     transactionId: number,
     contentId: number,
     text: string,
-    diff: string
+    diff: string,
+    includeEtag: boolean
   ) => void;
   handleClose: () => void;
   getProject: (projectId: number) => void;
@@ -138,7 +139,8 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
       projectItem.id,
       content.id,
       revisions[revisionIndex - 1].content!,
-      JSON.stringify(diff)
+      JSON.stringify(diff),
+      true
     );
     handleClose();
   };
