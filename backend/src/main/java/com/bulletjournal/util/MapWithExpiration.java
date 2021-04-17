@@ -37,9 +37,9 @@ public class MapWithExpiration {
     }
 
     // O(1)
-    public void put(final String k, Object v, long ttl) {
+    public Value putIfAbsent(final String k, Object v, long ttl) {
         if (ttl <= 0) {
-            return;
+            return null;
         }
         this.scheduler.schedule(() -> {
             Value val = this.map.get(k);
@@ -48,7 +48,7 @@ public class MapWithExpiration {
             }
         }, ttl, TimeUnit.MILLISECONDS);
         long expirationTime = this.getCurrentTime() + ttl;
-        this.map.put(k, new Value(v, expirationTime));
+        return this.map.putIfAbsent(k, new Value(v, expirationTime));
     }
 
     private Long currentTime; // for testing purpose

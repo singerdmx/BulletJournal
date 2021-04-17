@@ -266,11 +266,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             }
         }
 
-        synchronized (this) { // temporary hack
-            if (this.contentUpdateLock.get(requester + "#" + contentId.toString()) != null) {
-                return Pair.of(content, projectItem);
-            }
-            this.contentUpdateLock.put(requester + "#" + contentId.toString(), requester, 3_000);
+        if (this.contentUpdateLock.putIfAbsent(requester + "#" + contentId.toString(), requester, 3_000) != null) {
+            return Pair.of(content, projectItem);
         }
         projectItem.setUpdatedAt(Timestamp.from(Instant.now()));
         this.getJpaRepository().save(projectItem);
