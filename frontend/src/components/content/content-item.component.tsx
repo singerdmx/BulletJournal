@@ -121,16 +121,8 @@ const ContentItem: React.FC<ContentProps> = ({
   let newDelta : DeltaStatic = new Delta();
   if (contentHtml) {
     console.log('contentHtml', contentHtml);
-    contentHtml.split('</p><p>').forEach((p: string) => {
-      if (p.startsWith('<p>')) {
-        p = p.substring(3);
-      }
-      if (p.endsWith('</p>')) {
-        p = p.substring(0, p.length - 4);
-      }
-      newDelta = newDelta.concat(convertHtmlToDelta(p));
-      newDelta = newDelta.insert('\n');
-    });
+    newDelta = newDelta.concat(convertHtmlToDelta(contentHtml));
+    newDelta = newDelta.insert('\n');
 
     console.log('newDelta', newDelta);
     console.log('oldDelta', delta);

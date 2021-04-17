@@ -107,14 +107,8 @@ public class Converter {
                     .append(String.format(INSERT_STR_FORMAT, "Attendees:"))
                     .append(INSERT_LINE_BREAK);
             for (EventAttendee attendee : attendeeList) {
-                baseText.append(String.format(INSERT_STR_FORMAT, " ["))
+                baseText.append(INSERT_LINE_BREAK)
                         .append(String.format(INSERT_STR_FORMAT, attendee.getDisplayName()));
-
-                if (StringUtils.isNotBlank(attendee.getEmail())) {
-                    baseText.append(String.format(INSERT_STR_FORMAT, " " + attendee.getEmail()));
-                }
-                baseText.append(String.format(INSERT_STR_FORMAT, "]"))
-                        .append(INSERT_LINE_BREAK);
             }
         }
 
@@ -140,11 +134,13 @@ public class Converter {
         if (!attendeeList.isEmpty()) {
             text.append(System.lineSeparator()).append("Attendees:").append(System.lineSeparator());
             for (EventAttendee attendee : attendeeList) {
-                text.append(" [").append(attendee.getDisplayName());
-                if (StringUtils.isNotBlank(attendee.getEmail())) {
-                    text.append(" ").append(attendee.getEmail());
+                text.append(System.lineSeparator());
+                if (StringUtils.isBlank(attendee.getEmail())) {
+                    text.append(attendee.getDisplayName());
+                } else {
+                    text.append("<a href=\"mailto:").append(attendee.getEmail()).append("\" target=\"_blank\">")
+                            .append(attendee.getDisplayName()).append("</a>");
                 }
-                text.append("]").append(System.lineSeparator());
             }
         }
 
