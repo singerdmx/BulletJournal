@@ -254,9 +254,6 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         this.authorizationService.checkAuthorizedToOperateOnContent(content.getOwner(), requester, ContentType.CONTENT,
                 Operation.UPDATE, content.getId(), projectItem.getOwner(), projectItem.getProject().getOwner(),
                 projectItem);
-        if (this.contentUpdateLock.get(requester + "#" + contentId.toString()) != null) {
-            return Pair.of(content, projectItem);
-        }
 
         String oldText = content.getText();
         if (etag.isPresent()) {
@@ -269,7 +266,12 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             }
         }
 
-        this.contentUpdateLock.put(requester + "#" + contentId.toString(), requester, 3_000);
+        synchronized (this) { // temporary hack
+            if (this.contentUpdateLock.get(requester + "#" + contentId.toString()) != null) {
+                return Pair.of(content, projectItem);
+            }
+            this.contentUpdateLock.put(requester + "#" + contentId.toString(), requester, 3_000);
+        }
         projectItem.setUpdatedAt(Timestamp.from(Instant.now()));
         this.getJpaRepository().save(projectItem);
         return updateContent(requester, updateContentParams, projectItem, content, oldText);
