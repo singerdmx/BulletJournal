@@ -189,6 +189,7 @@ public class GoogleCalendarController {
             String html = StringUtils.join(l, "");
             text = "{\"delta\":{\"ops\":" + text + "},\"$$$html$$$\":\"" + html + "\"}";
         }
+        LOGGER.info("createTaskFromEvent: {}", text);
         taskDaoJpa.create(projectId, username,
                 Converter.toCreateTaskParams(e), e.getEventId(), text);
     }

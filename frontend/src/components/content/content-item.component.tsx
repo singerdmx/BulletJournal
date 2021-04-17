@@ -115,6 +115,7 @@ const ContentItem: React.FC<ContentProps> = ({
   };
   const patchContentFunction = patchContentCall[projectItem.contentType];
 
+  console.log(content.text)
   const contentJson = JSON.parse(content.text);
   const delta = contentJson['delta'];
   const contentHtml = contentJson['$$$html$$$'];
