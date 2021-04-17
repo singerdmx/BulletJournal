@@ -138,7 +138,7 @@ public class Converter {
                 if (StringUtils.isBlank(attendee.getEmail())) {
                     text.append(attendee.getDisplayName());
                 } else {
-                    text.append("<a href=\"mailto:").append(attendee.getEmail()).append("\" target=\"_blank\">")
+                    text.append("<a href=\\\"mailto:").append(attendee.getEmail()).append("\\\" target=\\\"_blank\\\">")
                             .append(attendee.getDisplayName()).append("</a>");
                 }
             }
