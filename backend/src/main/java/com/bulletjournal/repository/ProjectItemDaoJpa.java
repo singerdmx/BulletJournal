@@ -266,7 +266,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             }
         }
 
-        if (this.contentUpdateLock.putIfAbsent(requester + "#" + contentId.toString(), requester, 3_000) != null) {
+        if (this.contentUpdateLock.putIfAbsent(requester + "#" + contentId.toString(), requester, 2_000) != null) {
             return Pair.of(content, projectItem);
         }
         projectItem.setUpdatedAt(Timestamp.from(Instant.now()));
