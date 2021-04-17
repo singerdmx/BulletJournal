@@ -287,6 +287,10 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     }
 
     private void adjustContentText(String newText, K content) {
+        if (newText.contains("$$$html$$$")) {
+            LOGGER.info("Skip convertDeltaToHtml");
+            return;
+        }
         try {
             DeltaContent newContent = new DeltaContent(newText);
             // call grpc to get html string from delta
