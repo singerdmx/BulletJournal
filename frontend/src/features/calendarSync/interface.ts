@@ -27,4 +27,5 @@ export interface GoogleCalendarEvent {
     task: Task;
     content: Content;
     eventId: string;
+    description: string;
 }

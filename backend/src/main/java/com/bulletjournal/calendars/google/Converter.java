@@ -2,10 +2,10 @@ package com.bulletjournal.calendars.google;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.Content;
-import com.bulletjournal.controller.models.params.CreateTaskParams;
 import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.controller.models.Task;
 import com.bulletjournal.controller.models.User;
+import com.bulletjournal.controller.models.params.CreateTaskParams;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
@@ -64,13 +64,18 @@ public class Converter {
         content.setBaseText(getBaseText(event, task));
         content.setOwner(new User(username));
 
-        return new GoogleCalendarEvent(task, content, event.getId());
+        return new GoogleCalendarEvent(task, content, event.getId(),
+                processHtmlTags(event.getDescription()));
+    }
+
+    private static String processHtmlTags(String htmlString) {
+        return htmlString.replaceAll("\\<[^>]*>", "");
     }
 
     private static String getBaseText(Event event, Task task) {
         StringBuilder baseText = new StringBuilder("[");
         if (event.getDescription() != null) {
-            String description = event.getDescription();
+            String description = processHtmlTags(event.getDescription());
             // Split description based on break line,
             StringBuilder sb = new StringBuilder();
             for (char c : description.toCharArray()) {

@@ -15,13 +15,16 @@ public class GoogleCalendarEvent {
 
     private String eventId;
 
+    private String description;
+
     public GoogleCalendarEvent() {
     }
 
-    public GoogleCalendarEvent(Task task, Content content, String eventId) {
+    public GoogleCalendarEvent(Task task, Content content, String eventId, String description) {
         this.task = task;
         this.content = content;
         this.eventId = eventId;
+        this.description = description;
     }
 
     public static List<GoogleCalendarEvent> addAvatar(
@@ -61,12 +64,21 @@ public class GoogleCalendarEvent {
         this.eventId = eventId;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public String toString() {
         return "GoogleCalendarEvent{" +
                 "task=" + task +
                 ", content=" + content +
                 ", eventId='" + eventId + '\'' +
+                ", description='" + description + '\'' +
                 '}';
     }
 }

@@ -472,11 +472,7 @@ const CalendarListEntryModal: React.FC<ModalProps> = (props) => {
                                       </Tooltip>
                                     </div>
                                     <div className="name">
-                                      <Tooltip
-                                        title={
-                                          event.content && event.content.text
-                                        }
-                                      >
+                                      <Tooltip title={event.description}>
                                         <div>{event.task.name}</div>
                                       </Tooltip>
                                     </div>
