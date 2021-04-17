@@ -269,7 +269,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             }
         }
 
-        this.contentUpdateLock.put(requester + "#" + contentId.toString(), requester, 1_000);
+        this.contentUpdateLock.put(requester + "#" + contentId.toString(), requester, 3_000);
         projectItem.setUpdatedAt(Timestamp.from(Instant.now()));
         this.getJpaRepository().save(projectItem);
         return updateContent(requester, updateContentParams, projectItem, content, oldText);
