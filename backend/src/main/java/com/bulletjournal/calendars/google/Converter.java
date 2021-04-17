@@ -86,6 +86,7 @@ public class Converter {
             }
             if (sb.length() > 0) {
                 baseText.append(String.format(INSERT_STR_FORMAT, sb.toString()));
+                baseText.append(INSERT_LINE_BREAK);
             }
         }
 
