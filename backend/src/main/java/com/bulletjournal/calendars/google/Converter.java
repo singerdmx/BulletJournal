@@ -85,7 +85,7 @@ public class Converter {
                 }
             }
             if (sb.length() > 0) {
-                baseText.append(sb.toString());
+                baseText.append(String.format(INSERT_STR_FORMAT, sb.toString()));
             }
         }
 
