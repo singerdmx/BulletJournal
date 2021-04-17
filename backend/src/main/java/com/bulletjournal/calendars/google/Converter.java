@@ -124,15 +124,16 @@ public class Converter {
         }
         if (event.getLocation() != null) {
             task.setLocation(event.getLocation());
-            text.append(System.lineSeparator())
-                    .append("Location: ").append(event.getLocation()).append(System.lineSeparator());
+            text.append(System.lineSeparator()).append(System.lineSeparator())
+                    .append("<b>Location:</b> ").append(event.getLocation()).append(System.lineSeparator());
         }
         List<EventAttendee> attendeeList = event.getAttendees();
         attendeeList = attendeeList != null ?
                 attendeeList.stream().filter((a) -> StringUtils.isNotBlank(a.getDisplayName()))
                         .collect(Collectors.toList()) : Collections.emptyList();
         if (!attendeeList.isEmpty()) {
-            text.append(System.lineSeparator()).append("Attendees:").append(System.lineSeparator());
+            text.append(System.lineSeparator()).append(System.lineSeparator())
+                    .append("<b>Attendees:</b>").append(System.lineSeparator());
             for (EventAttendee attendee : attendeeList) {
                 text.append(System.lineSeparator());
                 if (StringUtils.isBlank(attendee.getEmail())) {
