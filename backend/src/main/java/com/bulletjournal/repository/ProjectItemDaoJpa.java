@@ -266,7 +266,10 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             }
         }
 
-        if (this.contentUpdateLock.putIfAbsent(requester + "#" + contentId.toString(), requester, 2_000) != null) {
+        // for "$$$html$$$" patch, etag is missing and we want to prevent multiple patch
+        if (!etag.isPresent() &&
+                this.contentUpdateLock.putIfAbsent(requester + "#" + contentId.toString(), requester, 2_000) != null) {
+            LOGGER.info("{} is still in lock", requester + "#" + contentId.toString());
             return Pair.of(content, projectItem);
         }
         projectItem.setUpdatedAt(Timestamp.from(Instant.now()));
