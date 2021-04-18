@@ -36,19 +36,27 @@ public class MapWithExpiration {
         return val.val;
     }
 
-    // O(1)
+    /**
+     * @return null if a new key is put, non-null if the key already exists
+     */
     public Value putIfAbsent(final String k, Object v, long ttl) {
         if (ttl <= 0) {
             return null;
         }
-        this.scheduler.schedule(() -> {
-            Value val = this.map.get(k);
-            if (val != null && val.expirationTime < this.getCurrentTime()) {
-                this.map.remove(k);
-            }
-        }, ttl, TimeUnit.MILLISECONDS);
+
         long expirationTime = this.getCurrentTime() + ttl;
-        return this.map.putIfAbsent(k, new Value(v, expirationTime));
+        Value res = this.map.putIfAbsent(k, new Value(v, expirationTime));
+        if (res == null) {
+            // not null means key already exists
+            // null means a new key is put
+            this.scheduler.schedule(() -> {
+                Value val = this.map.get(k);
+                if (val != null && val.expirationTime < this.getCurrentTime()) {
+                    this.map.remove(k);
+                }
+            }, ttl, TimeUnit.MILLISECONDS);
+        }
+        return res;
     }
 
     private Long currentTime; // for testing purpose
