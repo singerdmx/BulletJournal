@@ -1,48 +1,59 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.contents.ContentAction;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "task_auditables")
-public class TaskAuditable {
+public class TaskAuditable extends ProjectItemAuditModel {
 
-    @EmbeddedId
-    private TaskAuditableKey id;
+  @Id
+  @GeneratedValue(generator = "task_auditables_generator", strategy = GenerationType.SEQUENCE)
+  @SequenceGenerator(
+      name = "task_auditables_generator",
+      sequenceName = "task_auditables_sequence",
+      initialValue = 100)
+  private Long id;
 
-    @ManyToOne
-    @MapsId("task_id")
-    @JoinColumn(name = "task_id")
-    private Task task;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "task_id", nullable = false)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  private Task task;
 
-    @ManyToOne
-    @MapsId("auditable_id")
-    @JoinColumn(name = "auditable_id")
-    private Auditable auditable;
+  public TaskAuditable(
+      Task task,
+      String activity,
+      String originator,
+      Timestamp activityTime,
+      ContentAction action,
+      String beforeActivity,
+      String afterActivity) {
+    this.task = task;
+    this.activity = activity;
+    this.originator = originator;
+    this.activityTime = activityTime;
+    this.action = action;
+    this.beforeActivity = beforeActivity;
+    this.afterActivity = afterActivity;
+  }
 
-    public TaskAuditable() {
-    }
+  public Task getTask() {
+    return task;
+  }
 
-    public TaskAuditableKey getId() {
-        return id;
-    }
+  public void setTask(Task task) {
+    this.task = task;
+  }
 
-    public void setId(TaskAuditableKey id) {
-        this.id = id;
-    }
+  public Long getId() {
+    return id;
+  }
 
-    public com.bulletjournal.repository.models.Task getTask() {
-        return task;
-    }
-
-    public void setTask(com.bulletjournal.repository.models.Task task) {
-        this.task = task;
-    }
-
-    public Auditable getAuditable() {
-        return auditable;
-    }
-
-    public void setAuditable(Auditable auditable) {
-        this.auditable = auditable;
-    }
+  public void setId(Long id) {
+    this.id = id;
+  }
 }
