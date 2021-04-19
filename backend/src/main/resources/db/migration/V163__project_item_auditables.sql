@@ -84,3 +84,44 @@ ALTER TABLE task_auditables
             ON DELETE CASCADE;
 
 
+
+--
+-- Name: transaction_auditables; Type: TABLE; Schema: public; Owner: postgres
+--
+DROP TABLE public.transaction_auditables;
+
+CREATE TABLE public.transaction_auditables (
+    id bigint not null
+        constraint transaction_auditables_pkey
+            primary key,
+    transaction_id bigint NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    activity character varying(512),
+    originator character varying(512) NOT NULL,
+    activity_time timestamp,
+    action int,
+    before_activity text,
+    after_activity text
+);
+
+ALTER TABLE public.transaction_auditables OWNER TO postgres;
+
+--
+-- Name: transaction_auditables_sequence; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.transaction_auditables_sequence
+    START WITH 100
+    INCREMENT BY 50
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE index transaction_auditables_activity_time_index
+	ON transaction_auditables (activity_time DESC);
+
+ALTER TABLE transaction_auditables
+    ADD CONSTRAINT transaction_auditables_transactions_id_fk
+        FOREIGN KEY (transaction_id) REFERENCES transactions
+            ON DELETE CASCADE;
