@@ -246,3 +246,15 @@ export const shareTaskByEmail = (
     targetGroup: targetGroup,
   });
 
+export const exportTask = (
+    taskId: number,
+    contents: Content[],
+    exportType: string,
+    fileName: string
+) =>
+    actions.ExportTask({
+        taskId: taskId,
+        contents: contents,
+        exportType: exportType,
+        fileName: fileName
+    });

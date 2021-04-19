@@ -264,3 +264,34 @@ export const shareNoteByEmail = (
       throw Error(err);
     });
 };
+
+export const exportNoteAsPdfOrImage = (
+    noteId: number,
+    contents: Content[],
+    exportType: string,
+    fileName: string
+) => {
+  const Delta = Quill.import('delta');
+  let contentsHTML: Content[] = [];
+  contents.forEach((content) => {
+    let contentHTML = {...content};
+    contentHTML['text'] = createHTML(new Delta(JSON.parse(content.text)['delta']));
+    contentsHTML.push(contentHTML);
+  })
+  const postBody = JSON.stringify({
+    contents: contentsHTML,
+    "mobile": false,
+  });
+  return doPost(`/api/notes/${noteId}/export${exportType}`, postBody)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.download = fileName;
+        link.click();
+      })
+      .catch((err) => {
+        throw Error(err);
+      });
+};

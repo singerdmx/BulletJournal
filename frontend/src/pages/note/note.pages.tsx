@@ -5,14 +5,14 @@ import {useHistory, useParams} from 'react-router-dom';
 import {connect} from 'react-redux';
 // features
 //actions
-import {deleteNote, getNote, updateNoteContents, deleteContent} from '../../features/notes/actions';
+import {deleteNote, getNote, updateNoteContents, deleteContent, exportNote} from '../../features/notes/actions';
 
 import {IState} from '../../store';
 // components
 import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
 // antd imports
-import {Popconfirm, Tooltip} from 'antd';
-import {DeleteTwoTone, PlusOutlined, SyncOutlined, UpSquareOutlined,} from '@ant-design/icons';
+import {Popconfirm, Tooltip,Popover, Button} from 'antd';
+import {DeleteTwoTone, PlusOutlined, SyncOutlined, UpSquareOutlined, FilePdfOutlined, ExportOutlined, FileImageOutlined} from '@ant-design/icons';
 // modals import
 import EditNote from '../../components/modals/edit-note.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
@@ -44,6 +44,13 @@ interface NotePageHandler {
     setDisplayRevision: (displayRevision: boolean) => void;
     deleteContent: (noteId: number, contentId: number) => void;
     getProject: (projectId: number) => void;
+    exportNote: (
+        noteId: number,
+        contents: Content[],
+        exportType: string,
+        fileName: string
+    ) => void;
+
 }
 
 export const contentEditable = (
@@ -123,6 +130,13 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
         deleteContent(note.id, content.id);
     };
 
+    const exportAsImageOrPdf = () => {
+        return <div className="export">
+            <Button onClick={() => props.exportNote(note.id, contents, "Pdf", note!.name + ".pdf")}><FilePdfOutlined/>PDF</Button>
+            <Button onClick={() => props.exportNote(note.id, contents, "Image", note!.name + ".png")}><FileImageOutlined/>Image</Button>
+        </div>
+    }
+
     const createContentElem = (
         <Container>
             <FloatButton
@@ -161,6 +175,15 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
             >
                 <EditOutlined/>
             </FloatButton>}
+            <Popover placement="left" title='Export Note' content={exportAsImageOrPdf()}
+                     trigger="click">
+                <FloatButton
+                    tooltip="Export"
+                    styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
+                >
+                    <ExportOutlined />
+                </FloatButton>
+            </Popover>
             <FloatButton
                 tooltip="Add Content"
                 onClick={createHandler}
@@ -247,5 +270,6 @@ export default connect(mapStateToProps, {
     deleteContent,
     setDisplayMore,
     setDisplayRevision,
-    getProject
+    getProject,
+    exportNote,
 })(NotePage);

@@ -418,3 +418,34 @@ export const shareTaskByEmail = (
       throw Error(err);
     });
 };
+
+export const exportTaskAsPdfOrImage = (
+    taskId: number,
+    contents: Content[],
+    exportType: string,
+    fileName: string
+) => {
+  const Delta = Quill.import('delta');
+  let contentsHTML: Content[] = [];
+  contents.forEach((content) => {
+    let contentHTML = {...content};
+    contentHTML['text'] = createHTML(new Delta(JSON.parse(content.text)['delta']));
+    contentsHTML.push(contentHTML);
+  })
+  const postBody = JSON.stringify({
+    contents: contentsHTML,
+    "mobile": false,
+  });
+  return doPost(`/api/tasks/${taskId}/export${exportType}`, postBody)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.download = fileName;
+        link.click();
+      })
+      .catch((err) => {
+        throw Error(err);
+      });
+};

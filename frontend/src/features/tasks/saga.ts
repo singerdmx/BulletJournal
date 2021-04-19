@@ -32,6 +32,7 @@ import {
   UpdateTaskContents,
   UpdateTasks,
   ShareTaskByEmailAction,
+  ExportTask,
 } from './reducer';
 import {PayloadAction} from 'redux-starter-kit';
 import {
@@ -63,7 +64,8 @@ import {
   updateContent,
   updateSampleContent,
   updateTask,
-  shareTaskByEmail
+  shareTaskByEmail,
+  exportTaskAsPdfOrImage,
 } from '../../apis/taskApis';
 import {updateLoadingCompletedTask, updateTaskContents, updateTasks } from './actions';
 import {getProjectItemsAfterUpdateSelect} from '../myBuJo/actions';
@@ -1330,6 +1332,32 @@ function* shareTaskByEmails(action: PayloadAction<ShareTaskByEmailAction>) {
   }
 }
 
+function* exportTask(action: PayloadAction<ExportTask>) {
+  try {
+    const {
+      taskId,
+      contents,
+      exportType,
+      fileName
+    } = action.payload;
+    yield call(message.success, `Exporting ${exportType.toUpperCase()}`);
+
+    yield call(
+        exportTaskAsPdfOrImage,
+        taskId,
+        contents,
+        exportType,
+        fileName
+    );
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Export Task Error Received: ${error}`);
+    }
+  }
+}
+
 export default function* taskSagas() {
   yield all([
     yield takeLatest(
@@ -1384,5 +1412,6 @@ export default function* taskSagas() {
     yield takeLatest(tasksActions.TaskStatusSet.type, setTaskStatus),
     yield takeLatest(tasksActions.GetTaskStatistics.type, fetchTaskStatistics),
     yield takeLatest(tasksActions.TaskShareByEmail.type, shareTaskByEmails),
+    yield takeLatest(tasksActions.ExportTask.type, exportTask),
   ]);
 }

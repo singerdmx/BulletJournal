@@ -5,13 +5,13 @@ import {useHistory, useParams} from 'react-router-dom';
 import {connect} from 'react-redux';
 // features
 //actions
-import {completeTask, deleteContent, deleteTask, getTask, updateTaskContents,} from '../../features/tasks/actions';
+import {completeTask, deleteContent, deleteTask, getTask, updateTaskContents, exportTask} from '../../features/tasks/actions';
 import {IState} from '../../store';
 // antd imports
-import {Avatar, Badge, Popconfirm, Popover, Tooltip} from 'antd';
+import {Avatar, Badge, Button, Popconfirm, Popover, Tooltip} from 'antd';
 import {
   CheckCircleTwoTone,
-  DeleteTwoTone,
+  DeleteTwoTone, ExportOutlined, FileImageOutlined, FilePdfOutlined,
   PlusOutlined,
   SyncOutlined,
   TeamOutlined,
@@ -55,6 +55,12 @@ interface TaskPageHandler {
   setDisplayRevision: (displayRevision: boolean) => void;
   deleteContent: (taskId: number, contentId: number) => void;
   getProject: (projectId: number) => void;
+  exportTask: (
+      taskId: number,
+      contents: Content[],
+      exportType: string,
+      fileName: string
+  ) => void;
 }
 
 const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
@@ -132,6 +138,12 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
     deleteContent(task.id, content.id);
   };
 
+  const exportAsImageOrPdf = () => {
+    return <div className="export">
+      <Button onClick={() => props.exportTask(task.id, contents, "Pdf", task!.name + ".pdf")}><FilePdfOutlined/>PDF</Button>
+      <Button onClick={() => props.exportTask(task.id, contents, "Image", task!.name + ".png")}><FileImageOutlined/>Image</Button>
+    </div>
+  }
 
   const createContentElem = (
       <Container>
@@ -170,6 +182,15 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
         >
           <EditOutlined/>
         </FloatButton>}
+        <Popover placement="left" title='Export Task' content={exportAsImageOrPdf()}
+                 trigger="click">
+          <FloatButton
+              tooltip="Export"
+              styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
+          >
+            <ExportOutlined />
+          </FloatButton>
+        </Popover>
         <FloatButton
             tooltip="Add Content"
             onClick={createHandler}
@@ -337,5 +358,6 @@ export default connect(mapStateToProps, {
   deleteContent,
   setDisplayMore,
   setDisplayRevision,
-  getProject
+  getProject,
+  exportTask,
 })(TaskPage);

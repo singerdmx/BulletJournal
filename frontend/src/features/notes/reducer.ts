@@ -167,6 +167,13 @@ export type ShareNoteByEmailAction = {
   targetGroup?: number,
 };
 
+export type ExportNote= {
+  noteId: number,
+  contents: Content[],
+  exportType: string,
+  fileName: string
+}
+
 let initialState = {
   note: undefined as Note | undefined,
   colorSettingShown: false,
@@ -271,6 +278,7 @@ const slice = createSlice({
       action: PayloadAction<UpdateNoteColorAction>
     ) => state,
     NoteShareByEmail: (state, action: PayloadAction<ShareNoteByEmailAction>) => state,
+    ExportNote: (state, action: PayloadAction<ExportNote>) => state,
   },
 });
 

@@ -24,7 +24,8 @@ import {
   UpdateNoteContents,
   UpdateNotes,
   UpdateNoteColorAction,
-  ShareNoteByEmailAction
+  ShareNoteByEmailAction,
+  ExportNote,
 } from './reducer';
 import {PayloadAction} from 'redux-starter-kit';
 import {
@@ -48,6 +49,7 @@ import {
   updateNote,
   putNoteColor,
   shareNoteByEmail,
+  exportNoteAsPdfOrImage,
 } from '../../apis/noteApis';
 import {IState} from '../../store';
 import {updateNoteContents, updateNotes} from './actions';
@@ -684,6 +686,32 @@ function* shareNoteByEmails(action: PayloadAction<ShareNoteByEmailAction>) {
   }
 }
 
+function* exportNote(action: PayloadAction<ExportNote>) {
+  try {
+    const {
+      noteId,
+      contents,
+      exportType,
+      fileName
+    } = action.payload;
+    yield call(message.success, `Exporting ${exportType.toUpperCase()}`);
+
+    yield call(
+        exportNoteAsPdfOrImage,
+        noteId,
+        contents,
+        exportType,
+        fileName
+    );
+  } catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Export Note Error Received: ${error}`);
+    }
+  }
+}
+
 export default function* noteSagas() {
   yield all([
     yield takeLatest(
@@ -715,5 +743,6 @@ export default function* noteSagas() {
     yield takeLatest(notesActions.NotesDelete.type, notesDelete),
     yield takeLatest(notesActions.updateNoteColor.type, updateNoteColor),
     yield takeLatest(notesActions.NoteShareByEmail.type, shareNoteByEmails),
+    yield takeLatest(notesActions.ExportNote.type, exportNote),
   ]);
 }

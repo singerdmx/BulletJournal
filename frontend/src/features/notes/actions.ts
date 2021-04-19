@@ -135,3 +135,16 @@ export const shareNoteByEmail = (
     targetUser: targetUser,
     targetGroup: targetGroup,
   });
+
+export const exportNote = (
+    noteId: number,
+    contents: Content[],
+    exportType: string,
+    fileName: string
+) =>
+    actions.ExportNote({
+        noteId: noteId,
+        contents: contents,
+        exportType: exportType,
+        fileName: fileName
+    });
