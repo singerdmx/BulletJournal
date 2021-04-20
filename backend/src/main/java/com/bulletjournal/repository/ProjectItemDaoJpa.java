@@ -224,7 +224,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
                     (com.bulletjournal.repository.models.Note) projectItem,
                     new JSONObject().put("projectContent", "\"\"").toString(),
                     new JSONObject().put("projectContent", GSON.toJson(content.toPresentationModel())).toString(),
-                    "added content to note ##" + projectItem.getName() + "## by ##" + owner +"##",
+                    "added content to note ##" + projectItem.getName() + "##",
                     owner,
                     ContentAction.ADD_NOTE_CONTENT,
                     Timestamp.from(Instant.now())
@@ -270,6 +270,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
                 Operation.UPDATE, content.getId(), projectItem.getOwner(), projectItem.getProject().getOwner(),
                 projectItem);
 
+        String contentBeforeUpdate = GSON.toJson(content.toPresentationModel());
+
         String oldText = content.getText();
         if (etag.isPresent()) {
             String itemEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
@@ -289,7 +291,24 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         }
         projectItem.setUpdatedAt(Timestamp.from(Instant.now()));
         this.getJpaRepository().save(projectItem);
-        return updateContent(requester, updateContentParams, projectItem, content, oldText);
+
+        Pair<K, T> res = updateContent(requester, updateContentParams, projectItem, content, oldText);
+        String contentAfterUpdate = GSON.toJson(res.getLeft().toPresentationModel());
+
+        if (projectItem.getContentType() == ContentType.NOTE) {
+            this.notificationService.trackNoteActivity(
+                new com.bulletjournal.notifications.NoteAuditable(
+                    (com.bulletjournal.repository.models.Note) projectItem,
+                    new JSONObject().put("projectContent", contentBeforeUpdate).toString(),
+                    new JSONObject().put("projectContent", contentAfterUpdate).toString(),
+                    "updated note content in ##" + projectItem.getName() + "##",
+                    requester,
+                    ContentAction.UPDATE_NOTE_CONTENT,
+                    Timestamp.from(Instant.now())
+                )
+            );
+        }
+        return res;
     }
 
     private <T extends ProjectItemModel> Pair<K, T> updateContent(
