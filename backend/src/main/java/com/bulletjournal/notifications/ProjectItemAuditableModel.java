@@ -5,6 +5,11 @@ import com.bulletjournal.contents.ContentAction;
 import java.sql.Timestamp;
 
 public abstract class ProjectItemAuditableModel {
+  public static final String PROJECT_NAME_PROPERTY = "projectName";
+  public static final String PROJECT_ITEM_PROPERTY = "projectItem";
+  public static final String PROJECT_CONTENT_PROPERTY = "projectContent";
+  public static final String EMPTY_VALUE = "{}";
+
   protected String beforeActivity;
   protected String afterActivity;
   protected String activity;

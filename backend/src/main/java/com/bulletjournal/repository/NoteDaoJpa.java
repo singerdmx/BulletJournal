@@ -42,6 +42,9 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.bulletjournal.notifications.ProjectItemAuditableModel.PROJECT_ITEM_PROPERTY;
+import static com.bulletjournal.notifications.ProjectItemAuditableModel.PROJECT_NAME_PROPERTY;
+
 @Repository
 public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     private static final Logger LOGGER = LoggerFactory.getLogger(NoteDaoJpa.class);
@@ -192,8 +195,8 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         this.notificationService.trackNoteActivity(
             new com.bulletjournal.notifications.NoteAuditable(
                 note,
-                new JSONObject().put("projectItem", noteBeforeUpdate).toString(),
-                new JSONObject().put("projectItem", noteAfterUpdate).toString(),
+                new JSONObject().put(PROJECT_ITEM_PROPERTY, noteBeforeUpdate).toString(),
+                new JSONObject().put(PROJECT_ITEM_PROPERTY, noteAfterUpdate).toString(),
                 "updated note ##" + note.getName() + "## in BuJo ##" + note.getProject().getName() + "##",
                 requester,
                 ContentAction.UPDATE_NOTE,
@@ -280,8 +283,8 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         this.notificationService.trackNoteActivity(
             new com.bulletjournal.notifications.NoteAuditable(
                 note,
-                new JSONObject().put("projectName", projNameBeforeUpdate).toString(),
-                new JSONObject().put("projectName", projNameAfterUpdate).toString(),
+                new JSONObject().put(PROJECT_NAME_PROPERTY, projNameBeforeUpdate).toString(),
+                new JSONObject().put(PROJECT_NAME_PROPERTY, projNameAfterUpdate).toString(),
                 "moved note ##" + note.getName() + "## from BuJo ##" + projNameBeforeUpdate + "## to BuJo ##"
                     + projNameAfterUpdate + "##",
                 requester,

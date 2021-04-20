@@ -47,6 +47,9 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.bulletjournal.notifications.ProjectItemAuditableModel.EMPTY_VALUE;
+import static com.bulletjournal.notifications.ProjectItemAuditableModel.PROJECT_CONTENT_PROPERTY;
+
 public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectItemDaoJpa.class);
@@ -222,8 +225,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             this.notificationService.trackNoteActivity(
                 new com.bulletjournal.notifications.NoteAuditable(
                     (com.bulletjournal.repository.models.Note) projectItem,
-                    new JSONObject().put("projectContent", "\"\"").toString(),
-                    new JSONObject().put("projectContent", GSON.toJson(content.toPresentationModel())).toString(),
+                    new JSONObject().put(PROJECT_CONTENT_PROPERTY, EMPTY_VALUE).toString(),
+                    new JSONObject().put(PROJECT_CONTENT_PROPERTY, GSON.toJson(content.toPresentationModel())).toString(),
                     "added content to note ##" + projectItem.getName() + "##",
                     owner,
                     ContentAction.ADD_NOTE_CONTENT,
@@ -299,8 +302,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             this.notificationService.trackNoteActivity(
                 new com.bulletjournal.notifications.NoteAuditable(
                     (com.bulletjournal.repository.models.Note) projectItem,
-                    new JSONObject().put("projectContent", contentBeforeUpdate).toString(),
-                    new JSONObject().put("projectContent", contentAfterUpdate).toString(),
+                    new JSONObject().put(PROJECT_CONTENT_PROPERTY, contentBeforeUpdate).toString(),
+                    new JSONObject().put(PROJECT_CONTENT_PROPERTY, contentAfterUpdate).toString(),
                     "updated note content in ##" + projectItem.getName() + "##",
                     requester,
                     ContentAction.UPDATE_NOTE_CONTENT,
@@ -357,8 +360,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             this.notificationService.trackNoteActivity(
                 new com.bulletjournal.notifications.NoteAuditable(
                     (com.bulletjournal.repository.models.Note) projectItem,
-                    new JSONObject().put("projectContent", GSON.toJson(content.toPresentationModel())).toString(),
-                    new JSONObject().put("projectContent", "\"\"").toString(),
+                    new JSONObject().put(PROJECT_CONTENT_PROPERTY, GSON.toJson(content.toPresentationModel())).toString(),
+                    new JSONObject().put(PROJECT_CONTENT_PROPERTY, EMPTY_VALUE).toString(),
                     "deleted note content in ##" + projectItem.getName() + "##",
                     requester,
                     ContentAction.DELETE_NOTE_CONTENT,
