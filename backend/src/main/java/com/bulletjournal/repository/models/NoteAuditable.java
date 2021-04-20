@@ -5,10 +5,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 import java.sql.Timestamp;
-import com.bulletjournal.repository.models.Note;
 
 @Entity
 @Table(name = "note_auditables")

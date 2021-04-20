@@ -14,7 +14,9 @@ import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.hierarchy.HierarchyItem;
 import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.NoteRelationsProcessor;
+import com.bulletjournal.notifications.Auditable;
 import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import org.apache.commons.lang3.StringUtils;
@@ -56,6 +58,8 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     private SharedProjectItemDaoJpa sharedProjectItemDaoJpa;
     @Autowired
     private SearchIndexDaoJpa searchIndexDaoJpa;
+    @Autowired
+    protected NotificationService notificationService;
 
     @Override
     public JpaRepository getJpaRepository() {
@@ -174,6 +178,10 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         if (updateNoteParams.hasLabels()) {
             note.setLabels(updateNoteParams.getLabels());
         }
+
+        this.notificationService.trackActivity(
+                new Auditable(note,
+                        )
 
         return this.noteRepository.save(note);
     }
