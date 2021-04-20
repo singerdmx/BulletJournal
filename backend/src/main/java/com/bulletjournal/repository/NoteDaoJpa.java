@@ -2,6 +2,7 @@ package com.bulletjournal.repository;
 
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
+import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.params.CreateNoteParams;
 import com.bulletjournal.controller.models.ProjectType;
@@ -19,8 +20,10 @@ import com.bulletjournal.notifications.Event;
 import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
+import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,6 +45,7 @@ import java.util.stream.Collectors;
 @Repository
 public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     private static final Logger LOGGER = LoggerFactory.getLogger(NoteDaoJpa.class);
+    private static final Gson GSON = new Gson();
 
     @PersistenceContext
     EntityManager entityManager;
@@ -166,6 +171,8 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     public Note partialUpdate(String requester, Long noteId, UpdateNoteParams updateNoteParams) {
         Note note = this.getProjectItem(noteId, requester);
 
+        String noteBeforeUpdate = GSON.toJson(note.toPresentationModel());
+
         this.authorizationService.checkAuthorizedToOperateOnContent(note.getOwner(), requester, ContentType.NOTE,
                 Operation.UPDATE, noteId, note.getProject().getOwner());
 
@@ -179,11 +186,22 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
             note.setLabels(updateNoteParams.getLabels());
         }
 
-        this.notificationService.trackActivity(
-                new Auditable(note,
-                        )
+        Note res = this.noteRepository.save(note);
 
-        return this.noteRepository.save(note);
+        String noteAfterUpdate = GSON.toJson(note.toPresentationModel());
+        this.notificationService.trackNoteActivity(
+            new com.bulletjournal.notifications.NoteAuditable(
+                note,
+                new JSONObject().put("projectItem", noteBeforeUpdate).toString(),
+                new JSONObject().put("projectItem", noteAfterUpdate).toString(),
+                "updated note ##" + note.getName() + "## in BuJo " + note.getProject().getName() + "##",
+                requester,
+                ContentAction.UPDATE_NOTE,
+                Timestamp.from(Instant.now())
+            )
+        );
+
+        return res;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

@@ -30,6 +30,7 @@ public class NotificationService {
     private final BlockingQueue<Object> eventQueue;
     private final NotificationDaoJpa notificationDaoJpa;
     private final AuditableDaoJpa auditableDaoJpa;
+    private final NoteAuditableDaoJpa noteAuditableDaoJpa;
     private final SearchIndexDaoJpa searchIndexDaoJpa;
     private final RedisEtagDaoJpa redisEtagDaoJpa;
     private volatile boolean stop = false;
@@ -60,9 +61,11 @@ public class NotificationService {
 
     @Autowired
     public NotificationService(NotificationDaoJpa notificationDaoJpa, AuditableDaoJpa auditableDaoJpa,
+                               NoteAuditableDaoJpa noteAuditableDaoJpa,
                                SearchIndexDaoJpa searchIndexDaoJpa, RedisEtagDaoJpa redisEtagDaoJpa) {
         this.notificationDaoJpa = notificationDaoJpa;
         this.auditableDaoJpa = auditableDaoJpa;
+        this.noteAuditableDaoJpa = noteAuditableDaoJpa;
         this.searchIndexDaoJpa = searchIndexDaoJpa;
         this.redisEtagDaoJpa = redisEtagDaoJpa;
         this.executorService = Executors.newSingleThreadExecutor(new CustomThreadFactory("notification-service"));
@@ -88,6 +91,14 @@ public class NotificationService {
             return;
         }
         this.eventQueue.offer(auditable);
+    }
+
+    public void trackNoteActivity(NoteAuditable noteAuditable) {
+        LOGGER.info("Received note auditable: " + noteAuditable);
+        if (noteAuditable == null) {
+            return;
+        }
+        this.eventQueue.offer(noteAuditable);
     }
 
     public void remind(Remindable remindable) {
@@ -172,6 +183,7 @@ public class NotificationService {
             }
             List<Informed> informeds = new ArrayList<>();
             List<Auditable> auditables = new ArrayList<>();
+            List<NoteAuditable> noteAuditables = new ArrayList<>();
             List<RemoveElasticsearchDocumentEvent> removeElasticsearchDocumentEvents = new ArrayList<>();
             List<SaveCompleteTasksEvent> saveCompleteTasksEvents = new ArrayList<>();
             List<EtagEvent> etagEvents = new ArrayList<>();
@@ -185,6 +197,8 @@ public class NotificationService {
                     informeds.add((Informed) e);
                 } else if (e instanceof Auditable) {
                     auditables.add((Auditable) e);
+                } else if (e instanceof NoteAuditable) {
+                    noteAuditables.add((NoteAuditable) e);
                 } else if (e instanceof RemoveElasticsearchDocumentEvent) {
                     removeElasticsearchDocumentEvents.add((RemoveElasticsearchDocumentEvent) e);
                 } else if (e instanceof SaveCompleteTasksEvent) {
@@ -216,6 +230,13 @@ public class NotificationService {
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error on creating records in AuditableDaoJpa", ex);
+            }
+            try {
+                if (!noteAuditables.isEmpty()) {
+                    this.noteAuditableDaoJpa.create(noteAuditables);
+                }
+            } catch (Exception ex) {
+                LOGGER.error("Error on creating records in NoteAuditableDaoJpa", ex);
             }
             try {
                 if (!removeElasticsearchDocumentEvents.isEmpty() && this.springESConfig.getEnable()) {
