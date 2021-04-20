@@ -352,6 +352,20 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
                 Operation.DELETE, content.getId(), projectItem.getOwner(), projectItem.getProject().getOwner(),
                 projectItem);
         this.getContentJpaRepository().delete(content);
+
+        if (projectItem.getContentType() == ContentType.NOTE) {
+            this.notificationService.trackNoteActivity(
+                new com.bulletjournal.notifications.NoteAuditable(
+                    (com.bulletjournal.repository.models.Note) projectItem,
+                    new JSONObject().put("projectContent", GSON.toJson(content.toPresentationModel())).toString(),
+                    new JSONObject().put("projectContent", "\"\"").toString(),
+                    "deleted note content in ##" + projectItem.getName() + "##",
+                    requester,
+                    ContentAction.DELETE_NOTE_CONTENT,
+                    Timestamp.from(Instant.now())
+                )
+            );
+        }
         return projectItem;
     }
 
