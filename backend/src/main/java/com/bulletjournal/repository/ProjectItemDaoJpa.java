@@ -33,6 +33,7 @@ import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -216,6 +217,20 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         this.getJpaRepository().save(projectItem);
         populateContent(owner, content, projectItem);
         this.getContentJpaRepository().save(content);
+
+        if (projectItem.getContentType() == ContentType.NOTE) {
+            this.notificationService.trackNoteActivity(
+                new com.bulletjournal.notifications.NoteAuditable(
+                    (com.bulletjournal.repository.models.Note) projectItem,
+                    new JSONObject().put("projectContent", "\"\"").toString(),
+                    new JSONObject().put("projectContent", GSON.toJson(content.toPresentationModel())).toString(),
+                    "added content to note ##" + projectItem.getName() + "## by ##" + owner +"##",
+                    owner,
+                    ContentAction.ADD_NOTE_CONTENT,
+                    Timestamp.from(Instant.now())
+                )
+            );
+        }
         return Pair.of(content, projectItem);
     }
 
