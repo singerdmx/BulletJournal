@@ -23,6 +23,9 @@ public class NoteAuditable extends ProjectItemAuditModel {
   @OnDelete(action = OnDeleteAction.CASCADE)
   private Note note;
 
+  public NoteAuditable() {
+  }
+
   public NoteAuditable(
       Note note,
       String activity,

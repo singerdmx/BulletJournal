@@ -13,10 +13,7 @@ import com.bulletjournal.messaging.OpenHtmlConverter;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.notifications.informed.Informed;
 import com.bulletjournal.notifications.informed.RemoveNoteEvent;
-import com.bulletjournal.repository.GroupDaoJpa;
-import com.bulletjournal.repository.NoteDaoJpa;
-import com.bulletjournal.repository.NoteRepository;
-import com.bulletjournal.repository.ProjectDaoJpa;
+import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.NoteContent;
 import com.bulletjournal.repository.models.ProjectItemModel;
@@ -38,6 +35,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -68,6 +66,7 @@ public class NoteController {
     protected static final String NOTE_EXPORT_EMAIL_ROUTE = "/api/notes/{noteId}/exportEmail";
     protected static final String NOTE_EXPORT_PDF_ROUTE = "/api/notes/{noteId}/exportPdf";
     protected static final String NOTE_EXPORT_IMAGE_ROUTE = "/api/notes/{noteId}/exportImage";
+    protected static final String NOTE_HISTORY_ROUTE = "/api/notes/{noteId}/history";
 
     @Autowired
     private NoteDaoJpa noteDaoJpa;
@@ -92,6 +91,9 @@ public class NoteController {
 
     @Autowired
     private GroupDaoJpa groupDaoJpa;
+
+    @Autowired
+    private NoteAuditableDaoJpa noteAuditableDaoJpa;
 
     @GetMapping(NOTES_ROUTE)
     public ResponseEntity<List<Note>> getNotes(@NotNull @PathVariable Long projectId,
@@ -432,5 +434,20 @@ public class NoteController {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
           .body("Failed to get note as image.");
     }
+  }
+
+  @GetMapping(NOTE_HISTORY_ROUTE)
+  public List<ProjectItemActivity> getHistory(@NotNull @PathVariable Long noteId, @NotBlank @RequestParam int pageInd,
+                                              @NotBlank @RequestParam int pageSize) {
+      String requester = MDC.get(UserClient.USER_NAME_KEY);
+
+      // check if requester is eligible to access the note
+      noteDaoJpa.getProjectItem(noteId, requester);
+
+      return this.noteAuditableDaoJpa.getHistory(noteId, pageInd, pageSize)
+              .stream().peek(a -> {
+                  User user = this.userClient.getUser(a.getOriginator().getName());
+                  a.setOriginator(user);
+              }).collect(Collectors.toList());
   }
 }
