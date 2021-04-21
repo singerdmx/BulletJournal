@@ -113,7 +113,8 @@ public class Converter {
                     .append(INSERT_LINE_BREAK);
             for (EventAttendee attendee : attendeeList) {
                 baseText.append(INSERT_LINE_BREAK)
-                        .append(String.format(INSERT_STR_FORMAT, attendee.getDisplayName()));
+                        .append(String.format(INSERT_STR_FORMAT, attendee.getDisplayName()))
+                        .append(INSERT_LINE_BREAK);
             }
         }
 
