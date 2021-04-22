@@ -113,8 +113,7 @@ public class Converter {
                     .append(INSERT_LINE_BREAK);
             for (EventAttendee attendee : attendeeList) {
                 baseText.append(INSERT_LINE_BREAK)
-                        .append(String.format(INSERT_STR_FORMAT, attendee.getDisplayName()))
-                        .append(INSERT_LINE_BREAK);
+                        .append(String.format(INSERT_STR_FORMAT, attendee.getDisplayName()));
             }
         }
 
@@ -148,6 +147,7 @@ public class Converter {
                     text.append("<a href=\\\"mailto:").append(attendee.getEmail()).append("\\\" target=\\\"_blank\\\">")
                             .append(attendee.getDisplayName()).append("</a>");
                 }
+                text.append(System.lineSeparator());
             }
         }
 
