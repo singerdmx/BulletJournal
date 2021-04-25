@@ -125,29 +125,31 @@ public class Converter {
     private static String getText(Event event, Task task) {
         StringBuilder text = new StringBuilder();
         if (event.getDescription() != null) {
-            text.append(event.getDescription()).append(System.lineSeparator());
+            text.append(event.getDescription().replace(System.lineSeparator(), "<br/>"))
+                    .append("<br/>").append(System.lineSeparator());
         }
         if (event.getLocation() != null) {
             task.setLocation(event.getLocation());
-            text.append(System.lineSeparator()).append(System.lineSeparator())
-                    .append("<b>Location:</b> ").append(event.getLocation()).append(System.lineSeparator());
+            text.append(System.lineSeparator()).append("<br/>")
+                    .append("<b>Location:</b> ").append(event.getLocation())
+                    .append(System.lineSeparator()).append("<br/>");
         }
         List<EventAttendee> attendeeList = event.getAttendees();
         attendeeList = attendeeList != null ?
                 attendeeList.stream().filter((a) -> StringUtils.isNotBlank(a.getDisplayName()))
                         .collect(Collectors.toList()) : Collections.emptyList();
         if (!attendeeList.isEmpty()) {
-            text.append(System.lineSeparator()).append(System.lineSeparator())
-                    .append("<b>Attendees:</b>").append(System.lineSeparator());
+            text.append(System.lineSeparator()).append("<br/>")
+                    .append("<b>Attendees:</b>").append("<br/>");
             for (EventAttendee attendee : attendeeList) {
-                text.append(System.lineSeparator());
+                text.append(System.lineSeparator()).append("<br/>");
                 if (StringUtils.isBlank(attendee.getEmail())) {
                     text.append(attendee.getDisplayName());
                 } else {
                     text.append("<a href=\\\"mailto:").append(attendee.getEmail()).append("\\\" target=\\\"_blank\\\">")
                             .append(attendee.getDisplayName()).append("</a>");
                 }
-                text.append(System.lineSeparator());
+                text.append(System.lineSeparator()).append("<br/>");
             }
         }
 
