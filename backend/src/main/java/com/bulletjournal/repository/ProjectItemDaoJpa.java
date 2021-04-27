@@ -260,8 +260,6 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
                 Operation.UPDATE, content.getId(), projectItem.getOwner(), projectItem.getProject().getOwner(),
                 projectItem);
 
-        String contentBeforeUpdate = GSON.toJson(content.toPresentationModel());
-
         String oldText = content.getText();
         if (etag.isPresent()) {
             String itemEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
@@ -283,13 +281,13 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         this.getJpaRepository().save(projectItem);
 
         Pair<K, T> res = updateContent(requester, updateContentParams, projectItem, content, oldText);
-        String contentAfterUpdate = GSON.toJson(res.getLeft().toPresentationModel());
+        String contentAfterUpdate = res.getLeft().getBaseText();
 
         if (projectItem.getContentType() == ContentType.NOTE) {
             this.notificationService.trackNoteActivity(
                 new com.bulletjournal.notifications.NoteAuditable(
                     (com.bulletjournal.repository.models.Note) projectItem,
-                    new JSONObject().put(PROJECT_CONTENT_PROPERTY, contentBeforeUpdate).toString(),
+                    null,
                     new JSONObject().put(PROJECT_CONTENT_PROPERTY, contentAfterUpdate).toString(),
                     "updated note content in ##" + projectItem.getName() + "##",
                     requester,
