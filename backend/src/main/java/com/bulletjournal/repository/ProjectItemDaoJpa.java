@@ -345,8 +345,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             this.notificationService.trackNoteActivity(
                 new com.bulletjournal.notifications.NoteAuditable(
                     (com.bulletjournal.repository.models.Note) projectItem,
-                    new JSONObject().put(PROJECT_CONTENT_PROPERTY, GSON.toJson(content.toPresentationModel())).toString(),
-                    new JSONObject().put(PROJECT_CONTENT_PROPERTY, EMPTY_VALUE).toString(),
+                    new JSONObject().put(PROJECT_CONTENT_PROPERTY, content.getBaseText()).toString(),
+                    null,
                     "deleted note content in ##" + projectItem.getName() + "##",
                     requester,
                     ContentAction.DELETE_NOTE_CONTENT,
