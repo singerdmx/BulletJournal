@@ -221,19 +221,6 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         populateContent(owner, content, projectItem);
         this.getContentJpaRepository().save(content);
 
-        if (projectItem.getContentType() == ContentType.NOTE) {
-            this.notificationService.trackNoteActivity(
-                new com.bulletjournal.notifications.NoteAuditable(
-                    (com.bulletjournal.repository.models.Note) projectItem,
-                    new JSONObject().put(PROJECT_CONTENT_PROPERTY, EMPTY_VALUE).toString(),
-                    new JSONObject().put(PROJECT_CONTENT_PROPERTY, GSON.toJson(content.toPresentationModel())).toString(),
-                    "added content to note ##" + projectItem.getName() + "##",
-                    owner,
-                    ContentAction.ADD_NOTE_CONTENT,
-                    Timestamp.from(Instant.now())
-                )
-            );
-        }
         return Pair.of(content, projectItem);
     }
 
