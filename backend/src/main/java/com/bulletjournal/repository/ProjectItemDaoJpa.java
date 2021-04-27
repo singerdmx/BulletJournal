@@ -281,14 +281,14 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         this.getJpaRepository().save(projectItem);
 
         Pair<K, T> res = updateContent(requester, updateContentParams, projectItem, content, oldText);
-        String contentAfterUpdate = res.getLeft().getBaseText();
+        String newText = res.getLeft().getText();
 
         if (projectItem.getContentType() == ContentType.NOTE) {
             this.notificationService.trackNoteActivity(
                 new com.bulletjournal.notifications.NoteAuditable(
                     (com.bulletjournal.repository.models.Note) projectItem,
-                    null,
-                    new JSONObject().put(PROJECT_CONTENT_PROPERTY, contentAfterUpdate).toString(),
+                    new JSONObject().put(PROJECT_CONTENT_PROPERTY, oldText).toString(),
+                    new JSONObject().put(PROJECT_CONTENT_PROPERTY, newText).toString(),
                     "updated note content in ##" + projectItem.getName() + "##",
                     requester,
                     ContentAction.UPDATE_NOTE_CONTENT,
@@ -345,7 +345,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             this.notificationService.trackNoteActivity(
                 new com.bulletjournal.notifications.NoteAuditable(
                     (com.bulletjournal.repository.models.Note) projectItem,
-                    new JSONObject().put(PROJECT_CONTENT_PROPERTY, content.getBaseText()).toString(),
+                    new JSONObject().put(PROJECT_CONTENT_PROPERTY, content.getText()).toString(),
                     null,
                     "deleted note content in ##" + projectItem.getName() + "##",
                     requester,
