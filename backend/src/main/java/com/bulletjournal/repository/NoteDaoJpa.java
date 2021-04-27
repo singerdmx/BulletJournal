@@ -266,7 +266,6 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         final Project project = this.projectDaoJpa.getProject(targetProject, requester);
 
         Note note = this.getProjectItem(noteId, requester);
-        String projNameBeforeUpdate = note.getProject().getName();
 
         if (!Objects.equals(note.getProject().getType(), project.getType())) {
             throw new BadRequestException("Cannot move to Project Type " + project.getType());
@@ -277,20 +276,6 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
 
         note.setProject(project);
         noteRepository.save(note);
-
-        String projNameAfterUpdate = note.getProject().getName();
-        this.notificationService.trackNoteActivity(
-            new com.bulletjournal.notifications.NoteAuditable(
-                note,
-                new JSONObject().put(PROJECT_NAME_PROPERTY, projNameBeforeUpdate).toString(),
-                new JSONObject().put(PROJECT_NAME_PROPERTY, projNameAfterUpdate).toString(),
-                "moved note ##" + note.getName() + "## from BuJo ##" + projNameBeforeUpdate + "## to BuJo ##"
-                    + projNameAfterUpdate + "##",
-                requester,
-                ContentAction.MOVE_NOTE,
-                Timestamp.from(Instant.now())
-            )
-        );
 
         return Pair.of(note, project);
     }
