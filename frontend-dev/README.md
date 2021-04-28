@@ -14,7 +14,7 @@ nginx -c "$PWD/nginx.conf"
 nginx -c "/Users/xyao/ws/BulletJournal/frontend-dev/nginx.conf"
 ```
 
-(3) Use the latest backend image by updating https://github.com/singerdmx/BulletJournal/blob/master/frontend-dev/docker-compose.yml#L5 and use this `docker-compose.yml` file to start all containers needed.
+(3) Use the latest backend image in https://github.com/singerdmx/BulletJournal/blob/master/deployment/docker-compose.yml#L53 by updating https://github.com/singerdmx/BulletJournal/blob/master/frontend-dev/docker-compose.yml#L5 and use the `docker-compose.yml` file under `frontend-dev` folder to start all containers needed.
 
 
 (4) Go to folder `../frontend` to start the frontend application in the development mode
