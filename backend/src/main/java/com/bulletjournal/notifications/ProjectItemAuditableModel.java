@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 
 public abstract class ProjectItemAuditableModel {
   public static final String PROJECT_ITEM_PROPERTY = "projectItem";
-  public static final String PROJECT_CONTENT_PROPERTY = "projectContent";
+  public static final String CONTENT_PROPERTY = "content";
 
   protected String beforeActivity;
   protected String afterActivity;

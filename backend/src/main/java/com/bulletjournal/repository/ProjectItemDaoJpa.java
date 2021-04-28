@@ -47,7 +47,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.bulletjournal.notifications.ProjectItemAuditableModel.PROJECT_CONTENT_PROPERTY;
+import static com.bulletjournal.notifications.ProjectItemAuditableModel.CONTENT_PROPERTY;
 
 public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
@@ -286,8 +286,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             this.notificationService.trackNoteActivity(
                 new com.bulletjournal.notifications.NoteAuditable(
                     (com.bulletjournal.repository.models.Note) projectItem,
-                    new JSONObject().put(PROJECT_CONTENT_PROPERTY, oldText).toString(),
-                    new JSONObject().put(PROJECT_CONTENT_PROPERTY, newText).toString(),
+                    new JSONObject().put(CONTENT_PROPERTY, oldText).toString(),
+                    new JSONObject().put(CONTENT_PROPERTY, newText).toString(),
                     "updated note content in ##" + projectItem.getName() + "##",
                     requester,
                     ContentAction.UPDATE_NOTE_CONTENT,
@@ -344,7 +344,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
             this.notificationService.trackNoteActivity(
                 new com.bulletjournal.notifications.NoteAuditable(
                     (com.bulletjournal.repository.models.Note) projectItem,
-                    new JSONObject().put(PROJECT_CONTENT_PROPERTY, content.getText()).toString(),
+                    new JSONObject().put(CONTENT_PROPERTY, content.getText()).toString(),
                     null,
                     "deleted note content in ##" + projectItem.getName() + "##",
                     requester,
