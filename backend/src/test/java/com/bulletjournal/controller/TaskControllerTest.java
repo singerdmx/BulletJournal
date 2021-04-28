@@ -104,17 +104,21 @@ public class TaskControllerTest {
             group = TestHelpers.addUserToGroup(this.requestParams, group, username, ++count, USER);
         }
         users.add(USER);
+        String etag;
         Project p1 = TestHelpers.createProject(requestParams, USER, "task_project_1", group, ProjectType.TODO);
         Task task1 = createTask(
                 p1,
                 new CreateTaskParams("task_1", "2021-01-01", "01:01", 3, new ReminderSetting(), users, TIMEZONE, null));
         Content content1 = addContent(task1, testContent1);
-        List<Content> contents1 = updateContent(task1.getId(), content1.getId(), testUpdateContent2);
-        int sleepBetweenUpdateContents = 2000;
-        Thread.sleep(sleepBetweenUpdateContents); // we block update the same content id in 2 sec
-        List<Content> contents2 = updateContent(task1.getId(), content1.getId(), testUpdateContent3);
-        Thread.sleep(sleepBetweenUpdateContents); // we block update the same content id in 2 sec
-        List<Content> contents3 = updateContent(task1.getId(), content1.getId(), testUpdateContent4);
+        etag = content1.getEtag();
+        List<Content> contents1 = updateContent(task1.getId(), content1.getId(), testUpdateContent2, etag);
+
+        etag = contents1.stream().filter(c -> c.getId().equals(content1.getId())).findFirst().orElseThrow(() -> new RuntimeException()).getEtag();
+        List<Content> contents2 = updateContent(task1.getId(), content1.getId(), testUpdateContent3, etag);
+
+        etag = contents2.stream().filter(c -> c.getId().equals(content1.getId())).findFirst().orElseThrow(() -> new RuntimeException()).getEtag();
+        List<Content> contents3 = updateContent(task1.getId(), content1.getId(), testUpdateContent4, etag);
+
         assertEquals(testContent1, getContentRevision(task1.getId(), content1.getId(), 1L));
         assertEquals(testUpdateContent2Expected, getContentRevision(task1.getId(), content1.getId(), 2L));
         assertEquals(testUpdateContent3Expected, getContentRevision(task1.getId(), content1.getId(), 3L));
@@ -122,9 +126,10 @@ public class TaskControllerTest {
         testOtherAssignees(p1, task1, users);
         testUpdateAssignees(p1, task1, users);
         int maxRevisionNumber = revisionConfig.getMaxRevisionNumber();
+
         for (int i = 0; i < 2 * maxRevisionNumber; ++i) {
-            Thread.sleep(sleepBetweenUpdateContents); // we block update the same content id in 2 sec
-            contents1 = updateContent(task1.getId(), content1.getId(), generateUpdateContent(String.valueOf(i)));
+            contents1 = updateContent(task1.getId(), content1.getId(), generateUpdateContent(String.valueOf(i)), etag);
+            etag = contents2.stream().filter(c -> c.getId().equals(content1.getId())).findFirst().orElseThrow(() -> new RuntimeException()).getEtag();
         }
         assertEquals(1, contents1.size());
         assertEquals(maxRevisionNumber, contents1.get(0).getRevisions().length);
@@ -339,13 +344,13 @@ public class TaskControllerTest {
         return text;
     }
 
-    private List<Content> updateContent(Long taskId, Long contentId, String text) {
+    private List<Content> updateContent(Long taskId, Long contentId, String text, String etag) {
         Gson gson = new Gson();
         UpdateContentParams params =  gson.fromJson(text, UpdateContentParams.class);
         ResponseEntity<Content[]> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.CONTENT_ROUTE,
                 HttpMethod.PATCH,
-                TestHelpers.actAsOtherUser(params, USER),
+                TestHelpers.actAsOtherUser(params, USER, etag),
                 Content[].class,
                 taskId,
                 contentId
