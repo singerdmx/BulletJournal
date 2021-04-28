@@ -33,6 +33,7 @@ import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,8 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.bulletjournal.notifications.ProjectItemAuditableModel.CONTENT_PROPERTY;
 
 public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
@@ -216,6 +219,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         this.getJpaRepository().save(projectItem);
         populateContent(owner, content, projectItem);
         this.getContentJpaRepository().save(content);
+
         return Pair.of(content, projectItem);
     }
 
@@ -274,7 +278,24 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         }
         projectItem.setUpdatedAt(Timestamp.from(Instant.now()));
         this.getJpaRepository().save(projectItem);
-        return updateContent(requester, updateContentParams, projectItem, content, oldText);
+
+        Pair<K, T> res = updateContent(requester, updateContentParams, projectItem, content, oldText);
+        String newText = res.getLeft().getText();
+
+        if (projectItem.getContentType() == ContentType.NOTE) {
+            this.notificationService.trackNoteActivity(
+                new com.bulletjournal.notifications.NoteAuditable(
+                    (com.bulletjournal.repository.models.Note) projectItem,
+                    new JSONObject().put(CONTENT_PROPERTY, oldText).toString(),
+                    new JSONObject().put(CONTENT_PROPERTY, newText).toString(),
+                    "updated note content in ##" + projectItem.getName() + "##",
+                    requester,
+                    ContentAction.UPDATE_NOTE_CONTENT,
+                    Timestamp.from(Instant.now())
+                )
+            );
+        }
+        return res;
     }
 
     private <T extends ProjectItemModel> Pair<K, T> updateContent(
@@ -318,6 +339,20 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
                 Operation.DELETE, content.getId(), projectItem.getOwner(), projectItem.getProject().getOwner(),
                 projectItem);
         this.getContentJpaRepository().delete(content);
+
+        if (projectItem.getContentType() == ContentType.NOTE) {
+            this.notificationService.trackNoteActivity(
+                new com.bulletjournal.notifications.NoteAuditable(
+                    (com.bulletjournal.repository.models.Note) projectItem,
+                    new JSONObject().put(CONTENT_PROPERTY, content.getText()).toString(),
+                    null,
+                    "deleted note content in ##" + projectItem.getName() + "##",
+                    requester,
+                    ContentAction.DELETE_NOTE_CONTENT,
+                    Timestamp.from(Instant.now())
+                )
+            );
+        }
         return projectItem;
     }
 

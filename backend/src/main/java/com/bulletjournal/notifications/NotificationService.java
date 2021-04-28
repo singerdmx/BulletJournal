@@ -35,6 +35,10 @@ public class NotificationService {
     private volatile boolean stop = false;
 
     @Autowired
+    @Lazy
+    private NoteAuditableDaoJpa noteAuditableDaoJpa;
+
+    @Autowired
     private SpringESConfig springESConfig;
 
     @Autowired
@@ -88,6 +92,14 @@ public class NotificationService {
             return;
         }
         this.eventQueue.offer(auditable);
+    }
+
+    public void trackNoteActivity(NoteAuditable noteAuditable) {
+        LOGGER.info("Received note auditable: " + noteAuditable);
+        if (noteAuditable == null) {
+            return;
+        }
+        this.eventQueue.offer(noteAuditable);
     }
 
     public void remind(Remindable remindable) {
@@ -172,6 +184,7 @@ public class NotificationService {
             }
             List<Informed> informeds = new ArrayList<>();
             List<Auditable> auditables = new ArrayList<>();
+            List<NoteAuditable> noteAuditables = new ArrayList<>();
             List<RemoveElasticsearchDocumentEvent> removeElasticsearchDocumentEvents = new ArrayList<>();
             List<SaveCompleteTasksEvent> saveCompleteTasksEvents = new ArrayList<>();
             List<EtagEvent> etagEvents = new ArrayList<>();
@@ -185,6 +198,8 @@ public class NotificationService {
                     informeds.add((Informed) e);
                 } else if (e instanceof Auditable) {
                     auditables.add((Auditable) e);
+                } else if (e instanceof NoteAuditable) {
+                    noteAuditables.add((NoteAuditable) e);
                 } else if (e instanceof RemoveElasticsearchDocumentEvent) {
                     removeElasticsearchDocumentEvents.add((RemoveElasticsearchDocumentEvent) e);
                 } else if (e instanceof SaveCompleteTasksEvent) {
@@ -216,6 +231,13 @@ public class NotificationService {
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error on creating records in AuditableDaoJpa", ex);
+            }
+            try {
+                if (!noteAuditables.isEmpty()) {
+                    this.noteAuditableDaoJpa.create(noteAuditables);
+                }
+            } catch (Exception ex) {
+                LOGGER.error("Error on creating records in NoteAuditableDaoJpa", ex);
             }
             try {
                 if (!removeElasticsearchDocumentEvents.isEmpty() && this.springESConfig.getEnable()) {

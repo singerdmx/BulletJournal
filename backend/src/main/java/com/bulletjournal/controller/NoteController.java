@@ -13,17 +13,16 @@ import com.bulletjournal.messaging.OpenHtmlConverter;
 import com.bulletjournal.notifications.*;
 import com.bulletjournal.notifications.informed.Informed;
 import com.bulletjournal.notifications.informed.RemoveNoteEvent;
-import com.bulletjournal.repository.GroupDaoJpa;
-import com.bulletjournal.repository.NoteDaoJpa;
-import com.bulletjournal.repository.NoteRepository;
-import com.bulletjournal.repository.ProjectDaoJpa;
+import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.NoteContent;
+import com.bulletjournal.repository.models.ProjectItemAuditModel;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import freemarker.template.TemplateException;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.*;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -31,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,11 +38,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
@@ -68,6 +67,7 @@ public class NoteController {
     protected static final String NOTE_EXPORT_EMAIL_ROUTE = "/api/notes/{noteId}/exportEmail";
     protected static final String NOTE_EXPORT_PDF_ROUTE = "/api/notes/{noteId}/exportPdf";
     protected static final String NOTE_EXPORT_IMAGE_ROUTE = "/api/notes/{noteId}/exportImage";
+    protected static final String NOTE_HISTORY_ROUTE = "/api/notes/{noteId}/history";
 
     @Autowired
     private NoteDaoJpa noteDaoJpa;
@@ -92,6 +92,9 @@ public class NoteController {
 
     @Autowired
     private GroupDaoJpa groupDaoJpa;
+
+    @Autowired
+    private NoteAuditableDaoJpa noteAuditableDaoJpa;
 
     @GetMapping(NOTES_ROUTE)
     public ResponseEntity<List<Note>> getNotes(@NotNull @PathVariable Long projectId,
@@ -431,6 +434,43 @@ public class NoteController {
       LOGGER.error("Failed to convert note into HTML string - " + e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
           .body("Failed to get note as image.");
+    }
+  }
+
+  @GetMapping(NOTE_HISTORY_ROUTE)
+  public ResponseEntity<?> getHistory(
+      @NotNull @PathVariable Long noteId,
+      @NotBlank @RequestParam int pageInd,
+      @NotBlank @RequestParam int pageSize) {
+    String requester = MDC.get(UserClient.USER_NAME_KEY);
+
+    // check if requester is eligible to access the note
+    noteDaoJpa.getProjectItem(noteId, requester);
+
+    try {
+      Page<com.bulletjournal.repository.models.NoteAuditable> page =
+          this.noteAuditableDaoJpa.getHistory(noteId, pageInd, pageSize);
+      Map<String, Object> response = new HashMap<>();
+      List<ProjectItemActivity> activities =
+          page.getContent().stream()
+              .map(ProjectItemAuditModel::toProjectItemActivity)
+              .peek(
+                  item -> {
+                    User user = this.userClient.getUser(item.getOriginator().getName());
+                    item.setOriginator(user);
+                  })
+              .collect(Collectors.toList());
+
+      response.put("activities", activities);
+      response.put("currentPage", page.getNumber());
+      response.put("totalItems", page.getTotalElements());
+      response.put("totalPages", page.getTotalPages());
+
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    } catch (Exception e) {
+      LOGGER.error("Failed to get note auditable details " + e);
+      return new ResponseEntity<>(
+          "Failed to get note auditable details.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }
