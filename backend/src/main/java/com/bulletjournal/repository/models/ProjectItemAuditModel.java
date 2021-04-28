@@ -1,7 +1,6 @@
 package com.bulletjournal.repository.models;
 
 import com.bulletjournal.contents.ContentAction;
-import com.bulletjournal.controller.models.Activity;
 import com.bulletjournal.controller.models.ProjectItemActivity;
 import com.bulletjournal.controller.models.User;
 

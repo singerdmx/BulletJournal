@@ -47,7 +47,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.bulletjournal.notifications.ProjectItemAuditableModel.EMPTY_VALUE;
 import static com.bulletjournal.notifications.ProjectItemAuditableModel.PROJECT_CONTENT_PROPERTY;
 
 public abstract class ProjectItemDaoJpa<K extends ContentModel> {

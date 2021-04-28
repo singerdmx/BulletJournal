@@ -22,7 +22,9 @@ public class NotificationServiceTest {
         MockSearchIndexDaoJpa mockSearchIndexDaoJpa = new MockSearchIndexDaoJpa();
         MockRedisEtagDaoJpa mockRedisEtagDaoJpa = new MockRedisEtagDaoJpa();
         NotificationService notificationService = new NotificationService(
-                mockedNotificationDaoJpa, mockedAuditableDaoJpa, mockSearchIndexDaoJpa, mockRedisEtagDaoJpa);
+                mockedNotificationDaoJpa, mockedAuditableDaoJpa,
+                null,
+                mockSearchIndexDaoJpa, mockRedisEtagDaoJpa);
         notificationService.postConstruct();
         String originator = "BulletJournal";
         String targetUser = "u1";

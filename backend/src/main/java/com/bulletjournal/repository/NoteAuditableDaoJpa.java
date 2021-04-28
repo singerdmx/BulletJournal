@@ -1,9 +1,8 @@
 package com.bulletjournal.repository;
 
-import com.bulletjournal.controller.models.ProjectItemActivity;
 import com.bulletjournal.repository.models.NoteAuditable;
-import com.bulletjournal.repository.models.ProjectItemAuditModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
@@ -27,13 +26,8 @@ public class NoteAuditableDaoJpa {
   }
 
   @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-  public List<ProjectItemActivity> getHistory(Long noteId, int pageInd, int pageSize) {
-
-    List<NoteAuditable> hist =
-        this.noteAuditableRepository.findAllByNoteId(
-            noteId, PageRequest.of(pageInd, pageSize, Sort.by("activityTime").descending()));
-    return hist.stream()
-        .map(ProjectItemAuditModel::toProjectItemActivity)
-        .collect(Collectors.toList());
+  public Page<NoteAuditable> getHistory(Long noteId, int pageInd, int pageSize) {
+    return this.noteAuditableRepository.findAllByNoteId(
+        noteId, PageRequest.of(pageInd, pageSize, Sort.by("activityTime").descending()));
   }
 }

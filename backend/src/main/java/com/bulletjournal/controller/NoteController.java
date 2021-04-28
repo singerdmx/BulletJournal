@@ -16,11 +16,13 @@ import com.bulletjournal.notifications.informed.RemoveNoteEvent;
 import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.models.ContentModel;
 import com.bulletjournal.repository.models.NoteContent;
+import com.bulletjournal.repository.models.ProjectItemAuditModel;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import freemarker.template.TemplateException;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.*;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -28,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,8 +42,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;
@@ -437,17 +438,39 @@ public class NoteController {
   }
 
   @GetMapping(NOTE_HISTORY_ROUTE)
-  public List<ProjectItemActivity> getHistory(@NotNull @PathVariable Long noteId, @NotBlank @RequestParam int pageInd,
-                                              @NotBlank @RequestParam int pageSize) {
-      String requester = MDC.get(UserClient.USER_NAME_KEY);
+  public ResponseEntity<?> getHistory(
+      @NotNull @PathVariable Long noteId,
+      @NotBlank @RequestParam int pageInd,
+      @NotBlank @RequestParam int pageSize) {
+    String requester = MDC.get(UserClient.USER_NAME_KEY);
 
-      // check if requester is eligible to access the note
-      noteDaoJpa.getProjectItem(noteId, requester);
+    // check if requester is eligible to access the note
+    noteDaoJpa.getProjectItem(noteId, requester);
 
-      return this.noteAuditableDaoJpa.getHistory(noteId, pageInd, pageSize)
-              .stream().peek(a -> {
-                  User user = this.userClient.getUser(a.getOriginator().getName());
-                  a.setOriginator(user);
-              }).collect(Collectors.toList());
+    try {
+      Page<com.bulletjournal.repository.models.NoteAuditable> page =
+          this.noteAuditableDaoJpa.getHistory(noteId, pageInd, pageSize);
+      Map<String, Object> response = new HashMap<>();
+      List<ProjectItemActivity> activities =
+          page.getContent().stream()
+              .map(ProjectItemAuditModel::toProjectItemActivity)
+              .peek(
+                  item -> {
+                    User user = this.userClient.getUser(item.getOriginator().getName());
+                    item.setOriginator(user);
+                  })
+              .collect(Collectors.toList());
+
+      response.put("activities", activities);
+      response.put("currentPage", page.getNumber());
+      response.put("totalItems", page.getTotalElements());
+      response.put("totalPages", page.getTotalPages());
+
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    } catch (Exception e) {
+      LOGGER.error("Failed to get note auditable details " + e);
+      return new ResponseEntity<>(
+          "Failed to get note auditable details.", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }

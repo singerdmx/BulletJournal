@@ -42,7 +42,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.bulletjournal.notifications.ProjectItemAuditableModel.PROJECT_ITEM_PROPERTY;
-import static com.bulletjournal.notifications.ProjectItemAuditableModel.PROJECT_NAME_PROPERTY;
 
 @Repository
 public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
