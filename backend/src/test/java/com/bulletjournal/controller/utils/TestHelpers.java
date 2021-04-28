@@ -39,12 +39,17 @@ public class TestHelpers {
         }
     }
 
-    public static <T> HttpEntity actAsOtherUser(T body, String username, String... eTags) {
+    public static <T> HttpEntity actAsOtherUser(T body, String username) {
+        return actAsOtherUser(body, username, null);
+    }
+
+    public static <T> HttpEntity actAsOtherUser(T body, String username, String eTag) {
         final HttpHeaders headers = new HttpHeaders();
         headers.set(UserClient.USER_NAME_KEY, username);
 
-        if (eTags.length > 0)
-            headers.setIfNoneMatch(eTags[0]);
+        if (eTag != null) {
+            headers.setIfNoneMatch(eTag);
+        }
 
         if (body == null) {
             return new HttpEntity<>(headers);
