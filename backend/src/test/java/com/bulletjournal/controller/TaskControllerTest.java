@@ -119,6 +119,8 @@ public class TaskControllerTest {
         etag = contents2.stream().filter(c -> c.getId().equals(content1.getId())).findFirst().orElseThrow(() -> new RuntimeException()).getEtag();
         List<Content> contents3 = updateContent(task1.getId(), content1.getId(), testUpdateContent4, etag);
 
+        etag = contents3.stream().filter(c -> c.getId().equals(content1.getId())).findFirst().orElseThrow(() -> new RuntimeException()).getEtag();
+
         assertEquals(testContent1, getContentRevision(task1.getId(), content1.getId(), 1L));
         assertEquals(testUpdateContent2Expected, getContentRevision(task1.getId(), content1.getId(), 2L));
         assertEquals(testUpdateContent3Expected, getContentRevision(task1.getId(), content1.getId(), 3L));
@@ -129,7 +131,7 @@ public class TaskControllerTest {
 
         for (int i = 0; i < 2 * maxRevisionNumber; ++i) {
             contents1 = updateContent(task1.getId(), content1.getId(), generateUpdateContent(String.valueOf(i)), etag);
-            etag = contents2.stream().filter(c -> c.getId().equals(content1.getId())).findFirst().orElseThrow(() -> new RuntimeException()).getEtag();
+            etag = contents1.stream().filter(c -> c.getId().equals(content1.getId())).findFirst().orElseThrow(() -> new RuntimeException()).getEtag();
         }
         assertEquals(1, contents1.size());
         assertEquals(maxRevisionNumber, contents1.get(0).getRevisions().length);
