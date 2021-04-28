@@ -32,8 +32,8 @@ CREATE SEQUENCE public.note_auditables_sequence
     NO MAXVALUE
     CACHE 1;
 
-CREATE index note_auditables_activity_time_index
-	ON note_auditables (activity_time DESC);
+create index note_auditables_note_id_activity_time_index
+	on note_auditables (note_id asc, activity_time desc);
 
 ALTER TABLE note_auditables
     ADD CONSTRAINT note_auditables_notes_id_fk
@@ -75,8 +75,8 @@ CREATE SEQUENCE public.task_auditables_sequence
     NO MAXVALUE
     CACHE 1;
 
-CREATE index task_auditables_activity_time_index
-	ON task_auditables (activity_time DESC);
+create index task_auditables_task_id_activity_time_index
+	on task_auditables (task_id asc, activity_time desc);
 
 ALTER TABLE task_auditables
     ADD CONSTRAINT task_auditables_tasks_id_fk
@@ -118,8 +118,8 @@ CREATE SEQUENCE public.transaction_auditables_sequence
     NO MAXVALUE
     CACHE 1;
 
-CREATE index transaction_auditables_activity_time_index
-	ON transaction_auditables (activity_time DESC);
+create index transaction_auditables_transaction_id_activity_time_index
+	on transaction_auditables (transaction_id asc, activity_time desc);
 
 ALTER TABLE transaction_auditables
     ADD CONSTRAINT transaction_auditables_transactions_id_fk
