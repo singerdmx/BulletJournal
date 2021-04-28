@@ -30,10 +30,13 @@ public class NotificationService {
     private final BlockingQueue<Object> eventQueue;
     private final NotificationDaoJpa notificationDaoJpa;
     private final AuditableDaoJpa auditableDaoJpa;
-    private final NoteAuditableDaoJpa noteAuditableDaoJpa;
     private final SearchIndexDaoJpa searchIndexDaoJpa;
     private final RedisEtagDaoJpa redisEtagDaoJpa;
     private volatile boolean stop = false;
+
+    @Autowired
+    @Lazy
+    private NoteAuditableDaoJpa noteAuditableDaoJpa;
 
     @Autowired
     private SpringESConfig springESConfig;
@@ -61,11 +64,9 @@ public class NotificationService {
 
     @Autowired
     public NotificationService(NotificationDaoJpa notificationDaoJpa, AuditableDaoJpa auditableDaoJpa,
-                               NoteAuditableDaoJpa noteAuditableDaoJpa,
                                SearchIndexDaoJpa searchIndexDaoJpa, RedisEtagDaoJpa redisEtagDaoJpa) {
         this.notificationDaoJpa = notificationDaoJpa;
         this.auditableDaoJpa = auditableDaoJpa;
-        this.noteAuditableDaoJpa = noteAuditableDaoJpa;
         this.searchIndexDaoJpa = searchIndexDaoJpa;
         this.redisEtagDaoJpa = redisEtagDaoJpa;
         this.executorService = Executors.newSingleThreadExecutor(new CustomThreadFactory("notification-service"));

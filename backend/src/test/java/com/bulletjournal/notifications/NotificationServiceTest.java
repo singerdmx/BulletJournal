@@ -23,7 +23,6 @@ public class NotificationServiceTest {
         MockRedisEtagDaoJpa mockRedisEtagDaoJpa = new MockRedisEtagDaoJpa();
         NotificationService notificationService = new NotificationService(
                 mockedNotificationDaoJpa, mockedAuditableDaoJpa,
-                null,
                 mockSearchIndexDaoJpa, mockRedisEtagDaoJpa);
         notificationService.postConstruct();
         String originator = "BulletJournal";
