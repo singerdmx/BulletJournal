@@ -1,5 +1,6 @@
 package com.bulletjournal.repository;
 
+import com.bulletjournal.notifications.ProjectItemAuditable;
 import com.bulletjournal.repository.models.NoteAuditable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,10 +19,11 @@ public class NoteAuditableDaoJpa {
   @Autowired private NoteAuditableRepository noteAuditableRepository;
 
   @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-  public void create(List<com.bulletjournal.notifications.NoteAuditable> noteAuditables) {
+  public void create(
+      List<com.bulletjournal.notifications.ProjectItemAuditable> projectItemAuditables) {
     this.noteAuditableRepository.saveAll(
-        noteAuditables.stream()
-            .map(com.bulletjournal.notifications.NoteAuditable::toRepositoryAuditable)
+        projectItemAuditables.stream()
+            .map(ProjectItemAuditable::toRepositoryNoteAuditable)
             .collect(Collectors.toList()));
   }
 

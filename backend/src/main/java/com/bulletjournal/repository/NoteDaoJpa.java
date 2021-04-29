@@ -41,7 +41,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.bulletjournal.notifications.ProjectItemAuditableModel.PROJECT_ITEM_PROPERTY;
+import static com.bulletjournal.notifications.ProjectItemAuditable.PROJECT_ITEM_PROPERTY;
 
 @Repository
 public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
@@ -190,8 +190,8 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         Note res = this.noteRepository.save(note);
 
         String noteAfterUpdate = GSON.toJson(note.toPresentationModel());
-        this.notificationService.trackNoteActivity(
-            new com.bulletjournal.notifications.NoteAuditable(
+        this.notificationService.trackProjectItemActivity(
+            new com.bulletjournal.notifications.ProjectItemAuditable(
                 note,
                 new JSONObject().put(PROJECT_ITEM_PROPERTY, noteBeforeUpdate).toString(),
                 new JSONObject().put(PROJECT_ITEM_PROPERTY, noteAfterUpdate).toString(),

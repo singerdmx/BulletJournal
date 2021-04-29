@@ -94,12 +94,12 @@ public class NotificationService {
         this.eventQueue.offer(auditable);
     }
 
-    public void trackNoteActivity(NoteAuditable noteAuditable) {
-        LOGGER.info("Received note auditable: " + noteAuditable);
-        if (noteAuditable == null) {
+    public void trackProjectItemActivity(ProjectItemAuditable projectItemAuditable) {
+        LOGGER.info("Received project item auditable: " + projectItemAuditable);
+        if (projectItemAuditable == null) {
             return;
         }
-        this.eventQueue.offer(noteAuditable);
+        this.eventQueue.offer(projectItemAuditable);
     }
 
     public void remind(Remindable remindable) {
@@ -184,7 +184,7 @@ public class NotificationService {
             }
             List<Informed> informeds = new ArrayList<>();
             List<Auditable> auditables = new ArrayList<>();
-            List<NoteAuditable> noteAuditables = new ArrayList<>();
+            List<ProjectItemAuditable> noteAuditables = new ArrayList<>();
             List<RemoveElasticsearchDocumentEvent> removeElasticsearchDocumentEvents = new ArrayList<>();
             List<SaveCompleteTasksEvent> saveCompleteTasksEvents = new ArrayList<>();
             List<EtagEvent> etagEvents = new ArrayList<>();
@@ -198,8 +198,8 @@ public class NotificationService {
                     informeds.add((Informed) e);
                 } else if (e instanceof Auditable) {
                     auditables.add((Auditable) e);
-                } else if (e instanceof NoteAuditable) {
-                    noteAuditables.add((NoteAuditable) e);
+                } else if (e instanceof ProjectItemAuditable) {
+                    noteAuditables.add((ProjectItemAuditable) e);
                 } else if (e instanceof RemoveElasticsearchDocumentEvent) {
                     removeElasticsearchDocumentEvents.add((RemoveElasticsearchDocumentEvent) e);
                 } else if (e instanceof SaveCompleteTasksEvent) {

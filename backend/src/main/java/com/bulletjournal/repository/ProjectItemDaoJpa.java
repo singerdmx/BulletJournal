@@ -47,7 +47,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.bulletjournal.notifications.ProjectItemAuditableModel.CONTENT_PROPERTY;
+import static com.bulletjournal.notifications.ProjectItemAuditable.CONTENT_PROPERTY;
 
 public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
@@ -283,8 +283,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         String newText = res.getLeft().getText();
 
         if (projectItem.getContentType() == ContentType.NOTE) {
-            this.notificationService.trackNoteActivity(
-                new com.bulletjournal.notifications.NoteAuditable(
+            this.notificationService.trackProjectItemActivity(
+                new com.bulletjournal.notifications.ProjectItemAuditable(
                     (com.bulletjournal.repository.models.Note) projectItem,
                     new JSONObject().put(CONTENT_PROPERTY, oldText).toString(),
                     new JSONObject().put(CONTENT_PROPERTY, newText).toString(),
@@ -341,8 +341,8 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         this.getContentJpaRepository().delete(content);
 
         if (projectItem.getContentType() == ContentType.NOTE) {
-            this.notificationService.trackNoteActivity(
-                new com.bulletjournal.notifications.NoteAuditable(
+            this.notificationService.trackProjectItemActivity(
+                new com.bulletjournal.notifications.ProjectItemAuditable(
                     (com.bulletjournal.repository.models.Note) projectItem,
                     new JSONObject().put(CONTENT_PROPERTY, content.getText()).toString(),
                     null,
