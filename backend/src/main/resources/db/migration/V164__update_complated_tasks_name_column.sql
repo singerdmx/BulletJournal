@@ -1,0 +1,1 @@
+alter table completed_tasks alter column name type varchar(500) using name::varchar(500);

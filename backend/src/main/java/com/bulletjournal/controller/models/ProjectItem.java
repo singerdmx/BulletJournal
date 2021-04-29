@@ -19,7 +19,7 @@ public abstract class ProjectItem {
     protected Long id;
 
     @NotBlank
-    @Size(min = 1, max = 100)
+    @Size(min = 1, max = 500)
     protected String name;
 
     @NotNull
