@@ -167,6 +167,7 @@ public class NotificationService {
         this.eventQueue.offer(event);
     }
 
+    // CHECKSTYLE:OFF
     public void handleNotifications() {
         Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
         List<Object> events = new ArrayList<>();
@@ -319,6 +320,7 @@ public class NotificationService {
             events = new ArrayList<>();
         }
     }
+    // CHECKSTYLE:ON
 
     @PreDestroy
     public void preDestroy() {
