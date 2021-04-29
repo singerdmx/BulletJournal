@@ -1,11 +1,10 @@
 version: '2.1'
 services:
-
   controller:
-    image: mwangxx/bulletjournal-backend:1.1.202104272238
+    image: mwangxx/bulletjournal-backend:1.1.202104291450
     container_name: springboot_app
     ports:
-      - "8080:8080"
+      - '8080:8080'
     environment:
       spring_profiles_active: dev
     volumes:
@@ -18,14 +17,14 @@ services:
     image: mwangxx/redis:5.0.8
     container_name: cache
     ports:
-      - "127.0.0.1:6379:6379"
+      - '127.0.0.1:6379:6379'
 
   database:
     image: mwangxx/postgres:12.2-2
     container_name: db
     hostname: postgres
     ports:
-      - "5432:5432"
+      - '5432:5432'
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: docker
@@ -35,7 +34,7 @@ services:
       - $HOME/docker/volumes/db_backup:/var/db_backup
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 10s
       timeout: 5s
       retries: 5
