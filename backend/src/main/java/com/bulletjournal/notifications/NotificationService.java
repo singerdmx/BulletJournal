@@ -6,6 +6,7 @@ import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.notifications.informed.Informed;
 import com.bulletjournal.redis.RedisEtagDaoJpa;
 import com.bulletjournal.repository.*;
+import com.bulletjournal.repository.models.Note;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
 import com.bulletjournal.util.CustomThreadFactory;
@@ -199,7 +200,10 @@ public class NotificationService {
                 } else if (e instanceof Auditable) {
                     auditables.add((Auditable) e);
                 } else if (e instanceof ProjectItemAuditable) {
-                    noteAuditables.add((ProjectItemAuditable) e);
+                    ProjectItemAuditable projectItemAuditable = (ProjectItemAuditable) e;
+                    if (projectItemAuditable.getProjectItem() instanceof Note) {
+                        noteAuditables.add(projectItemAuditable);
+                    }
                 } else if (e instanceof RemoveElasticsearchDocumentEvent) {
                     removeElasticsearchDocumentEvents.add((RemoveElasticsearchDocumentEvent) e);
                 } else if (e instanceof SaveCompleteTasksEvent) {

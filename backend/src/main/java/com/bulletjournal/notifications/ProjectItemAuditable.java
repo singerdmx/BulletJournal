@@ -81,6 +81,14 @@ public class ProjectItemAuditable {
     this.activityTime = activityTime;
   }
 
+  public ProjectItemModel getProjectItem() {
+    return projectItem;
+  }
+
+  public void setProjectItem(ProjectItemModel projectItem) {
+    this.projectItem = projectItem;
+  }
+
   public com.bulletjournal.repository.models.NoteAuditable toRepositoryNoteAuditable() {
     return new com.bulletjournal.repository.models.NoteAuditable(
         (com.bulletjournal.repository.models.Note) this.projectItem,
