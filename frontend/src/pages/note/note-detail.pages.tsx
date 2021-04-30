@@ -166,7 +166,7 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
       <div className="note-content">
         <div className="content-list">
           {contents.length > 1
-          && <Tooltip title="reorder contents">
+          && <Tooltip title="Reorder Contents">
             <Button
                 type="primary"
                 shape="circle"
