@@ -4,7 +4,7 @@ import {RouteComponentProps, withRouter} from "react-router";
 import {IState} from "../../store";
 import {connect} from "react-redux";
 import {Content, ProjectItem} from "../../features/myBuJo/interface";
-import {Avatar, Empty} from "antd";
+import {Avatar, Empty, Tooltip} from "antd";
 import ContentItem from "../content/content-item.component";
 import moment from "moment";
 
@@ -88,8 +88,9 @@ const ContentDnd: React.FC<RouteComponentProps & ContentProps> = (props) => {
                                             )}
                                         >
                                             <div>
-                                                <Avatar src={content.owner.avatar} size='small'/>
-                                                {content.owner.alias + " "}
+                                                <Tooltip title={content.owner.alias} placement='left'>
+                                                    <Avatar src={content.owner.avatar} size='small'/>
+                                                </Tooltip>
                                                 {`${moment(content.updatedAt).format('MMM Do YYYY')} (${moment(content.updatedAt).fromNow()})`}
                                                 <div style={{ maxHeight: "50px",
                                                     width: "400px",
