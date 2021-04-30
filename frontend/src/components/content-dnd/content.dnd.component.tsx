@@ -10,7 +10,7 @@ import moment from "moment";
 
 const reorder = (contents: Content[], startIndex: number, endIndex: number) => {
     console.log(contents + " " + startIndex + " " + endIndex)
-    const result = contents;
+    const result = [...contents];
     const [removed] = result.splice(startIndex, 1);
     result.splice(endIndex, 0, removed);
 
