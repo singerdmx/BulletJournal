@@ -1,13 +1,13 @@
 // page display contents of notes
 // react imports
-import React, { useEffect } from 'react';
+import React, { useEffect,useState } from 'react';
 // features
 //actions
 import { Note } from '../../features/notes/interface';
 // components
 import NoteContentList from '../../components/content/content-list.component';
 // antd imports
-import {Avatar, Divider, message, Tag, Tooltip} from 'antd';
+import {Avatar, Button, Divider, Form, message, Modal, Tag, Tooltip} from 'antd';
 import './note-page.styles.less';
 import 'braft-editor/dist/index.css';
 import { ProjectType } from '../../features/project/constants';
@@ -19,8 +19,9 @@ import {connect} from "react-redux";
 import {animation, IconFont, Item, Menu, MenuProvider} from "react-contexify";
 import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
 import CopyToClipboard from "react-copy-to-clipboard";
-import {CopyOutlined, BgColorsOutlined, EnvironmentOutlined} from "@ant-design/icons/lib";
+import {CopyOutlined, BgColorsOutlined, EnvironmentOutlined, DragOutlined} from "@ant-design/icons/lib";
 import {updateColorSettingShown} from '../../features/notes/actions';
+import ContentDnd from "../../components/content-dnd/content.dnd.component";
 
 
 export type NoteProps = {
@@ -52,6 +53,8 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
     isPublic,
     updateColorSettingShown,
   } = props;
+  const [reorderContentsVisible,setReorderContentsVisible] = useState(false);
+
   useEffect(() => {
     if (note) {
       document.title = note.name;
@@ -89,6 +92,26 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
   const bgColorSetting = note.color ? JSON.parse(note.color) : undefined;
   const bgColor = bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined;
 
+  const getReorderContextsModal = () => {
+    console.log(reorderContentsVisible)
+    return(
+        <Modal
+            destroyOnClose
+            centered
+            title='Drag to Reorder Contents'
+            visible={reorderContentsVisible}
+            okText='Confirm'
+            onCancel={() => setReorderContentsVisible(false)}
+            // onOk={() => {
+            // }}
+        >
+          <div >
+            <ContentDnd contents={contents} projectItem={note}/>
+          </div>
+        </Modal>
+    )
+  }
+  // @ts-ignore
   return (
     <div className={`note-page ${inPublicPage() ? 'publicPage' : ''} ${isPublic ? 'sharedItem' : ''}`} style={{background: bgColor}}>
       <Tooltip
@@ -142,8 +165,19 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
       <Divider style={{marginTop: '0px'}}/>
       <div className="note-content">
         <div className="content-list">
+          {contents.length > 1
+          && <Tooltip title="reorder contents">
+            <Button
+                type="primary"
+                shape="circle"
+                icon={<DragOutlined />}
+                onClick={() => setReorderContentsVisible(true)}
+                style={{marginBottom: '5px'}}
+            />
+          </Tooltip>}
           <NoteContentList projectItem={note} contents={contents} />
         </div>
+        {getReorderContextsModal()}
         {createContentElem}
       </div>
       {noteEditorElem}
