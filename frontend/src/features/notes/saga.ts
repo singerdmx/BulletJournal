@@ -719,12 +719,18 @@ function* setContentsOrder(action: PayloadAction<SetContentsOrder>){
       noteId,
       order
     }=action.payload;
-    yield call(message.success, `Set Contents Order`);
+    yield call(message.success, `Updating`);
 
     yield call(
         setContentsDisplayOrder,
         noteId,
         order
+    );
+    const contents : Content[] = yield call(getContents, noteId);
+    yield put(
+        notesActions.noteContentsReceived({
+          contents: contents,
+        })
     );
   }catch (error) {
     if (error.message === 'reload') {

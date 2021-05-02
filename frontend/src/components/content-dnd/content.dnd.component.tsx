@@ -7,6 +7,7 @@ import {Content, ProjectItem} from "../../features/myBuJo/interface";
 import {Avatar, Empty, Tooltip} from "antd";
 import ContentItem from "../content/content-item.component";
 import moment from "moment";
+import '../../styles/main.less';
 
 const reorder = (contents: Content[], startIndex: number, endIndex: number) => {
     console.log(contents + " " + startIndex + " " + endIndex)
@@ -25,13 +26,12 @@ const getItemStyle = (isDragging: boolean, draggableStyle: DraggingStyle | NotDr
         padding: grid * 2,
         margin: `0 0 ${grid}px 0`,
         borderRadius: "8px",
-        background: isDragging ? "lightgreen" : "white",
+        background: isDragging ? "#caccd8" : "white",
         ...draggableStyle
     });
 };
 
-const getListStyle = (isDraggingOver: boolean) => ({
-    background:isDraggingOver?"grey":"#1890ff",
+const getListStyle = () => ({
     padding: grid * 2,
     width: 450,
     borderRadius: "8px",
@@ -59,7 +59,7 @@ const ContentDnd: React.FC<RouteComponentProps & ContentProps> = (props) => {
             result.destination.index
         );
         setContentsOnOrder(reorderedContents)
-        props.setContentIdsOnOrder(contentsOnOrder.map(content => content.id))
+        props.setContentIdsOnOrder(reorderedContents.map(content => content.id))
     }
 
     if (props.contents.length === 0) {
@@ -72,10 +72,11 @@ const ContentDnd: React.FC<RouteComponentProps & ContentProps> = (props) => {
                 <Droppable droppableId="content-droppable">
                     {(provided, snapshot) => (
                         <div
+                            className="reorder-content-list"
                             {...provided.droppableProps}
                             ref={provided.innerRef}
                             key={i++}
-                            style={getListStyle(snapshot.isDraggingOver)}
+                            style={getListStyle()}
                         >
                             {contentsOnOrder.map((content, index) => (
                                 <Draggable key={content.id} draggableId={content.id.toString(10)} index={index}>
