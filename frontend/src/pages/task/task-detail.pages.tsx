@@ -5,8 +5,8 @@ import React, {useEffect, useState} from 'react';
 //actions
 import {getReminderSettingString, getTaskBackgroundColor, Task, TaskStatus,} from '../../features/tasks/interface';
 // antd imports
-import {Avatar, BackTop, Divider, message, Select, Tag, Tooltip} from 'antd';
-import { AlertOutlined, ClockCircleOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import {Avatar, BackTop, Button, Divider, message, Modal, Select, Tag, Tooltip} from 'antd';
+import {AlertOutlined, ClockCircleOutlined, DragOutlined, EnvironmentOutlined} from '@ant-design/icons';
 import './task-page.styles.less';
 import 'braft-editor/dist/index.css';
 import {ProjectItemUIType, ProjectType} from '../../features/project/constants';
@@ -20,13 +20,14 @@ import TaskContentList from '../../components/content/content-list.component';
 import {IState} from '../../store';
 import {connect} from 'react-redux';
 //action
-import {setTaskStatus} from '../../features/tasks/actions';
+import {setTaskStatus, setContentsOrder} from '../../features/tasks/actions';
 import {getDuration} from '../../components/project-item/task-item.component';
 import {inPublicPage} from "../../index";
 import {animation, IconFont, Item, Menu, MenuProvider} from "react-contexify";
 import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
 import CopyToClipboard from "react-copy-to-clipboard";
 import {CopyOutlined} from "@ant-design/icons/lib";
+import ContentDnd from "../../components/content-dnd/content.dnd.component";
 
 const { Option } = Select;
 
@@ -44,6 +45,10 @@ type TaskDetailProps = {
   taskOperation: Function;
   createContentElem: React.ReactNode;
   taskEditorElem: React.ReactNode;
+  setContentsOrder: (
+      taskId: number,
+      order: number[]
+  ) => void;
 };
 
 const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
@@ -58,10 +63,17 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
     contentEditable,
     setTaskStatus,
     isPublic,
+    setContentsOrder,
   } = props;
   const [inputStatus, setInputStatus] = useState('' as TaskStatus);
+  const [reorderContentsVisible,setReorderContentsVisible] = useState(false);
+  const [contentIdsOnOrder, setContentIdsOnOrder] = useState(contents.map(content => content.id))
 
-  useEffect(() => {
+    useEffect(() => {
+        setContentIdsOnOrder(props.contents.map(content => content.id))
+    },[props.contents])
+
+    useEffect(() => {
     if (task) {
       setInputStatus(task.status);
     }
@@ -192,6 +204,31 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
         </div>;
     };
 
+    const setContentsOrderAndCloseModal = () => {
+        setContentsOrder(task?.id, contentIdsOnOrder);
+        setReorderContentsVisible(false);
+    }
+
+    const getReorderContextsModal = () => {
+        return(
+            <Modal
+                destroyOnClose
+                centered
+                title='Drag to Reorder Contents'
+                visible={reorderContentsVisible}
+                okText='Confirm'
+                onCancel={() => setReorderContentsVisible(false)}
+                onOk={() => {
+                    setContentsOrderAndCloseModal()
+                }}
+            >
+                <div >
+                    <ContentDnd contents={contents} setContentIdsOnOrder={setContentIdsOnOrder} projectItem={task}/>
+                </div>
+            </Modal>
+        )
+    }
+
     return (
     <div className={`task-page ${inPublicPage() ? 'publicPage' : ''} ${isPublic ? 'sharedItem' : ''}`}>
         <BackTop/>
@@ -241,12 +278,23 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
         <Divider style={{marginTop: '0px'}}/>
         <div className="task-content">
             <div className="content-list">
+                {contents.length > 1
+                && <Tooltip title="Reorder Contents">
+                    <Button
+                        type="primary"
+                        shape="circle"
+                        icon={<DragOutlined />}
+                        onClick={() => setReorderContentsVisible(true)}
+                        style={{marginBottom: '5px'}}
+                    />
+                </Tooltip>}
                 <TaskContentList
                     projectItem={task}
                     contents={contents}
                     contentEditable={contentEditable}
                 />
             </div>
+            {getReorderContextsModal()}
             {createContentElem}
         </div>
         {taskEditorElem}
@@ -260,4 +308,5 @@ const mapStateToProps = (state: IState) => ({
 
 export default connect(mapStateToProps, {
   setTaskStatus,
+  setContentsOrder,
 })(TaskDetailPage);

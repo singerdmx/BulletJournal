@@ -449,3 +449,14 @@ export const exportTaskAsPdfOrImage = (
         throw Error(err);
       });
 };
+
+export const setContentsDisplayOrder = (
+    taskId: number,
+    order: number[]
+) => {
+  return doPost(`/api/tasks/${taskId}/contents/setOrder`, '[' + order.toString() + ']')
+      .then(res => res)
+      .catch((err) => {
+        throw Error(err);
+      });
+};

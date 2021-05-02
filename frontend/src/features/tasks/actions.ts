@@ -258,3 +258,12 @@ export const exportTask = (
         exportType: exportType,
         fileName: fileName
     });
+
+export const setContentsOrder = (
+    taskId:number,
+    order: number[]
+)=>
+    actions.SetContentsOrder({
+        taskId:taskId,
+        order:order
+    })

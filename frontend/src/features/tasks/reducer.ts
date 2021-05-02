@@ -243,6 +243,10 @@ export type ExportTask = {
   fileName: string
 }
 
+export type SetContentsOrder = {
+  taskId:number,
+  order:number[]
+};
 
 let initialState = {
   addTaskVisible: true,
@@ -402,6 +406,7 @@ const slice = createSlice({
     },
     TaskShareByEmail: (state, action: PayloadAction<ShareTaskByEmailAction>) => state,
     ExportTask: (state, action: PayloadAction<ExportTask>) => state,
+    SetContentsOrder:(state,action: PayloadAction<SetContentsOrder>) => state,
   },
 });
 
