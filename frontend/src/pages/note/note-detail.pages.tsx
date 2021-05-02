@@ -20,7 +20,7 @@ import {animation, IconFont, Item, Menu, MenuProvider} from "react-contexify";
 import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
 import CopyToClipboard from "react-copy-to-clipboard";
 import {CopyOutlined, BgColorsOutlined, EnvironmentOutlined, DragOutlined} from "@ant-design/icons/lib";
-import {updateColorSettingShown} from '../../features/notes/actions';
+import {updateColorSettingShown, setContentsOrder, updateNoteContents} from '../../features/notes/actions';
 import ContentDnd from "../../components/content-dnd/content.dnd.component";
 
 
@@ -30,6 +30,10 @@ export type NoteProps = {
   updateColorSettingShown: (
     visible: boolean
   ) => void;
+  updateNoteContents: (
+      noteId: number,
+      updateDisplayMore?: boolean
+  ) => void
 };
 
 type NoteDetailProps = {
@@ -39,6 +43,10 @@ type NoteDetailProps = {
   createContentElem: React.ReactNode;
   noteEditorElem: React.ReactNode;
   isPublic?: boolean;
+  setContentsOrder: (
+      noteId: number,
+      order: number[]
+  ) => void;
 };
 
 const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
@@ -52,8 +60,14 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
     contents,
     isPublic,
     updateColorSettingShown,
+    setContentsOrder,
+    updateNoteContents,
   } = props;
   const [reorderContentsVisible,setReorderContentsVisible] = useState(false);
+  const [contentIdsOnOrder, setContentIdsOnOrder] = useState(props.contents.map(content => content.id))
+  useEffect(() => {
+    setContentIdsOnOrder(props.contents.map(content => content.id))
+  },[props.contents])
 
   useEffect(() => {
     if (note) {
@@ -92,8 +106,13 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
   const bgColorSetting = note.color ? JSON.parse(note.color) : undefined;
   const bgColor = bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined;
 
+  const setContentsOrderAndCloseModal = () => {
+    setContentsOrder(note?.id, contentIdsOnOrder);
+    setReorderContentsVisible(false);
+    updateNoteContents(note?.id);
+  }
+
   const getReorderContextsModal = () => {
-    console.log(reorderContentsVisible)
     return(
         <Modal
             destroyOnClose
@@ -102,11 +121,12 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
             visible={reorderContentsVisible}
             okText='Confirm'
             onCancel={() => setReorderContentsVisible(false)}
-            // onOk={() => {
-            // }}
+            onOk={() => {
+              setContentsOrderAndCloseModal()
+            }}
         >
           <div >
-            <ContentDnd contents={contents} projectItem={note}/>
+            <ContentDnd contents={contents} setContentIdsOnOrder={setContentIdsOnOrder} projectItem={note}/>
           </div>
         </Modal>
     )
@@ -189,4 +209,8 @@ const mapStateToProps = (state: IState) => ({
   theme: state.myself.theme,
 });
 
-export default connect(mapStateToProps, {updateColorSettingShown})(NoteDetailPage);
+export default connect(mapStateToProps, {
+  updateColorSettingShown,
+  setContentsOrder,
+  updateNoteContents,
+})(NoteDetailPage);

@@ -295,3 +295,15 @@ export const exportNoteAsPdfOrImage = (
         throw Error(err);
       });
 };
+
+export const setContentsDisplayOrder = (
+    noteId: number,
+    order: number[]
+) => {
+    return doPost(`/api/notes/${noteId}/contents/setOrder`, '[' + order.toString() + ']')
+        .then(res => res)
+        .catch((err) => {
+            console.log("error")
+          throw Error(err);
+        });
+};

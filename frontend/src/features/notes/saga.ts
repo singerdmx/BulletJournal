@@ -25,7 +25,7 @@ import {
   UpdateNotes,
   UpdateNoteColorAction,
   ShareNoteByEmailAction,
-  ExportNote,
+  ExportNote, SetContentsOrder,
 } from './reducer';
 import {PayloadAction} from 'redux-starter-kit';
 import {
@@ -50,6 +50,7 @@ import {
   putNoteColor,
   shareNoteByEmail,
   exportNoteAsPdfOrImage,
+  setContentsDisplayOrder,
 } from '../../apis/noteApis';
 import {IState} from '../../store';
 import {updateNoteContents, updateNotes} from './actions';
@@ -712,6 +713,28 @@ function* exportNote(action: PayloadAction<ExportNote>) {
   }
 }
 
+function* setContentsOrder(action: PayloadAction<SetContentsOrder>){
+  try {
+    const {
+      noteId,
+      order
+    }=action.payload;
+    yield call(message.success, `Set Contents Order`);
+
+    yield call(
+        setContentsDisplayOrder,
+        noteId,
+        order
+    );
+  }catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Set Contents Order Error Received: ${error}`);
+    }
+  }
+}
+
 export default function* noteSagas() {
   yield all([
     yield takeLatest(
@@ -744,5 +767,6 @@ export default function* noteSagas() {
     yield takeLatest(notesActions.updateNoteColor.type, updateNoteColor),
     yield takeLatest(notesActions.NoteShareByEmail.type, shareNoteByEmails),
     yield takeLatest(notesActions.ExportNote.type, exportNote),
+    yield takeLatest(notesActions.SetContentsOrder.type, setContentsOrder),
   ]);
 }

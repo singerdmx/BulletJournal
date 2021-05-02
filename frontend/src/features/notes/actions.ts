@@ -148,3 +148,12 @@ export const exportNote = (
         exportType: exportType,
         fileName: fileName
     });
+
+export const setContentsOrder = (
+    noteId:number,
+    order: number[]
+)=>
+    actions.SetContentsOrder({
+        noteId:noteId,
+        order:order
+    })

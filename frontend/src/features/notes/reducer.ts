@@ -172,7 +172,12 @@ export type ExportNote= {
   contents: Content[],
   exportType: string,
   fileName: string
-}
+};
+
+export type SetContentsOrder = {
+  noteId:number,
+  order:number[]
+};
 
 let initialState = {
   note: undefined as Note | undefined,
@@ -279,6 +284,7 @@ const slice = createSlice({
     ) => state,
     NoteShareByEmail: (state, action: PayloadAction<ShareNoteByEmailAction>) => state,
     ExportNote: (state, action: PayloadAction<ExportNote>) => state,
+    SetContentsOrder:(state,action: PayloadAction<SetContentsOrder>) => state,
   },
 });
 

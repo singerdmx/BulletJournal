@@ -40,6 +40,7 @@ const getListStyle = (isDraggingOver: boolean) => ({
 type ContentProps = {
     contents: Content[];
     projectItem: ProjectItem;
+    setContentIdsOnOrder: (order: number[]) => void;
 }
 
 const ContentDnd: React.FC<RouteComponentProps & ContentProps> = (props) => {
@@ -58,6 +59,7 @@ const ContentDnd: React.FC<RouteComponentProps & ContentProps> = (props) => {
             result.destination.index
         );
         setContentsOnOrder(reorderedContents)
+        props.setContentIdsOnOrder(contentsOnOrder.map(content => content.id))
     }
 
     if (props.contents.length === 0) {
