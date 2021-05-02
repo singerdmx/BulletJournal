@@ -1366,7 +1366,7 @@ function* setContentsOrder(action: PayloadAction<SetContentsOrder>){
       taskId,
       order
     }=action.payload;
-    yield call(message.success, `Updating`);
+    yield call(message.success, 'Updating');
 
     yield call(
         setContentsDisplayOrder,

@@ -885,7 +885,7 @@ function* setContentsOrder(action: PayloadAction<SetContentsOrder>){
       transactionId,
       order
     }=action.payload;
-    yield call(message.success, `Updating`);
+    yield call(message.success, 'Updating');
 
     yield call(
         setContentsDisplayOrder,

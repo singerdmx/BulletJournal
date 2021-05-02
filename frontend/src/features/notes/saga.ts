@@ -719,7 +719,7 @@ function* setContentsOrder(action: PayloadAction<SetContentsOrder>){
       noteId,
       order
     }=action.payload;
-    yield call(message.success, `Updating`);
+    yield call(message.success, 'Updating');
 
     yield call(
         setContentsDisplayOrder,
