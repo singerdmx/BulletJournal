@@ -41,12 +41,13 @@ import {
   BgColorsOutlined,
   CreditCardOutlined,
   DeleteTwoTone,
-  DollarCircleOutlined, DragOutlined,
+  DollarCircleOutlined,
   ExportOutlined,
   FileImageOutlined,
   FilePdfOutlined,
   PlusOutlined,
   SyncOutlined,
+  UnorderedListOutlined,
   UpSquareOutlined,
 } from '@ant-design/icons';
 import moment from 'moment';
@@ -470,7 +471,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
             <Button
                 type="primary"
                 shape="circle"
-                icon={<DragOutlined />}
+                icon={<UnorderedListOutlined />}
                 onClick={() => setReorderContentsVisible(true)}
                 style={{marginBottom: '5px'}}
             />

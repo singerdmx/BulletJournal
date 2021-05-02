@@ -6,7 +6,7 @@ import React, {useEffect, useState} from 'react';
 import {getReminderSettingString, getTaskBackgroundColor, Task, TaskStatus,} from '../../features/tasks/interface';
 // antd imports
 import {Avatar, BackTop, Button, Divider, message, Modal, Select, Tag, Tooltip} from 'antd';
-import {AlertOutlined, ClockCircleOutlined, DragOutlined, EnvironmentOutlined} from '@ant-design/icons';
+import {AlertOutlined, ClockCircleOutlined, UnorderedListOutlined, EnvironmentOutlined} from '@ant-design/icons';
 import './task-page.styles.less';
 import 'braft-editor/dist/index.css';
 import {ProjectItemUIType, ProjectType} from '../../features/project/constants';
@@ -283,7 +283,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
                     <Button
                         type="primary"
                         shape="circle"
-                        icon={<DragOutlined />}
+                        icon={<UnorderedListOutlined />}
                         onClick={() => setReorderContentsVisible(true)}
                         style={{marginBottom: '5px'}}
                     />

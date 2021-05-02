@@ -19,8 +19,8 @@ import {connect} from "react-redux";
 import {animation, IconFont, Item, Menu, MenuProvider} from "react-contexify";
 import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
 import CopyToClipboard from "react-copy-to-clipboard";
-import {CopyOutlined, BgColorsOutlined, EnvironmentOutlined, DragOutlined} from "@ant-design/icons/lib";
-import {updateColorSettingShown, setContentsOrder, getNote} from '../../features/notes/actions';
+import {CopyOutlined, BgColorsOutlined, EnvironmentOutlined, UnorderedListOutlined} from "@ant-design/icons/lib";
+import {updateColorSettingShown, setContentsOrder} from '../../features/notes/actions';
 import ContentDnd from "../../components/content-dnd/content.dnd.component";
 
 
@@ -184,7 +184,7 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
             <Button
                 type="primary"
                 shape="circle"
-                icon={<DragOutlined />}
+                icon={<UnorderedListOutlined />}
                 onClick={() => setReorderContentsVisible(true)}
                 style={{marginBottom: '5px'}}
             />
