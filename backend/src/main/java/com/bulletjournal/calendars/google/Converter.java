@@ -14,6 +14,9 @@ import com.google.api.services.calendar.model.EventReminder;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.dmfs.rfc5545.DateTime;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -28,6 +31,7 @@ public class Converter {
     private static final String INSERT_STR_FORMAT = "{\"insert\":\"%s\"},";
     private static final String INSERT_LINE_BREAK = "{\"insert\":\"\\n\"},";
     public static final Logger LOGGER = LoggerFactory.getLogger(Converter.class);
+    private static final Document.OutputSettings HTML_DOC_OUTPUT_SETTINGS = new Document.OutputSettings();
 
     public static GoogleCalendarEvent toTask(Event event, String timezone) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -68,8 +72,27 @@ public class Converter {
                 processHtmlTags(event.getDescription()));
     }
 
-    private static String processHtmlTags(String htmlString) {
-        return htmlString.replaceAll("\\<[^>]*>", "");
+    private static String processHtmlTags(String strHTML) {
+        //create Jsoup document from HTML
+        Document jsoupDoc = Jsoup.parse(strHTML);
+
+        //set pretty print to false, so \n is not removed
+        jsoupDoc.outputSettings(HTML_DOC_OUTPUT_SETTINGS.prettyPrint(false));
+
+        //select all <br> tags and append \n after that
+        jsoupDoc.select("br").after("\\n");
+
+        //select all <p> tags and prepend \n before that
+        jsoupDoc.select("p").before("\\n");
+
+        //get the HTML from the document, and retaining original new lines
+        String str = jsoupDoc.html().replaceAll("\\\\n", "\n").replaceAll("&nbsp;", "\t");
+
+        String strWithNewLines =
+                Jsoup.clean(str, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false)).replaceAll("&lt;", "<").replaceAll("&gt;", ">");
+
+        LOGGER.info("Html Tags processed: {}", strWithNewLines);
+        return strWithNewLines;
     }
 
     private static String getBaseText(Event event, Task task) {
