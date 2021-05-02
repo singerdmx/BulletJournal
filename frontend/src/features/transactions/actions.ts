@@ -263,3 +263,12 @@ export const changeAccountBalance = (bankAccount: BankAccount, balance: number, 
 
 export const getBankAccountTransactions = (bankAccountId: number, startDate: string, endDate: string) =>
     actions.GetBankAccountTransactions({bankAccountId: bankAccountId, startDate: startDate, endDate: endDate});
+
+export const setContentsOrder = (
+    transactionId:number,
+    order: number[]
+)=>
+    actions.SetContentsOrder({
+        transactionId:transactionId,
+        order:order
+    })

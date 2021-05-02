@@ -344,3 +344,15 @@ export const exportTransactionAsPdfOrImage = (
         throw Error(err);
       });
 };
+
+export const setContentsDisplayOrder = (
+    transactionId: number,
+    order: number[]
+) => {
+  return doPost(`/api/transactions/${transactionId}/contents/setOrder`, '[' + order.toString() + ']')
+      .then(res => res)
+      .catch((err) => {
+        throw Error(err);
+      });
+};
+

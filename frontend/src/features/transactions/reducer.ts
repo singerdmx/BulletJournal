@@ -216,6 +216,11 @@ export type GetBankAccountTransactionsAction = {
   endDate: string
 }
 
+export type SetContentsOrder = {
+  transactionId:number,
+  order:number[]
+};
+
 let initialState = {
   contents: [] as Array<Content>,
   transaction: undefined as Transaction | undefined,
@@ -366,6 +371,7 @@ const slice = createSlice({
     ExportTransaction: (state, action: PayloadAction<ExportTransaction>) => state,
     ChangeBankAccountBalance: (state, action: PayloadAction<ChangeBankAccountBalanceAction>) => state,
     GetBankAccountTransactions: (state, action: PayloadAction<GetBankAccountTransactionsAction>) => state,
+    SetContentsOrder:(state,action: PayloadAction<SetContentsOrder>) => state,
   },
 });
 

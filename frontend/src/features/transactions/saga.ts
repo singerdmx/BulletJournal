@@ -21,6 +21,7 @@ import {
   UpdateTransactionContentRevision,
   UpdateTransactionContents,
   UpdateTransactions,
+  SetContentsOrder,
 } from './reducer';
 import {IState} from '../../store';
 import {PayloadAction} from 'redux-starter-kit';
@@ -44,6 +45,7 @@ import {
   shareTransactionWithOther,
   updateContent,
   updateTransaction,
+  setContentsDisplayOrder,
 } from '../../apis/transactionApis';
 import {BankAccount, LedgerSummary, Transaction, TransactionView} from './interface';
 import {getProjectItemsAfterUpdateSelect} from '../myBuJo/actions';
@@ -877,6 +879,35 @@ function* getBankAccountTransactions(action: PayloadAction<GetBankAccountTransac
   }
 }
 
+function* setContentsOrder(action: PayloadAction<SetContentsOrder>){
+  try {
+    const {
+      transactionId,
+      order
+    }=action.payload;
+    yield call(message.success, `Updating`);
+
+    yield call(
+        setContentsDisplayOrder,
+        transactionId,
+        order
+    );
+    const contents : Content[] = yield call(getContents, transactionId);
+    yield put(
+        transactionsActions.transactionContentsReceived({
+          contents: contents,
+        })
+    );
+  }catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Set Contents Order Error Received: ${error}`);
+    }
+  }
+}
+
+
 export default function* transactionSagas() {
   yield all([
     yield takeLatest(
@@ -960,5 +991,6 @@ export default function* transactionSagas() {
     yield takeLatest(
         transactionsActions.GetBankAccountTransactions.type,
         getBankAccountTransactions),
+    yield takeLatest(transactionsActions.SetContentsOrder.type, setContentsOrder),
   ]);
 }

@@ -13,6 +13,7 @@ import {
   exportTransaction,
   updateTransactionColorSettingShown,
   updateTransactionContents,
+  setContentsOrder,
 } from '../../features/transactions/actions';
 import {dateFormat} from '../../features/myBuJo/constants';
 // modals import
@@ -34,12 +35,13 @@ import {
   Statistic,
   Tag,
   Tooltip,
+  Modal,
 } from 'antd';
 import {
   BgColorsOutlined,
   CreditCardOutlined,
   DeleteTwoTone,
-  DollarCircleOutlined,
+  DollarCircleOutlined, DragOutlined,
   ExportOutlined,
   FileImageOutlined,
   FilePdfOutlined,
@@ -75,6 +77,7 @@ import {convertToTextWithRRule} from "../../features/recurrence/actions";
 import BankList from "../../components/modals/bank-list.component";
 import BankAccountElem from "../../components/settings/bank-account";
 import {resizeFloatButton} from "../../utils/Util";
+import ContentDnd from "../../components/content-dnd/content.dnd.component";
 
 const LocaleCurrency = require('locale-currency');
 
@@ -96,6 +99,11 @@ type TransactionProps = {
       exportType: string,
       fileName: string
   ) => void;
+  setContentsOrder: (
+      taskId: number,
+      order: number[]
+  ) => void;
+
 };
 
 interface TransactionPageHandler {
@@ -149,7 +157,8 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
     deleteContent,
     getProject,
     updateTransactionColorSettingShown,
-    exportTransaction
+    exportTransaction,
+    setContentsOrder,
   } = props;
 
   // get id of Transaction from router
@@ -160,6 +169,12 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   const currencyType = LocaleCurrency.getCurrency(currency);
   // hook history in router
   const history = useHistory();
+  const [reorderContentsVisible,setReorderContentsVisible] = useState(false);
+  const [contentIdsOnOrder, setContentIdsOnOrder] = useState(contents.map(content => content.id))
+
+  useEffect(() => {
+    setContentIdsOnOrder(props.contents.map(content => content.id))
+  },[props.contents])
 
   // listening on the empty state working as componentDidmount
   useEffect(() => {
@@ -315,6 +330,31 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
   const bgColorSetting = transaction.color ? JSON.parse(transaction.color) : undefined;
   const bgColor = bgColorSetting ? `rgba(${ bgColorSetting.r }, ${ bgColorSetting.g }, ${ bgColorSetting.b }, ${ bgColorSetting.a })` : undefined;
 
+  const setContentsOrderAndCloseModal = () => {
+    setContentsOrder(transaction?.id, contentIdsOnOrder);
+    setReorderContentsVisible(false);
+  }
+
+  const getReorderContextsModal = () => {
+    return(
+        <Modal
+            destroyOnClose
+            centered
+            title='Drag to Reorder Contents'
+            visible={reorderContentsVisible}
+            okText='Confirm'
+            onCancel={() => setReorderContentsVisible(false)}
+            onOk={() => {
+              setContentsOrderAndCloseModal()
+            }}
+        >
+          <div >
+            <ContentDnd contents={contents} setContentIdsOnOrder={setContentIdsOnOrder} projectItem={transaction}/>
+          </div>
+        </Modal>
+    )
+  }
+
   return (
     <div className="tran-page" style={{background: bgColor}}>
       <BackTop />
@@ -425,11 +465,22 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
       <Divider style={{marginTop: '5px'}}/>
       <div className="tran-content">
         <div className="content-list">
+          {contents.length > 1
+          && <Tooltip title="Reorder Contents">
+            <Button
+                type="primary"
+                shape="circle"
+                icon={<DragOutlined />}
+                onClick={() => setReorderContentsVisible(true)}
+                style={{marginBottom: '5px'}}
+            />
+          </Tooltip>}
           <TransactionContentList
             projectItem={transaction}
             contents={contents}
           />
         </div>
+        {getReorderContextsModal()}
         {createContentElem}
       </div>
       <div className="transaction-drawer">
@@ -463,4 +514,5 @@ export default connect(mapStateToProps, {
   getProject,
   updateTransactionColorSettingShown,
   exportTransaction,
+  setContentsOrder,
 })(TransactionPage);
