@@ -129,15 +129,15 @@ const AddProject: React.FC<GroupProps & ProjectProps> = (props) => {
                     value={projectType ? projectType : undefined}
                     onChange={(e) => onChangeProjectType(e)}
                 >
-                  <Option value="TODO" title="Project Type: TODO">
+                  <Option value="TODO">
                     <CarryOutOutlined/>
                     &nbsp;TODO
                   </Option>
-                  <Option value="NOTE" title="Project Type: NOTE">
+                  <Option value="NOTE">
                     <FileTextOutlined/>
                     &nbsp;NOTE
                   </Option>
-                  <Option value="LEDGER" title="Project Type: LEDGER">
+                  <Option value="LEDGER">
                     <CreditCardOutlined/>
                     &nbsp;LEDGER
                   </Option>
