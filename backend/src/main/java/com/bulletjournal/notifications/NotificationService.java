@@ -1,6 +1,7 @@
 package com.bulletjournal.notifications;
 
 import com.bulletjournal.config.SpringESConfig;
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.daemon.Reminder;
 import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.notifications.informed.Informed;
@@ -8,6 +9,7 @@ import com.bulletjournal.redis.RedisEtagDaoJpa;
 import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.models.Note;
 import com.bulletjournal.repository.models.Project;
+import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.templates.repository.SampleTaskDaoJpa;
 import com.bulletjournal.util.CustomThreadFactory;
 import org.apache.commons.lang3.tuple.Pair;
@@ -38,6 +40,10 @@ public class NotificationService {
     @Autowired
     @Lazy
     private NoteAuditableDaoJpa noteAuditableDaoJpa;
+
+    @Autowired
+    @Lazy
+    private TaskAuditableDaoJpa taskAuditableDaoJpa;
 
     @Autowired
     private SpringESConfig springESConfig;
@@ -187,6 +193,7 @@ public class NotificationService {
             List<Informed> informeds = new ArrayList<>();
             List<Auditable> auditables = new ArrayList<>();
             List<ProjectItemAuditable> noteAuditables = new ArrayList<>();
+            List<ProjectItemAuditable> taskAuditables = new ArrayList<>();
             List<RemoveElasticsearchDocumentEvent> removeElasticsearchDocumentEvents = new ArrayList<>();
             List<SaveCompleteTasksEvent> saveCompleteTasksEvents = new ArrayList<>();
             List<EtagEvent> etagEvents = new ArrayList<>();
@@ -202,8 +209,12 @@ public class NotificationService {
                     auditables.add((Auditable) e);
                 } else if (e instanceof ProjectItemAuditable) {
                     ProjectItemAuditable projectItemAuditable = (ProjectItemAuditable) e;
-                    if (projectItemAuditable.getProjectItem() instanceof Note) {
+                    ContentType contentType = projectItemAuditable.getProjectItem().getContentType();
+                    if (contentType == ContentType.NOTE) {
                         noteAuditables.add(projectItemAuditable);
+                    }
+                    else if (contentType == ContentType.TASK) {
+                        taskAuditables.add(projectItemAuditable) ;
                     }
                 } else if (e instanceof RemoveElasticsearchDocumentEvent) {
                     removeElasticsearchDocumentEvents.add((RemoveElasticsearchDocumentEvent) e);
@@ -243,6 +254,13 @@ public class NotificationService {
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error on creating records in NoteAuditableDaoJpa", ex);
+            }
+            try {
+                if (!taskAuditables.isEmpty()) {
+                    this.taskAuditableDaoJpa.create(taskAuditables);
+                }
+            } catch (Exception ex) {
+                LOGGER.error("Error on creating records in TaskAuditableDaoJpa", ex);
             }
             try {
                 if (!removeElasticsearchDocumentEvents.isEmpty() && this.springESConfig.getEnable()) {

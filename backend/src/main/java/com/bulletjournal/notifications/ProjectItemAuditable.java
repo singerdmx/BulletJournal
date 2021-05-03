@@ -8,12 +8,12 @@ import java.sql.Timestamp;
 public class ProjectItemAuditable {
   public static final String PROJECT_ITEM_PROPERTY = "projectItem";
   public static final String CONTENT_PROPERTY = "content";
-  protected String beforeActivity;
-  protected String afterActivity;
-  protected String activity;
-  protected String originator;
-  protected ContentAction action;
-  protected Timestamp activityTime;
+  private String beforeActivity;
+  private String afterActivity;
+  private String activity;
+  private String originator;
+  private ContentAction action;
+  private Timestamp activityTime;
   private ProjectItemModel projectItem;
 
   public ProjectItemAuditable(
@@ -92,6 +92,17 @@ public class ProjectItemAuditable {
   public com.bulletjournal.repository.models.NoteAuditable toRepositoryNoteAuditable() {
     return new com.bulletjournal.repository.models.NoteAuditable(
         (com.bulletjournal.repository.models.Note) this.projectItem,
+        this.activity,
+        this.originator,
+        this.activityTime,
+        this.action,
+        this.beforeActivity,
+        this.afterActivity);
+  }
+
+  public com.bulletjournal.repository.models.TaskAuditable toRepositoryTaskAuditable() {
+    return new com.bulletjournal.repository.models.TaskAuditable(
+        (com.bulletjournal.repository.models.Task) this.projectItem,
         this.activity,
         this.originator,
         this.activityTime,
