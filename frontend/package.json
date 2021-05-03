@@ -18,7 +18,7 @@
     "@types/google-map-react": "^2.1.0",
     "@types/moment-timezone": "^0.5.13",
     "@types/react-color": "^3.0.4",
-    "antd": "^4.1.4",
+    "antd": "^4.2.0",
     "axios": "^0.21.1",
     "braft-editor": "^2.3.9",
     "browserslist": "^4.13.0",
