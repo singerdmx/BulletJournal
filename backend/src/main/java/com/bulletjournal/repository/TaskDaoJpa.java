@@ -700,15 +700,15 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         String taskAfterUpdate = GSON.toJson(task.toPresentationModel());
 
         this.notificationService.trackProjectItemActivity(
-                new com.bulletjournal.notifications.ProjectItemAuditable(
-                        task,
-                        new JSONObject().put(PROJECT_ITEM_PROPERTY, taskBeforeUpdate).toString(),
-                        new JSONObject().put(PROJECT_ITEM_PROPERTY, taskAfterUpdate).toString(),
-                        "updated task ##" + task.getName() + "## in BuJo ##" + task.getProject().getName() + "##",
-                        requester,
-                        ContentAction.UPDATE_NOTE,
-                        Timestamp.from(Instant.now())
-                )
+            new com.bulletjournal.notifications.ProjectItemAuditable(
+                task,
+                new JSONObject().put(PROJECT_ITEM_PROPERTY, taskBeforeUpdate).toString(),
+                new JSONObject().put(PROJECT_ITEM_PROPERTY, taskAfterUpdate).toString(),
+                "updated task ##" + task.getName() + "## in BuJo ##" + task.getProject().getName() + "##",
+                requester,
+                ContentAction.UPDATE_TASK,
+                Timestamp.from(Instant.now())
+            )
         );
 
         return res;
