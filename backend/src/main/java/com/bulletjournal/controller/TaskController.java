@@ -654,7 +654,6 @@ public class TaskController {
       @NotBlank @RequestParam int pageSize) {
     String requester = MDC.get(UserClient.USER_NAME_KEY);
 
-    // check if requester is eligible to access the note
     ProjectItemModel task = taskDaoJpa.getProjectItem(taskId, requester);
 
     try {
@@ -679,9 +678,9 @@ public class TaskController {
 
       return new ResponseEntity<>(response, HttpStatus.OK);
     } catch (Exception e) {
-      LOGGER.error("Failed to get note auditable details " + e);
+      LOGGER.error("Failed to get task auditable details " + e);
       return new ResponseEntity<>(
-          "Failed to get note auditable details.", HttpStatus.INTERNAL_SERVER_ERROR);
+          "Failed to get task auditable details.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }
