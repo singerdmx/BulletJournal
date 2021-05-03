@@ -5,7 +5,15 @@ import {
   Project,
   ProjectsWithOwner,
 } from '../../features/project/interface';
-import {Avatar, Button, DatePicker, Divider, Modal, Select, Tooltip} from 'antd';
+import {
+  Avatar,
+  Button,
+  DatePicker,
+  Divider,
+  Modal,
+  Select,
+  Tooltip,
+} from 'antd';
 import {
   CheckCircleTwoTone,
   CloseCircleTwoTone,
@@ -17,10 +25,10 @@ import {
   EditTwoTone,
   SyncOutlined,
   RightCircleTwoTone,
-  GiftTwoTone
+  GiftTwoTone,
 } from '@ant-design/icons';
 import { connect } from 'react-redux';
-import {ContentAction, ProjectType} from '../../features/project/constants';
+import { ContentAction, ProjectType } from '../../features/project/constants';
 import { iconMapper } from '../side-menu/side-menu.component';
 import {
   flattenOwnedProject,
@@ -29,7 +37,10 @@ import {
 import { getGroup } from '../../features/group/actions';
 import { Group, User } from '../../features/group/interface';
 import moment from 'moment';
-import { getProjectHistory, historyReceived } from '../../features/project/actions';
+import {
+  getProjectHistory,
+  historyReceived,
+} from '../../features/project/actions';
 import ProjectHistory from '../project-history/project-history.component';
 
 import './modals.styles.less';
@@ -122,6 +133,11 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
   useEffect(() => {
     if (project) {
       setSelectProject(project.id);
+      setActions(
+        Object.values(ContentAction).filter((action) =>
+          filterActions(action, project.projectType)
+        )
+      );
     }
   }, [project]);
   useEffect(() => {
@@ -162,7 +178,7 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
       default:
         return true;
     }
-  }
+  };
 
   return (
     <Tooltip title='Show History'>
@@ -211,7 +227,11 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
                       if (p.id === id) {
                         getGroup(p.group.id);
                         setSelectUser('Everyone');
-                        setActions(Object.values(ContentAction).filter(action => filterActions(action, p.projectType)));
+                        setActions(
+                          Object.values(ContentAction).filter((action) =>
+                            filterActions(action, p.projectType)
+                          )
+                        );
                       }
                     });
                   }}
@@ -280,8 +300,10 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
                       return (
                         <Option value={user.name} key={user.name}>
                           <Tooltip title={user.alias} placement='right'>
-                          <span><Avatar size='small' src={user.avatar}/>
-                            &nbsp;&nbsp; <strong>{user.alias}</strong></span>
+                            <span>
+                              <Avatar size='small' src={user.avatar} />
+                              &nbsp;&nbsp; <strong>{user.alias}</strong>
+                            </span>
                           </Tooltip>
                         </Option>
                       );
@@ -290,7 +312,13 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
               </Tooltip>
             </span>
             <span className='history-refresh-button'>
-              <Button type="primary" icon={<SyncOutlined />} onClick={handleGetHistory}>Refresh</Button>
+              <Button
+                type='primary'
+                icon={<SyncOutlined />}
+                onClick={handleGetHistory}
+              >
+                Refresh
+              </Button>
             </span>
           </div>
           <Divider />
@@ -310,6 +338,8 @@ const mapStateToProps = (state: IState) => ({
   timezone: state.myself.timezone,
 });
 
-export default connect(mapStateToProps, { getGroup, getProjectHistory, historyReceived })(
-  ShowProjectHistory
-);
+export default connect(mapStateToProps, {
+  getGroup,
+  getProjectHistory,
+  historyReceived,
+})(ShowProjectHistory);
