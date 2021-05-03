@@ -1,5 +1,5 @@
 import React from 'react';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 
 import {
   AppstoreOutlined,
@@ -14,23 +14,24 @@ import {
   SketchOutlined,
   TagsOutlined,
   TeamOutlined,
-  UserOutlined
+  UserOutlined,
+  BookOutlined,
 } from '@ant-design/icons';
 
 import AddGroup from '../../components/modals/add-group.component';
 import AddProject from '../../components/modals/add-project.component';
-import {OwnProject, ProjectDnd} from '../../components/project-dnd';
-import {Avatar, Menu, Tooltip} from 'antd';
-import {RouteComponentProps, withRouter} from 'react-router';
-import {GroupsWithOwner} from '../../features/group/interface';
-import {Project, ProjectsWithOwner} from '../../features/project/interface';
-import {createGroupByName, updateGroups} from '../../features/group/actions';
-import {updateProjects} from '../../features/project/actions';
-import {IState} from '../../store';
-import {getProjectItemsAfterUpdateSelect} from '../../features/myBuJo/actions';
-import {getCookie} from "../../index";
+import { OwnProject, ProjectDnd } from '../../components/project-dnd';
+import { Avatar, Menu, Tooltip } from 'antd';
+import { RouteComponentProps, withRouter } from 'react-router';
+import { GroupsWithOwner } from '../../features/group/interface';
+import { Project, ProjectsWithOwner } from '../../features/project/interface';
+import { createGroupByName, updateGroups } from '../../features/group/actions';
+import { updateProjects } from '../../features/project/actions';
+import { IState } from '../../store';
+import { getProjectItemsAfterUpdateSelect } from '../../features/myBuJo/actions';
+import { getCookie } from '../../index';
 
-const {SubMenu} = Menu;
+const { SubMenu } = Menu;
 //props of groups
 type GroupProps = {
   groups: GroupsWithOwner[];
@@ -45,18 +46,18 @@ type ProjectProps = {
   ledgerSelected: boolean;
   noteSelected: boolean;
   getProjectItemsAfterUpdateSelect: (
-      todoSelected: boolean,
-      ledgerSelected: boolean,
-      noteSelected: boolean,
-      category: string,
-      forceToday?: boolean
+    todoSelected: boolean,
+    ledgerSelected: boolean,
+    noteSelected: boolean,
+    category: string,
+    forceToday?: boolean
   ) => void;
 };
 
 export const iconMapper = {
-  TODO: <CarryOutOutlined/>,
-  LEDGER: <CreditCardOutlined/>,
-  NOTE: <FileTextOutlined/>,
+  TODO: <CarryOutOutlined />,
+  LEDGER: <CreditCardOutlined />,
+  NOTE: <FileTextOutlined />,
 };
 
 // props of router
@@ -89,143 +90,142 @@ class SideMenu extends React.Component<GroupProps & PathProps & ProjectProps> {
   }
 
   handleClickToday = () => {
-    const {ledgerSelected, todoSelected, noteSelected} = this.props;
+    const { ledgerSelected, todoSelected, noteSelected } = this.props;
     this.props.getProjectItemsAfterUpdateSelect(
-        todoSelected,
-        ledgerSelected,
-        noteSelected,
-        'today',
-        true
+      todoSelected,
+      ledgerSelected,
+      noteSelected,
+      'today',
+      true
     );
   };
 
   handleClickCalendar = () => {
-    const {ledgerSelected, todoSelected, noteSelected} = this.props;
+    const { ledgerSelected, todoSelected, noteSelected } = this.props;
     this.props.getProjectItemsAfterUpdateSelect(
-        todoSelected,
-        ledgerSelected,
-        noteSelected,
-        'calendar'
+      todoSelected,
+      ledgerSelected,
+      noteSelected,
+      'calendar'
     );
   };
 
   render() {
-    const {groups: groupsByOwner, ownProjects} = this.props;
+    const { groups: groupsByOwner, ownProjects } = this.props;
     return (
-        <Menu
-            mode='inline'
-            defaultOpenKeys={['todo', 'ownedProjects', 'sharedProjects']}
-            style={{fontWeight: 500}}
-            onClick={this.onClick}
-        >
-          <SubMenu
-              key='bujo'
-              title={
-                <span>
-              <SketchOutlined/>
+      <Menu
+        mode='inline'
+        defaultOpenKeys={['todo', 'ownedProjects', 'sharedProjects']}
+        style={{ fontWeight: 500 }}
+        onClick={this.onClick}
+      >
+        <SubMenu
+          key='bujo'
+          title={
+            <span>
+              <SketchOutlined />
               <span id='myBuJo'>My BuJo</span>
             </span>
-              }
-          >
-            <Menu.Item key='today' onClick={() => this.handleClickToday()}>
-              <BellOutlined/>
-              Today
-            </Menu.Item>
-            <Menu.Item
-                key='recent'
-            >
-              <AppstoreOutlined/>
-              Recent
-            </Menu.Item>
-            <Menu.Item
-                key='calendar'
-                onClick={() => this.handleClickCalendar()}
-            >
-              <CalendarOutlined/>
-              Calendar
-            </Menu.Item>
-          </SubMenu>
-          <SubMenu
-              key='projects'
-              title={
-                <span>
-              <FolderOutlined/>
+          }
+        >
+          <Menu.Item key='today' onClick={() => this.handleClickToday()}>
+            <BellOutlined />
+            Today
+          </Menu.Item>
+          <Menu.Item key='recent'>
+            <AppstoreOutlined />
+            Recent
+          </Menu.Item>
+          <Menu.Item key='calendar' onClick={() => this.handleClickCalendar()}>
+            <CalendarOutlined />
+            Calendar
+          </Menu.Item>
+          <Menu.Item key='book'>
+            <BookOutlined />
+            Book Me
+          </Menu.Item>
+        </SubMenu>
+        <SubMenu
+          key='projects'
+          title={
+            <span>
+              <FolderOutlined />
               <span id='ownBuJos'>Journals</span>
             </span>
-              }
-              onTitleClick={this.onGroupsClick}
-          >
-            <AddProject history={this.props.history} mode={'singular'}/>
-            <SubMenu
-                key='ownedProjects'
-                title={
-                  <span>
-                <ProfileOutlined/>
+          }
+          onTitleClick={this.onGroupsClick}
+        >
+          <AddProject history={this.props.history} mode={'singular'} />
+          <SubMenu
+            key='ownedProjects'
+            title={
+              <span>
+                <ProfileOutlined />
                 <Tooltip placement='right' title='BuJo created by me'>
                   <span>My Own</span>
                 </Tooltip>
               </span>
-                }
-            >
-              <OwnProject ownProjects={ownProjects} id={1}/>
-            </SubMenu>
-            <SubMenu
-                key='sharedProjects'
-                title={
-                  <span>
-                <TeamOutlined/>
+            }
+          >
+            <OwnProject ownProjects={ownProjects} id={1} />
+          </SubMenu>
+          <SubMenu
+            key='sharedProjects'
+            title={
+              <span>
+                <TeamOutlined />
                 <Tooltip placement='right' title='BuJo shared with me'>
                   <span>Shared with Me</span>
                 </Tooltip>
               </span>
-                }
-            >
-              <ProjectDnd sharedProjects={this.props.sharedProjects}/>
-            </SubMenu>
+            }
+          >
+            <ProjectDnd sharedProjects={this.props.sharedProjects} />
           </SubMenu>
-          <SubMenu
-              key='groups'
-              onTitleClick={this.onGroupsClick}
-              title={
-                <span>
-              <TeamOutlined/>
+        </SubMenu>
+        <SubMenu
+          key='groups'
+          onTitleClick={this.onGroupsClick}
+          title={
+            <span>
+              <TeamOutlined />
               <span id='allGroups'>Groups</span>
             </span>
-              }
-          >
-            <AddGroup/>
+          }
+        >
+          <AddGroup />
 
-            {groupsByOwner.map((groupsOwner, index) => {
-              return groupsOwner.groups.map((group) => (
-                  <Menu.Item key={`group${group.id}`}>
+          {groupsByOwner.map((groupsOwner, index) => {
+            return groupsOwner.groups.map((group) => (
+              <Menu.Item key={`group${group.id}`}>
                 <span className='group-title'>
                   <span>
-                    <Avatar size='small' src={group.owner.avatar}/>
+                    <Avatar size='small' src={group.owner.avatar} />
                     <Tooltip
-                        placement='right'
-                        title={`Group "${group.name}" (owner "${group.owner.alias}")`}
+                      placement='right'
+                      title={`Group "${group.name}" (owner "${group.owner.alias}")`}
                     >
                       <span className='group-name'>{group.name}</span>
                     </Tooltip>
                   </span>
                   <span>
-                    <UserOutlined/>
+                    <UserOutlined />
                     {group.users.length}
                   </span>
                 </span>
-                  </Menu.Item>
-              ));
-            })}
-          </SubMenu>
-          <Menu.Item key='labels'>
-            <TagsOutlined/>
-            <span id='labels'>Labels</span>
-          </Menu.Item>
-          <Menu.Item key='settings'>
-            <SettingOutlined/>
-            <span id='settings'>Settings</span>
-          </Menu.Item>
-        </Menu>
+              </Menu.Item>
+            ));
+          })}
+        </SubMenu>
+        <Menu.Item key='labels'>
+          <TagsOutlined />
+          <span id='labels'>Labels</span>
+        </Menu.Item>
+        <Menu.Item key='settings'>
+          <SettingOutlined />
+          <span id='settings'>Settings</span>
+        </Menu.Item>
+      </Menu>
     );
   }
 }
