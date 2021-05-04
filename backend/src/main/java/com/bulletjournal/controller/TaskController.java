@@ -4,6 +4,8 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.Task;
+import com.bulletjournal.controller.models.User;
 import com.bulletjournal.controller.models.params.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.es.ESUtil;
@@ -12,18 +14,13 @@ import com.bulletjournal.messaging.FreeMarkerClient;
 import com.bulletjournal.messaging.MessagingService;
 import com.bulletjournal.messaging.OpenHtmlConverter;
 import com.bulletjournal.notifications.*;
+import com.bulletjournal.notifications.Auditable;
 import com.bulletjournal.notifications.informed.Informed;
 import com.bulletjournal.notifications.informed.RemoveTaskEvent;
 import com.bulletjournal.notifications.informed.SetTaskStatusEvent;
 import com.bulletjournal.notifications.informed.UpdateTaskAssigneeEvent;
-import com.bulletjournal.repository.GroupDaoJpa;
-import com.bulletjournal.repository.ProjectDaoJpa;
-import com.bulletjournal.repository.TaskDaoJpa;
-import com.bulletjournal.repository.TaskRepository;
-import com.bulletjournal.repository.models.CompletedTask;
-import com.bulletjournal.repository.models.ContentModel;
-import com.bulletjournal.repository.models.ProjectItemModel;
-import com.bulletjournal.repository.models.TaskContent;
+import com.bulletjournal.repository.*;
+import com.bulletjournal.repository.models.*;
 import freemarker.template.TemplateException;
 import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -77,6 +75,7 @@ public class TaskController {
     protected static final String COMPLETED_TASK_CONTENTS_ROUTE = "/api/completedTasks/{taskId}/contents";
     protected static final String CONTENT_REVISIONS_ROUTE = "/api/tasks/{taskId}/contents/{contentId}/revisions/{revisionId}";
     protected static final String TASK_STATISTICS_ROUTE = "/api/taskStatistics";
+    protected static final String TASK_HISTORY_ROUTE = "/api/tasks/{taskId}/getHistory";
 
     @Autowired
     private TaskDaoJpa taskDaoJpa;
@@ -101,6 +100,9 @@ public class TaskController {
 
     @Autowired
     private MessagingService messagingService;
+
+    @Autowired
+    private TaskAuditableDaoJpa taskAuditableDaoJpa;
 
 
     @GetMapping(TASKS_ROUTE)
@@ -645,4 +647,40 @@ public class TaskController {
         return taskStatistics;
     }
 
+  @GetMapping(TASK_HISTORY_ROUTE)
+  public ResponseEntity<?> getHistory(
+      @NotNull @PathVariable Long taskId,
+      @NotBlank @RequestParam int pageInd,
+      @NotBlank @RequestParam int pageSize) {
+    String requester = MDC.get(UserClient.USER_NAME_KEY);
+
+    ProjectItemModel task = taskDaoJpa.getProjectItem(taskId, requester);
+
+    try {
+      Page<TaskAuditable> page = this.taskAuditableDaoJpa.getHistory(
+              (com.bulletjournal.repository.models.Task) task,
+              pageInd, pageSize);
+      Map<String, Object> response = new HashMap<>();
+      List<ProjectItemActivity> activities =
+          page.getContent().stream()
+              .map(ProjectItemAuditModel::toProjectItemActivity)
+              .peek(
+                  item -> {
+                    User user = this.userClient.getUser(item.getOriginator().getName());
+                    item.setOriginator(user);
+                  })
+              .collect(Collectors.toList());
+
+      response.put("activities", activities);
+      response.put("currentPage", page.getNumber());
+      response.put("totalItems", page.getTotalElements());
+      response.put("totalPages", page.getTotalPages());
+
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    } catch (Exception e) {
+      LOGGER.error("Failed to get task auditable details " + e);
+      return new ResponseEntity<>(
+          "Failed to get task auditable details.", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }

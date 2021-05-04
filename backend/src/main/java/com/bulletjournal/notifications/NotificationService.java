@@ -1,6 +1,7 @@
 package com.bulletjournal.notifications;
 
 import com.bulletjournal.config.SpringESConfig;
+import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.daemon.Reminder;
 import com.bulletjournal.es.repository.SearchIndexDaoJpa;
 import com.bulletjournal.notifications.informed.Informed;
@@ -37,6 +38,10 @@ public class NotificationService {
     @Autowired
     @Lazy
     private NoteAuditableDaoJpa noteAuditableDaoJpa;
+
+    @Autowired
+    @Lazy
+    private TaskAuditableDaoJpa taskAuditableDaoJpa;
 
     @Autowired
     private SpringESConfig springESConfig;
@@ -94,12 +99,12 @@ public class NotificationService {
         this.eventQueue.offer(auditable);
     }
 
-    public void trackNoteActivity(NoteAuditable noteAuditable) {
-        LOGGER.info("Received note auditable: " + noteAuditable);
-        if (noteAuditable == null) {
+    public void trackProjectItemActivity(ProjectItemAuditable projectItemAuditable) {
+        LOGGER.info("Received project item auditable: " + projectItemAuditable);
+        if (projectItemAuditable == null) {
             return;
         }
-        this.eventQueue.offer(noteAuditable);
+        this.eventQueue.offer(projectItemAuditable);
     }
 
     public void remind(Remindable remindable) {
@@ -166,6 +171,7 @@ public class NotificationService {
         this.eventQueue.offer(event);
     }
 
+    // CHECKSTYLE:OFF
     public void handleNotifications() {
         Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
         List<Object> events = new ArrayList<>();
@@ -184,7 +190,8 @@ public class NotificationService {
             }
             List<Informed> informeds = new ArrayList<>();
             List<Auditable> auditables = new ArrayList<>();
-            List<NoteAuditable> noteAuditables = new ArrayList<>();
+            List<ProjectItemAuditable> noteAuditables = new ArrayList<>();
+            List<ProjectItemAuditable> taskAuditables = new ArrayList<>();
             List<RemoveElasticsearchDocumentEvent> removeElasticsearchDocumentEvents = new ArrayList<>();
             List<SaveCompleteTasksEvent> saveCompleteTasksEvents = new ArrayList<>();
             List<EtagEvent> etagEvents = new ArrayList<>();
@@ -198,8 +205,15 @@ public class NotificationService {
                     informeds.add((Informed) e);
                 } else if (e instanceof Auditable) {
                     auditables.add((Auditable) e);
-                } else if (e instanceof NoteAuditable) {
-                    noteAuditables.add((NoteAuditable) e);
+                } else if (e instanceof ProjectItemAuditable) {
+                    ProjectItemAuditable projectItemAuditable = (ProjectItemAuditable) e;
+                    ContentType contentType = projectItemAuditable.getProjectItem().getContentType();
+                    if (contentType == ContentType.NOTE) {
+                        noteAuditables.add(projectItemAuditable);
+                    }
+                    else if (contentType == ContentType.TASK) {
+                        taskAuditables.add(projectItemAuditable) ;
+                    }
                 } else if (e instanceof RemoveElasticsearchDocumentEvent) {
                     removeElasticsearchDocumentEvents.add((RemoveElasticsearchDocumentEvent) e);
                 } else if (e instanceof SaveCompleteTasksEvent) {
@@ -238,6 +252,13 @@ public class NotificationService {
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error on creating records in NoteAuditableDaoJpa", ex);
+            }
+            try {
+                if (!taskAuditables.isEmpty()) {
+                    this.taskAuditableDaoJpa.create(taskAuditables);
+                }
+            } catch (Exception ex) {
+                LOGGER.error("Error on creating records in TaskAuditableDaoJpa", ex);
             }
             try {
                 if (!removeElasticsearchDocumentEvents.isEmpty() && this.springESConfig.getEnable()) {
@@ -315,6 +336,7 @@ public class NotificationService {
             events = new ArrayList<>();
         }
     }
+    // CHECKSTYLE:ON
 
     @PreDestroy
     public void preDestroy() {

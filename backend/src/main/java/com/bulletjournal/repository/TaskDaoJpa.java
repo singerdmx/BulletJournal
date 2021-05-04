@@ -2,6 +2,7 @@ package com.bulletjournal.repository;
 
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
+import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.ReminderSetting;
@@ -20,6 +21,7 @@ import com.bulletjournal.hierarchy.HierarchyProcessor;
 import com.bulletjournal.hierarchy.TaskRelationsProcessor;
 import com.bulletjournal.notifications.ContentBatch;
 import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.NotificationService;
 import com.bulletjournal.notifications.informed.UpdateTaskAssigneeEvent;
 import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
@@ -31,6 +33,7 @@ import com.google.gson.GsonBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dmfs.rfc5545.DateTime;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +55,8 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.bulletjournal.notifications.ProjectItemAuditable.PROJECT_ITEM_PROPERTY;
 
 @Repository
 public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
@@ -88,6 +93,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
     @Autowired
     private SearchIndexDaoJpa searchIndexDaoJpa;
+
+    @Autowired
+    protected NotificationService notificationService;
 
     @Lazy
     @Autowired
@@ -648,6 +656,8 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         updateTaskParams.selfClean();
         Task task = this.getProjectItem(taskId, requester);
 
+        String taskBeforeUpdate = GSON.toJson(task.toPresentationModel());
+
         this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(), requester, ContentType.TASK,
                 Operation.UPDATE, taskId, task.getProject().getOwner());
 
@@ -685,7 +695,23 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             task.setLocation(updateTaskParams.getLocation());
         }
 
-        return this.taskRepository.save(selfAdjustTask(task, requester));
+        Task res = this.taskRepository.save(selfAdjustTask(task, requester));
+
+        String taskAfterUpdate = GSON.toJson(task.toPresentationModel());
+
+        this.notificationService.trackProjectItemActivity(
+            new com.bulletjournal.notifications.ProjectItemAuditable(
+                task,
+                new JSONObject().put(PROJECT_ITEM_PROPERTY, taskBeforeUpdate).toString(),
+                new JSONObject().put(PROJECT_ITEM_PROPERTY, taskAfterUpdate).toString(),
+                "updated task ##" + task.getName() + "## in BuJo ##" + task.getProject().getName() + "##",
+                requester,
+                ContentAction.UPDATE_TASK,
+                Timestamp.from(Instant.now())
+            )
+        );
+
+        return res;
     }
 
     private Task selfAdjustTask(Task task, String requester) {

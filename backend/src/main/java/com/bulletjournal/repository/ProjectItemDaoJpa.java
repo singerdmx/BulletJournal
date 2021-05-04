@@ -47,7 +47,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.bulletjournal.notifications.ProjectItemAuditableModel.CONTENT_PROPERTY;
+import static com.bulletjournal.notifications.ProjectItemAuditable.CONTENT_PROPERTY;
 
 public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
@@ -281,20 +281,33 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
 
         Pair<K, T> res = updateContent(requester, updateContentParams, projectItem, content, oldText);
         String newText = res.getLeft().getText();
+        String activity = null;
+        ContentAction action = null;
 
         if (projectItem.getContentType() == ContentType.NOTE) {
-            this.notificationService.trackNoteActivity(
-                new com.bulletjournal.notifications.NoteAuditable(
-                    (com.bulletjournal.repository.models.Note) projectItem,
-                    new JSONObject().put(CONTENT_PROPERTY, oldText).toString(),
-                    new JSONObject().put(CONTENT_PROPERTY, newText).toString(),
-                    "updated note content in ##" + projectItem.getName() + "##",
-                    requester,
-                    ContentAction.UPDATE_NOTE_CONTENT,
-                    Timestamp.from(Instant.now())
-                )
-            );
+            activity = "updated note content in ##" + projectItem.getName() + "##";
+            action = ContentAction.UPDATE_NOTE_CONTENT;
         }
+        else if (projectItem.getContentType() == ContentType.TASK) {
+            activity = "updated task content in ##" + projectItem.getName() + "##";
+            action = ContentAction.UPDATE_TASK_CONTENT;
+        }
+        else if (projectItem.getContentType() == ContentType.TRANSACTION) {
+            activity = "updated transaction content in ##" + projectItem.getName() + "##";
+            action = ContentAction.UPDATE_TRANSACTION_CONTENT;
+        }
+
+        this.notificationService.trackProjectItemActivity(
+            new com.bulletjournal.notifications.ProjectItemAuditable(
+                projectItem,
+                new JSONObject().put(CONTENT_PROPERTY, oldText).toString(),
+                new JSONObject().put(CONTENT_PROPERTY, newText).toString(),
+                activity,
+                requester,
+                action,
+                Timestamp.from(Instant.now())
+            )
+        );
         return res;
     }
 
@@ -340,19 +353,32 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
                 projectItem);
         this.getContentJpaRepository().delete(content);
 
+        String activity = null;
+        ContentAction action = null;
         if (projectItem.getContentType() == ContentType.NOTE) {
-            this.notificationService.trackNoteActivity(
-                new com.bulletjournal.notifications.NoteAuditable(
-                    (com.bulletjournal.repository.models.Note) projectItem,
-                    new JSONObject().put(CONTENT_PROPERTY, content.getText()).toString(),
-                    null,
-                    "deleted note content in ##" + projectItem.getName() + "##",
-                    requester,
-                    ContentAction.DELETE_NOTE_CONTENT,
-                    Timestamp.from(Instant.now())
-                )
-            );
+            activity = "deleted note content in ##" + projectItem.getName() + "##";
+            action = ContentAction.DELETE_NOTE_CONTENT;
         }
+        else if (projectItem.getContentType() == ContentType.TASK) {
+            activity = "deleted task content in ##" + projectItem.getName() + "##";
+            action = ContentAction.DELETE_TASK_CONTENT;
+        }
+        else if (projectItem.getContentType() == ContentType.TRANSACTION) {
+            activity = "deleted transaction content in ##" + projectItem.getName() + "##";
+            action = ContentAction.DELETE_TRANSACTION_CONTENT;
+        }
+
+        this.notificationService.trackProjectItemActivity(
+            new com.bulletjournal.notifications.ProjectItemAuditable(
+                projectItem,
+                new JSONObject().put(CONTENT_PROPERTY, content.getText()).toString(),
+                null,
+                activity,
+                requester,
+                action,
+                Timestamp.from(Instant.now()))
+        );
+
         return projectItem;
     }
 

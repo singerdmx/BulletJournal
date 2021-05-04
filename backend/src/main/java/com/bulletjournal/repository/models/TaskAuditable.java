@@ -24,6 +24,9 @@ public class TaskAuditable extends ProjectItemAuditModel {
   @OnDelete(action = OnDeleteAction.CASCADE)
   private Task task;
 
+  public TaskAuditable() {
+  }
+
   public TaskAuditable(
       Task task,
       String activity,

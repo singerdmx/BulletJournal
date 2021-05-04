@@ -55,6 +55,10 @@
 <!--                  default="checkstyle-suppressions.xml" />-->
 <!--        <property name="optional" value="true"/>-->
 <!--    </module>-->
+    <module name="SuppressWithPlainTextCommentFilter">
+        <property name="offCommentFormat" value="// CHECKSTYLE\:OFF"/>
+        <property name="onCommentFormat" value="// CHECKSTYLE\:ON"/>
+    </module>
 
     <!-- Checks that a package-info.java file exists for each package.     -->
     <!-- See https://checkstyle.org/config_javadoc.html#JavadocPackage -->
