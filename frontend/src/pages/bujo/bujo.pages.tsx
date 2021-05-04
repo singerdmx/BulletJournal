@@ -16,12 +16,11 @@ import AddProjectItem from '../../components/modals/add-project-item.component';
 import '@ant-design/compatible/assets/index.css';
 import { BackTop, Checkbox, Tooltip } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
-import {
-  getProjectItemsAfterUpdateSelect,
-} from '../../features/myBuJo/actions';
+import { getProjectItemsAfterUpdateSelect } from '../../features/myBuJo/actions';
 
 import './bujo.styles.less';
 import RecentItemList from '../../components/recent/recent-item-list.component';
+import BookMe from '../../components/book-me/book-me.component';
 
 type BujoProps = {
   todoSelected: boolean;
@@ -108,6 +107,8 @@ class BujoPage extends React.Component<
         return <BujoCalendar />;
       case 'recent':
         return <RecentItemList />;
+      case 'bookme':
+        return <BookMe />;
       default:
         return null;
     }
@@ -129,10 +130,10 @@ class BujoPage extends React.Component<
       noteCheckbox = (
         <Checkbox
           checked={this.props.noteSelected}
-          value="note"
+          value='note'
           onChange={(e) => this.handleOnChange(e.target.value, category)}
         >
-          <Tooltip placement="top" title="NOTE">
+          <Tooltip placement='top' title='NOTE'>
             <FileTextOutlined />
           </Tooltip>
         </Checkbox>
@@ -140,30 +141,30 @@ class BujoPage extends React.Component<
     }
     return (
       <div className={`todo ${category}`}>
-        <div className="todo-header">
-          <div className="header-check">
+        <div className='todo-header'>
+          <div className='header-check'>
             <Checkbox
               checked={this.props.todoSelected}
-              value="todo"
+              value='todo'
               onChange={(e) => this.handleOnChange(e.target.value, category)}
             >
-              <Tooltip placement="top" title="TODO">
+              <Tooltip placement='top' title='TODO'>
                 <CarryOutOutlined />
               </Tooltip>
             </Checkbox>
             {noteCheckbox}
             <Checkbox
               checked={this.props.ledgerSelected}
-              value="ledger"
+              value='ledger'
               onChange={(e) => this.handleOnChange(e.target.value, category)}
             >
-              <Tooltip placement="top" title="LEDGER">
+              <Tooltip placement='top' title='LEDGER'>
                 <CreditCardOutlined />
               </Tooltip>
             </Checkbox>
-            <Tooltip title="Refresh">
+            <Tooltip title='Refresh'>
               <SyncOutlined
-                className="refreshButton"
+                className='refreshButton'
                 onClick={(e) => this.refresh(category)}
               />
             </Tooltip>
