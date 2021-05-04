@@ -26,6 +26,9 @@ public class TransactionAuditable extends ProjectItemAuditModel {
   @OnDelete(action = OnDeleteAction.CASCADE)
   private Transaction transaction;
 
+  public TransactionAuditable() {
+  }
+
   public TransactionAuditable(
       Transaction transaction,
       String activity,
