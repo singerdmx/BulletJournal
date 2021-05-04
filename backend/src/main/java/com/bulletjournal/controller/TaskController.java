@@ -75,7 +75,7 @@ public class TaskController {
     protected static final String COMPLETED_TASK_CONTENTS_ROUTE = "/api/completedTasks/{taskId}/contents";
     protected static final String CONTENT_REVISIONS_ROUTE = "/api/tasks/{taskId}/contents/{contentId}/revisions/{revisionId}";
     protected static final String TASK_STATISTICS_ROUTE = "/api/taskStatistics";
-    protected static final String TASK_HISTORY_ROUTE = "/api/tasks/{taskId}/getHistory";
+    protected static final String TASK_HISTORY_ROUTE = "/api/tasks/{taskId}/history";
 
     @Autowired
     private TaskDaoJpa taskDaoJpa;
