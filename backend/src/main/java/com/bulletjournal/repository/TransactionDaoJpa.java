@@ -2,6 +2,7 @@ package com.bulletjournal.repository;
 
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
+import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.ProjectType;
@@ -20,9 +21,11 @@ import com.bulletjournal.repository.models.*;
 import com.bulletjournal.repository.utils.DaoHelper;
 import com.bulletjournal.util.BuJoRecurrenceRule;
 import com.google.common.collect.ImmutableList;
+import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dmfs.rfc5545.DateTime;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,15 +37,20 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+import static com.bulletjournal.notifications.ProjectItemAuditable.PROJECT_ITEM_PROPERTY;
+
 @Repository
 public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransactionDaoJpa.class);
+    private static final Gson GSON = new Gson();
+
     @PersistenceContext
     EntityManager entityManager;
     @Autowired
@@ -256,6 +264,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         this.authorizationService.checkAuthorizedToOperateOnContent(transaction.getOwner(), requester,
                 ContentType.TRANSACTION, Operation.UPDATE, transactionId, transaction.getProject().getOwner());
 
+        String transBeforeUpdate = GSON.toJson(transaction.toPresentationModel());
+
         DaoHelper.updateIfPresent(updateTransactionParams.hasName(), updateTransactionParams.getName(),
                 transaction::setName);
 
@@ -320,6 +330,18 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
             transaction = this.setBankAccount(transaction.getBankAccount().getOwner(),
                     transactionId, null);
         }
+
+        String transAfterUpdate = GSON.toJson(transaction.toPresentationModel());
+        this.notificationService.trackProjectItemActivity(
+            new com.bulletjournal.notifications.ProjectItemAuditable(
+                transaction,
+                new JSONObject().put(PROJECT_ITEM_PROPERTY, transBeforeUpdate).toString(),
+                new JSONObject().put(PROJECT_ITEM_PROPERTY, transAfterUpdate).toString(),
+                "updated transaction ##" + transaction.getName() + "## in BuJo ##" + transaction.getProject().getName() + "##",
+                requester,
+                ContentAction.UPDATE_TRANSACTION,
+                Timestamp.from(Instant.now()))
+        );
         return Pair.of(events, transaction);
     }
 
