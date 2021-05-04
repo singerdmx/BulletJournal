@@ -110,4 +110,15 @@ public class ProjectItemAuditable {
         this.beforeActivity,
         this.afterActivity);
   }
+
+  public com.bulletjournal.repository.models.TransactionAuditable toRepositoryTransactionAuditable() {
+    return new com.bulletjournal.repository.models.TransactionAuditable(
+        (com.bulletjournal.repository.models.Transaction) this.projectItem,
+        this.activity,
+        this.originator,
+        this.activityTime,
+        this.action,
+        this.beforeActivity,
+        this.afterActivity);
+  }
 }

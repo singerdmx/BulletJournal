@@ -4,6 +4,8 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.Transaction;
+import com.bulletjournal.controller.models.User;
 import com.bulletjournal.controller.models.params.*;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
@@ -23,13 +25,8 @@ import com.bulletjournal.notifications.RemoveElasticsearchDocumentEvent;
 import com.bulletjournal.notifications.informed.Informed;
 import com.bulletjournal.notifications.informed.RemoveTransactionEvent;
 import com.bulletjournal.notifications.informed.UpdateTransactionPayerEvent;
-import com.bulletjournal.repository.GroupDaoJpa;
-import com.bulletjournal.repository.ProjectDaoJpa;
-import com.bulletjournal.repository.TransactionDaoJpa;
-import com.bulletjournal.repository.TransactionRepository;
-import com.bulletjournal.repository.models.ContentModel;
-import com.bulletjournal.repository.models.ProjectItemModel;
-import com.bulletjournal.repository.models.TransactionContent;
+import com.bulletjournal.repository.*;
+import com.bulletjournal.repository.models.*;
 import freemarker.template.TemplateException;
 import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
@@ -39,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -76,6 +74,8 @@ public class TransactionController {
     protected static final String TRANSACTION_EXPORT_EMAIL_ROUTE = "/api/transactions/{transactionId}/exportEmail";
     protected static final String TRANSACTION_EXPORT_PDF_ROUTE = "/api/transactions/{transactionId}/exportPdf";
     protected static final String TRANSACTION_EXPORT_IMAGE_ROUTE = "/api/transactions/{transactionId}/exportImage";
+    protected static final String TRANSACTION_HISTORY_ROUTE = "/api/transactions/{transactionId}/history";
+
 
 
     @Autowired
@@ -104,6 +104,9 @@ public class TransactionController {
 
     @Autowired
     private GroupDaoJpa groupDaoJpa;
+
+    @Autowired
+    private TransactionAuditableDaoJpa transactionAuditableDaoJpa;
 
     @GetMapping(RECURRING_TRANSACTIONS_ROUTE)
     public List<Transaction> getRecurringTransactions(@NotNull @PathVariable Long projectId) {
@@ -519,4 +522,41 @@ public class TransactionController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to get transaction as image.");
         }
     }
+
+  @GetMapping(TRANSACTION_HISTORY_ROUTE)
+  public ResponseEntity<?> getHistory(
+      @NotNull @PathVariable Long transactionId,
+      @NotBlank @RequestParam int pageInd,
+      @NotBlank @RequestParam int pageSize) {
+    String requester = MDC.get(UserClient.USER_NAME_KEY);
+
+    ProjectItemModel transaction = transactionDaoJpa.getProjectItem(transactionId, requester);
+
+    try {
+      Page<TransactionAuditable> page =
+          this.transactionAuditableDaoJpa.getHistory(
+              (com.bulletjournal.repository.models.Transaction) transaction, pageInd, pageSize);
+      Map<String, Object> response = new HashMap<>();
+      List<ProjectItemActivity> activities =
+          page.getContent().stream()
+              .map(ProjectItemAuditModel::toProjectItemActivity)
+              .peek(
+                  item -> {
+                    User user = this.userClient.getUser(item.getOriginator().getName());
+                    item.setOriginator(user);
+                  })
+              .collect(Collectors.toList());
+
+      response.put("activities", activities);
+      response.put("currentPage", page.getNumber());
+      response.put("totalItems", page.getTotalElements());
+      response.put("totalPages", page.getTotalPages());
+
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    } catch (Exception e) {
+      LOGGER.error("Failed to get transaction auditable details " + e);
+      return new ResponseEntity<>(
+          "Failed to get transaction auditable details.", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }
