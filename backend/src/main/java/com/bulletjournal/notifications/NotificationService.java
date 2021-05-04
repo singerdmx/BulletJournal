@@ -44,6 +44,10 @@ public class NotificationService {
     private TaskAuditableDaoJpa taskAuditableDaoJpa;
 
     @Autowired
+    @Lazy
+    private TransactionAuditableDaoJpa transactionAuditableDaoJpa;
+
+    @Autowired
     private SpringESConfig springESConfig;
 
     @Autowired
@@ -192,6 +196,7 @@ public class NotificationService {
             List<Auditable> auditables = new ArrayList<>();
             List<ProjectItemAuditable> noteAuditables = new ArrayList<>();
             List<ProjectItemAuditable> taskAuditables = new ArrayList<>();
+            List<ProjectItemAuditable> transactionAuditables = new ArrayList<>();
             List<RemoveElasticsearchDocumentEvent> removeElasticsearchDocumentEvents = new ArrayList<>();
             List<SaveCompleteTasksEvent> saveCompleteTasksEvents = new ArrayList<>();
             List<EtagEvent> etagEvents = new ArrayList<>();
@@ -212,7 +217,10 @@ public class NotificationService {
                         noteAuditables.add(projectItemAuditable);
                     }
                     else if (contentType == ContentType.TASK) {
-                        taskAuditables.add(projectItemAuditable) ;
+                        taskAuditables.add(projectItemAuditable);
+                    }
+                    else if (contentType == ContentType.TRANSACTION) {
+                        transactionAuditables.add(projectItemAuditable);
                     }
                 } else if (e instanceof RemoveElasticsearchDocumentEvent) {
                     removeElasticsearchDocumentEvents.add((RemoveElasticsearchDocumentEvent) e);
@@ -259,6 +267,13 @@ public class NotificationService {
                 }
             } catch (Exception ex) {
                 LOGGER.error("Error on creating records in TaskAuditableDaoJpa", ex);
+            }
+            try {
+                if (!transactionAuditables.isEmpty()) {
+                    this.transactionAuditableDaoJpa.create(transactionAuditables);
+                }
+            } catch (Exception ex) {
+                LOGGER.error("Error on creating records in TransactionAuditableDaoJpa", ex);
             }
             try {
                 if (!removeElasticsearchDocumentEvents.isEmpty() && this.springESConfig.getEnable()) {
