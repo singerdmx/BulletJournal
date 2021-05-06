@@ -13,6 +13,6 @@ import java.sql.Timestamp;
 public interface TaskAuditableRepository extends PagingAndSortingRepository<TaskAuditable, Long> {
   Page<TaskAuditable> findAllByTask(Task task, Pageable pageable);
 
-  Page<TaskAuditable> findAllByTaskIdAndActivityTimeBetween(
-      Long taskId, Timestamp activityTimeStart, Timestamp activityTimeEnd, Pageable pageable);
+  Page<TaskAuditable> findAllByTaskAndActivityTimeBetween(
+      Task task, Timestamp activityTimeStart, Timestamp activityTimeEnd, Pageable pageable);
 }

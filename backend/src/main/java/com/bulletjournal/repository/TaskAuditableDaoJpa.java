@@ -36,8 +36,9 @@ public class TaskAuditableDaoJpa {
     if (startDate != null && endDate != null && timezone != null) {
       ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(startDate, null, timezone);
       ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
-      return this.taskAuditableRepository.findAllByTaskIdAndActivityTimeBetween(
-          task.getId(),
+
+      return this.taskAuditableRepository.findAllByTaskAndActivityTimeBetween(
+          task,
           Timestamp.from(startTime.toInstant()),
           Timestamp.from(endTime.toInstant()),
           PageRequest.of(pageInd, pageSize, Sort.by("activityTime").descending()));
