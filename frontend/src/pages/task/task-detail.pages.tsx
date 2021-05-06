@@ -279,6 +279,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
         <div className="task-content">
             <div className="content-list">
                 {contents.length > 1
+                && !isPublic
                 && <Tooltip title="Reorder Contents">
                     <Button
                         type="primary"

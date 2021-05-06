@@ -107,7 +107,7 @@ class BujoPage extends React.Component<
         return <BujoCalendar />;
       case 'recent':
         return <RecentItemList />;
-      case 'bookme':
+      case 'book':
         return <BookMe />;
       default:
         return null;

@@ -180,6 +180,7 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
       <div className="note-content">
         <div className="content-list">
           {contents.length > 1
+          && !isPublic
           && <Tooltip title="Reorder Contents">
             <Button
                 type="primary"
