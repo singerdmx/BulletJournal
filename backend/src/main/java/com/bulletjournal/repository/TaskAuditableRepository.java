@@ -7,7 +7,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
+
 @Repository
 public interface TaskAuditableRepository extends PagingAndSortingRepository<TaskAuditable, Long> {
   Page<TaskAuditable> findAllByTask(Task task, Pageable pageable);
+
+  Page<TaskAuditable> findAllByTaskIdAndActivityTimeBetween(
+      Long taskId, Timestamp activityTimeStart, Timestamp activityTimeEnd, Pageable pageable);
 }

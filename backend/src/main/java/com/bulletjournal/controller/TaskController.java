@@ -31,6 +31,7 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -651,15 +652,18 @@ public class TaskController {
   public ResponseEntity<?> getHistory(
       @NotNull @PathVariable Long taskId,
       @NotBlank @RequestParam int pageInd,
-      @NotBlank @RequestParam int pageSize) {
+      @NotBlank @RequestParam int pageSize,
+      @RequestParam(required = false) String startDate,
+      @RequestParam(required = false) String endDate,
+      @RequestParam(required = false) String timezone
+  ) {
     String requester = MDC.get(UserClient.USER_NAME_KEY);
 
     ProjectItemModel task = taskDaoJpa.getProjectItem(taskId, requester);
 
     try {
       Page<TaskAuditable> page = this.taskAuditableDaoJpa.getHistory(
-              (com.bulletjournal.repository.models.Task) task,
-              pageInd, pageSize);
+              (com.bulletjournal.repository.models.Task) task, pageInd, pageSize, startDate, endDate, timezone);
       Map<String, Object> response = new HashMap<>();
       List<ProjectItemActivity> activities =
           page.getContent().stream()
