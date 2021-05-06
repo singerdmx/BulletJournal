@@ -441,7 +441,11 @@ public class NoteController {
   public ResponseEntity<?> getHistory(
       @NotNull @PathVariable Long noteId,
       @NotBlank @RequestParam int pageInd,
-      @NotBlank @RequestParam int pageSize) {
+      @NotBlank @RequestParam int pageSize,
+      @RequestParam(required = false) String startDate,
+      @RequestParam(required = false) String endDate,
+      @RequestParam(required = false) String timezone
+  ) {
     String requester = MDC.get(UserClient.USER_NAME_KEY);
 
     // check if requester is eligible to access the note
@@ -449,7 +453,7 @@ public class NoteController {
 
     try {
       Page<com.bulletjournal.repository.models.NoteAuditable> page =
-          this.noteAuditableDaoJpa.getHistory(noteId, pageInd, pageSize);
+          this.noteAuditableDaoJpa.getHistory(noteId, pageInd, pageSize, startDate, endDate, timezone);
       Map<String, Object> response = new HashMap<>();
       List<ProjectItemActivity> activities =
           page.getContent().stream()
