@@ -527,7 +527,11 @@ public class TransactionController {
   public ResponseEntity<?> getHistory(
       @NotNull @PathVariable Long transactionId,
       @NotBlank @RequestParam int pageInd,
-      @NotBlank @RequestParam int pageSize) {
+      @NotBlank @RequestParam int pageSize,
+      @RequestParam(required = false) String startDate,
+      @RequestParam(required = false) String endDate,
+      @RequestParam(required = false) String timezone
+      ) {
     String requester = MDC.get(UserClient.USER_NAME_KEY);
 
     ProjectItemModel transaction = transactionDaoJpa.getProjectItem(transactionId, requester);
@@ -535,7 +539,13 @@ public class TransactionController {
     try {
       Page<TransactionAuditable> page =
           this.transactionAuditableDaoJpa.getHistory(
-              (com.bulletjournal.repository.models.Transaction) transaction, pageInd, pageSize);
+              (com.bulletjournal.repository.models.Transaction) transaction,
+              pageInd,
+              pageSize,
+              startDate,
+              endDate,
+              timezone);
+
       Map<String, Object> response = new HashMap<>();
       List<ProjectItemActivity> activities =
           page.getContent().stream()
