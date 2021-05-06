@@ -141,7 +141,7 @@ class BujoPage extends React.Component<
     }
     return (
       <div className={`todo ${category}`}>
-        <div className='todo-header'>
+        {category !== 'book' && <div className='todo-header'>
           <div className='header-check'>
             <Checkbox
               checked={this.props.todoSelected}
@@ -171,7 +171,7 @@ class BujoPage extends React.Component<
           </div>
 
           {plusIcon}
-        </div>
+        </div>}
         <BackTop />
         {this.getCategoryPage(category)}
       </div>
