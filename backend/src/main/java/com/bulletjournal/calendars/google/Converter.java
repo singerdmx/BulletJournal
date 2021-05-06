@@ -73,6 +73,9 @@ public class Converter {
     }
 
     private static String processHtmlTags(String strHTML) {
+        if (StringUtils.isBlank(strHTML)) {
+            return strHTML;
+        }
         //create Jsoup document from HTML
         Document jsoupDoc = Jsoup.parse(strHTML);
 
