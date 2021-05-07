@@ -279,36 +279,7 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
         projectItem.setUpdatedAt(Timestamp.from(Instant.now()));
         this.getJpaRepository().save(projectItem);
 
-        Pair<K, T> res = updateContent(requester, updateContentParams, projectItem, content, oldText);
-        String newText = res.getLeft().getText();
-        String activity = null;
-        ContentAction action = null;
-
-        if (projectItem.getContentType() == ContentType.NOTE) {
-            activity = "updated note content in ##" + projectItem.getName() + "##";
-            action = ContentAction.UPDATE_NOTE_CONTENT;
-        }
-        else if (projectItem.getContentType() == ContentType.TASK) {
-            activity = "updated task content in ##" + projectItem.getName() + "##";
-            action = ContentAction.UPDATE_TASK_CONTENT;
-        }
-        else if (projectItem.getContentType() == ContentType.TRANSACTION) {
-            activity = "updated transaction content in ##" + projectItem.getName() + "##";
-            action = ContentAction.UPDATE_TRANSACTION_CONTENT;
-        }
-
-        this.notificationService.trackProjectItemActivity(
-            new com.bulletjournal.notifications.ProjectItemAuditable(
-                projectItem,
-                new JSONObject().put(CONTENT_PROPERTY, oldText).toString(),
-                new JSONObject().put(CONTENT_PROPERTY, newText).toString(),
-                activity,
-                requester,
-                action,
-                Timestamp.from(Instant.now())
-            )
-        );
-        return res;
+        return updateContent(requester, updateContentParams, projectItem, content, oldText);
     }
 
     private <T extends ProjectItemModel> Pair<K, T> updateContent(
