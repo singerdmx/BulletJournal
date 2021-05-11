@@ -66,6 +66,8 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     private SearchIndexDaoJpa searchIndexDaoJpa;
     @Autowired
     protected NotificationService notificationService;
+    @Autowired
+    protected LabelDaoJpa labelDaoJpa;
 
     @Override
     public JpaRepository getJpaRepository() {
@@ -172,7 +174,10 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     public Note partialUpdate(String requester, Long noteId, UpdateNoteParams updateNoteParams) {
         Note note = this.getProjectItem(noteId, requester);
 
-        String noteBeforeUpdate = GSON.toJson(note.toPresentationModel());
+        com.bulletjournal.controller.models.Note noteAsPresentationModel = note.toPresentationModel();
+        noteAsPresentationModel.setLabels(labelDaoJpa.getLabels(note.getLabels()));
+
+        String noteBeforeUpdate = GSON.toJson(noteAsPresentationModel);
 
         this.authorizationService.checkAuthorizedToOperateOnContent(note.getOwner(), requester, ContentType.NOTE,
                 Operation.UPDATE, noteId, note.getProject().getOwner());
@@ -189,7 +194,10 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
 
         Note res = this.noteRepository.save(note);
 
-        String noteAfterUpdate = GSON.toJson(note.toPresentationModel());
+        noteAsPresentationModel = note.toPresentationModel();
+        noteAsPresentationModel.setLabels(labelDaoJpa.getLabels(note.getLabels()));
+
+        String noteAfterUpdate = GSON.toJson(noteAsPresentationModel);
         this.notificationService.trackProjectItemActivity(
             new com.bulletjournal.notifications.ProjectItemAuditable(
                 note,
