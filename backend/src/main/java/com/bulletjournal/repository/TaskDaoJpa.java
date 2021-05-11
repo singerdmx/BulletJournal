@@ -101,6 +101,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Autowired
     private UserDaoJpa userDaoJpa;
 
+    @Autowired
+    private LabelDaoJpa labelDaoJpa;
+
     public static Task generateTask(String owner, Project project, CreateTaskParams createTaskParams) {
         return generateTask(owner, project, createTaskParams, null);
     }
@@ -656,7 +659,10 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         updateTaskParams.selfClean();
         Task task = this.getProjectItem(taskId, requester);
 
-        String taskBeforeUpdate = GSON.toJson(task.toPresentationModel());
+        com.bulletjournal.controller.models.Task taskAsPresentationModel = task.toPresentationModel();
+        taskAsPresentationModel.setLabels(labelDaoJpa.getLabels(task.getLabels()));
+
+        String taskBeforeUpdate = GSON.toJson(taskAsPresentationModel);
 
         this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(), requester, ContentType.TASK,
                 Operation.UPDATE, taskId, task.getProject().getOwner());
@@ -697,7 +703,9 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         Task res = this.taskRepository.save(selfAdjustTask(task, requester));
 
-        String taskAfterUpdate = GSON.toJson(task.toPresentationModel());
+        taskAsPresentationModel = task.toPresentationModel();
+        taskAsPresentationModel.setLabels(labelDaoJpa.getLabels(task.getLabels()));
+        String taskAfterUpdate = GSON.toJson(taskAsPresentationModel);
 
         this.notificationService.trackProjectItemActivity(
             new com.bulletjournal.notifications.ProjectItemAuditable(

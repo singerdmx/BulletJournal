@@ -69,6 +69,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     private BankAccountTransactionRepository bankAccountTransactionRepository;
     @Autowired
     private BankAccountBalanceRepository bankAccountBalanceRepository;
+    @Autowired
+    private LabelDaoJpa labelDaoJpa;
 
     @Override
     public JpaRepository getJpaRepository() {
@@ -264,7 +266,9 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         this.authorizationService.checkAuthorizedToOperateOnContent(transaction.getOwner(), requester,
                 ContentType.TRANSACTION, Operation.UPDATE, transactionId, transaction.getProject().getOwner());
 
-        String transBeforeUpdate = GSON.toJson(transaction.toPresentationModel());
+        com.bulletjournal.controller.models.Transaction transAsPresentationModel = transaction.toPresentationModel();
+        transAsPresentationModel.setLabels(labelDaoJpa.getLabels(transaction.getLabels()));
+        String transBeforeUpdate = GSON.toJson(transAsPresentationModel);
 
         DaoHelper.updateIfPresent(updateTransactionParams.hasName(), updateTransactionParams.getName(),
                 transaction::setName);
@@ -331,7 +335,10 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
                     transactionId, null);
         }
 
-        String transAfterUpdate = GSON.toJson(transaction.toPresentationModel());
+        transAsPresentationModel = transaction.toPresentationModel();
+        transAsPresentationModel.setLabels(labelDaoJpa.getLabels(transaction.getLabels()));
+        String transAfterUpdate = GSON.toJson(transAsPresentationModel);
+
         this.notificationService.trackProjectItemActivity(
             new com.bulletjournal.notifications.ProjectItemAuditable(
                 transaction,
