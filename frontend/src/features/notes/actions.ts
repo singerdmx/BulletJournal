@@ -3,6 +3,7 @@ import {Note} from './interface';
 import {History} from 'history';
 import {ProjectItemUIType} from "../project/constants";
 import { Content } from '../myBuJo/interface';
+import {ProjectItemActivity} from "../projectItem/interface";
 
 export const updateNotes = (projectId: number) =>
   actions.NotesUpdate({ projectId: projectId });
@@ -157,3 +158,23 @@ export const setContentsOrder = (
         noteId:noteId,
         order:order
     })
+
+export const getProjectItemHistory = (
+    noteId: number,
+    pageInd: number,
+    pageSize: number,
+    startDate?: string,
+    endDate?: string,
+    timezone?: string
+) =>
+    actions.GetProjectItemHistory({
+        noteId: noteId,
+        pageInd : pageInd,
+        pageSize: pageSize,
+        startDate: startDate,
+        endDate: endDate,
+        timezone: timezone
+    })
+
+export const historyReceived = (activities: ProjectItemActivity[]) =>
+    actions.historyReceived({projectItemHistory: activities});

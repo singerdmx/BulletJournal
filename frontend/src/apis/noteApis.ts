@@ -306,3 +306,23 @@ export const setContentsDisplayOrder = (
           throw Error(err);
         });
 };
+
+export const getProjectItemRevisionHistory = (
+    noteId: number,
+    pageInd: number,
+    pageSize: number,
+    startDate?: string,
+    endDate?: string,
+    timezone?: string
+) => {
+    let url = `/api/notes/${noteId}/history?pageInd=${pageInd}&pageSize=${pageSize}`;
+    if (timezone) url += `&timezone=${timezone}`;
+    if (startDate) url += `&startDate=${startDate}`;
+    if (endDate) url += `&endDate=${endDate}`;
+
+    return doFetch(url)
+        .then((res) => res.json())
+        .catch((err) =>{
+            throw Error(err);
+        });
+}

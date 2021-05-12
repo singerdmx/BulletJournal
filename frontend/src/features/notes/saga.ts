@@ -26,6 +26,7 @@ import {
   UpdateNoteColorAction,
   ShareNoteByEmailAction,
   ExportNote, SetContentsOrder,
+  GetProjectItemHistory
 } from './reducer';
 import {PayloadAction} from 'redux-starter-kit';
 import {
@@ -51,6 +52,7 @@ import {
   shareNoteByEmail,
   exportNoteAsPdfOrImage,
   setContentsDisplayOrder,
+  getProjectItemRevisionHistory
 } from '../../apis/noteApis';
 import {IState} from '../../store';
 import {updateNoteContents, updateNotes} from './actions';
@@ -741,6 +743,36 @@ function* setContentsOrder(action: PayloadAction<SetContentsOrder>){
   }
 }
 
+function* getProjectItemHistory(action: PayloadAction<GetProjectItemHistory>) {
+  try{
+    const {
+      noteId,
+      pageInd,
+      pageSize,
+      startDate,
+      endDate,
+      timezone
+    }=action.payload;
+
+    const data = yield call(
+        getProjectItemRevisionHistory,
+        noteId,
+        pageInd,
+        pageSize,
+        startDate,
+        endDate,
+        timezone
+    );
+    yield put(notesActions.historyReceived({ projectItemHistory: data.activities}));
+  }catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Get Note History Error Received: ${error}`);
+    }
+  }
+}
+
 export default function* noteSagas() {
   yield all([
     yield takeLatest(
@@ -774,5 +806,6 @@ export default function* noteSagas() {
     yield takeLatest(notesActions.NoteShareByEmail.type, shareNoteByEmails),
     yield takeLatest(notesActions.ExportNote.type, exportNote),
     yield takeLatest(notesActions.SetContentsOrder.type, setContentsOrder),
+    yield takeLatest(notesActions.GetProjectItemHistory.type, getProjectItemHistory),
   ]);
 }

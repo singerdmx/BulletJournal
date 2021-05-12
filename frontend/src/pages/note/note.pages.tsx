@@ -31,6 +31,7 @@ import {getProject} from "../../features/project/actions";
 import {Project} from "../../features/project/interface";
 import NoteColorSettingDialog from '../../components/modals/note-color.component';
 import {resizeFloatButton} from "../../utils/Util";
+import ProjectItemHistoryDrawer from "../../components/project-item/project-item-history-drawer";
 
 interface NotePageHandler {
     myself: string;
@@ -207,6 +208,9 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
     const noteOperation = () => {
         return (
             <div className="note-operation">
+                <ProjectItemHistoryDrawer
+                    noteId={note.id}
+                />
                 <LabelManagement
                     labelEditableHandler={labelEditableHandler}
                     labelEditable={labelEditable}

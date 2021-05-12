@@ -5,6 +5,7 @@ import { Content } from '../myBuJo/interface';
 import { ProjectItemSharables, SharableLink } from '../system/interface';
 import { User } from '../group/interface';
 import {ProjectItemUIType} from "../project/constants";
+import {ProjectItemActivity} from "../projectItem/interface";
 
 export type NoteApiErrorAction = {
   error: string;
@@ -179,6 +180,19 @@ export type SetContentsOrder = {
   order:number[]
 };
 
+export type HistoryAction = {
+  projectItemHistory: ProjectItemActivity[];
+};
+
+export type GetProjectItemHistory = {
+  noteId: number,
+  pageInd: number,
+  pageSize: number,
+  startDate?: string,
+  endDate?: string,
+  timezone?: string
+}
+
 let initialState = {
   note: undefined as Note | undefined,
   colorSettingShown: false,
@@ -191,6 +205,7 @@ let initialState = {
   sharedLink: '',
   notesByOwner: [] as Array<Note>,
   notesByOrder: [] as Array<Note>,
+  projectItemHistory: [] as  ProjectItemActivity[],
 };
 
 const slice = createSlice({
@@ -285,6 +300,11 @@ const slice = createSlice({
     NoteShareByEmail: (state, action: PayloadAction<ShareNoteByEmailAction>) => state,
     ExportNote: (state, action: PayloadAction<ExportNote>) => state,
     SetContentsOrder:(state,action: PayloadAction<SetContentsOrder>) => state,
+    GetProjectItemHistory:(state, action:PayloadAction<GetProjectItemHistory>) => state,
+    historyReceived: (state, action: PayloadAction<HistoryAction>) => {
+      const { projectItemHistory } = action.payload;
+      state.projectItemHistory = projectItemHistory;
+    },
   },
 });
 
