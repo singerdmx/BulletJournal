@@ -1,7 +1,6 @@
 package com.bulletjournal.controller.models;
 
 import com.bulletjournal.contents.ContentAction;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
