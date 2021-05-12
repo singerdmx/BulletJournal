@@ -6,7 +6,7 @@ import moment from "moment";
 import {dateFormat} from "../../features/myBuJo/constants";
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {getProjectItemHistory, historyReceived} from "../../features/notes/actions";
+import {getProjectItemHistory} from "../../features/notes/actions";
 import ProjectItemHistory from "./project-item-history.component";
 import {ProjectItemActivity} from "../../features/projectItem/interface";
 import {ProjectItemType} from "../../features/project/constants";
@@ -17,7 +17,6 @@ type ProjectItemHistoryDrawerProps = {
     noteId: number;
     timezone: string;
     projectItemHistory: ProjectItemActivity[];
-    historyReceived: (activities: ProjectItemActivity[]) => void;
     getProjectItemHistory: (
         noteId: number,
         pageInd: number,
@@ -28,22 +27,20 @@ type ProjectItemHistoryDrawerProps = {
     ) => void;
 };
 
-interface ContentEditorDrawerHandler {
-}
-
-const ProjectItemHistoryDrawer: React.FC<ProjectItemHistoryDrawerProps & ContentEditorDrawerHandler> = (props) => {
+const ProjectItemHistoryDrawer: React.FC<ProjectItemHistoryDrawerProps> = (props) => {
     const {noteId, timezone, getProjectItemHistory, projectItemHistory} = props;
     const [visible, setVisible] = useState(false);
     const [dateArray, setDateArray] = useState(['', '']);
     const [historyIndex, setHistoryIndex] = useState(1);
-    useEffect(() => {
-        handleUpdate();
-    }, []);
 
     const openModal = () => {
-        historyReceived([]);
         setVisible(true);
     };
+
+    useEffect(() => {
+        handleUpdate();
+        setDateArray(['', '']);
+    }, [visible]);
 
     const handleClose = (e: React.KeyboardEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement | HTMLButtonElement, MouseEvent>) => {
         e.stopPropagation();
@@ -52,6 +49,7 @@ const ProjectItemHistoryDrawer: React.FC<ProjectItemHistoryDrawerProps & Content
     const handleRangeChange = (dates: any, dateStrings: string[]) => {
         setDateArray([dateStrings[0], dateStrings[1]]);
     };
+
     const handleUpdate = () => {
         getProjectItemHistory(noteId, 0, 50, dateArray[0], dateArray[1], timezone);
         setHistoryIndex(1);
@@ -120,6 +118,7 @@ const ProjectItemHistoryDrawer: React.FC<ProjectItemHistoryDrawerProps & Content
                         <ProjectItemHistory
                             activities={projectItemHistory}
                             historyIndex={historyIndex - 1}
+
                             projectItemType={ProjectItemType.NOTE}
                         />
                     ) : (
@@ -151,6 +150,5 @@ const mapStateToProps = (state: IState) => ({
 });
 
 export default connect(mapStateToProps, {
-    historyReceived,
     getProjectItemHistory,
 })(ProjectItemHistoryDrawer);

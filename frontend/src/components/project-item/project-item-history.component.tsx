@@ -28,6 +28,12 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
     const [hideDiff, setHideDiff] = useState(true);
     const [currentHistory, setCurrentHistory] = useState(activities[historyIndex]);
 
+    useEffect(()=>{
+        setCurrentHistory(
+            activities[historyIndex]
+        );
+    },[activities])
+
     useEffect(() => {
         setCurrentHistory(
             activities[historyIndex]
@@ -82,8 +88,8 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
                 projectItem = a.projectItem as Note;
                 const html = <div id={id}>
                     <h1>{projectItem.name}</h1>
-                    <ol style={{listStyle: "square inside"}}>
-                        {projectItem.labels && <li key={projectItem.id + "labels"}>Labels: {projectItem.labels.map((label: any) => (
+                    <ol style={{listStyle: "none"}}>
+                        {projectItem.labels.length>0 && <li key={projectItem.id + "labels"}>Labels: {projectItem.labels.map((label: any) => (
                             <span key={label.id}>{label.value}{' '}</span>
                         ))}</li>}
                         {projectItem.location && <li key={projectItem.id + "location"}>Location: {projectItem.location}</li>}
