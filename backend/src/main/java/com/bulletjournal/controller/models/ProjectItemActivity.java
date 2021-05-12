@@ -1,8 +1,9 @@
 package com.bulletjournal.controller.models;
 
 import com.bulletjournal.contents.ContentAction;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.Gson;
+
+import java.util.LinkedHashMap;
 
 import static com.bulletjournal.notifications.ProjectItemAuditable.CONTENT_PROPERTY;
 import static com.bulletjournal.notifications.ProjectItemAuditable.PROJECT_ITEM_PROPERTY;
@@ -12,8 +13,10 @@ public class ProjectItemActivity {
   private String activity;
   private Long activityTime;
   private ContentAction action;
-  private JsonObject beforeActivity;
-  private JsonObject afterActivity;
+  private Object beforeActivity;
+  private Object afterActivity;
+
+  private Gson GSON = new Gson();
 
   public ProjectItemActivity(
       User originator,
@@ -62,19 +65,19 @@ public class ProjectItemActivity {
     this.activityTime = activityTime;
   }
 
-  public JsonObject getBeforeActivity() {
+  public Object getBeforeActivity() {
     return beforeActivity;
   }
 
-  public void setBeforeActivity(JsonObject beforeActivity) {
+  public void setBeforeActivity(Object beforeActivity) {
     this.beforeActivity = beforeActivity;
   }
 
-  public JsonObject getAfterActivity() {
+  public Object getAfterActivity() {
     return afterActivity;
   }
 
-  public void setAfterActivity(JsonObject afterActivity) {
+  public void setAfterActivity(Object afterActivity) {
     this.afterActivity = afterActivity;
   }
 
@@ -84,20 +87,19 @@ public class ProjectItemActivity {
    * @param activityHist activity history string
    * @return activity history as Json Object
    */
-  private JsonObject deserializeActivityHist(String activityHist) {
+  private Object deserializeActivityHist(String activityHist) {
     if (activityHist == null) return null;
 
-    JsonObject object = JsonParser.parseString(activityHist).getAsJsonObject();
-    if (object.has(PROJECT_ITEM_PROPERTY)) {
-      object.add(
-          PROJECT_ITEM_PROPERTY,
-          JsonParser.parseString(object.get(PROJECT_ITEM_PROPERTY).getAsString()).getAsJsonObject());
+    LinkedHashMap object = GSON.fromJson(activityHist, LinkedHashMap.class);
+    String o = (String) object.get(PROJECT_ITEM_PROPERTY);
+    if (o != null) {
+      object.put(PROJECT_ITEM_PROPERTY, GSON.fromJson(o, LinkedHashMap.class));
     }
-    if (object.has(CONTENT_PROPERTY)) {
-      object.add(
-          CONTENT_PROPERTY,
-          JsonParser.parseString(object.get(CONTENT_PROPERTY).getAsString()).getAsJsonObject());
+    o = (String) object.get(CONTENT_PROPERTY);
+    if (o != null) {
+      object.put(CONTENT_PROPERTY, GSON.fromJson(o, LinkedHashMap.class));
     }
+
     return object;
   }
 }
