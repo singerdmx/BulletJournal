@@ -16,7 +16,7 @@ public class ProjectItemActivity {
   private Object beforeActivity;
   private Object afterActivity;
 
-  private Gson GSON = new Gson();
+  private static Gson GSON = new Gson();
 
   public ProjectItemActivity(
       User originator,
