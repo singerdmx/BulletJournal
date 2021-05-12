@@ -81,13 +81,12 @@ public abstract class ProjectItemAuditModel extends AuditModel {
   }
 
   public ProjectItemActivity toProjectItemActivity() {
-    ProjectItemActivity projectItemActivity = new ProjectItemActivity();
-    projectItemActivity.setAction(this.getAction());
-    projectItemActivity.setActivity(this.activity);
-    projectItemActivity.setActivityTime(this.activityTime.getTime());
-    projectItemActivity.setOriginator(new User(this.originator));
-    projectItemActivity.setBeforeActivity(this.beforeActivity);
-    projectItemActivity.setAfterActivity(this.afterActivity);
-    return projectItemActivity;
+    return new ProjectItemActivity(
+        new User(this.originator),
+        this.activity,
+        this.activityTime.getTime(),
+        this.getAction(),
+        this.beforeActivity,
+        this.afterActivity);
   }
 }
