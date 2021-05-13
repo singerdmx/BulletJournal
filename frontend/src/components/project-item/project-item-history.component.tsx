@@ -86,12 +86,11 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
             let projectItem;
             if (projectType === ProjectType.NOTE) {
                 projectItem = a.projectItem as Note;
+                const labelString = projectItem.labels.map(label => label.value).join(", ");
                 const html = <div id={id}>
                     <h1>{projectItem.name}</h1>
                     <ol style={{listStyle: "none"}}>
-                        {projectItem.labels.length>0 && <li key={projectItem.id + "labels"}>Labels: {projectItem.labels.map((label: any) => (
-                            <span key={label.id}>{label.value}{' '}</span>
-                        ))}</li>}
+                        {projectItem.labels.length>0 && <li key={projectItem.id + "labels"}>Labels: {labelString}</li>}
                         {projectItem.location && <li key={projectItem.id + "location"}>Location: {projectItem.location}</li>}
                     </ol>
                 </div>;
