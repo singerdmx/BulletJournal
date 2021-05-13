@@ -43,7 +43,7 @@ import {Button as FloatButton, Container, darkColors, lightColors,} from 'react-
 import {getTaskAssigneesPopoverContent} from '../../components/project-item/task-item.component';
 import {setDisplayMore, setDisplayRevision} from "../../features/content/actions";
 import {Content} from "../../features/myBuJo/interface";
-import {DeleteOutlined, EditOutlined, HighlightOutlined} from "@ant-design/icons/lib";
+import {DeleteOutlined, EditOutlined} from "@ant-design/icons/lib";
 import {getProject} from "../../features/project/actions";
 import {Project} from "../../features/project/interface";
 import {contentEditable} from "../note/note.pages";
@@ -138,10 +138,6 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
     task && task.id && updateTaskContents(task.id, true);
   };
 
-  const handleOpenRevisions = () => {
-    setDisplayRevision(true);
-  };
-
   const handleDelete = () => {
     if (!content) {
       return;
@@ -178,13 +174,6 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
             styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
         >
           <DeleteOutlined/>
-        </FloatButton>}
-        {content && content.revisions.length > 1 && contentEditable(myself, content, task, project) && <FloatButton
-            tooltip={`View Revision History (${content.revisions.length - 1})`}
-            onClick={handleOpenRevisions}
-            styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
-        >
-          <HighlightOutlined/>
         </FloatButton>}
         {contentEditable(myself, content, task, project) && <FloatButton
             tooltip="Edit Content"
@@ -306,6 +295,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
         <ProjectItemHistoryDrawer
             projectItemId={task.id}
             projectType={ProjectType.TODO}
+            editable={contentEditable(myself, content, task, project)}
         />
         <LabelManagement
           labelEditableHandler={labelEditableHandler}
