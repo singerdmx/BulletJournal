@@ -114,15 +114,7 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
                 return null;
             }
 
-            let dueDateTitle =
-                'Due: ' +
-                moment
-                    .tz(
-                        `${task.dueDate} ${task.dueTime ? task.dueTime : '00:00'}`,
-                        task.timezone
-                    )
-                    .fromNow();
-            return  dueDateTitle;
+            return <span>Due: {task.dueDate} {task.dueTime}</span> ;
         }
 
         const getLabelString = (labels: Label[]) => {
@@ -149,11 +141,15 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
                     <h1>{projectItem.name}</h1>
                     <ol style={{listStyle: "none"}}>
                         {<li>{getTaskAssignees(projectItem.assignees)}</li>}
-                        {projectItem.labels.length>0 && <li key={projectItem.id + "labels"}>{getLabelString(projectItem.labels)}</li>}
-                        {projectItem.location && <li key={projectItem.id + "location"}>{getLocation(projectItem.location)}</li>}
-                        {projectItem.duration && <li>Duration: {getDuration(projectItem.duration)}</li>}
-                        {projectItem.reminderSetting && <li>{getReminderSettingString(projectItem.reminderSetting)}</li>}
                         <li key={projectItem.id + "due"}>{getTaskDue(projectItem)}</li>
+                        {projectItem.timezone && <li>Timezone: {projectItem.timezone}</li>}
+                        {projectItem.duration && <li>Duration: {getDuration(projectItem.duration)}</li>}
+                        {projectItem.reminderSetting &&
+                        <li>{getReminderSettingString(projectItem.reminderSetting)}</li>}
+                        {projectItem.labels.length > 0 &&
+                        <li key={projectItem.id + "labels"}>{getLabelString(projectItem.labels)}</li>}
+                        {projectItem.location &&
+                        <li key={projectItem.id + "location"}>{getLocation(projectItem.location)}</li>}
                     </ol>
                 </div>;
             }
