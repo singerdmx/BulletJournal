@@ -5,14 +5,22 @@ import {useHistory, useParams} from 'react-router-dom';
 import {connect} from 'react-redux';
 // features
 //actions
-import {deleteNote, getNote, updateNoteContents, deleteContent, exportNote} from '../../features/notes/actions';
+import {deleteContent, deleteNote, exportNote, getNote, updateNoteContents} from '../../features/notes/actions';
 
 import {IState} from '../../store';
 // components
 import ContentEditorDrawer from '../../components/content-editor/content-editor-drawer.component';
 // antd imports
-import {Popconfirm, Tooltip,Popover, Button} from 'antd';
-import {DeleteTwoTone, PlusOutlined, SyncOutlined, UpSquareOutlined, FilePdfOutlined, ExportOutlined, FileImageOutlined} from '@ant-design/icons';
+import {Button, Popconfirm, Popover, Tooltip} from 'antd';
+import {
+    DeleteTwoTone,
+    ExportOutlined,
+    FileImageOutlined,
+    FilePdfOutlined,
+    PlusOutlined,
+    SyncOutlined,
+    UpSquareOutlined
+} from '@ant-design/icons';
 // modals import
 import EditNote from '../../components/modals/edit-note.component';
 import MoveProjectItem from '../../components/modals/move-project-item.component';
@@ -20,11 +28,11 @@ import ShareProjectItem from '../../components/modals/share-project-item.compone
 
 import './note-page.styles.less';
 import 'braft-editor/dist/index.css';
-import {ProjectItemUIType, ProjectType,} from '../../features/project/constants';
+import {ProjectItemType, ProjectItemUIType, ProjectType,} from '../../features/project/constants';
 import NoteDetailPage, {NoteProps} from './note-detail.pages';
 import LabelManagement from '../project/label-management.compoent';
 import {Button as FloatButton, Container, darkColors, lightColors,} from 'react-floating-action-button';
-import {DeleteOutlined, EditOutlined, HighlightOutlined} from "@ant-design/icons/lib";
+import {DeleteOutlined, EditOutlined} from "@ant-design/icons/lib";
 import {setDisplayMore, setDisplayRevision} from "../../features/content/actions";
 import {Content, ProjectItem} from "../../features/myBuJo/interface";
 import {getProject} from "../../features/project/actions";
@@ -120,10 +128,6 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
         note && note.id && updateNoteContents(note.id, true);
     };
 
-    const handleOpenRevisions = () => {
-        setDisplayRevision(true);
-    };
-
     const handleDelete = () => {
         if (!content) {
             return;
@@ -161,13 +165,6 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
                 styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
             >
                 <DeleteOutlined/>
-            </FloatButton>}
-            {content && content.revisions.length > 1 && contentEditable(myself, content, note, project) && <FloatButton
-                tooltip={`View Revision History (${content.revisions.length - 1})`}
-                onClick={handleOpenRevisions}
-                styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
-            >
-                <HighlightOutlined/>
             </FloatButton>}
             {contentEditable(myself, content, note, project) && <FloatButton
                 tooltip="Edit Content"
@@ -209,7 +206,9 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
         return (
             <div className="note-operation">
                 <ProjectItemHistoryDrawer
-                    noteId={note.id}
+                    projectItemId={note.id}
+                    projectType={ProjectType.NOTE}
+                    editable={ contentEditable(myself, content, note, project)}
                 />
                 <LabelManagement
                     labelEditableHandler={labelEditableHandler}

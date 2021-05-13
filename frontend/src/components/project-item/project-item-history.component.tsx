@@ -11,7 +11,7 @@ import {ActivityObject, ProjectItemActivity} from "../../features/projectItem/in
 import {getHtmlDiff} from "../../utils/htmldiff/htmldiff";
 import moment from "moment-timezone";
 import {Note} from "../../features/notes/interface";
-import {ProjectItemType} from "../../features/project/constants";
+import {ProjectType} from "../../features/project/constants";
 import Quill from "quill";
 import {createHTML} from "../content/content-item.component";
 
@@ -20,11 +20,11 @@ const Delta = Quill.import('delta');
 type ProjectHistoryProps = {
     activities: ProjectItemActivity[];
     historyIndex: number;
-    projectItemType: ProjectItemType;
+    projectType: ProjectType;
 };
 
 const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
-    const {activities, historyIndex,projectItemType} = props;
+    const {activities, historyIndex,projectType} = props;
     const [hideDiff, setHideDiff] = useState(true);
     const [currentHistory, setCurrentHistory] = useState(activities[historyIndex]);
 
@@ -84,7 +84,7 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
     } else {
         const parseHTML = (a: ActivityObject, id: string) => {
             let projectItem;
-            if (projectItemType === ProjectItemType.NOTE) {
+            if (projectType === ProjectType.NOTE) {
                 projectItem = a.projectItem as Note;
                 const html = <div id={id}>
                     <h1>{projectItem.name}</h1>
