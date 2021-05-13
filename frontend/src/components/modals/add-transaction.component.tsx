@@ -394,7 +394,7 @@ const AddTransaction: React.FC<
             </Form.Item>
           </div>
           {/* Bank Account */}
-          {bankAccountVisible && <div>
+          <div>
             <Form.Item name="bankAccountId" label={
               <Tooltip title="Click to go to bank page to create bank account">
                 <span style={{cursor: 'pointer'}} onClick={() => history.push('/bank')}>
@@ -410,7 +410,7 @@ const AddTransaction: React.FC<
                 })}
               </Select>
             </Form.Item>
-          </div>}
+          </div>
         </Form>
       </Modal>
     );
