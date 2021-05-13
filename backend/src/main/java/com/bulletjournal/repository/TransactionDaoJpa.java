@@ -2,6 +2,7 @@ package com.bulletjournal.repository;
 
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
+import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.Label;
@@ -71,6 +72,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     private BankAccountBalanceRepository bankAccountBalanceRepository;
     @Autowired
     private LabelDaoJpa labelDaoJpa;
+    @Autowired
+    private UserClient userClient;
 
     @Override
     public JpaRepository getJpaRepository() {
@@ -268,6 +271,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
         com.bulletjournal.controller.models.Transaction transAsPresentationModel = transaction.toPresentationModel();
         transAsPresentationModel.setLabels(labelDaoJpa.getLabels(transaction.getLabels()));
+        transAsPresentationModel.setPayer(userClient.getUser(transAsPresentationModel.getPayer().getName()));
         String transBeforeUpdate = GSON.toJson(transAsPresentationModel);
 
         DaoHelper.updateIfPresent(updateTransactionParams.hasName(), updateTransactionParams.getName(),
@@ -337,6 +341,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
         transAsPresentationModel = transaction.toPresentationModel();
         transAsPresentationModel.setLabels(labelDaoJpa.getLabels(transaction.getLabels()));
+        transAsPresentationModel.setPayer(userClient.getUser(transAsPresentationModel.getPayer().getName()));
         String transAfterUpdate = GSON.toJson(transAsPresentationModel);
 
         this.notificationService.trackProjectItemActivity(
