@@ -8,6 +8,7 @@ import {IState} from "../../store";
 import {connect} from "react-redux";
 import {getProjectItemHistory as getNoteHistory} from "../../features/notes/actions";
 import {getProjectItemHistory as getTaskHistory} from "../../features/tasks/actions";
+import {getProjectItemHistory as getTransactionHistory} from "../../features/transactions/actions";
 import ProjectItemHistory from "./project-item-history.component";
 import {ProjectItemActivity} from "../../features/projectItem/interface";
 import {ProjectType} from '../../features/project/constants';
@@ -28,6 +29,7 @@ type ProjectItemHistoryDrawerProps = {
     timezone: string;
     noteHistory: ProjectItemActivity[];
     taskHistory: ProjectItemActivity[];
+    transactionHistory: ProjectItemActivity[];
     getNoteHistory: (
         noteId: number,
         pageInd: number,
@@ -38,6 +40,14 @@ type ProjectItemHistoryDrawerProps = {
     ) => void;
     getTaskHistory: (
         taskId: number,
+        pageInd: number,
+        pageSize: number,
+        startDate?: string,
+        endDate?: string,
+        timezone?: string
+    ) => void;
+    getTransactionHistory: (
+        transactionId: number,
         pageInd: number,
         pageSize: number,
         startDate?: string,
@@ -56,8 +66,10 @@ const ProjectItemHistoryDrawer: React.FC<ProjectItemHistoryDrawerProps> = (props
         timezone,
         getNoteHistory,
         getTaskHistory,
+        getTransactionHistory,
         noteHistory,
         taskHistory,
+        transactionHistory,
         content,
         setDisplayRevision,
         projectType,
@@ -73,8 +85,10 @@ const ProjectItemHistoryDrawer: React.FC<ProjectItemHistoryDrawerProps> = (props
             setCurrentHistories(noteHistory);
         } else if(projectType === ProjectType.TODO) {
             setCurrentHistories(taskHistory);
+        } else if (projectType === ProjectType.LEDGER) {
+            setCurrentHistories(transactionHistory);
         }
-    },[noteHistory, taskHistory,projectItemId])
+    },[noteHistory, taskHistory, transactionHistory, projectItemId])
 
     useEffect(() => {
         handleUpdate();
@@ -94,6 +108,8 @@ const ProjectItemHistoryDrawer: React.FC<ProjectItemHistoryDrawerProps> = (props
             getNoteHistory(projectItemId, 0, 50, dateArray[0], dateArray[1], timezone);
         } else if (projectType === ProjectType.TODO) {
             getTaskHistory(projectItemId, 0, 50, dateArray[0], dateArray[1], timezone);
+        } else if (projectType === ProjectType.LEDGER) {
+            getTransactionHistory(projectItemId, 0, 50, dateArray[0], dateArray[1], timezone);
         }
         setHistoryIndex(1);
     };
@@ -220,11 +236,13 @@ const mapStateToProps = (state: IState) => ({
     timezone: state.settings.timezone,
     noteHistory: state.note.projectItemHistory,
     taskHistory: state.task.projectItemHistory,
+    transactionHistory: state.transaction.projectItemHistory,
     content: state.content.content,
 });
 
 export default connect(mapStateToProps, {
     getNoteHistory,
     getTaskHistory,
+    getTransactionHistory,
     setDisplayRevision,
 })(ProjectItemHistoryDrawer);

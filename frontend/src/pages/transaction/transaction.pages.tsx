@@ -9,11 +9,11 @@ import {ProjectItemUIType, ProjectType,} from '../../features/project/constants'
 import {
   deleteContent,
   deleteTransaction,
-  getTransaction,
   exportTransaction,
+  getTransaction,
+  setContentsOrder,
   updateTransactionColorSettingShown,
   updateTransactionContents,
-  setContentsOrder,
 } from '../../features/transactions/actions';
 import {dateFormat} from '../../features/myBuJo/constants';
 // modals import
@@ -29,13 +29,13 @@ import {
   Col,
   Divider,
   message,
+  Modal,
   Popconfirm,
   Popover,
   Row,
   Statistic,
   Tag,
   Tooltip,
-  Modal,
 } from 'antd';
 import {
   BgColorsOutlined,
@@ -79,6 +79,7 @@ import BankList from "../../components/modals/bank-list.component";
 import BankAccountElem from "../../components/settings/bank-account";
 import {resizeFloatButton} from "../../utils/Util";
 import ContentDnd from "../../components/content-dnd/content.dnd.component";
+import ProjectItemHistoryDrawer from "../../components/project-item/project-item-history-drawer";
 
 const LocaleCurrency = require('locale-currency');
 
@@ -408,6 +409,10 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
               <Avatar src={transaction.owner.avatar} />
             </div>
           </Tooltip>
+          <ProjectItemHistoryDrawer
+              projectItemId={transaction.id}
+              projectType={ProjectType.LEDGER}
+          />
           <LabelManagement
             labelEditableHandler={labelEditableHandler}
             labelEditable={labelEditable}

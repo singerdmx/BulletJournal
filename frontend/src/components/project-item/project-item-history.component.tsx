@@ -19,6 +19,7 @@ import {getDuration} from "./task-item.component";
 import {convertToTextWithRRule} from "../../features/recurrence/actions";
 import {Label} from "../../features/label/interface";
 import {User} from "../../features/group/interface";
+import {Transaction} from "../../features/transactions/interface";
 
 const Delta = Quill.import('delta');
 
@@ -29,15 +30,15 @@ type ProjectHistoryProps = {
 };
 
 const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
-    const {activities, historyIndex,projectType} = props;
+    const {activities, historyIndex, projectType} = props;
     const [hideDiff, setHideDiff] = useState(true);
     const [currentHistory, setCurrentHistory] = useState(activities[historyIndex]);
 
-    useEffect(()=>{
+    useEffect(() => {
         setCurrentHistory(
             activities[historyIndex]
         );
-    },[activities])
+    }, [activities])
 
     useEffect(() => {
         setCurrentHistory(
@@ -62,9 +63,9 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
         );
     };
 
-    if(currentHistory.afterActivity == null){
+    if (currentHistory.afterActivity == null) {
         // @ts-ignore
-        const previousHtmlBody = createHTML( new Delta(currentHistory.beforeActivity.content.delta));
+        const previousHtmlBody = createHTML(new Delta(currentHistory.beforeActivity.content.delta));
         return (
             <div>
                 <div className="revision-container">
@@ -87,27 +88,27 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
             </div>
         )
     } else {
-        const getAvatarAndName=(assignee:User) => {
+        const getAvatarAndName = (assignee: User) => {
             return <span>
-                    <Avatar src={assignee.avatar} size={20} style={{marginRight:"5px", marginLeft:"10px"}}/>
+                    <Avatar src={assignee.avatar} size={20} style={{marginRight: "5px", marginLeft: "10px"}}/>
                 {assignee.name}
                 </span>
         }
 
-        const getTaskAssignees = (assignees: User[]) => {
+        const getUser = (users: User[]) => {
             // return  <div>
             //     {assignees.map((assignee, index) => (
             //             <span key={index}>{getAvatarAndName(assignee)}</span>
             //     ))}
             // </div>
 
-            return "Assignees: " + assignees.map(assignee => (assignee.name)).join(", ");
+            return users.map(user => (user.name)).join(", ");
         }
 
-        const getTaskDue = (task : Task) => {
+        const getTaskDue = (task: Task) => {
             if (task.recurrenceRule) {
                 let s = convertToTextWithRRule(task.recurrenceRule);
-                return  'Due: ' +s;
+                return 'Due: ' + s;
             }
 
             if (!task.dueDate) {
@@ -131,8 +132,10 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
                 return <div id={id}>
                     <h1>{projectItem.name}</h1>
                     <ol style={{listStyle: "none"}}>
-                        {projectItem.labels.length>0 && <li key={projectItem.id + "labels"}>{getLabelString(projectItem.labels)}</li>}
-                        {projectItem.location && <li key={projectItem.id + "location"}>{getLocation(projectItem.location)}</li>}
+                        {projectItem.labels.length > 0 &&
+                        <li key={projectItem.id + "labels"}>{getLabelString(projectItem.labels)}</li>}
+                        {projectItem.location &&
+                        <li key={projectItem.id + "location"}>{getLocation(projectItem.location)}</li>}
                     </ol>
                 </div>;
             } else if (projectType === ProjectType.TODO) {
@@ -140,7 +143,7 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
                 return <div id={id}>
                     <h1>{projectItem.name}</h1>
                     <ol style={{listStyle: "none"}}>
-                        {<li>{getTaskAssignees(projectItem.assignees)}</li>}
+                        {projectItem.assignees &&<li>Assignees: {getUser(projectItem.assignees)}</li>}
                         <li key={projectItem.id + "due"}>{getTaskDue(projectItem)}</li>
                         {projectItem.timezone && <li>Timezone: {projectItem.timezone}</li>}
                         {projectItem.duration && <li>Duration: {getDuration(projectItem.duration)}</li>}
@@ -152,6 +155,21 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
                         <li key={projectItem.id + "location"}>{getLocation(projectItem.location)}</li>}
                     </ol>
                 </div>;
+            } else if (projectType === ProjectType.LEDGER) {
+                projectItem = a.projectItem as Transaction;
+                return <div id={id}>
+                    <h1>{projectItem.name}</h1>
+                    <ol style={{listStyle: "none"}}>
+                        <li>Payer: {projectItem.payer.name}</li>
+                        <li>Amount: {projectItem.amount} {projectItem.transactionType == 0? "Income" : "Expense"}</li>
+                        {projectItem.recurrenceRule
+                            ?<li>Transaction Type: <Tag>Recurring</Tag> {convertToTextWithRRule(projectItem.recurrenceRule)}</li>
+                            :<li>Transaction Type: <Tag>One time</Tag> {projectItem.date} {projectItem.time}</li>}
+                        {projectItem.timezone && <li>Timezone: {projectItem.timezone}</li>}
+                        {projectItem.labels.length > 0 && <li key={projectItem.id + "labels"}>{getLabelString(projectItem.labels)}</li>}
+                        {projectItem.location && <li key={projectItem.id + "location"}>{getLocation(projectItem.location)}</li>}
+                    </ol>
+                </div>
             }
         }
 
@@ -195,8 +213,6 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
     }
 };
 
-const mapStateToProps = (state: IState) => ({
-
-});
+const mapStateToProps = (state: IState) => ({});
 
 export default connect(mapStateToProps, {})(ProjectItemHistory);

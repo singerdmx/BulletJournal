@@ -8,6 +8,7 @@ import {
 import { History } from 'history';
 import { Content } from '../myBuJo/interface';
 import {ProjectItemUIType} from "../project/constants";
+import {ProjectItemActivity} from "../projectItem/interface";
 
 export type TransactionApiErrorAction = {
   error: string;
@@ -221,6 +222,19 @@ export type SetContentsOrder = {
   order:number[]
 };
 
+export type HistoryAction = {
+  projectItemHistory: ProjectItemActivity[];
+};
+
+export type GetProjectItemHistory = {
+  transactionId: number,
+  pageInd: number,
+  pageSize: number,
+  startDate?: string,
+  endDate?: string,
+  timezone?: string
+}
+
 let initialState = {
   contents: [] as Array<Content>,
   transaction: undefined as Transaction | undefined,
@@ -236,6 +250,7 @@ let initialState = {
   transactionsByPayer: [] as Array<Transaction>,
   bankAccountTransactions: [] as Array<Transaction>,
   transactionColorSettingShown: false,
+  projectItemHistory: [] as  ProjectItemActivity[],
 };
 
 const slice = createSlice({
@@ -372,6 +387,11 @@ const slice = createSlice({
     ChangeBankAccountBalance: (state, action: PayloadAction<ChangeBankAccountBalanceAction>) => state,
     GetBankAccountTransactions: (state, action: PayloadAction<GetBankAccountTransactionsAction>) => state,
     SetContentsOrder:(state,action: PayloadAction<SetContentsOrder>) => state,
+    GetProjectItemHistory:(state, action:PayloadAction<GetProjectItemHistory>) => state,
+    historyReceived: (state, action: PayloadAction<HistoryAction>) => {
+      const { projectItemHistory } = action.payload;
+      state.projectItemHistory = projectItemHistory;
+    },
   },
 });
 

@@ -3,6 +3,7 @@ import { History } from 'history';
 import {BankAccount, FrequencyType, LedgerSummaryType, Transaction} from './interface';
 import {ProjectItemUIType} from "../project/constants";
 import { Content } from '../myBuJo/interface';
+import {ProjectItemActivity} from "../projectItem/interface";
 
 export const updateTransactions = (
   projectId: number,
@@ -272,3 +273,23 @@ export const setContentsOrder = (
         transactionId:transactionId,
         order:order
     })
+
+export const getProjectItemHistory = (
+    transactionId: number,
+    pageInd: number,
+    pageSize: number,
+    startDate?: string,
+    endDate?: string,
+    timezone?: string
+) =>
+    actions.GetProjectItemHistory({
+        transactionId: transactionId,
+        pageInd : pageInd,
+        pageSize: pageSize,
+        startDate: startDate,
+        endDate: endDate,
+        timezone: timezone
+    })
+
+export const historyReceived = (projectItemHistory: ProjectItemActivity[]) =>
+    actions.historyReceived({projectItemHistory: projectItemHistory});

@@ -21,7 +21,7 @@ import {
   UpdateTransactionContentRevision,
   UpdateTransactionContents,
   UpdateTransactions,
-  SetContentsOrder,
+  SetContentsOrder, GetProjectItemHistory,
 } from './reducer';
 import {IState} from '../../store';
 import {PayloadAction} from 'redux-starter-kit';
@@ -45,7 +45,7 @@ import {
   shareTransactionWithOther,
   updateContent,
   updateTransaction,
-  setContentsDisplayOrder,
+  setContentsDisplayOrder, getProjectItemRevisionHistory,
 } from '../../apis/transactionApis';
 import {BankAccount, LedgerSummary, Transaction, TransactionView} from './interface';
 import {getProjectItemsAfterUpdateSelect} from '../myBuJo/actions';
@@ -907,6 +907,36 @@ function* setContentsOrder(action: PayloadAction<SetContentsOrder>){
   }
 }
 
+function* getProjectItemHistory(action: PayloadAction<GetProjectItemHistory>) {
+  try{
+    const {
+      transactionId,
+      pageInd,
+      pageSize,
+      startDate,
+      endDate,
+      timezone
+    }=action.payload;
+
+    const data = yield call(
+        getProjectItemRevisionHistory,
+        transactionId,
+        pageInd,
+        pageSize,
+        startDate,
+        endDate,
+        timezone
+    );
+    yield put(transactionsActions.historyReceived({ projectItemHistory: data.activities}));
+  }catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Get Transaction History Error Received: ${error}`);
+    }
+  }
+}
+
 
 export default function* transactionSagas() {
   yield all([
@@ -992,5 +1022,6 @@ export default function* transactionSagas() {
         transactionsActions.GetBankAccountTransactions.type,
         getBankAccountTransactions),
     yield takeLatest(transactionsActions.SetContentsOrder.type, setContentsOrder),
+    yield takeLatest(transactionsActions.GetProjectItemHistory.type, getProjectItemHistory),
   ]);
 }
