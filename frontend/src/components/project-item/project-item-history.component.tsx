@@ -14,6 +14,11 @@ import {Note} from "../../features/notes/interface";
 import {ProjectType} from "../../features/project/constants";
 import Quill from "quill";
 import {createHTML} from "../content/content-item.component";
+import {getReminderSettingString, Task} from "../../features/tasks/interface";
+import {getDuration} from "./task-item.component";
+import {convertToTextWithRRule} from "../../features/recurrence/actions";
+import {Label} from "../../features/label/interface";
+import {User} from "../../features/group/interface";
 
 const Delta = Quill.import('delta');
 
@@ -82,22 +87,76 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
             </div>
         )
     } else {
+        const getAvatarAndName=(assignee:User) => {
+            return <span>
+                    <Avatar src={assignee.avatar} size={20} style={{marginRight:"5px", marginLeft:"10px"}}/>
+                {assignee.name}
+                </span>
+        }
+
+        const getTaskAssignees = (assignees: User[]) => {
+            // return  <div>
+            //     {assignees.map((assignee, index) => (
+            //             <span key={index}>{getAvatarAndName(assignee)}</span>
+            //     ))}
+            // </div>
+
+            return "Assignees: " + assignees.map(assignee => (assignee.name)).join(", ");
+        }
+
+        const getTaskDue = (task : Task) => {
+            if (task.recurrenceRule) {
+                let s = convertToTextWithRRule(task.recurrenceRule);
+                return  'Due: ' +s;
+            }
+
+            if (!task.dueDate) {
+                return null;
+            }
+
+            let dueDateTitle =
+                'Due: ' +
+                moment
+                    .tz(
+                        `${task.dueDate} ${task.dueTime ? task.dueTime : '00:00'}`,
+                        task.timezone
+                    )
+                    .fromNow();
+            return  dueDateTitle;
+        }
+
+        const getLabelString = (labels: Label[]) => {
+            return "Labels: " + labels.map(label => label.value).join(", ");
+        }
+
+        const getLocation = (location: string) => {
+            return "Location: " + location;
+        }
         const parseHTML = (a: ActivityObject, id: string) => {
             let projectItem;
             if (projectType === ProjectType.NOTE) {
                 projectItem = a.projectItem as Note;
-                const labelString = projectItem.labels.map(label => label.value).join(", ");
-                const html = <div id={id}>
+                return <div id={id}>
                     <h1>{projectItem.name}</h1>
                     <ol style={{listStyle: "none"}}>
-                        {projectItem.labels.length>0 && <li key={projectItem.id + "labels"}>Labels: {labelString}</li>}
-                        {projectItem.location && <li key={projectItem.id + "location"}>Location: {projectItem.location}</li>}
+                        {projectItem.labels.length>0 && <li key={projectItem.id + "labels"}>{getLabelString(projectItem.labels)}</li>}
+                        {projectItem.location && <li key={projectItem.id + "location"}>{getLocation(projectItem.location)}</li>}
                     </ol>
                 </div>;
-
-                return html;
+            } else if (projectType === ProjectType.TODO) {
+                projectItem = a.projectItem as Task;
+                return <div id={id}>
+                    <h1>{projectItem.name}</h1>
+                    <ol style={{listStyle: "none"}}>
+                        {<li>{getTaskAssignees(projectItem.assignees)}</li>}
+                        {projectItem.labels.length>0 && <li key={projectItem.id + "labels"}>{getLabelString(projectItem.labels)}</li>}
+                        {projectItem.location && <li key={projectItem.id + "location"}>{getLocation(projectItem.location)}</li>}
+                        {projectItem.duration && <li>Duration: {getDuration(projectItem.duration)}</li>}
+                        {projectItem.reminderSetting && <li>{getReminderSettingString(projectItem.reminderSetting)}</li>}
+                        <li key={projectItem.id + "due"}>{getTaskDue(projectItem)}</li>
+                    </ol>
+                </div>;
             }
-            return <p></p>;
         }
 
         const previousHtmlBody = parseHTML(currentHistory.beforeActivity, "project-item-before-activity-html");

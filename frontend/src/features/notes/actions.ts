@@ -176,5 +176,5 @@ export const getProjectItemHistory = (
         timezone: timezone
     })
 
-export const historyReceived = (activities: ProjectItemActivity[]) =>
-    actions.historyReceived({projectItemHistory: activities});
+export const historyReceived = (projectItemHistory: ProjectItemActivity[]) =>
+    actions.historyReceived({projectItemHistory: projectItemHistory});

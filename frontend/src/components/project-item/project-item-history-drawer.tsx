@@ -6,7 +6,8 @@ import moment from "moment";
 import {dateFormat} from "../../features/myBuJo/constants";
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {getProjectItemHistory} from "../../features/notes/actions";
+import {getProjectItemHistory as getNoteHistory} from "../../features/notes/actions";
+import {getProjectItemHistory as getTaskHistory} from "../../features/tasks/actions";
 import ProjectItemHistory from "./project-item-history.component";
 import {ProjectItemActivity} from "../../features/projectItem/interface";
 import {ProjectType} from '../../features/project/constants';
@@ -25,9 +26,18 @@ export const projectTypeMapper = {
 type ProjectItemHistoryDrawerProps = {
     projectItemId: number;
     timezone: string;
-    projectItemHistory: ProjectItemActivity[];
-    getProjectItemHistory: (
+    noteHistory: ProjectItemActivity[];
+    taskHistory: ProjectItemActivity[];
+    getNoteHistory: (
         noteId: number,
+        pageInd: number,
+        pageSize: number,
+        startDate?: string,
+        endDate?: string,
+        timezone?: string
+    ) => void;
+    getTaskHistory: (
+        taskId: number,
         pageInd: number,
         pageSize: number,
         startDate?: string,
@@ -37,15 +47,17 @@ type ProjectItemHistoryDrawerProps = {
     content: Content | undefined;
     projectType: ProjectType;
     setDisplayRevision: (displayRevision: boolean) => void;
-    editable: boolean;
+    editable?: boolean;
 };
 
 const ProjectItemHistoryDrawer: React.FC<ProjectItemHistoryDrawerProps> = (props) => {
     const {
         projectItemId,
         timezone,
-        getProjectItemHistory,
-        projectItemHistory,
+        getNoteHistory,
+        getTaskHistory,
+        noteHistory,
+        taskHistory,
         content,
         setDisplayRevision,
         projectType,
@@ -54,6 +66,15 @@ const ProjectItemHistoryDrawer: React.FC<ProjectItemHistoryDrawerProps> = (props
     const [projectItemDrawerVisible, setProjectItemDrawerVisible] = useState(false);
     const [dateArray, setDateArray] = useState(['', '']);
     const [historyIndex, setHistoryIndex] = useState(1);
+    const [currentHistories, setCurrentHistories] = useState();
+
+    useEffect(() => {
+        if (projectType === ProjectType.NOTE) {
+            setCurrentHistories(noteHistory);
+        } else if(projectType === ProjectType.TODO) {
+            setCurrentHistories(taskHistory);
+        }
+    },[noteHistory, taskHistory,projectItemId])
 
     useEffect(() => {
         handleUpdate();
@@ -69,7 +90,11 @@ const ProjectItemHistoryDrawer: React.FC<ProjectItemHistoryDrawerProps> = (props
     };
 
     const handleUpdate = () => {
-        getProjectItemHistory(projectItemId, 0, 50, dateArray[0], dateArray[1], timezone);
+        if (projectType === ProjectType.NOTE) {
+            getNoteHistory(projectItemId, 0, 50, dateArray[0], dateArray[1], timezone);
+        } else if (projectType === ProjectType.TODO) {
+            getTaskHistory(projectItemId, 0, 50, dateArray[0], dateArray[1], timezone);
+        }
         setHistoryIndex(1);
     };
 
@@ -103,7 +128,7 @@ const ProjectItemHistoryDrawer: React.FC<ProjectItemHistoryDrawerProps> = (props
                 pageSize={1}
                 current={historyIndex}
                 onChange={handlePageChange}
-                total={projectItemHistory.length}
+                total={currentHistories ? currentHistories.length : 0}
             />
         }
     >
@@ -139,9 +164,9 @@ const ProjectItemHistoryDrawer: React.FC<ProjectItemHistoryDrawerProps> = (props
                         </span>
             </div>
             <Divider/>
-            {projectItemHistory.length > 0 ? (
+            {currentHistories && currentHistories.length > 0 ? (
                 <ProjectItemHistory
-                    activities={projectItemHistory}
+                    activities={currentHistories}
                     historyIndex={historyIndex - 1}
                     projectType={projectType}
                 />
@@ -156,11 +181,12 @@ const ProjectItemHistoryDrawer: React.FC<ProjectItemHistoryDrawerProps> = (props
 
     const chooseDrawer = () => {
         return content && <div className="view-history">
-            <Button className="view-history-choice" onClick={showProjectItemRevisionHistory} style={{textAlign: "left"}}>{
+            <Button className="view-history-choice" onClick={showProjectItemRevisionHistory}
+                    style={{textAlign: "left"}}>{
                 iconMapper[projectType]}{projectTypeMapper[projectType]} Revision History
             </Button>
             <br/>
-            <Button  className="view-history-choice" onClick={showContentRevisionHistory} style={{textAlign: "left"}}>
+            <Button className="view-history-choice" onClick={showContentRevisionHistory} style={{textAlign: "left"}}>
                 <HighlightOutlined/>Current Content Revision History ({content.revisions.length - 1})
             </Button>
         </div>
@@ -192,11 +218,13 @@ const ProjectItemHistoryDrawer: React.FC<ProjectItemHistoryDrawerProps> = (props
 
 const mapStateToProps = (state: IState) => ({
     timezone: state.settings.timezone,
-    projectItemHistory: state.note.projectItemHistory,
+    noteHistory: state.note.projectItemHistory,
+    taskHistory: state.task.projectItemHistory,
     content: state.content.content,
 });
 
 export default connect(mapStateToProps, {
-    getProjectItemHistory,
+    getNoteHistory,
+    getTaskHistory,
     setDisplayRevision,
 })(ProjectItemHistoryDrawer);

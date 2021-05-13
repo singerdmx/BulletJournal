@@ -33,7 +33,7 @@ import {
   UpdateTasks,
   ShareTaskByEmailAction,
   ExportTask,
-  SetContentsOrder
+  SetContentsOrder, GetProjectItemHistory
 } from './reducer';
 import {PayloadAction} from 'redux-starter-kit';
 import {
@@ -67,7 +67,7 @@ import {
   updateTask,
   shareTaskByEmail,
   exportTaskAsPdfOrImage,
-  setContentsDisplayOrder,
+  setContentsDisplayOrder, getProjectItemRevisionHistory,
 } from '../../apis/taskApis';
 import {updateLoadingCompletedTask, updateTaskContents, updateTasks } from './actions';
 import {getProjectItemsAfterUpdateSelect} from '../myBuJo/actions';
@@ -1388,6 +1388,36 @@ function* setContentsOrder(action: PayloadAction<SetContentsOrder>){
   }
 }
 
+function* getProjectItemHistory(action: PayloadAction<GetProjectItemHistory>) {
+  try{
+    const {
+      taskId,
+      pageInd,
+      pageSize,
+      startDate,
+      endDate,
+      timezone
+    }=action.payload;
+
+    const data = yield call(
+        getProjectItemRevisionHistory,
+        taskId,
+        pageInd,
+        pageSize,
+        startDate,
+        endDate,
+        timezone
+    );
+    yield put(tasksActions.historyReceived({ projectItemHistory: data.activities}));
+  }catch (error) {
+    if (error.message === 'reload') {
+      yield put(reloadReceived(true));
+    } else {
+      yield call(message.error, `Get Task History Error Received: ${error}`);
+    }
+  }
+}
+
 export default function* taskSagas() {
   yield all([
     yield takeLatest(
@@ -1444,5 +1474,6 @@ export default function* taskSagas() {
     yield takeLatest(tasksActions.TaskShareByEmail.type, shareTaskByEmails),
     yield takeLatest(tasksActions.ExportTask.type, exportTask),
     yield takeLatest(tasksActions.SetContentsOrder.type, setContentsOrder),
+    yield takeLatest(tasksActions.GetProjectItemHistory.type, getProjectItemHistory),
   ]);
 }

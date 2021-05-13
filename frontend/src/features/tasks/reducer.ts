@@ -5,6 +5,7 @@ import { User } from '../group/interface';
 import { Content } from '../myBuJo/interface';
 import { ProjectItemSharables, SharableLink } from '../system/interface';
 import {ProjectItemUIType} from "../project/constants";
+import {ProjectItemActivity} from "../projectItem/interface";
 
 export type TaskApiErrorAction = {
   error: string;
@@ -248,6 +249,19 @@ export type SetContentsOrder = {
   order:number[]
 };
 
+export type HistoryAction = {
+  projectItemHistory: ProjectItemActivity[];
+};
+
+export type GetProjectItemHistory = {
+  taskId: number,
+  pageInd: number,
+  pageSize: number,
+  startDate?: string,
+  endDate?: string,
+  timezone?: string
+}
+
 let initialState = {
   addTaskVisible: true,
   contents: [] as Array<Content>,
@@ -264,6 +278,7 @@ let initialState = {
   tasksByOrder: [] as Array<Task>,
   searchCompletedTasks: [] as Array<Task>,
   projectStatistics: undefined as TaskStatistics | undefined,
+  projectItemHistory: [] as  ProjectItemActivity[],
 };
 
 const slice = createSlice({
@@ -407,6 +422,12 @@ const slice = createSlice({
     TaskShareByEmail: (state, action: PayloadAction<ShareTaskByEmailAction>) => state,
     ExportTask: (state, action: PayloadAction<ExportTask>) => state,
     SetContentsOrder:(state,action: PayloadAction<SetContentsOrder>) => state,
+    GetProjectItemHistory:(state, action:PayloadAction<GetProjectItemHistory>) => state,
+    historyReceived: (state, action: PayloadAction<HistoryAction>) => {
+      const { projectItemHistory } = action.payload;
+      state.projectItemHistory = projectItemHistory;
+    },
+
   },
 });
 

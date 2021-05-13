@@ -5,13 +5,23 @@ import {useHistory, useParams} from 'react-router-dom';
 import {connect} from 'react-redux';
 // features
 //actions
-import {completeTask, deleteContent, deleteTask, getTask, updateTaskContents, exportTask} from '../../features/tasks/actions';
+import {
+  completeTask,
+  deleteContent,
+  deleteTask,
+  exportTask,
+  getTask,
+  updateTaskContents
+} from '../../features/tasks/actions';
 import {IState} from '../../store';
 // antd imports
 import {Avatar, Badge, Button, Popconfirm, Popover, Tooltip} from 'antd';
 import {
   CheckCircleTwoTone,
-  DeleteTwoTone, ExportOutlined, FileImageOutlined, FilePdfOutlined,
+  DeleteTwoTone,
+  ExportOutlined,
+  FileImageOutlined,
+  FilePdfOutlined,
   PlusOutlined,
   SyncOutlined,
   TeamOutlined,
@@ -38,6 +48,7 @@ import {getProject} from "../../features/project/actions";
 import {Project} from "../../features/project/interface";
 import {contentEditable} from "../note/note.pages";
 import {resizeFloatButton} from "../../utils/Util";
+import ProjectItemHistoryDrawer from "../../components/project-item/project-item-history-drawer";
 
 interface TaskPageHandler {
   myself: string;
@@ -292,7 +303,10 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
     return (
       <div className="task-operation">
         {getAssignees()}
-
+        <ProjectItemHistoryDrawer
+            projectItemId={task.id}
+            projectType={ProjectType.TODO}
+        />
         <LabelManagement
           labelEditableHandler={labelEditableHandler}
           labelEditable={labelEditable}

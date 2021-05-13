@@ -3,6 +3,7 @@ import { Task, ReminderSetting, TaskStatus } from './interface';
 import { History } from 'history';
 import {ProjectItemUIType} from "../project/constants";
 import { Content } from '../myBuJo/interface';
+import {ProjectItemActivity} from "../projectItem/interface";
 
 export const updateTasks = (projectId: number) =>
   actions.TasksUpdate({ projectId: projectId });
@@ -267,3 +268,23 @@ export const setContentsOrder = (
         taskId:taskId,
         order:order
     })
+
+export const getProjectItemHistory = (
+    taskId: number,
+    pageInd: number,
+    pageSize: number,
+    startDate?: string,
+    endDate?: string,
+    timezone?: string
+) =>
+    actions.GetProjectItemHistory({
+        taskId: taskId,
+        pageInd : pageInd,
+        pageSize: pageSize,
+        startDate: startDate,
+        endDate: endDate,
+        timezone: timezone
+    })
+
+export const historyReceived = (projectItemHistory: ProjectItemActivity[]) =>
+    actions.historyReceived({projectItemHistory: projectItemHistory});
