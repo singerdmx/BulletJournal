@@ -149,7 +149,7 @@ const ProjectItemHistoryDrawer: React.FC<ProjectItemHistoryDrawerProps> = (props
         }
     >
         <div>
-            <div className="range-picker" style={{paddingBottom: '20px'}}>
+            <div className="time-range-picker" >
                 <RangePicker
                     ranges={{
                         Today: [moment(), moment()],
@@ -167,13 +167,13 @@ const ProjectItemHistoryDrawer: React.FC<ProjectItemHistoryDrawerProps> = (props
                     format={dateFormat}
                     placeholder={['Start Date', 'End Date']}
                     onChange={handleRangeChange}
-                    style={{marginLeft: '20px'}}
                 />
-                <span className='history-refresh-button'>
+                <span className='project-item-history-refresh-button'>
                             <Button
                                 type="primary"
                                 icon={<SyncOutlined/>}
                                 onClick={handleUpdate}
+                                style={{marginLeft:"60px"}}
                             >
                               Refresh
                             </Button>
