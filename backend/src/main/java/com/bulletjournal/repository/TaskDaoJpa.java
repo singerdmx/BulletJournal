@@ -2,8 +2,10 @@ package com.bulletjournal.repository;
 
 import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.authz.Operation;
+import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.contents.ContentType;
+import com.bulletjournal.controller.models.ProjectItem;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.controller.models.TaskStatus;
@@ -100,6 +102,10 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     @Lazy
     @Autowired
     private UserDaoJpa userDaoJpa;
+
+    @Lazy
+    @Autowired
+    private UserClient userClient;
 
     @Autowired
     private LabelDaoJpa labelDaoJpa;
@@ -661,6 +667,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         com.bulletjournal.controller.models.Task taskAsPresentationModel = task.toPresentationModel();
         taskAsPresentationModel.setLabels(labelDaoJpa.getLabels(task.getLabels()));
+        ProjectItem.addAvatar(taskAsPresentationModel, userClient);
 
         String taskBeforeUpdate = GSON.toJson(taskAsPresentationModel);
 
@@ -705,6 +712,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         taskAsPresentationModel = task.toPresentationModel();
         taskAsPresentationModel.setLabels(labelDaoJpa.getLabels(task.getLabels()));
+        ProjectItem.addAvatar(taskAsPresentationModel, userClient);
         String taskAfterUpdate = GSON.toJson(taskAsPresentationModel);
 
         this.notificationService.trackProjectItemActivity(

@@ -31,6 +31,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -73,6 +74,8 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     private BankAccountBalanceRepository bankAccountBalanceRepository;
     @Autowired
     private LabelDaoJpa labelDaoJpa;
+
+    @Lazy
     @Autowired
     private UserClient userClient;
 
