@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public class BookingLinkDaoJpa {
     @Autowired
-    BookingLinkRepository bookingLinkRepository;
+    private BookingLinkRepository bookingLinkRepository;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public BookingLink getBookingLink(String id) {

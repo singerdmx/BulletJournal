@@ -20,6 +20,8 @@ public class BookingLink {
     @Column(name = "end_date")
     private String endDate;
 
+    private String slots;
+
     private String invitees;
 
     private String timezone;
@@ -114,5 +116,13 @@ public class BookingLink {
 
     public void setBufferInMin(int bufferInMin) {
         this.bufferInMin = bufferInMin;
+    }
+
+    public String getSlots() {
+        return slots;
+    }
+
+    public void setSlots(String slots) {
+        this.slots = slots;
     }
 }
