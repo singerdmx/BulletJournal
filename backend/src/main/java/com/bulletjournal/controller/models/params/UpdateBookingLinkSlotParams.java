@@ -5,20 +5,30 @@ import com.bulletjournal.controller.models.BookingSlot;
 import java.util.List;
 
 public class UpdateBookingLinkSlotParams {
-    private List<BookingSlot> slots;
+    private int slotIndex;
+    private boolean isOn;
 
-    public UpdateBookingLinkSlotParams(List<BookingSlot> slots) {
-        this.slots = slots;
+    public UpdateBookingLinkSlotParams(int slotIndex, boolean isOn) {
+        this.slotIndex = slotIndex;
+        this.isOn = isOn;
     }
 
     public UpdateBookingLinkSlotParams() {
     }
 
-    public List<BookingSlot> getSlots() {
-        return slots;
+    public int getSlotIndex() {
+        return slotIndex;
     }
 
-    public void setSlots(List<BookingSlot> slots) {
-        this.slots = slots;
+    public void setSlotIndex(int slotIndex) {
+        this.slotIndex = slotIndex;
+    }
+
+    public boolean isOn() {
+        return isOn;
+    }
+
+    public void setOn(boolean on) {
+        isOn = on;
     }
 }

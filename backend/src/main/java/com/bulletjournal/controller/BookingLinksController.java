@@ -2,6 +2,7 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.BookingLink;
+import com.bulletjournal.controller.models.BookingSlot;
 import com.bulletjournal.controller.models.params.CreateBookingLinkParams;
 import com.bulletjournal.controller.models.params.UpdateBookingLinkSlotParams;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -13,13 +14,15 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class BookingLinksController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BookingLinksController.class);
     public static final String BOOKING_LINKS_ROUTE = "/api/bookingLinks";
-    public static final String BOOKING_LINK_ROUTE = "/api/bookingLinks/" + "{bookingLinkId}";
+    public static final String BOOKING_LINK_ROUTE = "/api/bookingLinks/{bookingLinkId}";
     public static final String PUBLIC_BOOKING_LINKS_ROUTE_PREFIX = "/api/public/bookingLinks/";
     public static final String PUBLIC_BOOKING_LINK_ROUTE = PUBLIC_BOOKING_LINKS_ROUTE_PREFIX + "{bookingLinkId}";
 
@@ -46,7 +49,6 @@ public class BookingLinksController {
     @PostMapping(BOOKING_LINK_ROUTE)
     public BookingLink updateBookingLink(@NotNull @PathVariable String bookingLinkId,  @NotNull @RequestBody UpdateBookingLinkSlotParams updateBookingLinkSlotParams){
         BookingLink bookingLink = getBookingLink(bookingLinkId);
-        bookingLink.setSlots(updateBookingLinkSlotParams.getSlots());
         return bookingLink;
     }
 
