@@ -1,17 +1,17 @@
 package com.bulletjournal.repository.models;
 
-import com.google.firebase.database.annotations.NotNull;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.List;
 
 @Entity
 @Table(name = "booking_links")
 public class BookingLink {
 
-    @NotNull
+    @Id
     private String id;
 
     protected String owner;
@@ -22,9 +22,21 @@ public class BookingLink {
     @Column(name = "end_date")
     private String endDate;
 
-//    private List<Invitee> invitees;
+    private String invitees;
 
     private String timezone;
+
+    @Column(name = "slot_span")
+    private int slotSpan;
+
+    @Column(name = "include_task_without_duration")
+    private boolean includeTaskWithoutDuration;
+
+    @Column(name = "expire_on_booking")
+    private boolean expireOnBooking;
+
+    @Column(name = "buffer_in_min")
+    private int bufferInMin;
 
     public String getId() {
         return id;
@@ -90,20 +102,12 @@ public class BookingLink {
         this.expireOnBooking = expireOnBooking;
     }
 
-    public List<Integer> getSlotsON() {
-        return slotsON;
+    public String getInvitees() {
+        return invitees;
     }
 
-    public void setSlotsON(List<Integer> slotsON) {
-        this.slotsON = slotsON;
-    }
-
-    public List<Integer> getSlotsOff() {
-        return slotsOff;
-    }
-
-    public void setSlotsOff(List<Integer> slotsOff) {
-        this.slotsOff = slotsOff;
+    public void setInvitees(String invitees) {
+        this.invitees = invitees;
     }
 
     public int getBufferInMin() {
@@ -113,22 +117,4 @@ public class BookingLink {
     public void setBufferInMin(int bufferInMin) {
         this.bufferInMin = bufferInMin;
     }
-
-    @Column(name = "slot_span")
-    private int slotSpan;
-
-    @Column(name = "include_task_without_duration")
-    private boolean includeTaskWithoutDuration;
-
-    @Column(name = "expire_on_booking")
-    private boolean expireOnBooking;
-
-    @Column(name = "slots_on")
-    private List<Integer> slotsON;
-
-    @Column(name = "slots_off")
-    private List<Integer> slotsOff;
-
-    @Column(name = "buffer_in_min")
-    private int bufferInMin;
 }

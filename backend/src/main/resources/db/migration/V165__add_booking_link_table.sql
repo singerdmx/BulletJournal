@@ -5,8 +5,6 @@ CREATE TABLE public.booking_links (
       end_date varchar(15),
       timezone varchar(255),
       slot_span int,
-      slots_on int[],
-      slots_off int[],
       buffer_in_min int,
       invitees text,
       include_task_without_duration boolean,
