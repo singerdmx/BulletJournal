@@ -24,7 +24,7 @@ public class BookingLinksController {
 
     @PostMapping(BOOKING_LINKS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
-    public BookingLink createBookingLink(@Valid @RequestBody CreateBookingLinkParams createBookingLinkParams){
+    public BookingLink createBookingLink(@Valid @RequestBody CreateBookingLinkParams createBookingLinkParams) {
 
         String uuid = RandomStringUtils.randomAlphabetic(8);
         String username = MDC.get(UserClient.USER_NAME_KEY);
@@ -36,7 +36,7 @@ public class BookingLinksController {
     }
 
     @GetMapping(PUBLIC_BOOKING_LINK_ROUTE)
-    public BookingLink getBookingLink(@NotNull @PathVariable String bookingLinkId){
+    public BookingLink getBookingLink(@NotNull @PathVariable String bookingLinkId) {
         LOGGER.info("Create a new Empty Booking Links");
         return new BookingLink();
     }

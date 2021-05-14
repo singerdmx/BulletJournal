@@ -8,7 +8,7 @@ import java.util.Objects;
 
 public class BookingLink {
 
-    private String uuid;
+    private String id;
 
     @NotNull
     protected String owner;
@@ -17,7 +17,7 @@ public class BookingLink {
 
     private String endDate;
 
-    private List<Invitee> invitees;
+    private List<Invitee> guess;
 
     private String timezone;
 
@@ -29,15 +29,15 @@ public class BookingLink {
 
     private int bufferInMin;
 
-    public BookingLink(){
+    public BookingLink() {
 
     }
 
     public BookingLink(String uuid,
                        @NotNull String owner,
                        String startDate,
-                       String endDate, int bufferInMin, boolean expireOnBooking, boolean includeTaskWithoutDuration){
-        this.uuid = uuid;
+                       String endDate, int bufferInMin, boolean expireOnBooking, boolean includeTaskWithoutDuration) {
+        this.id = id;
         this.owner = owner;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -71,20 +71,40 @@ public class BookingLink {
         this.startDate = startDate;
     }
 
-    public List<Invitee> getInvitees() {
-        return invitees;
-    }
-
-    public void setInvitees(List<Invitee> invitees) {
-        this.invitees = invitees;
-    }
-
     public String getTimezone() {
         return timezone;
     }
 
     public void setTimezone(String timezone) {
         this.timezone = timezone;
+    }
+
+    public List<Invitee> getGuess() {
+        return guess;
+    }
+
+    public void setGuess(List<Invitee> guess) {
+        this.guess = guess;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public boolean isIncludeTaskWithoutDuration() {
+        return includeTaskWithoutDuration;
+    }
+
+    public boolean isExpireOnBooking() {
+        return expireOnBooking;
     }
 
     public List<BookingSlot> getSlots() {
@@ -96,12 +116,25 @@ public class BookingLink {
     }
 
 
-    public String getUuid() {
-        return uuid;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
+    }
+
+    public void setIncludeTaskWithoutDuration(boolean includeTaskWithoutDuration) {
+        this.includeTaskWithoutDuration = includeTaskWithoutDuration;
+    }
+
+    public void setExpireOnBooking(boolean expireOnBooking) {
+        this.expireOnBooking = expireOnBooking;
     }
 
     public int getBufferInMin() {
@@ -113,11 +146,11 @@ public class BookingLink {
     }
 
     @Override
-    public boolean equals(Object o){
-        if(this == o) return true;
-        if(!(o instanceof BookingLink)) return false;
-        BookingLink bookingLink = (BookingLink)o;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BookingLink)) return false;
+        BookingLink bookingLink = (BookingLink) o;
         return Objects.equals(getSlots(), bookingLink.getSlots()) &&
-                java.util.Objects.equals(getUuid(), bookingLink.getUuid());
+                java.util.Objects.equals(getId(), bookingLink.getId());
     }
 }

@@ -1,10 +1,6 @@
 package com.bulletjournal.controller.models.params;
 
-import com.bulletjournal.controller.models.User;
-
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-import java.util.List;
 
 public class CreateBookingLinkParams {
 
@@ -79,11 +75,11 @@ public class CreateBookingLinkParams {
         this.expireOnBooking = expireOnBooking;
     }
 
-    public boolean getExpireOnBooking(){
+    public boolean getExpireOnBooking() {
         return expireOnBooking;
     }
 
-    public boolean getIncludeTaskWithoutDuration(){
+    public boolean getIncludeTaskWithoutDuration() {
         return includeTaskWithoutDuration;
     }
 
