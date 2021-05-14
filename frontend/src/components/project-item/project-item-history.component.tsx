@@ -166,6 +166,7 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
                         {projectItem.timezone && <li>Timezone: {projectItem.timezone}</li>}
                         {projectItem.labels.length > 0 && <li key={projectItem.id + "labels"}>{getLabelString(projectItem.labels)}</li>}
                         {projectItem.location && <li key={projectItem.id + "location"}>{getLocation(projectItem.location)}</li>}
+                        {projectItem.bankAccount && <li key={projectItem.id + "bankAccount"}>Bank Account: {projectItem.bankAccount.name} {projectItem.bankAccount.accountNumber}</li>}
                     </ol>
                 </div>
             }
