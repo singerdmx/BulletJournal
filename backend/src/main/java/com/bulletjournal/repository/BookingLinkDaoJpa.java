@@ -31,8 +31,6 @@ public class BookingLinkDaoJpa {
         bookingLink.setIncludeTaskWithoutDuration(createBookingLinkParams.getIncludeTaskWithoutDuration());
         bookingLink.setSlotSpan(createBookingLinkParams.getSlotSpan());
         bookingLink.setTimezone(createBookingLinkParams.getTimezone());
-        // slots
-
         this.bookingLinkRepository.save(bookingLink);
         return bookingLink;
     }
