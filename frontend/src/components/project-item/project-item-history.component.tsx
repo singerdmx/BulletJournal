@@ -164,31 +164,7 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
         );
     };
 
-    if (currentHistory.afterActivity == null) {
-        // @ts-ignore
-        const previousHtmlBody = createHTML(new Delta(currentHistory.beforeActivity.content.delta));
-        return (
-            <div>
-                <div className="revision-container">
-                    <div className="revision-content">
-                        <div className="project-item-history" style={{display: "flex", flexDirection: "row"}}>
-                            <div><Avatar src={currentHistory.originator.avatar}/></div>
-                            <div style={{
-                                fontWeight: "bold",
-                                marginRight: "10px",
-                                marginLeft: "5px"
-                            }}>{currentHistory.originator.name}</div>
-                            <div style={{marginRight: "10px"}}>deleted content</div>
-                            <Tag color="blue">{`${moment(currentHistory.activityTime).format('MMM Do YYYY')}`}</Tag>
-                        </div>
-                        <div className="project-item-content-html">
-                            {<div dangerouslySetInnerHTML={{__html: previousHtmlBody}}></div>}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        )
-    } else {
+    if (currentHistory.afterActivity) {
         return (
             <div>
                 <div className="revision-container">
@@ -219,6 +195,30 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
                 </div>
             </div>
         );
+    } else {
+        // @ts-ignore
+        const previousHtmlBody = createHTML(new Delta(currentHistory.beforeActivity.content.delta));
+        return (
+            <div>
+                <div className="revision-container">
+                    <div className="revision-content">
+                        <div className="project-item-history" style={{display: "flex", flexDirection: "row"}}>
+                            <div><Avatar src={currentHistory.originator.avatar}/></div>
+                            <div style={{
+                                fontWeight: "bold",
+                                marginRight: "10px",
+                                marginLeft: "5px"
+                            }}>{currentHistory.originator.name}</div>
+                            <div style={{marginRight: "10px"}}>deleted content</div>
+                            <Tag color="blue">{`${moment(currentHistory.activityTime).format('MMM Do YYYY')}`}</Tag>
+                        </div>
+                        <div className="project-item-content-html">
+                            {<div dangerouslySetInnerHTML={{__html: previousHtmlBody}}></div>}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
     }
 };
 
