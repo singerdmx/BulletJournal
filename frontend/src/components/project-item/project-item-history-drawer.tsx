@@ -182,7 +182,7 @@ const ProjectItemHistoryDrawer: React.FC<ProjectItemHistoryDrawerProps> = (props
             <Divider/>
             {currentHistories && currentHistories.length > 0 ? (
                 <ProjectItemHistory
-                    activities={currentHistories}
+                    projectItemHistories={currentHistories}
                     historyIndex={historyIndex - 1}
                     projectType={projectType}
                 />
