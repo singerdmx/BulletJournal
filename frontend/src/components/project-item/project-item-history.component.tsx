@@ -22,15 +22,17 @@ import {User} from "../../features/group/interface";
 import {Transaction} from "../../features/transactions/interface";
 
 const Delta = Quill.import('delta');
+const LocaleCurrency = require('locale-currency');
 
 type ProjectHistoryProps = {
     activities: ProjectItemActivity[];
     historyIndex: number;
     projectType: ProjectType;
+    currency: string;
 };
 
 const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
-    const {activities, historyIndex, projectType} = props;
+    const {activities, historyIndex, projectType,currency} = props;
     const [hideDiff, setHideDiff] = useState(true);
     const [currentHistory, setCurrentHistory] = useState(activities[historyIndex]);
 
@@ -129,7 +131,7 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
                 projectItem = a.projectItem as Note;
                 return <div id={id}>
                     <h1>{projectItem.name}</h1>
-                    <ol style={{listStyle: "none"}}>
+                    <ol style={{listStyle: "none", paddingLeft:"0px"}}>
                         {projectItem.labels.length > 0 &&
                         <li key={projectItem.id + "labels"}>{getLabelString(projectItem.labels)}</li>}
                         {projectItem.location &&
@@ -140,12 +142,11 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
                 projectItem = a.projectItem as Task;
                 return <div id={id}>
                     <h1>{projectItem.name}</h1>
-                    <ol style={{listStyle: "none"}}>
+                    <ol style={{listStyle: "none", paddingLeft:"0px"}}>
                         {projectItem.assignees &&<li>Assignees: {getUser(projectItem.assignees)}</li>}
-                        <li key={projectItem.id + "due"}>{getTaskDue(projectItem)}</li>
-                        {projectItem.timezone && <li>Timezone: {projectItem.timezone}</li>}
+                        <li key={projectItem.id + "due"}>{getTaskDue(projectItem)} {projectItem.timezone}</li>
                         {projectItem.duration && <li>Duration: {getDuration(projectItem.duration)}</li>}
-                        {projectItem.reminderSetting &&
+                        {projectItem.reminderSetting && projectItem.reminderSetting.date &&
                         <li>{getReminderSettingString(projectItem.reminderSetting)}</li>}
                         {projectItem.labels.length > 0 &&
                         <li key={projectItem.id + "labels"}>{getLabelString(projectItem.labels)}</li>}
@@ -157,13 +158,12 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
                 projectItem = a.projectItem as Transaction;
                 return <div id={id}>
                     <h1>{projectItem.name}</h1>
-                    <ol style={{listStyle: "none"}}>
+                    <ol style={{listStyle: "none", paddingLeft:"0px"}}>
                         <li>Payer:{getAvatarAndName(projectItem.payer)}</li>
-                        <li>{projectItem.transactionType == 0? "Income" : "Expense"}: {projectItem.amount} </li>
+                        <li>{projectItem.transactionType == 0? "Income" : "Expense"}: {projectItem.amount} {LocaleCurrency.getCurrency(currency)}</li>
                         {projectItem.recurrenceRule
-                            ?<li>Transaction Type: <Tag>Recurring</Tag>{convertToTextWithRRule(projectItem.recurrenceRule)}</li>
-                            :<li>Transaction Type: <Tag>One time</Tag>{projectItem.date} {projectItem.time}</li>}
-                        {projectItem.timezone && <li>Timezone: {projectItem.timezone}</li>}
+                            ?<li>{convertToTextWithRRule(projectItem.recurrenceRule)} {projectItem.timezone}</li>
+                            :<li>{projectItem.date} {projectItem.time} {projectItem.timezone}</li>}
                         {projectItem.labels.length > 0 && <li key={projectItem.id + "labels"}>{getLabelString(projectItem.labels)}</li>}
                         {projectItem.location && <li key={projectItem.id + "location"}>{getLocation(projectItem.location)}</li>}
                         {projectItem.bankAccount && <li key={projectItem.id + "bankAccount"}>Bank Account: {projectItem.bankAccount.name} {projectItem.bankAccount.accountNumber}</li>}
@@ -212,6 +212,8 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
     }
 };
 
-const mapStateToProps = (state: IState) => ({});
+const mapStateToProps = (state: IState) => ({
+    currency: state.myself.currency
+});
 
 export default connect(mapStateToProps, {})(ProjectItemHistory);
