@@ -1,9 +1,5 @@
 package com.bulletjournal.controller.models.params;
 
-import com.bulletjournal.controller.models.BookingSlot;
-
-import java.util.List;
-
 public class UpdateBookingLinkSlotParams {
     private int slotIndex;
     private boolean isOn;

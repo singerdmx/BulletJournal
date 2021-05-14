@@ -2,7 +2,6 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.BookingLink;
-import com.bulletjournal.controller.models.BookingSlot;
 import com.bulletjournal.controller.models.params.CreateBookingLinkParams;
 import com.bulletjournal.controller.models.params.UpdateBookingLinkSlotParams;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -14,8 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 public class BookingLinksController {
@@ -47,7 +44,9 @@ public class BookingLinksController {
     }
 
     @PostMapping(BOOKING_LINK_ROUTE)
-    public BookingLink updateBookingLink(@NotNull @PathVariable String bookingLinkId,  @NotNull @RequestBody UpdateBookingLinkSlotParams updateBookingLinkSlotParams){
+    public BookingLink updateBookingLinkSlot(
+            @NotNull @PathVariable String bookingLinkId,
+            @NotNull @RequestBody UpdateBookingLinkSlotParams updateBookingLinkSlotParams) {
         BookingLink bookingLink = getBookingLink(bookingLinkId);
         return bookingLink;
     }
