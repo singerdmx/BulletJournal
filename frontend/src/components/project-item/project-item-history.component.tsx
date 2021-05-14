@@ -90,19 +90,17 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
     } else {
         const getAvatarAndName = (assignee: User) => {
             return <span>
-                    <Avatar src={assignee.avatar} size={20} style={{marginRight: "5px", marginLeft: "10px"}}/>
-                {assignee.name}
+                    <Avatar src={assignee.avatar} size={20} style={{marginRight: "1px", marginLeft: "7px"}}/>
+                    {assignee.name}
                 </span>
         }
 
         const getUser = (users: User[]) => {
-            // return  <div>
-            //     {assignees.map((assignee, index) => (
-            //             <span key={index}>{getAvatarAndName(assignee)}</span>
-            //     ))}
-            // </div>
-
-            return users.map(user => (user.name)).join(", ");
+            return  <div>
+                {users.map((u, index) => (
+                        <span key={index}>{getAvatarAndName(u)}</span>
+                ))}
+            </div>
         }
 
         const getTaskDue = (task: Task) => {
@@ -160,7 +158,7 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
                 return <div id={id}>
                     <h1>{projectItem.name}</h1>
                     <ol style={{listStyle: "none"}}>
-                        <li>Payer: {projectItem.payer.name}</li>
+                        <li>Payer:{getAvatarAndName(projectItem.payer)}</li>
                         <li>Amount: {projectItem.amount} {projectItem.transactionType == 0? "Income" : "Expense"}</li>
                         {projectItem.recurrenceRule
                             ?<li>Transaction Type: <Tag>Recurring</Tag> {convertToTextWithRRule(projectItem.recurrenceRule)}</li>
