@@ -1,7 +1,7 @@
 package com.bulletjournal.controller.models.params;
 
-import java.util.List;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 public class AppInvitationParams {
 

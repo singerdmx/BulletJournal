@@ -2,6 +2,7 @@ package com.bulletjournal.templates.repository.model;
 
 
 import com.bulletjournal.repository.models.User;
+
 import javax.persistence.*;
 
 @Entity

@@ -3,9 +3,9 @@ package com.bulletjournal.repository.models;
 import com.bulletjournal.repository.utils.LongArrayType;
 import org.hibernate.annotations.*;
 
-import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;

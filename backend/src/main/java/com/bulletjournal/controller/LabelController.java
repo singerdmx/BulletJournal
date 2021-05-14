@@ -1,9 +1,9 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.controller.models.params.CreateLabelParams;
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.ProjectItems;
+import com.bulletjournal.controller.models.params.CreateLabelParams;
 import com.bulletjournal.controller.models.params.UpdateLabelParams;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.bulletjournal.repository.LabelDaoJpa;

@@ -2,11 +2,10 @@ package com.bulletjournal.controller.models.params;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.List;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 public class CreateTransactionParams {
 

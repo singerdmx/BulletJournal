@@ -1,10 +1,7 @@
 package com.bulletjournal.controller.models;
 
 import javax.validation.constraints.NotNull;
-
-
 import java.util.List;
-import java.util.Objects;
 
 public class BookingLink {
 
@@ -17,7 +14,9 @@ public class BookingLink {
 
     private String endDate;
 
-    private List<Invitee> guess;
+    private Invitee invitee;
+
+    private List<Invitee> guests;
 
     private String timezone;
 
@@ -30,13 +29,15 @@ public class BookingLink {
     private int bufferInMin;
 
     public BookingLink() {
-
     }
 
-    public BookingLink(String uuid,
+    public BookingLink(String id,
                        @NotNull String owner,
                        String startDate,
-                       String endDate, int bufferInMin, boolean expireOnBooking, boolean includeTaskWithoutDuration) {
+                       String endDate,
+                       int bufferInMin,
+                       boolean expireOnBooking,
+                       boolean includeTaskWithoutDuration) {
         this.id = id;
         this.owner = owner;
         this.startDate = startDate;
@@ -45,7 +46,6 @@ public class BookingLink {
         this.expireOnBooking = expireOnBooking;
         this.includeTaskWithoutDuration = includeTaskWithoutDuration;
     }
-
 
     public String getOwner() {
         return owner;
@@ -77,14 +77,6 @@ public class BookingLink {
 
     public void setTimezone(String timezone) {
         this.timezone = timezone;
-    }
-
-    public List<Invitee> getGuess() {
-        return guess;
-    }
-
-    public void setGuess(List<Invitee> guess) {
-        this.guess = guess;
     }
 
     public String getId() {
@@ -145,12 +137,19 @@ public class BookingLink {
         this.bufferInMin = bufferInMin;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof BookingLink)) return false;
-        BookingLink bookingLink = (BookingLink) o;
-        return Objects.equals(getSlots(), bookingLink.getSlots()) &&
-                java.util.Objects.equals(getId(), bookingLink.getId());
+    public Invitee getInvitee() {
+        return invitee;
+    }
+
+    public void setInvitee(Invitee invitee) {
+        this.invitee = invitee;
+    }
+
+    public List<Invitee> getGuests() {
+        return guests;
+    }
+
+    public void setGuests(List<Invitee> guests) {
+        this.guests = guests;
     }
 }

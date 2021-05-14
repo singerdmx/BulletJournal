@@ -4,7 +4,8 @@ import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.controller.models.ProjectItemActivity;
 import com.bulletjournal.controller.models.User;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;

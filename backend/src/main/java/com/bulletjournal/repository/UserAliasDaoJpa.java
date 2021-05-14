@@ -6,8 +6,6 @@ import com.bulletjournal.redis.RedisUserAliasesRepository;
 import com.bulletjournal.redis.models.UserAliases;
 import com.bulletjournal.repository.models.UserAlias;
 import com.google.gson.Gson;
-import java.util.ArrayList;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -16,10 +14,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public class UserAliasDaoJpa {

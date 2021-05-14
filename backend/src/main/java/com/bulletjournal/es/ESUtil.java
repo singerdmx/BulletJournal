@@ -1,7 +1,5 @@
 package com.bulletjournal.es;
 
-import static com.bulletjournal.es.repository.SearchIndexDaoJpa.SEARCH_INDEX_SPLITTER;
-
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.SearchResult;
 import com.bulletjournal.controller.models.SearchResultItem;
@@ -12,6 +10,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
+
+import static com.bulletjournal.es.repository.SearchIndexDaoJpa.SEARCH_INDEX_SPLITTER;
 
 public class ESUtil {
     private static final String SCROLL_ID = "unit-test-scroll-id";

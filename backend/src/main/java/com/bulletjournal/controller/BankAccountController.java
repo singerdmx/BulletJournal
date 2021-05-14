@@ -1,7 +1,9 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
-import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.BankAccount;
+import com.bulletjournal.controller.models.ProjectItem;
+import com.bulletjournal.controller.models.Transaction;
 import com.bulletjournal.controller.models.params.CreateBankAccountParams;
 import com.bulletjournal.controller.models.params.SetBankAccountBalanceParams;
 import com.bulletjournal.controller.models.params.UpdateBankAccountParams;

@@ -10,7 +10,10 @@ import com.bulletjournal.es.ESUtil;
 import com.bulletjournal.messaging.FreeMarkerClient;
 import com.bulletjournal.messaging.MessagingService;
 import com.bulletjournal.messaging.OpenHtmlConverter;
-import com.bulletjournal.notifications.*;
+import com.bulletjournal.notifications.Auditable;
+import com.bulletjournal.notifications.Event;
+import com.bulletjournal.notifications.NotificationService;
+import com.bulletjournal.notifications.RemoveElasticsearchDocumentEvent;
 import com.bulletjournal.notifications.informed.Informed;
 import com.bulletjournal.notifications.informed.RemoveNoteEvent;
 import com.bulletjournal.repository.*;
@@ -19,10 +22,6 @@ import com.bulletjournal.repository.models.NoteContent;
 import com.bulletjournal.repository.models.ProjectItemAuditModel;
 import com.bulletjournal.repository.models.ProjectItemModel;
 import freemarker.template.TemplateException;
-
-import java.io.IOException;
-import java.util.*;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -40,8 +39,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.IF_NONE_MATCH;

@@ -3,7 +3,10 @@ package com.bulletjournal.controller.models;
 import com.bulletjournal.clients.UserClient;
 
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Projects {
 

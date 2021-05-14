@@ -1,9 +1,8 @@
 package com.bulletjournal.controller.models.params;
 
-import java.util.List;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 public class CreateNoteParams {
 
