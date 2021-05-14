@@ -49,14 +49,14 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
     }, [projectItemHistories, historyIndex])
 
     useEffect(() => {
-        if (currentHistory.afterActivity != null) {
+        if (currentHistory.afterActivity) {
             setAfterHtmlBody(parseHTML(currentHistory.afterActivity, "project-item-after-activity-html"));
             setBeforeHtmlBody(parseHTML(currentHistory.beforeActivity, "project-item-before-activity-html"));
         }
     }, [currentHistory])
 
     useEffect(() => {
-        if (currentHistory.afterActivity != null && beforeHtmlBody && afterHtmlBody) {
+        if (currentHistory.afterActivity && beforeHtmlBody && afterHtmlBody) {
             const beforeHtmlString = ReactDOMServer.renderToString(beforeHtmlBody);
             const afterHtmlString = ReactDOMServer.renderToString(afterHtmlBody);
             setDiff(getHtmlDiff(beforeHtmlString, afterHtmlString));
