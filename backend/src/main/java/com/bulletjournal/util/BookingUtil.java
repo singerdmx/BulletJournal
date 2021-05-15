@@ -61,4 +61,8 @@ public class BookingUtil {
         }
         return GSON.toJson(slots);
     }
+
+    public static String updateBookingLinkRecurrences(List<String> recurrence) {
+        return GSON.toJson(recurrence);
+    }
 }

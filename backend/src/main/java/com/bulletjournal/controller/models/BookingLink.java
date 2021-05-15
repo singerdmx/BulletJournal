@@ -28,6 +28,16 @@ public class BookingLink {
 
     private List<BookingSlot> slots;
 
+    private List<String> recurrences;
+
+    public List<String> getRecurrences() {
+        return recurrences;
+    }
+
+    public void setRecurrences(List<String> recurrences) {
+        this.recurrences = recurrences;
+    }
+
     private int bufferInMin;
 
     public BookingLink() {

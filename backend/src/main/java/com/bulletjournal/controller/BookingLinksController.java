@@ -75,9 +75,9 @@ public class BookingLinksController {
 
     @PostMapping(BOOKING_LINK_UPDATE_RECURRENCE_RULES_ROUTE)
     public BookingLink updateBookingLinkRecurrenceRule(@NotNull @PathVariable String bookingLinkId,
-                                                       List<String> recurrenceRule) {
-        BookingLink bookingLink = getBookingLink(bookingLinkId);
-        return bookingLink;
+                                                       @RequestBody List<String> recurrenceRules) {
+        this.bookingLinkDaoJpa.updateRecurrence(bookingLinkId, recurrenceRules);
+        return getBookingLink(bookingLinkId);
     }
 
 }

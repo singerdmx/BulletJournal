@@ -29,7 +29,17 @@ public class BookingLink extends AuditModel {
 
     private String invitees;
 
+    private String recurrences;
+
     private String timezone;
+
+    public String getRecurrences() {
+        return recurrences;
+    }
+
+    public void setRecurrences(String recurrences) {
+        this.recurrences = recurrences;
+    }
 
     @Column(name = "slot_span")
     private int slotSpan;

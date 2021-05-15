@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Repository
 public class BookingLinkDaoJpa {
 
@@ -43,6 +45,14 @@ public class BookingLinkDaoJpa {
         BookingLink bookingLink = getBookingLink(bookingLinkId);
         String updatedSlots = BookingUtil.updateBookingLinkSlot(slot, bookingLink);
         bookingLink.setSlots(updatedSlots);
+        this.bookingLinkRepository.save(bookingLink);
+        return bookingLink;
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public BookingLink updateRecurrence(String bookingLinkId, final List<String> recurrenceRules) {
+        BookingLink bookingLink = getBookingLink(bookingLinkId);
+        bookingLink.setRecurrences(BookingUtil.updateBookingLinkRecurrences(recurrenceRules));
         this.bookingLinkRepository.save(bookingLink);
         return bookingLink;
     }

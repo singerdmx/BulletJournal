@@ -1,0 +1,1 @@
+alter table booking_links add recurrences text;
