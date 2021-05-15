@@ -62,7 +62,12 @@ public class BookingUtil {
         return GSON.toJson(slots);
     }
 
-    public static String updateBookingLinkRecurrences(List<String> recurrence) {
-        return GSON.toJson(recurrence);
+    public static String toString(List<String> recurrences) {
+        return GSON.toJson(recurrences);
+    }
+
+    public static List<String> toList(String recurrences) {
+        return StringUtils.isBlank(recurrences) ? new ArrayList<>() :
+                Arrays.asList(GSON.fromJson(recurrences, String[].class));
     }
 }

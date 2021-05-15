@@ -50,9 +50,9 @@ public class BookingLinkDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public BookingLink updateRecurrence(String bookingLinkId, final List<String> recurrenceRules) {
+    public BookingLink updateRecurrences(String bookingLinkId, final List<String> recurrences) {
         BookingLink bookingLink = getBookingLink(bookingLinkId);
-        bookingLink.setRecurrences(BookingUtil.updateBookingLinkRecurrences(recurrenceRules));
+        bookingLink.setRecurrences(BookingUtil.toString(recurrences));
         this.bookingLinkRepository.save(bookingLink);
         return bookingLink;
     }

@@ -62,6 +62,7 @@ public class BookingLinksController {
         result.setSlots(BookingUtil.calculateSlots(
                 BookingUtil.getBookingLinkSlots(bookingLink),
                 bookingLink.getStartDate(), bookingLink.getEndDate(), bookingLink.getSlotSpan()));
+        result.setRecurrences(BookingUtil.toList(bookingLink.getRecurrences()));
         return result;
     }
 
@@ -74,9 +75,9 @@ public class BookingLinksController {
     }
 
     @PostMapping(BOOKING_LINK_UPDATE_RECURRENCE_RULES_ROUTE)
-    public BookingLink updateBookingLinkRecurrenceRule(@NotNull @PathVariable String bookingLinkId,
-                                                       @RequestBody List<String> recurrenceRules) {
-        this.bookingLinkDaoJpa.updateRecurrence(bookingLinkId, recurrenceRules);
+    public BookingLink updateBookingLinkRecurrences(@NotNull @PathVariable String bookingLinkId,
+                                                    @NotNull @RequestBody List<String> recurrences) {
+        this.bookingLinkDaoJpa.updateRecurrences(bookingLinkId, recurrences);
         return getBookingLink(bookingLinkId);
     }
 
