@@ -4,7 +4,9 @@ import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.BookingLink;
 import com.bulletjournal.controller.models.BookingSlot;
 import com.bulletjournal.controller.models.params.CreateBookingLinkParams;
+import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.BookingLinkDaoJpa;
+import com.bulletjournal.util.BookingUtil;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @RestController
@@ -40,16 +43,26 @@ public class BookingLinksController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
         this.bookingLinkDaoJpa.create(uuid, username, createBookingLinkParams);
-//        ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(createBookingLinkParams.getStartDate(), null, createBookingLinkParams.getTimezone());
-//        ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(createBookingLinkParams.getEndDate(), null, createBookingLinkParams.getTimezone());
-
         return getBookingLink(uuid);
     }
 
     @GetMapping(PUBLIC_BOOKING_LINK_ROUTE)
     public BookingLink getBookingLink(@NotNull @PathVariable String bookingLinkId) {
         LOGGER.info("Create a new Empty Booking Links");
-        return this.bookingLinkDaoJpa.getBookingLink(bookingLinkId).toPresentationModel();
+        com.bulletjournal.repository.models.BookingLink bookingLink =
+                this.bookingLinkDaoJpa.getBookingLink(bookingLinkId);
+        ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(
+                bookingLink.getStartDate(), null, bookingLink.getTimezone());
+        ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(
+                bookingLink.getEndDate(), null, bookingLink.getTimezone());
+
+        // get all tasks between startTime and endTime
+
+        BookingLink result = bookingLink.toPresentationModel();
+        result.setSlots(BookingUtil.calculateSlots(
+                BookingUtil.getBookingLinkSlots(bookingLink),
+                bookingLink.getStartDate(), bookingLink.getEndDate(), bookingLink.getSlotSpan()));
+        return result;
     }
 
     @PostMapping(BOOKING_LINK_UPDATE_SLOT_ROUTE)

@@ -4,15 +4,20 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "booking_links")
-public class BookingLink {
+public class BookingLink extends AuditModel {
 
     @Id
     private String id;
 
-    protected String owner;
+    @NotBlank
+    @Size(min = 2, max = 100)
+    @Column(length = 100, nullable = false, updatable = false)
+    private String owner;
 
     @Column(name = "start_date")
     private String startDate;
