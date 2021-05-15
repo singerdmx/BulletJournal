@@ -133,11 +133,13 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
   useEffect(() => {
     if (project) {
       setSelectProject(project.id);
-      setActions(
-        Object.values(ContentAction).filter((action) =>
-          filterActions(action, project.projectType)
-        )
-      );
+      if (!project.shared) {
+        setActions(
+            Object.values(ContentAction).filter((action) =>
+                filterActions(action, project.projectType)
+            )
+        );
+      }
     }
   }, [project]);
   useEffect(() => {

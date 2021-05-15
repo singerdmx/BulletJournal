@@ -582,7 +582,7 @@ class ProjectPage extends React.Component<ProjectPageProps & ProjectPathProps & 
                 </Badge>
               </span>
             </Popover>
-            <ShowProjectHistory/>
+            {!project.shared && <ShowProjectHistory/>}
             {createContent}
             {editContent}
             {deleteContent}
