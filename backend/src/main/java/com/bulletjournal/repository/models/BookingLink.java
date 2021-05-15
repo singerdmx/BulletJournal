@@ -127,6 +127,16 @@ public class BookingLink {
     }
 
     public com.bulletjournal.controller.models.BookingLink toPresentationModel() {
-        return null;
+       com.bulletjournal.controller.models.BookingLink bookingLink = new com.bulletjournal.controller.models.BookingLink(
+               this.getId(),
+               this.getOwner(),
+               this.getStartDate(),
+               this.getEndDate(),
+               this.getSlotSpan(),
+               this.getBufferInMin(),
+               this.isExpireOnBooking(),
+               this.isIncludeTaskWithoutDuration()
+       );
+       return bookingLink;
     }
 }
