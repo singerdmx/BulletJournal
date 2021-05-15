@@ -118,7 +118,7 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
                 <h1>{projectItem.name}</h1>
                 <ol style={{listStyle: "none", paddingLeft: "0px"}}>
                     {projectItem.assignees && <li>Assignees: {getUser(projectItem.assignees)}</li>}
-                    <li key={projectItem.id + "due"}>{getTaskDue(projectItem)} {projectItem.timezone}</li>
+                    {projectItem.dueDate && <li key={projectItem.id + "due"}>{getTaskDue(projectItem)} {projectItem.timezone}</li>}
                     {projectItem.duration && <li>Duration: {getDuration(projectItem.duration)}</li>}
                     {projectItem.reminderSetting && projectItem.reminderSetting.date &&
                     <li>{getReminderSettingString(projectItem.reminderSetting)}</li>}
