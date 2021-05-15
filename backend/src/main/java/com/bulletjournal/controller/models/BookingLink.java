@@ -14,6 +14,8 @@ public class BookingLink {
 
     private String endDate;
 
+    private int slotSpan;
+
     private Invitee invitee;
 
     private List<Invitee> guests;
@@ -35,6 +37,7 @@ public class BookingLink {
                        @NotNull String owner,
                        String startDate,
                        String endDate,
+                       int slotSpan,
                        int bufferInMin,
                        boolean expireOnBooking,
                        boolean includeTaskWithoutDuration) {
@@ -42,6 +45,7 @@ public class BookingLink {
         this.owner = owner;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.slotSpan = slotSpan;
         this.bufferInMin = bufferInMin;
         this.expireOnBooking = expireOnBooking;
         this.includeTaskWithoutDuration = includeTaskWithoutDuration;
@@ -70,6 +74,10 @@ public class BookingLink {
     public void setStartTime(String startDate) {
         this.startDate = startDate;
     }
+
+    public int getSlotSpan() {  return slotSpan; }
+
+    public void setSlotSpan(int slotSpan) { this.slotSpan = slotSpan; }
 
     public String getTimezone() {
         return timezone;

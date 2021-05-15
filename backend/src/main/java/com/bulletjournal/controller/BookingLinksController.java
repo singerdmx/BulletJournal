@@ -19,6 +19,8 @@ public class BookingLinksController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BookingLinksController.class);
     public static final String BOOKING_LINKS_ROUTE = "/api/bookingLinks";
+    public static final String BOOKING_LINK_RECURRENCE_ROUTE = "/api/bookingLinks/{bookingLinkId}/recurrenceRule";
+    public static final String BOOKING_LINK_SLOT_ROUTE = "/api/bookingLinks/{bookingLinkId}/slot";
     public static final String BOOKING_LINK_ROUTE = "/api/bookingLinks/{bookingLinkId}";
     public static final String PUBLIC_BOOKING_LINKS_ROUTE_PREFIX = "/api/public/bookingLinks/";
     public static final String PUBLIC_BOOKING_LINK_ROUTE = PUBLIC_BOOKING_LINKS_ROUTE_PREFIX + "{bookingLinkId}";
@@ -51,5 +53,16 @@ public class BookingLinksController {
         return bookingLink;
     }
 
+    @PostMapping(BOOKING_LINK_RECURRENCE_ROUTE)
+    public BookingLink updateBookingLinkRecurenceRule(@NotNull @PathVariable String bookingLinkId, String recurenceRule){
+        BookingLink bookingLink = getBookingLink(bookingLinkId);
+        return bookingLink;
+    }
+
+    @PostMapping(BOOKING_LINK_SLOT_ROUTE)
+    public BookingLink updateBookingLinks(@NotNull @PathVariable String bookingLinkId, String recurenceRule){
+        BookingLink bookingLink = getBookingLink(bookingLinkId);
+        return bookingLink;
+    }
 
 }
