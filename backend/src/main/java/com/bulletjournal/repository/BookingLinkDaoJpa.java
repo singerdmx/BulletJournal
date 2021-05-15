@@ -2,8 +2,10 @@ package com.bulletjournal.repository;
 
 import com.bulletjournal.controller.models.BookingSlot;
 import com.bulletjournal.controller.models.params.CreateBookingLinkParams;
+import com.bulletjournal.controller.models.params.UpdateBookingLinkParams;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.models.BookingLink;
+import com.bulletjournal.repository.utils.DaoHelper;
 import com.bulletjournal.util.BookingUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -61,4 +63,18 @@ public class BookingLinkDaoJpa {
         this.bookingLinkRepository.save(bookingLink);
         return bookingLink;
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public BookingLink update(String bookingLinkId, UpdateBookingLinkParams updateBookingLinkParams) {
+        BookingLink bookingLink = getBookingLink(bookingLinkId);
+        DaoHelper.updateIfPresent(updateBookingLinkParams.hasBufferInMin(), updateBookingLinkParams.getBufferInMin(),
+                bookingLink::setBufferInMin);
+        DaoHelper.updateIfPresent(updateBookingLinkParams.hasExpireOnBooking(), updateBookingLinkParams.isExpireOnBooking(),
+                bookingLink::setExpireOnBooking);
+        DaoHelper.updateIfPresent(updateBookingLinkParams.hasIncludeTaskWithoutDuration(), updateBookingLinkParams.isIncludeTaskWithoutDuration(),
+                bookingLink::setIncludeTaskWithoutDuration);
+        this.bookingLinkRepository.save(bookingLink);
+        return bookingLink;
+    }
+
 }
