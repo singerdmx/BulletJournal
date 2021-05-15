@@ -6,10 +6,7 @@ import org.dmfs.rfc5545.DateTime;
 import org.springframework.data.util.Pair;
 
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
@@ -206,6 +203,13 @@ public class ZonedDateTimeHelper {
      */
     public static String getDate(ZonedDateTime dateTime) {
         return aggregateDate(dateTime.getYear(), dateTime.getMonthValue(), dateTime.getDayOfMonth());
+    }
+
+    /**
+     * Get Duration between two ZonedDateTime
+     */
+    public static int getDuration(ZonedDateTime startTime, ZonedDateTime endTime) {
+        return (int)Duration.between(startTime, endTime).toMinutes();
     }
 
     /**
