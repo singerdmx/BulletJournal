@@ -81,4 +81,9 @@ public class BookingLinksController {
         return getBookingLink(bookingLinkId);
     }
 
+    @DeleteMapping(BOOKING_LINK_ROUTE)
+    public void deleteBookingLink(@NotNull @PathVariable String bookingLinkId){
+        this.bookingLinkDaoJpa.deleteBookingLink(bookingLinkId);
+    }
+
 }

@@ -25,6 +25,11 @@ public class BookingLinkDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void deleteBookingLink(String id) {
+        this.bookingLinkRepository.deleteById(id);
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public BookingLink create(String id, String owner, CreateBookingLinkParams createBookingLinkParams) {
         BookingLink bookingLink = new BookingLink();
         bookingLink.setId(id);
