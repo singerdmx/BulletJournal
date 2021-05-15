@@ -43,9 +43,10 @@ const AddProjectItem: React.FC<GroupProps & ProjectItemProps> = (props) => {
   };
 
   useEffect(() => {
-    setProjects([]);
-    setProjects(flattenOwnedProject(props.ownedProjects, projects));
-    setProjects(flattenSharedProject(props.sharedProjects, projects));
+    let updateProjects = [] as Project[];
+    updateProjects = flattenOwnedProject(props.ownedProjects, updateProjects);
+    updateProjects = flattenSharedProject(props.sharedProjects, updateProjects);
+    setProjects(updateProjects.filter(p => !p.shared));
   }, []);
 
   const addBuJoItem = (values: any) => {

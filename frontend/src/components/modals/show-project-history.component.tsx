@@ -146,7 +146,7 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
     let updateProjects = [] as Project[];
     updateProjects = flattenOwnedProject(ownedProjects, updateProjects);
     updateProjects = flattenSharedProject(sharedProjects, updateProjects);
-    setProjects(updateProjects);
+    setProjects(updateProjects.filter(p => !p.shared));
   }, [ownedProjects, sharedProjects]);
 
   const handleRangeChange = (dates: any, dateStrings: string[]) => {
