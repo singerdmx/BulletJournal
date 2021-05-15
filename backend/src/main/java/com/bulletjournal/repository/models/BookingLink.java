@@ -125,4 +125,8 @@ public class BookingLink {
     public void setSlots(String slots) {
         this.slots = slots;
     }
+
+    public com.bulletjournal.controller.models.BookingLink toPresentationModel() {
+        return null;
+    }
 }

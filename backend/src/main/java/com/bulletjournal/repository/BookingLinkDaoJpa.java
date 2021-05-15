@@ -5,14 +5,13 @@ import com.bulletjournal.controller.models.params.CreateBookingLinkParams;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.repository.models.BookingLink;
 import com.google.gson.Gson;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Repository
 public class BookingLinkDaoJpa {
@@ -44,20 +43,16 @@ public class BookingLinkDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public BookingLink updateSlot(String bookingLinkId, BookingSlot slot) {
-        BookingLink bookingLink = this.bookingLinkRepository.findById(bookingLinkId)
-                .orElseThrow(() -> new ResourceNotFoundException("Booking link " + bookingLinkId + " not found"));
-        List<BookingSlot> slots = bookingLink.getSlots() == null ? new ArrayList<>() :
+    public BookingLink updateSlot(String bookingLinkId, final BookingSlot slot) {
+        BookingLink bookingLink = getBookingLink(bookingLinkId);
+        List<BookingSlot> slots = StringUtils.isBlank(bookingLink.getSlots()) ? new ArrayList<>() :
                 Arrays.asList(GSON.fromJson(bookingLink.getSlots(), BookingSlot[].class));
-        // equals check exclude isON?
-        if (!slots.contains(slot)) {
-            slots.add(slot);
+
+        Optional<BookingSlot> match = slots.stream().filter(s -> Objects.equals(s, slot)).findFirst();
+        if (match.isPresent()) {
+            match.get().setOn(slot.isOn());
         } else {
-            for (BookingSlot s : slots) {
-                if (s.equals(slot)) {
-                    s.setOn(slot.isOn());
-                }
-            }
+            slots.add(slot);
         }
         String updatedSlots = GSON.toJson(slots);
         bookingLink.setSlots(updatedSlots);

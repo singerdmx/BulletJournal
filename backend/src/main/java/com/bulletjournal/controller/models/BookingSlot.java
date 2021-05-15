@@ -9,7 +9,6 @@ public class BookingSlot {
     private String endTime;
     private String date;
 
-
     public boolean isOn() {
         return isOn;
     }
@@ -55,15 +54,12 @@ public class BookingSlot {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BookingSlot bookingSlot = (BookingSlot) o;
-        return isOn == bookingSlot.isOn &&
-                index == bookingSlot.index &&
-                Objects.equals(startTime, bookingSlot.startTime) &&
-                Objects.equals(endTime, bookingSlot.endTime) &&
+        return index == bookingSlot.index &&
                 Objects.equals(date, bookingSlot.date);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(isOn(), getIndex(), getStartTime(), getEndTime(), getDate());
+        return Objects.hash(getIndex(), getDate());
     }
 }
