@@ -37,10 +37,9 @@ public class BookingUtil {
 
             Optional<BookingSlot> match = slotsOverride.stream().filter(s -> Objects.equals(s, bookingSlot)).findFirst();
             if (match.isPresent()) {
-                slots.add(match.get());
-            } else {
-                slots.add(bookingSlot);
+                bookingSlot.setOn(match.get().isOn());
             }
+            slots.add(bookingSlot);
         }
 
         return slots;

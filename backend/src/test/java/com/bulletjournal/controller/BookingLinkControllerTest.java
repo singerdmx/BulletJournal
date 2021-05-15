@@ -1,6 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.BookingLink;
+import com.bulletjournal.controller.models.BookingSlot;
 import com.bulletjournal.controller.models.RequestParams;
 import com.bulletjournal.controller.models.params.CreateBookingLinkParams;
 import org.junit.Before;
@@ -16,6 +17,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
@@ -46,6 +48,14 @@ public class BookingLinkControllerTest {
         bookingLink1 = getBookingLink(bookingLink1.getId());
         bookingLink2 = getBookingLink(bookingLink2.getId());
 
+        BookingSlot bookingSlot = new BookingSlot();
+        bookingSlot.setIndex(0);
+        bookingSlot.setStartTime("00:00");
+        bookingSlot.setEndTime("00:30");
+        bookingSlot.setDate("2021-05-04");
+        bookingSlot.setOn(true);
+
+        updateBookingLinkSlot(bookingLink1.getId(), bookingSlot);
     }
 
     private BookingLink createBookingLink(String startDate, String endDate, String timezone, int slotSpan,
@@ -74,6 +84,19 @@ public class BookingLinkControllerTest {
                 bookingLinkId);
         BookingLink bookingLink = response.getBody();
         assertNotNull(bookingLink);
+        return bookingLink;
+    }
+
+    private BookingLink updateBookingLinkSlot(String bookingLinkId, BookingSlot bookingSlot) {
+        ResponseEntity<BookingLink> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + BookingLinksController.BOOKING_LINK_UPDATE_SLOT_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(bookingSlot),
+                BookingLink.class,
+                bookingLinkId);
+        BookingLink bookingLink = response.getBody();
+        assertNotNull(bookingLink);
+        assertEquals(bookingLink.getSlots().get(bookingSlot.getIndex()).isOn(), bookingSlot.isOn());
         return bookingLink;
     }
 }
