@@ -55,7 +55,7 @@ public class BookingLink {
                        boolean expireOnBooking,
                        boolean includeTaskWithoutDuration,
                        List<String> recurrences,
-                       @NotNull com.bulletjournal.controller.models.Project project) {
+                       com.bulletjournal.controller.models.Project project) {
         this.id = id;
         this.owner = owner;
         this.startDate = startDate;
