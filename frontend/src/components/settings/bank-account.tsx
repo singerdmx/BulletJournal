@@ -4,7 +4,8 @@ import {
     CheckOutlined,
     CloseOutlined,
     CreditCardOutlined,
-    DeleteOutlined, DollarCircleFilled,
+    DeleteOutlined,
+    DollarCircleFilled,
     DollarCircleOutlined,
     FileSearchOutlined,
 } from "@ant-design/icons";
@@ -29,7 +30,7 @@ export const getBankAccountType = (input: string) => {
             return BankAccountType.CHECKING_ACCOUNT;
         case 'SAVING_ACCOUNT':
             return BankAccountType.SAVING_ACCOUNT;
-        case 'CREDIT_CARD': 
+        case 'CREDIT_CARD':
             return BankAccountType.CREDIT_CARD;
         default:
             throw Error(`Invalid BankAccountType ${input}`);
@@ -108,43 +109,33 @@ const BankAccountElem: React.FC<BankAccountProps> = (
     }
     if (mode === 'card') {
         return <div className='bank-account-card'>
-            <Card
-                key={bankAccount.id}
-                style={{width: 280}}
-                cover={
-                    <img
-                        alt={bankAccount.accountType}
-                        src={image}
-                        onClick={() => history.push(`/bank/${bankAccount.id}`)}
-                    />
-                }
-                title={<span style={{color: color}} onClick={() => history.push(`/bank/${bankAccount.id}`)}>
-                    {bankAccount.name}
-                </span>}
-                actions={[
-                    <Tooltip title='View Transactions'>
-                        <FileSearchOutlined key="View Transactions" title='View Transactions'
-                                            onClick={() => history.push(`/bank/${bankAccount.id}`)}/>
-                    </Tooltip>,
-                    <EditBankAccountModal bankAccount={bankAccount} mode='card'
-                                          onChangeBalanceSuccess={getBankAccounts} />,
-                    <Tooltip title='Delete'>
-                        <DeleteOutlined key='Delete' title='Delete'
-                                        onClick={() => deleteBankAccount(bankAccount.id)}/>
-                    </Tooltip>
-                ]}
-            >
-                <Meta
-                    style={{height: 65}}
-                    title={<div onClick={() => history.push(`/bank/${bankAccount.id}`)}>
-                        <Statistic
-                        value={`${bankAccount.netBalance.toFixed(2)} ${LocaleCurrency.getCurrency(currency)}`}
-                        valueStyle={{color: balanceColor}}
-                        />
-                    </div>}
-                    description={<span onClick={() => history.push(`/bank/${bankAccount.id}`)}>{description}</span>}
+            <h1 className="bank-account-card-title" style={{color: color}}
+                onClick={() => history.push(`/bank/${bankAccount.id}`)}>
+                {bankAccount.name}
+            </h1>
+
+            <span className="bank-account-card-balance" onClick={() => history.push(`/bank/${bankAccount.id}`)}>
+                <Statistic
+                    value={`${bankAccount.netBalance.toFixed(2)} ${LocaleCurrency.getCurrency(currency)}`}
+                    valueStyle={{color: balanceColor}}
                 />
-            </Card>
+            </span>
+
+            <div className="bank-account-card-description"
+                 onClick={() => history.push(`/bank/${bankAccount.id}`)}>{description}</div>
+
+            <div className="bank-account-card-operations">
+                <Tooltip title='View Transactions'>
+                    <FileSearchOutlined key="View Transactions" title='View Transactions'
+                                        onClick={() => history.push(`/bank/${bankAccount.id}`)}/>
+                </Tooltip>
+                <EditBankAccountModal bankAccount={bankAccount} mode='card'
+                                      onChangeBalanceSuccess={getBankAccounts}/>
+                <Tooltip title='Delete'>
+                    <DeleteOutlined key='Delete' title='Delete'
+                                    onClick={() => deleteBankAccount(bankAccount.id)}/>
+                </Tooltip>
+            </div>
         </div>
     }
 
