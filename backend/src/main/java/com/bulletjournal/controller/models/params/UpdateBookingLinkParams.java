@@ -13,6 +13,8 @@ public class UpdateBookingLinkParams {
 
     private String endDate;
 
+    private Long projectId;
+
     @NotNull
     private String timezone;
 
@@ -85,5 +87,17 @@ public class UpdateBookingLinkParams {
 
     public void setEndDate(String endDate) {
         this.endDate = endDate;
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public boolean hasProjectId() {
+        return projectId != null;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
     }
 }

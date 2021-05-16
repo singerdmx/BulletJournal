@@ -21,6 +21,8 @@ public class CreateBookingLinkParams {
 
     private List<String> recurrences;
 
+    private long projectId;
+
     public CreateBookingLinkParams() {
     }
 
@@ -93,5 +95,13 @@ public class CreateBookingLinkParams {
 
     public void setRecurrences(List<String> recurrences) {
         this.recurrences = recurrences;
+    }
+
+    public long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(long projectId) {
+        this.projectId = projectId;
     }
 }

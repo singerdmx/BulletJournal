@@ -30,6 +30,8 @@ public class BookingLink {
 
     private List<String> recurrences;
 
+    private Project project;
+
     public List<String> getRecurrences() {
         return recurrences;
     }
@@ -52,7 +54,8 @@ public class BookingLink {
                        String timezone,
                        boolean expireOnBooking,
                        boolean includeTaskWithoutDuration,
-                       List<String> recurrences) {
+                       List<String> recurrences,
+                       @NotNull com.bulletjournal.controller.models.Project project) {
         this.id = id;
         this.owner = owner;
         this.startDate = startDate;
@@ -63,6 +66,7 @@ public class BookingLink {
         this.expireOnBooking = expireOnBooking;
         this.includeTaskWithoutDuration = includeTaskWithoutDuration;
         this.recurrences = recurrences;
+        this.project = project;
     }
 
     public String getOwner() {
@@ -177,5 +181,13 @@ public class BookingLink {
 
     public void setGuests(List<Invitee> guests) {
         this.guests = guests;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

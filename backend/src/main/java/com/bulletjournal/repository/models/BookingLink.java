@@ -1,11 +1,10 @@
 package com.bulletjournal.repository.models;
 
 import com.bulletjournal.util.BookingUtil;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
@@ -34,6 +33,11 @@ public class BookingLink extends AuditModel {
     private String recurrences;
 
     private String timezone;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "project_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Project project;
 
     public String getRecurrences() {
         return recurrences;
@@ -143,6 +147,14 @@ public class BookingLink extends AuditModel {
         this.slots = slots;
     }
 
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
     public com.bulletjournal.controller.models.BookingLink toPresentationModel() {
         com.bulletjournal.controller.models.BookingLink bookingLink = new com.bulletjournal.controller.models.BookingLink(
                 this.getId(),
@@ -154,7 +166,8 @@ public class BookingLink extends AuditModel {
                 this.getTimezone(),
                 this.isExpireOnBooking(),
                 this.isIncludeTaskWithoutDuration(),
-                BookingUtil.toList(this.getRecurrences())
+                BookingUtil.toList(this.getRecurrences()),
+                this.project.toPresentationModel()
         );
         return bookingLink;
     }

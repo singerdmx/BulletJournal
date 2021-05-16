@@ -88,7 +88,8 @@ public class BookingLinksController {
     @PatchMapping(BOOKING_LINK_ROUTE)
     public BookingLink updateBookingLink(@NotNull @PathVariable String bookingLinkId,
                                          @Valid @RequestBody UpdateBookingLinkParams updateBookingLinkParams) {
-        this.bookingLinkDaoJpa.partialUpdate(bookingLinkId, updateBookingLinkParams);
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.bookingLinkDaoJpa.partialUpdate(username, bookingLinkId, updateBookingLinkParams);
         return getBookingLink(bookingLinkId, updateBookingLinkParams.getTimezone());
     }
 
@@ -96,7 +97,8 @@ public class BookingLinksController {
     public BookingLink updateBookingLinkSlot(
             @NotNull @PathVariable String bookingLinkId,
             @NotNull @RequestBody UpdateBookingLinkSlotParams updateBookingLinkSlotParams) {
-        this.bookingLinkDaoJpa.updateSlot(bookingLinkId, updateBookingLinkSlotParams.getBookingSlot());
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.bookingLinkDaoJpa.updateSlot(username, bookingLinkId, updateBookingLinkSlotParams.getBookingSlot());
         return getBookingLink(bookingLinkId, updateBookingLinkSlotParams.getTimezone());
     }
 
@@ -104,13 +106,15 @@ public class BookingLinksController {
     public BookingLink updateBookingLinkRecurrences(
             @NotNull @PathVariable String bookingLinkId,
             @NotNull @RequestBody UpdateBookingLinkRecurrencesParams updateBookingLinkRecurrencesParams) {
-        this.bookingLinkDaoJpa.updateRecurrences(bookingLinkId, updateBookingLinkRecurrencesParams.getRecurrences());
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.bookingLinkDaoJpa.updateRecurrences(username, bookingLinkId, updateBookingLinkRecurrencesParams.getRecurrences());
         return getBookingLink(bookingLinkId, updateBookingLinkRecurrencesParams.getTimezone());
     }
 
     @DeleteMapping(BOOKING_LINK_ROUTE)
     public void deleteBookingLink(@NotNull @PathVariable String bookingLinkId) {
-        this.bookingLinkDaoJpa.deleteBookingLink(bookingLinkId);
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.bookingLinkDaoJpa.deleteBookingLink(username, bookingLinkId);
     }
 
 }
