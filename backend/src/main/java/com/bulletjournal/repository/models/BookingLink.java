@@ -34,8 +34,8 @@ public class BookingLink extends AuditModel {
 
     private String timezone;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "project_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "project_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Project project;
 
