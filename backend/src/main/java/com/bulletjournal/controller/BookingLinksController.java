@@ -2,11 +2,14 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.BookingLink;
-import com.bulletjournal.controller.models.BookingSlot;
 import com.bulletjournal.controller.models.params.CreateBookingLinkParams;
 import com.bulletjournal.controller.models.params.UpdateBookingLinkParams;
+import com.bulletjournal.controller.models.params.UpdateBookingLinkRecurrencesParams;
+import com.bulletjournal.controller.models.params.UpdateBookingLinkSlotParams;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
-import com.bulletjournal.repository.*;
+import com.bulletjournal.repository.BookingLinkDaoJpa;
+import com.bulletjournal.repository.ProjectDaoJpa;
+import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.util.BookingUtil;
@@ -52,11 +55,11 @@ public class BookingLinksController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
 
         this.bookingLinkDaoJpa.create(uuid, username, createBookingLinkParams);
-        return getBookingLink(uuid);
+        return getBookingLink(uuid, createBookingLinkParams.getTimezone());
     }
 
     @GetMapping(PUBLIC_BOOKING_LINK_ROUTE)
-    public BookingLink getBookingLink(@NotNull @PathVariable String bookingLinkId) {
+    public BookingLink getBookingLink(@NotNull @PathVariable String bookingLinkId, @RequestParam String timezone) {
         LOGGER.info("Create a new Empty Booking Links");
         com.bulletjournal.repository.models.BookingLink bookingLink =
                 this.bookingLinkDaoJpa.getBookingLink(bookingLinkId);
@@ -70,6 +73,7 @@ public class BookingLinksController {
 
         BookingLink result = bookingLink.toPresentationModel();
         result.setSlots(BookingUtil.calculateSlots(
+                timezone,
                 BookingUtil.getBookingLinkSlots(bookingLink),
                 bookingLink.getStartDate(), bookingLink.getEndDate(), bookingLink.getSlotSpan()));
         result.setRecurrences(BookingUtil.toList(bookingLink.getRecurrences()));
@@ -80,23 +84,23 @@ public class BookingLinksController {
     public BookingLink updateBookingLink(@NotNull @PathVariable String bookingLinkId,
                                          @Valid @RequestBody UpdateBookingLinkParams updateBookingLinkParams) {
         this.bookingLinkDaoJpa.update(bookingLinkId, updateBookingLinkParams);
-        return getBookingLink(bookingLinkId);
-
+        return getBookingLink(bookingLinkId, updateBookingLinkParams.getTimezone());
     }
 
     @PostMapping(BOOKING_LINK_UPDATE_SLOT_ROUTE)
     public BookingLink updateBookingLinkSlot(
             @NotNull @PathVariable String bookingLinkId,
-            @NotNull @RequestBody BookingSlot bookingSlot) {
-        this.bookingLinkDaoJpa.updateSlot(bookingLinkId, bookingSlot);
-        return getBookingLink(bookingLinkId);
+            @NotNull @RequestBody UpdateBookingLinkSlotParams updateBookingLinkSlotParams) {
+        this.bookingLinkDaoJpa.updateSlot(bookingLinkId, updateBookingLinkSlotParams.getBookingSlot());
+        return getBookingLink(bookingLinkId, updateBookingLinkSlotParams.getTimezone());
     }
 
     @PostMapping(BOOKING_LINK_UPDATE_RECURRENCE_RULES_ROUTE)
-    public BookingLink updateBookingLinkRecurrences(@NotNull @PathVariable String bookingLinkId,
-                                                    @NotNull @RequestBody List<String> recurrences) {
-        this.bookingLinkDaoJpa.updateRecurrences(bookingLinkId, recurrences);
-        return getBookingLink(bookingLinkId);
+    public BookingLink updateBookingLinkRecurrences(
+            @NotNull @PathVariable String bookingLinkId,
+            @NotNull @RequestBody UpdateBookingLinkRecurrencesParams updateBookingLinkRecurrencesParams) {
+        this.bookingLinkDaoJpa.updateRecurrences(bookingLinkId, updateBookingLinkRecurrencesParams.getRecurrences());
+        return getBookingLink(bookingLinkId, updateBookingLinkRecurrencesParams.getTimezone());
     }
 
     @DeleteMapping(BOOKING_LINK_ROUTE)

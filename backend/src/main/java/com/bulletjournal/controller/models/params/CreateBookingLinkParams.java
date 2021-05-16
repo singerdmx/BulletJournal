@@ -1,6 +1,7 @@
 package com.bulletjournal.controller.models.params;
 
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 public class CreateBookingLinkParams {
 
@@ -18,9 +19,9 @@ public class CreateBookingLinkParams {
 
     private boolean expireOnBooking;
 
+    private List<String> recurrences;
 
     public CreateBookingLinkParams() {
-
     }
 
     public CreateBookingLinkParams(@NotBlank String startDate, @NotBlank String endDate, boolean includeTaskWithoutDuration, boolean expireOnBooking) {
@@ -70,20 +71,27 @@ public class CreateBookingLinkParams {
         this.slotSpan = slotSpan;
     }
 
-
-    public void setExpireOnBooking(boolean expireOnBooking) {
-        this.expireOnBooking = expireOnBooking;
-    }
-
-    public boolean getExpireOnBooking() {
-        return expireOnBooking;
-    }
-
-    public boolean getIncludeTaskWithoutDuration() {
+    public boolean isIncludeTaskWithoutDuration() {
         return includeTaskWithoutDuration;
     }
 
     public void setIncludeTaskWithoutDuration(boolean includeTaskWithoutDuration) {
         this.includeTaskWithoutDuration = includeTaskWithoutDuration;
+    }
+
+    public boolean isExpireOnBooking() {
+        return expireOnBooking;
+    }
+
+    public void setExpireOnBooking(boolean expireOnBooking) {
+        this.expireOnBooking = expireOnBooking;
+    }
+
+    public List<String> getRecurrences() {
+        return recurrences;
+    }
+
+    public void setRecurrences(List<String> recurrences) {
+        this.recurrences = recurrences;
     }
 }

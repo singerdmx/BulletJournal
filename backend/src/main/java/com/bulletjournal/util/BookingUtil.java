@@ -14,7 +14,9 @@ public class BookingUtil {
     private static final Gson GSON = new Gson();
 
     public static List<BookingSlot> calculateSlots(
-            List<BookingSlot> slotsOverride, String startDate, String endDate, int slotSpan) {
+            String timezone,
+            List<BookingSlot> slotsOverride,
+            String startDate, String endDate, int slotSpan) {
         List<BookingSlot> slots = new ArrayList<>();
         ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(startDate, null, "America/Chicago");
         ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, "America/Chicago");

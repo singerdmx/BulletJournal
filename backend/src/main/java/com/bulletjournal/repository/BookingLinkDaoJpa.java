@@ -39,10 +39,11 @@ public class BookingLinkDaoJpa {
         bookingLink.setBufferInMin(createBookingLinkParams.getBufferInMin());
         bookingLink.setStartDate(createBookingLinkParams.getStartDate());
         bookingLink.setEndDate(createBookingLinkParams.getEndDate());
-        bookingLink.setExpireOnBooking(createBookingLinkParams.getExpireOnBooking());
-        bookingLink.setIncludeTaskWithoutDuration(createBookingLinkParams.getIncludeTaskWithoutDuration());
+        bookingLink.setExpireOnBooking(createBookingLinkParams.isExpireOnBooking());
+        bookingLink.setIncludeTaskWithoutDuration(createBookingLinkParams.isIncludeTaskWithoutDuration());
         bookingLink.setSlotSpan(createBookingLinkParams.getSlotSpan());
         bookingLink.setTimezone(createBookingLinkParams.getTimezone());
+        bookingLink.setRecurrences(BookingUtil.toString(createBookingLinkParams.getRecurrences()));
         this.bookingLinkRepository.save(bookingLink);
         return bookingLink;
     }

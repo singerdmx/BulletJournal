@@ -1,5 +1,7 @@
 package com.bulletjournal.controller.models.params;
 
+import javax.validation.constraints.NotNull;
+
 public class UpdateBookingLinkParams {
     private Integer bufferInMin;
 
@@ -7,14 +9,11 @@ public class UpdateBookingLinkParams {
 
     private Boolean expireOnBooking;
 
+    @NotNull
+    private String timezone;
+
     public UpdateBookingLinkParams() {
 
-    }
-
-    public UpdateBookingLinkParams(int bufferInMin, boolean includeTaskWithoutDuration, boolean expireOnBooking) {
-        this.bufferInMin = bufferInMin;
-        this.includeTaskWithoutDuration = includeTaskWithoutDuration;
-        this.expireOnBooking = expireOnBooking;
     }
 
     public int getBufferInMin() {
@@ -51,5 +50,13 @@ public class UpdateBookingLinkParams {
 
     public boolean hasExpireOnBooking() {
         return this.expireOnBooking != null;
+    }
+
+    public String getTimezone() {
+        return timezone;
+    }
+
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
     }
 }
