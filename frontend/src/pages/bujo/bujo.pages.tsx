@@ -20,7 +20,7 @@ import { getProjectItemsAfterUpdateSelect } from '../../features/myBuJo/actions'
 
 import './bujo.styles.less';
 import RecentItemList from '../../components/recent/recent-item-list.component';
-import BookMe from '../../components/book-me/book-me.component';
+import BookMe from "../book-me/book-me.pages";
 
 type BujoProps = {
   todoSelected: boolean;
