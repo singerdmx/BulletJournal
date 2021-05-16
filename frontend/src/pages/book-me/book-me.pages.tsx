@@ -4,6 +4,7 @@ import {Tabs} from "antd";
 import {IState} from "../../store";
 import {connect} from "react-redux";
 import BookMeCard from "../../components/book-me/book-me-card.component";
+import CustomDurationCard from "../../components/custom-duration/custom-duration-card.component";
 import './book-me.styles.less';
 
 const {TabPane} = Tabs;
@@ -27,7 +28,8 @@ const BookMe: React.FC<BookMeProps> = (props) => {
                     <div className="book-me-cards">
                         <BookMeCard span={15} backgroundColor={'#EFEFF1'} imgHeight="67px" imgWidth="60px" img="https://user-images.githubusercontent.com/59456058/118382802-b83e6a80-b5ad-11eb-8a69-07e47366c622.png"/>
                         <BookMeCard span={30} backgroundColor={'#ECD4D4'} imgHeight="60px" imgWidth="50px" img="https://user-images.githubusercontent.com/122956/118382659-6c3ef600-b5ac-11eb-8477-09e3fd4fa2ea.png"/>
-                        <BookMeCard span={60} backgroundColor={'#CCDBE2' } imgHeight="60px" imgWidth="50px" img="https://user-images.githubusercontent.com/59456058/118382868-61856080-b5ae-11eb-88e4-2ac9fa688025.png"/>
+                        <BookMeCard span={60} backgroundColor={'#CCDBE2'} imgHeight="60px" imgWidth="50px" img="https://user-images.githubusercontent.com/59456058/118382868-61856080-b5ae-11eb-88e4-2ac9fa688025.png" />
+                        <CustomDurationCard backgroundColor={'#C9CBE1'} imgHeight="60px" imgWidth="50px" img="https://user-images.githubusercontent.com/40779030/118413081-4a984a00-b652-11eb-8c01-af811b9032b2.png"/>
                     </div>
                 </div>
             </TabPane>
