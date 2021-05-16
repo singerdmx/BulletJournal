@@ -62,16 +62,26 @@ export const randomString = (length: number) => {
     return result;
 }
 
-const colors = ['magenta', 'red', 'volcano', 'orange', 'gold', 'lime', 'green',
-    'cyan', 'blue', 'geekblue', 'purple'];
+const colors = [
+    '#A86767',
+    '#CB8A90',
+    '#CB8A90',
+    '#D6CA09',
+    '#DD9518',
+    '#BBB44B',
+    '#7AB37F',
+    '#16C1AE',
+    '#109889',
+    '#4F8FC3',
+    '#B57FB3'
+];
 
 export function stringToRGB(str: string) {
     let hash: number = 0;
     for (let i = 0; i < str.length; i++) {
         hash = str.charCodeAt(i) + ((hash << 5) - hash);
     }
-
-    return colors[hash % colors.length];
+    return colors[Math.abs(hash % colors.length)];
 }
 
 export const swatchesPickerColors = [['#FCE9DA', '#FFCEC7', '#FFD0A6', '#E098AE'],

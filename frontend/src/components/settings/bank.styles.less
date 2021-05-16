@@ -22,7 +22,7 @@ div.banks-div {
 
 div.bank-account-card {
   display: grid;
-  grid-template-rows: 1fr 2fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
   margin: 3vh 1vw 3vh 1vw;
   width: 250px;
   min-height: 150px;
@@ -31,6 +31,7 @@ div.bank-account-card {
   box-shadow: 0 4px 6px 0 rgba(85, 85, 85, 0.08),
   0 1px 20px 0 rgba(0, 0, 0, 0.07), 0px 1px 11px 0px rgba(0, 0, 0, 0.07);
   transition: all 0.2s ease-in-out;
+  text-align: center;
   .bank-account-card-title {
     grid-row-start: 1;
     margin-bottom: 0;
@@ -40,10 +41,10 @@ div.bank-account-card {
   }
   .bank-account-card-description{
     grid-row-start: 3;
-
+    color: #666668;
   }
   .bank-account-card-operations{
-    border-top:1px solid #e0e6ed;
+    border-top:1px solid #666668;
     padding-top: 3%;
     padding-bottom: 3%;
     grid-row-start: 4;

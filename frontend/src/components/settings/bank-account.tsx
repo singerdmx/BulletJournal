@@ -103,12 +103,25 @@ const BankAccountElem: React.FC<BankAccountProps> = (
     const icon = getBankAccountTypeIcon(bankAccount.accountType);
     const image = getBankAccountTypeImage(bankAccount.accountType);
     const balanceColor = bankAccount.netBalance >= 0 ? '#3f8600' : '#cf1322';
+
+    const getColor = (type: BankAccountType) => {
+        switch (type) {
+            case BankAccountType.CHECKING_ACCOUNT:
+                return '#F4F4F4';
+            case BankAccountType.SAVING_ACCOUNT:
+                return '#FFFAF3';
+            case BankAccountType.CREDIT_CARD:
+                return '#EEF4F9';
+            default:
+                throw Error(`Invalid BankAccountType ${type}`);
+        }
+    }
     let description = bankAccount.accountNumber ? bankAccount.accountNumber + ' ' : '';
     if (bankAccount.description) {
         description += bankAccount.description;
     }
     if (mode === 'card') {
-        return <div className='bank-account-card'>
+        return <div className='bank-account-card' style={{backgroundColor: getColor(bankAccount.accountType)}}>
             <h1 className="bank-account-card-title" style={{color: color}}
                 onClick={() => history.push(`/bank/${bankAccount.id}`)}>
                 {bankAccount.name}
