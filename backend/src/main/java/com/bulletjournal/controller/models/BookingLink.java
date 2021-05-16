@@ -50,7 +50,8 @@ public class BookingLink {
                        int slotSpan,
                        int bufferInMin,
                        boolean expireOnBooking,
-                       boolean includeTaskWithoutDuration) {
+                       boolean includeTaskWithoutDuration,
+                       List<String> recurrences) {
         this.id = id;
         this.owner = owner;
         this.startDate = startDate;
@@ -59,6 +60,7 @@ public class BookingLink {
         this.bufferInMin = bufferInMin;
         this.expireOnBooking = expireOnBooking;
         this.includeTaskWithoutDuration = includeTaskWithoutDuration;
+        this.recurrences = recurrences;
     }
 
     public String getOwner() {
@@ -85,9 +87,13 @@ public class BookingLink {
         this.startDate = startDate;
     }
 
-    public int getSlotSpan() {  return slotSpan; }
+    public int getSlotSpan() {
+        return slotSpan;
+    }
 
-    public void setSlotSpan(int slotSpan) { this.slotSpan = slotSpan; }
+    public void setSlotSpan(int slotSpan) {
+        this.slotSpan = slotSpan;
+    }
 
     public String getTimezone() {
         return timezone;

@@ -1,5 +1,7 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.util.BookingUtil;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -142,16 +144,17 @@ public class BookingLink extends AuditModel {
     }
 
     public com.bulletjournal.controller.models.BookingLink toPresentationModel() {
-       com.bulletjournal.controller.models.BookingLink bookingLink = new com.bulletjournal.controller.models.BookingLink(
-               this.getId(),
-               this.getOwner(),
-               this.getStartDate(),
-               this.getEndDate(),
-               this.getSlotSpan(),
-               this.getBufferInMin(),
-               this.isExpireOnBooking(),
-               this.isIncludeTaskWithoutDuration()
-       );
-       return bookingLink;
+        com.bulletjournal.controller.models.BookingLink bookingLink = new com.bulletjournal.controller.models.BookingLink(
+                this.getId(),
+                this.getOwner(),
+                this.getStartDate(),
+                this.getEndDate(),
+                this.getSlotSpan(),
+                this.getBufferInMin(),
+                this.isExpireOnBooking(),
+                this.isIncludeTaskWithoutDuration(),
+                BookingUtil.toList(this.getRecurrences())
+        );
+        return bookingLink;
     }
 }

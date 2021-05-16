@@ -12,13 +12,14 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -45,8 +46,8 @@ public class BookingLinkControllerTest {
     public void testCRUD() throws Exception {
         BookingLink bookingLink1 = createBookingLink("2021-05-04", "2021-06-01", TIMEZONE, 30, 0, false, true);
         BookingLink bookingLink2 = createBookingLink("2021-06-01", "2021-06-04", TIMEZONE, 60, 0, false, true);
-        bookingLink1 = getBookingLink(bookingLink1.getId());
-        bookingLink2 = getBookingLink(bookingLink2.getId());
+        bookingLink1 = getBookingLink(bookingLink1.getId(), TIMEZONE);
+        bookingLink2 = getBookingLink(bookingLink2.getId(), TIMEZONE);
 
         BookingSlot bookingSlot = new BookingSlot();
         bookingSlot.setIndex(0);
@@ -56,6 +57,8 @@ public class BookingLinkControllerTest {
         bookingSlot.setOn(true);
 
         updateBookingLinkSlot(bookingLink1.getId(), bookingSlot);
+
+        deleteBookingLinkSlot(bookingLink2.getId());
     }
 
     private BookingLink createBookingLink(String startDate, String endDate, String timezone, int slotSpan,
@@ -75,9 +78,11 @@ public class BookingLinkControllerTest {
         return bookingLink;
     }
 
-    private BookingLink getBookingLink(String bookingLinkId) {
+    private BookingLink getBookingLink(String bookingLinkId, String timeZone) {
+        String url = ROOT_URL + randomServerPort + BookingLinksController.PUBLIC_BOOKING_LINK_ROUTE;
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url).queryParam("timeZone", timeZone);
         ResponseEntity<BookingLink> response = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + BookingLinksController.PUBLIC_BOOKING_LINK_ROUTE,
+                uriBuilder.toUriString(),
                 HttpMethod.GET,
                 null,
                 BookingLink.class,
@@ -98,5 +103,18 @@ public class BookingLinkControllerTest {
         assertNotNull(bookingLink);
         assertEquals(bookingLink.getSlots().get(bookingSlot.getIndex()).isOn(), bookingSlot.isOn());
         return bookingLink;
+    }
+
+    private void deleteBookingLinkSlot(String bookingLinkId) {
+        ResponseEntity<?> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + BookingLinksController.PUBLIC_BOOKING_LINK_ROUTE,
+                HttpMethod.DELETE,
+                null,
+                Void.class,
+                bookingLinkId);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        BookingLink bookingLink = getBookingLink(bookingLinkId, TIMEZONE);
+        assertNull(bookingLink);
     }
 }

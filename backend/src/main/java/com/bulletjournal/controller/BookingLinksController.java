@@ -66,7 +66,7 @@ public class BookingLinksController {
 
     @GetMapping(PUBLIC_BOOKING_LINK_ROUTE)
     public BookingLink getBookingLink(@NotNull @PathVariable String bookingLinkId, @RequestParam String timezone) {
-        LOGGER.info("Create a new Empty Booking Links");
+        LOGGER.info("Create a new BookingLinks");
         com.bulletjournal.repository.models.BookingLink bookingLink =
                 this.bookingLinkDaoJpa.getBookingLink(bookingLinkId);
         ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(

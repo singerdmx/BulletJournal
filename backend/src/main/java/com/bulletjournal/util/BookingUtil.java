@@ -18,8 +18,8 @@ public class BookingUtil {
             List<BookingSlot> slotsOverride,
             String startDate, String endDate, int slotSpan) {
         List<BookingSlot> slots = new ArrayList<>();
-        ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(startDate, null, "America/Chicago");
-        ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, "America/Chicago");
+        ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(startDate, null, timezone);
+        ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
         endTime.plusMinutes(1);
 
         if (slotSpan <= 0) return slots;
