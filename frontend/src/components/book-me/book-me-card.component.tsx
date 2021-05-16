@@ -6,11 +6,13 @@ import {ClockCircleOutlined, DashboardOutlined, FieldTimeOutlined} from "@ant-de
 type BookMeCardProps = {
     span: number,
     backgroundColor: string,
-    img: string
+    img: string,
+    imgHeight: string,
+    imgWidth: string,
 }
 
 const BookMeCard: React.FC<BookMeCardProps> = (props) => {
-    const {span, backgroundColor, img} = props;
+    const {span, backgroundColor, img, imgHeight, imgWidth} = props;
 
     const getIcon = (span: number) => {
         if (span == 15) {
@@ -35,7 +37,8 @@ const BookMeCard: React.FC<BookMeCardProps> = (props) => {
             <h1> {getIcon(span)} {span} Minute Booking</h1>
             <span>{getSpan(span)}, One-on-One</span>
             <div>
-                <img sizes="50px"
+                <img height={imgHeight}
+                     width={imgWidth}
                      alt="pointer"
                      src={img}/>
             </div>
