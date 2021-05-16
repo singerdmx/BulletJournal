@@ -34,14 +34,14 @@ const CustomDurationCard: React.FC<CustomDurationCardProps> = (props) => {
         <div className="book-me-card-title">
             <h1><HistoryOutlined/> Custom Duration</h1>
             <span>
-                <Select defaultValue="0" style={{width: 58,marginRight: 2}}>
+                <Select defaultValue="0" style={{width: 60}}>
                     {hourOptions}
                 </Select>
-                hr
-                <Select defaultValue="45" style={{width: 58,marginRight: 2, marginLeft: 2}}>
+                {' '}hr{' '}
+                <Select defaultValue="45" style={{width: 60}}>
                     {minOptions}
                 </Select>
-                min
+                {' '}min{' '}
             </span>
             <div>
                 <img height={imgHeight}
