@@ -26,7 +26,7 @@ const BookMeCard: React.FC<BookMeCardProps> = (props) => {
         if (span != 60) {
             return span + " mins"
         } else {
-            return span + " hrs"
+            return "1 hr"
         }
     }
 
