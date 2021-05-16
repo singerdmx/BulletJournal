@@ -41,6 +41,7 @@ public class BookingLinkDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public BookingLink create(String id, String owner, CreateBookingLinkParams createBookingLinkParams) {
+        Project project = this.projectDaoJpa.getProject(createBookingLinkParams.getProjectId(), owner);
         BookingLink bookingLink = new BookingLink();
         bookingLink.setId(id);
         bookingLink.setOwner(owner);
@@ -52,6 +53,7 @@ public class BookingLinkDaoJpa {
         bookingLink.setSlotSpan(createBookingLinkParams.getSlotSpan());
         bookingLink.setTimezone(createBookingLinkParams.getTimezone());
         bookingLink.setRecurrences(BookingUtil.toString(createBookingLinkParams.getRecurrences()));
+        bookingLink.setProject(project);
         this.bookingLinkRepository.save(bookingLink);
         return bookingLink;
     }
