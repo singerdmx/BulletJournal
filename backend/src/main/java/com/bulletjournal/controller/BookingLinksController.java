@@ -58,6 +58,12 @@ public class BookingLinksController {
         return getBookingLink(uuid, createBookingLinkParams.getTimezone());
     }
 
+    @GetMapping(BOOKING_LINKS_ROUTE)
+    public List<BookingLink> getBookingLinks() {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return this.bookingLinkDaoJpa.getBookingLinks(username);
+    }
+
     @GetMapping(PUBLIC_BOOKING_LINK_ROUTE)
     public BookingLink getBookingLink(@NotNull @PathVariable String bookingLinkId, @RequestParam String timezone) {
         LOGGER.info("Create a new Empty Booking Links");

@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class BookingLinkDaoJpa {
@@ -78,4 +79,15 @@ public class BookingLinkDaoJpa {
         return bookingLink;
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public List<com.bulletjournal.controller.models.BookingLink> getBookingLinks(String requester) {
+        List<BookingLink> links = this.bookingLinkRepository.findAllByOwner(requester);
+        return links.stream()
+                .map(bookingLink -> {
+                    com.bulletjournal.controller.models.BookingLink result = bookingLink.toPresentationModel();
+                    result.setRecurrences(BookingUtil.toList(bookingLink.getRecurrences()));
+                    return result;
+                })
+                .collect(Collectors.toList());
+    }
 }
