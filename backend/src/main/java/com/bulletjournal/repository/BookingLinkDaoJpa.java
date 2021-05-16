@@ -67,7 +67,7 @@ public class BookingLinkDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public BookingLink update(String bookingLinkId, UpdateBookingLinkParams updateBookingLinkParams) {
+    public BookingLink partialUpdate(String bookingLinkId, UpdateBookingLinkParams updateBookingLinkParams) {
         BookingLink bookingLink = getBookingLink(bookingLinkId);
         DaoHelper.updateIfPresent(updateBookingLinkParams.hasBufferInMin(), updateBookingLinkParams.getBufferInMin(),
                 bookingLink::setBufferInMin);
@@ -75,6 +75,11 @@ public class BookingLinkDaoJpa {
                 bookingLink::setExpireOnBooking);
         DaoHelper.updateIfPresent(updateBookingLinkParams.hasIncludeTaskWithoutDuration(), updateBookingLinkParams.isIncludeTaskWithoutDuration(),
                 bookingLink::setIncludeTaskWithoutDuration);
+        DaoHelper.updateIfPresent(updateBookingLinkParams.hasStartDate(), updateBookingLinkParams.getStartDate(),
+                bookingLink::setStartDate);
+        DaoHelper.updateIfPresent(updateBookingLinkParams.hasEndDate(), updateBookingLinkParams.getEndDate(),
+                bookingLink::setEndDate);
+        bookingLink.setTimezone(updateBookingLinkParams.getTimezone());
         this.bookingLinkRepository.save(bookingLink);
         return bookingLink;
     }

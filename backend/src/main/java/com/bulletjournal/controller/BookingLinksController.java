@@ -89,7 +89,7 @@ public class BookingLinksController {
     @PatchMapping(BOOKING_LINK_ROUTE)
     public BookingLink updateBookingLink(@NotNull @PathVariable String bookingLinkId,
                                          @Valid @RequestBody UpdateBookingLinkParams updateBookingLinkParams) {
-        this.bookingLinkDaoJpa.update(bookingLinkId, updateBookingLinkParams);
+        this.bookingLinkDaoJpa.partialUpdate(bookingLinkId, updateBookingLinkParams);
         return getBookingLink(bookingLinkId, updateBookingLinkParams.getTimezone());
     }
 

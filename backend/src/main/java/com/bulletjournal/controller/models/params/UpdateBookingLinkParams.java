@@ -9,6 +9,10 @@ public class UpdateBookingLinkParams {
 
     private Boolean expireOnBooking;
 
+    private String startDate;
+
+    private String endDate;
+
     @NotNull
     private String timezone;
 
@@ -58,5 +62,29 @@ public class UpdateBookingLinkParams {
 
     public void setTimezone(String timezone) {
         this.timezone = timezone;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public boolean hasStartDate() {
+        return startDate != null;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public boolean hasEndDate() {
+        return endDate != null;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
 }
