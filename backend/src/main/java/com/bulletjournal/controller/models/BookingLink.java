@@ -49,6 +49,7 @@ public class BookingLink {
                        String endDate,
                        int slotSpan,
                        int bufferInMin,
+                       String timezone,
                        boolean expireOnBooking,
                        boolean includeTaskWithoutDuration,
                        List<String> recurrences) {
@@ -58,6 +59,7 @@ public class BookingLink {
         this.endDate = endDate;
         this.slotSpan = slotSpan;
         this.bufferInMin = bufferInMin;
+        this.timezone = timezone;
         this.expireOnBooking = expireOnBooking;
         this.includeTaskWithoutDuration = includeTaskWithoutDuration;
         this.recurrences = recurrences;

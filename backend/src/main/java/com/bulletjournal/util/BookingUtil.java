@@ -65,6 +65,9 @@ public class BookingUtil {
     }
 
     public static String toString(List<String> recurrences) {
+        if (recurrences == null) {
+            recurrences = Collections.emptyList();
+        }
         return GSON.toJson(recurrences);
     }
 

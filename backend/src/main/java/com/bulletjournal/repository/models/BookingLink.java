@@ -151,6 +151,7 @@ public class BookingLink extends AuditModel {
                 this.getEndDate(),
                 this.getSlotSpan(),
                 this.getBufferInMin(),
+                this.getTimezone(),
                 this.isExpireOnBooking(),
                 this.isIncludeTaskWithoutDuration(),
                 BookingUtil.toList(this.getRecurrences())

@@ -87,13 +87,8 @@ public class BookingLinkDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<com.bulletjournal.controller.models.BookingLink> getBookingLinks(String requester) {
         List<BookingLink> links = this.bookingLinkRepository.findAllByOwner(requester);
-        System.out.println(links.size());
         return links.stream()
-                .map(bookingLink -> {
-                    com.bulletjournal.controller.models.BookingLink result = bookingLink.toPresentationModel();
-                    result.setRecurrences(BookingUtil.toList(bookingLink.getRecurrences()));
-                    return result;
-                })
+                .map(BookingLink::toPresentationModel)
                 .collect(Collectors.toList());
     }
 }

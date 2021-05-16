@@ -17,7 +17,6 @@ public class UpdateBookingLinkParams {
     private String timezone;
 
     public UpdateBookingLinkParams() {
-
     }
 
     public int getBufferInMin() {

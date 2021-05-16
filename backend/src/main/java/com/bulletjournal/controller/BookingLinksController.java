@@ -82,7 +82,6 @@ public class BookingLinksController {
                 timezone,
                 BookingUtil.getBookingLinkSlots(bookingLink),
                 bookingLink.getStartDate(), bookingLink.getEndDate(), bookingLink.getSlotSpan()));
-        result.setRecurrences(BookingUtil.toList(bookingLink.getRecurrences()));
         return result;
     }
 

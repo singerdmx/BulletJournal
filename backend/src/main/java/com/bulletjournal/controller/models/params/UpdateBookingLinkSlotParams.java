@@ -6,6 +6,14 @@ public class UpdateBookingLinkSlotParams {
     private BookingSlot bookingSlot;
     private String timezone;
 
+    public UpdateBookingLinkSlotParams() {
+    }
+
+    public UpdateBookingLinkSlotParams(BookingSlot bookingSlot, String timezone) {
+        this.bookingSlot = bookingSlot;
+        this.timezone = timezone;
+    }
+
     public BookingSlot getBookingSlot() {
         return bookingSlot;
     }

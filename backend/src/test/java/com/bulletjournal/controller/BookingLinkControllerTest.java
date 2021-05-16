@@ -2,8 +2,8 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.BookingLink;
 import com.bulletjournal.controller.models.BookingSlot;
-import com.bulletjournal.controller.models.RequestParams;
 import com.bulletjournal.controller.models.params.CreateBookingLinkParams;
+import com.bulletjournal.controller.models.params.UpdateBookingLinkSlotParams;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,21 +25,18 @@ import static org.junit.Assert.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 public class BookingLinkControllerTest {
-    private static final String USER = "BulletJournal";
 
     private static final String ROOT_URL = "http://localhost:";
 
-    private static String TIMEZONE = "America/Los_Angeles";
+    private static final String TIMEZONE = "America/Los_Angeles";
 
     @LocalServerPort
     int randomServerPort;
     private TestRestTemplate restTemplate = new TestRestTemplate();
-    private RequestParams requestParams;
 
     @Before
     public void setup() {
         restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-        requestParams = new RequestParams(restTemplate, randomServerPort);
     }
 
     @Test
@@ -73,22 +70,33 @@ public class BookingLinkControllerTest {
                 HttpMethod.POST,
                 new HttpEntity<>(createBookingLinkParams),
                 BookingLink.class);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
         BookingLink bookingLink = response.getBody();
         assertNotNull(bookingLink);
+        assertNotNull(bookingLink.getId());
         return bookingLink;
     }
 
-    private BookingLink getBookingLink(String bookingLinkId, String timeZone) {
+    private BookingLink getBookingLink(String bookingLinkId, String timezone) {
+        BookingLink bookingLink = getBookingLink(bookingLinkId, timezone, HttpStatus.OK);
+        assertNotNull(bookingLink);
+        assertNotNull(bookingLink.getId());
+        return bookingLink;
+    }
+
+    private BookingLink getBookingLink(String bookingLinkId, String timezone, HttpStatus expectedStatusCode) {
         String url = ROOT_URL + randomServerPort + BookingLinksController.PUBLIC_BOOKING_LINK_ROUTE;
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url).queryParam("timeZone", timeZone);
+        url = UriComponentsBuilder.fromHttpUrl(url)
+                .queryParam("timezone", timezone)
+                .buildAndExpand(bookingLinkId)
+                .toUriString();
         ResponseEntity<BookingLink> response = this.restTemplate.exchange(
-                uriBuilder.toUriString(),
+                url,
                 HttpMethod.GET,
                 null,
-                BookingLink.class,
-                bookingLinkId);
+                BookingLink.class);
+        assertEquals(expectedStatusCode, response.getStatusCode());
         BookingLink bookingLink = response.getBody();
-        assertNotNull(bookingLink);
         return bookingLink;
     }
 
@@ -96,10 +104,11 @@ public class BookingLinkControllerTest {
         ResponseEntity<BookingLink> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + BookingLinksController.BOOKING_LINK_UPDATE_SLOT_ROUTE,
                 HttpMethod.POST,
-                new HttpEntity<>(bookingSlot),
+                new HttpEntity<>(new UpdateBookingLinkSlotParams(bookingSlot, TIMEZONE)),
                 BookingLink.class,
                 bookingLinkId);
         BookingLink bookingLink = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(bookingLink);
         assertEquals(bookingLink.getSlots().get(bookingSlot.getIndex()).isOn(), bookingSlot.isOn());
         return bookingLink;
@@ -107,14 +116,12 @@ public class BookingLinkControllerTest {
 
     private void deleteBookingLinkSlot(String bookingLinkId) {
         ResponseEntity<?> response = this.restTemplate.exchange(
-                ROOT_URL + randomServerPort + BookingLinksController.PUBLIC_BOOKING_LINK_ROUTE,
+                ROOT_URL + randomServerPort + BookingLinksController.BOOKING_LINK_ROUTE,
                 HttpMethod.DELETE,
                 null,
                 Void.class,
                 bookingLinkId);
         assertEquals(HttpStatus.OK, response.getStatusCode());
-
-        BookingLink bookingLink = getBookingLink(bookingLinkId, TIMEZONE);
-        assertNull(bookingLink);
+        getBookingLink(bookingLinkId, TIMEZONE, HttpStatus.NOT_FOUND);
     }
 }
