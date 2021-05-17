@@ -19,6 +19,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.Collections;
+
 import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
@@ -60,10 +62,10 @@ public class BookingLinkControllerTest {
 
     private BookingLink createBookingLink(String startDate, String endDate, String timezone, int slotSpan,
                                           int bufferInMin, boolean includeTaskWithoutDuration, boolean expireOnBooking) {
-        CreateBookingLinkParams createBookingLinkParams = new CreateBookingLinkParams(startDate, endDate, includeTaskWithoutDuration, expireOnBooking);
-        createBookingLinkParams.setBufferInMin(bufferInMin);
-        createBookingLinkParams.setSlotSpan(slotSpan);
-        createBookingLinkParams.setTimezone(timezone);
+        CreateBookingLinkParams createBookingLinkParams = new CreateBookingLinkParams(
+                startDate, endDate, timezone,
+                slotSpan, bufferInMin, includeTaskWithoutDuration, expireOnBooking,
+                Collections.emptyList(), 0L);
 
         ResponseEntity<BookingLink> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + BookingLinksController.BOOKING_LINKS_ROUTE,

@@ -1,6 +1,5 @@
 package com.bulletjournal.controller.models.params;
 
-import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 public class CreateBookingLinkParams {
@@ -26,11 +25,19 @@ public class CreateBookingLinkParams {
     public CreateBookingLinkParams() {
     }
 
-    public CreateBookingLinkParams(@NotBlank String startDate, @NotBlank String endDate, boolean includeTaskWithoutDuration, boolean expireOnBooking) {
+    public CreateBookingLinkParams(
+            String startDate, String endDate, String timezone,
+            int slotSpan, int bufferInMin, boolean includeTaskWithoutDuration,
+            boolean expireOnBooking, List<String> recurrences, long projectId) {
         this.startDate = startDate;
         this.endDate = endDate;
+        this.timezone = timezone;
+        this.slotSpan = slotSpan;
+        this.bufferInMin = bufferInMin;
         this.includeTaskWithoutDuration = includeTaskWithoutDuration;
         this.expireOnBooking = expireOnBooking;
+        this.recurrences = recurrences;
+        this.projectId = projectId;
     }
 
     public String getStartDate() {

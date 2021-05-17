@@ -1,8 +1,10 @@
 package com.bulletjournal.repository;
 
 import com.bulletjournal.controller.models.BookingSlot;
+import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.params.CreateBookingLinkParams;
 import com.bulletjournal.controller.models.params.UpdateBookingLinkParams;
+import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.models.BookingLink;
@@ -42,6 +44,7 @@ public class BookingLinkDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public BookingLink create(String id, String owner, CreateBookingLinkParams createBookingLinkParams) {
         Project project = this.projectDaoJpa.getProject(createBookingLinkParams.getProjectId(), owner);
+        validateProject(project);
         BookingLink bookingLink = new BookingLink();
         bookingLink.setId(id);
         bookingLink.setOwner(owner);
@@ -56,6 +59,15 @@ public class BookingLinkDaoJpa {
         bookingLink.setProject(project);
         this.bookingLinkRepository.save(bookingLink);
         return bookingLink;
+    }
+
+    private void validateProject(Project project) {
+        if (project.isShared()) {
+            throw new BadRequestException("Project " + project.getName() + " is shared");
+        }
+        if (project.getType() != ProjectType.TODO.getValue()) {
+            throw new BadRequestException("Project " + project.getName() + " is not TODO");
+        }
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -91,6 +103,7 @@ public class BookingLinkDaoJpa {
         bookingLink.setTimezone(updateBookingLinkParams.getTimezone());
         if (updateBookingLinkParams.getProjectId() != null) {
             Project project = this.projectDaoJpa.getProject(updateBookingLinkParams.getProjectId(), requester);
+            validateProject(project);
             bookingLink.setProject(project);
         }
         this.bookingLinkRepository.save(bookingLink);
