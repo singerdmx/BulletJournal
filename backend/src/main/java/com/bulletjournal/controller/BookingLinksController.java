@@ -2,6 +2,7 @@ package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.BookingLink;
+import com.bulletjournal.controller.models.Invitee;
 import com.bulletjournal.controller.models.params.CreateBookingLinkParams;
 import com.bulletjournal.controller.models.params.UpdateBookingLinkParams;
 import com.bulletjournal.controller.models.params.UpdateBookingLinkRecurrencesParams;
@@ -13,6 +14,7 @@ import com.bulletjournal.repository.TaskDaoJpa;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.util.BookingUtil;
+import com.google.gson.Gson;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class BookingLinksController {
@@ -37,6 +40,8 @@ public class BookingLinksController {
     public static final String BOOKING_LINK_ROUTE = "/api/bookingLinks/{bookingLinkId}";
     public static final String PUBLIC_BOOKING_LINKS_ROUTE_PREFIX = "/api/public/bookingLinks/";
     public static final String PUBLIC_BOOKING_LINK_ROUTE = PUBLIC_BOOKING_LINKS_ROUTE_PREFIX + "{bookingLinkId}";
+
+    private static final Gson GSON = new Gson();
 
     @Autowired
     private BookingLinkDaoJpa bookingLinkDaoJpa;
@@ -82,6 +87,10 @@ public class BookingLinksController {
                 timezone,
                 BookingUtil.getBookingLinkSlots(bookingLink),
                 bookingLink.getStartDate(), bookingLink.getEndDate(), bookingLink.getSlotSpan()));
+        result.setInvitees(
+            bookingLink.getBookings().stream()
+                .map(item -> GSON.fromJson(item.getInvitee(), Invitee.class))
+                .collect(Collectors.toList()));
         return result;
     }
 
