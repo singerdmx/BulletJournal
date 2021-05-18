@@ -1,7 +1,7 @@
 package com.bulletjournal.controller;
 
-import com.bulletjournal.controller.models.BookingLink;
-import com.bulletjournal.controller.models.BookingSlot;
+import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.controller.models.params.CreateBookingLinkParams;
 import com.bulletjournal.controller.models.params.UpdateBookingLinkSlotParams;
 import org.junit.Before;
@@ -32,19 +32,28 @@ public class BookingLinkControllerTest {
 
     private static final String TIMEZONE = "America/Los_Angeles";
 
+    private final String expectedOwner = "BulletJournal";
+
     @LocalServerPort
     int randomServerPort;
     private TestRestTemplate restTemplate = new TestRestTemplate();
+    private RequestParams requestParams;
 
     @Before
     public void setup() {
         restTemplate.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+        requestParams = new RequestParams(restTemplate, randomServerPort);
     }
 
     @Test
     public void testCRUD() throws Exception {
-        BookingLink bookingLink1 = createBookingLink("2021-05-04", "2021-06-01", TIMEZONE, 30, 0, false, true);
-        BookingLink bookingLink2 = createBookingLink("2021-06-01", "2021-06-04", TIMEZONE, 60, 0, false, true);
+
+        Group group = TestHelpers.createGroup(requestParams, expectedOwner, "bookingLink_group");
+
+        Project p1 = TestHelpers.createProject(requestParams, expectedOwner, "bookingLink_test", group, ProjectType.TODO);
+
+        BookingLink bookingLink1 = createBookingLink("2021-05-04", "2021-06-01", TIMEZONE, 30, 0, false, true, p1.getId());
+        BookingLink bookingLink2 = createBookingLink("2021-06-01", "2021-06-04", TIMEZONE, 60, 0, false, true, p1.getId());
         bookingLink1 = getBookingLink(bookingLink1.getId(), TIMEZONE);
         bookingLink2 = getBookingLink(bookingLink2.getId(), TIMEZONE);
 
@@ -61,11 +70,11 @@ public class BookingLinkControllerTest {
     }
 
     private BookingLink createBookingLink(String startDate, String endDate, String timezone, int slotSpan,
-                                          int bufferInMin, boolean includeTaskWithoutDuration, boolean expireOnBooking) {
+                                          int bufferInMin, boolean includeTaskWithoutDuration, boolean expireOnBooking, long projectId) {
         CreateBookingLinkParams createBookingLinkParams = new CreateBookingLinkParams(
                 startDate, endDate, timezone,
                 slotSpan, bufferInMin, includeTaskWithoutDuration, expireOnBooking,
-                Collections.emptyList(), 0L);
+                Collections.emptyList(), projectId);
 
         ResponseEntity<BookingLink> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + BookingLinksController.BOOKING_LINKS_ROUTE,
