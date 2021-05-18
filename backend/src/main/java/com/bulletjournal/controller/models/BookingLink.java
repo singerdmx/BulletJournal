@@ -16,8 +16,6 @@ public class BookingLink {
 
     private int slotSpan;
 
-    private Invitee invitee;
-
     private List<Invitee> guests;
 
     private String timezone;
@@ -165,14 +163,6 @@ public class BookingLink {
 
     public void setBufferInMin(int bufferInMin) {
         this.bufferInMin = bufferInMin;
-    }
-
-    public Invitee getInvitee() {
-        return invitee;
-    }
-
-    public void setInvitee(Invitee invitee) {
-        this.invitee = invitee;
     }
 
     public List<Invitee> getGuests() {
