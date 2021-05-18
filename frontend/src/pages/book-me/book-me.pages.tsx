@@ -23,6 +23,7 @@ const BookMe: React.FC<BookMeProps> = (props) => {
     const [projects, setProjects] = useState<Project[]>([]);
     const [hasTodoProject, setHasTodoProject] = useState(false);
     const [cardIsClicked, setCardIsClicked] = useState(false);
+    const [disableCreateNewProjectOrBooking, setDisableCreateNewProjectOrBooking] = useState(false);
     const history = useHistory();
 
     useEffect(() => {
@@ -46,7 +47,7 @@ const BookMe: React.FC<BookMeProps> = (props) => {
     }
 
     const getCardOnclick = () => {
-        if(cardIsClicked) {
+        if(cardIsClicked && !disableCreateNewProjectOrBooking) {
             return hasTodoProject? getCreateBookingDrawer() : getAddProjectModal();
         }
     }
@@ -76,7 +77,8 @@ const BookMe: React.FC<BookMeProps> = (props) => {
                                     setCardIsClicked={setCardIsClicked}/>
                         <CustomDurationCard backgroundColor={'#C9CBE1'} imgHeight="60px" imgWidth="50px"
                                             img="https://user-images.githubusercontent.com/40779030/118413081-4a984a00-b652-11eb-8c01-af811b9032b2.png"
-                                            setCardIsClicked={setCardIsClicked}/>
+                                            setCardIsClicked={setCardIsClicked}
+                                            setDisableCreateNewProjectOrBooking={setDisableCreateNewProjectOrBooking}/>
                     </div>
                 </div>
             </TabPane>

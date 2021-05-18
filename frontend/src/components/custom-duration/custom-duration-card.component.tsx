@@ -12,6 +12,7 @@ type CustomDurationCardProps = {
     imgHeight: string,
     imgWidth: string,
     setCardIsClicked: (visible: boolean) => void,
+    setDisableCreateNewProjectOrBooking: (disable: boolean) => void,
 }
 
 const getHours = () => {
@@ -29,7 +30,7 @@ const mins = [0, 15, 30, 45];
 const minOptions = mins.map(min => <Option value={(min).toString()} key={(min).toString()}>{min}</Option>);
 
 const CustomDurationCard: React.FC<CustomDurationCardProps> = (props) => {
-    const {backgroundColor, img, imgHeight, imgWidth, setCardIsClicked} = props;
+    const {backgroundColor, img, imgHeight, imgWidth, setCardIsClicked, setDisableCreateNewProjectOrBooking} = props;
     const [hr, setHr] = useState("0");
     const [min, setMin] = useState("45");
     const [error, setError] = useState();
@@ -40,9 +41,11 @@ const CustomDurationCard: React.FC<CustomDurationCardProps> = (props) => {
 
     useEffect(() => {
         if (invalidInput()) {
-            setError("Duration cannot be 0")
+            setError("Duration cannot be 0");
+            setDisableCreateNewProjectOrBooking(true);
         }else {
             setError("");
+            setDisableCreateNewProjectOrBooking(false);
         }
     }, [hr, min])
 
