@@ -6,6 +6,14 @@ public class UpdateBookingLinkRecurrencesParams {
     private List<String> recurrences;
     private String timezone;
 
+    public UpdateBookingLinkRecurrencesParams() {
+    }
+
+    public UpdateBookingLinkRecurrencesParams(List<String> recurrences, String timezone) {
+        this.recurrences = recurrences;
+        this.timezone = timezone;
+    }
+
     public List<String> getRecurrences() {
         return recurrences;
     }

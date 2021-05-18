@@ -1,6 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.params.UpdateBookingLinkRecurrencesParams;
 import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.controller.models.params.CreateBookingLinkParams;
 import com.bulletjournal.controller.models.params.UpdateBookingLinkSlotParams;
@@ -19,7 +20,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -48,9 +51,9 @@ public class BookingLinkControllerTest {
     @Test
     public void testCRUD() throws Exception {
 
-        Group group = TestHelpers.createGroup(requestParams, expectedOwner, "bookingLink_group");
+        Group group = TestHelpers.createGroup(requestParams, expectedOwner, "bookingLink_group_test2");
 
-        Project p1 = TestHelpers.createProject(requestParams, expectedOwner, "bookingLink_test", group, ProjectType.TODO);
+        Project p1 = TestHelpers.createProject(requestParams, expectedOwner, "bookingLink_test_second2", group, ProjectType.TODO);
 
         BookingLink bookingLink1 = createBookingLink("2021-05-04", "2021-06-01", TIMEZONE, 30, 0, false, true, p1.getId());
         BookingLink bookingLink2 = createBookingLink("2021-06-01", "2021-06-04", TIMEZONE, 60, 0, false, true, p1.getId());
@@ -67,6 +70,9 @@ public class BookingLinkControllerTest {
         updateBookingLinkSlot(bookingLink1.getId(), bookingSlot);
 
         deleteBookingLinkSlot(bookingLink2.getId());
+        List<String> recurrences = new ArrayList<>();
+        recurrences.add("dddd");
+        updateBookingLinkRecurrences(bookingLink1.getId(), recurrences);
     }
 
     private BookingLink createBookingLink(String startDate, String endDate, String timezone, int slotSpan,
@@ -122,6 +128,21 @@ public class BookingLinkControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(bookingLink);
         assertEquals(bookingLink.getSlots().get(bookingSlot.getIndex()).isOn(), bookingSlot.isOn());
+        return bookingLink;
+    }
+
+    private BookingLink updateBookingLinkRecurrences(String bookingLinkId, List<String> recurrences) {
+
+        ResponseEntity<BookingLink> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + BookingLinksController.BOOKING_LINK_UPDATE_RECURRENCE_RULES_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(new UpdateBookingLinkRecurrencesParams(recurrences, TIMEZONE)),
+                BookingLink.class,
+                bookingLinkId);
+        BookingLink bookingLink = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(bookingLink);
+        assertEquals(bookingLink.getRecurrences().get(0), recurrences.get(0));
         return bookingLink;
     }
 
