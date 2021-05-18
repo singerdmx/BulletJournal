@@ -34,6 +34,8 @@ type ProjectProps = {
       projectType: ProjectType,
       history: History<History.PoorMansUnknown> | undefined
   ) => void;
+  visibleInBookMe?:boolean;
+  setVisibleInBookMe?:(v:boolean) => void;
 };
 
 //props of groups
@@ -51,8 +53,13 @@ const AddProject: React.FC<GroupProps & ProjectProps> = (props) => {
 
   const [form] = Form.useForm();
   const onCancel = () => {
-    setVisible(false);
-    form.resetFields();
+    if (props.mode === 'auto'){
+      // @ts-ignore
+      props.setVisibleInBookMe(false);
+    } else {
+      setVisible(false);
+      form.resetFields();
+    }
   };
   const openModal = () => {
     setVisible(true);
@@ -104,7 +111,7 @@ const AddProject: React.FC<GroupProps & ProjectProps> = (props) => {
             destroyOnClose
             centered
             okText="Create"
-            visible={visible}
+            visible={props.mode === 'auto'? props.visibleInBookMe : visible}
             onCancel={onCancel}
             onOk={() => {
               form
@@ -197,6 +204,12 @@ const AddProject: React.FC<GroupProps & ProjectProps> = (props) => {
   };
 
   const getDiv = () => {
+    if (props.mode === 'auto') {
+      return <div>
+        {getModal()}
+      </div>
+    }
+
     if (props.mode === 'singular') {
       return (
           <Tooltip placement="right" title="Create New BuJo">

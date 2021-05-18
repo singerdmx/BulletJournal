@@ -9,10 +9,11 @@ type BookMeCardProps = {
     img: string,
     imgHeight: string,
     imgWidth: string,
+    setCardIsClicked: (v: boolean) => void;
 }
 
 const BookMeCard: React.FC<BookMeCardProps> = (props) => {
-    const {span, backgroundColor, img, imgHeight, imgWidth} = props;
+    const {span, backgroundColor, img, imgHeight, imgWidth, setCardIsClicked} = props;
 
     const getIcon = (span: number) => {
         if (span == 15) {
@@ -32,7 +33,8 @@ const BookMeCard: React.FC<BookMeCardProps> = (props) => {
         }
     }
 
-    return <div className="book-me-card" style={{backgroundColor: backgroundColor}}>
+    return <div className="book-me-card" style={{backgroundColor: backgroundColor}}
+                onClick={() => setCardIsClicked(true)}>
         <div className="book-me-card-title">
             <h1> {getIcon(span)} {span} Minute Booking</h1>
             <span>{getSpan(span)}, One-on-One</span>
