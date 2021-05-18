@@ -7,6 +7,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Entity
 @Table(name = "booking_links")
@@ -36,6 +37,17 @@ public class BookingLink extends AuditModel {
     @JoinColumn(name = "project_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Project project;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "bookingLink")
+    private List<Booking> bookings;
+
+    public List<Booking> getBookings() {
+        return bookings;
+    }
+
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
+    }
 
     public String getRecurrences() {
         return recurrences;
