@@ -1,5 +1,7 @@
 package com.bulletjournal.controller.models.params;
 
+import com.bulletjournal.controller.models.RecurringSpan;
+
 import java.util.List;
 
 public class CreateBookingLinkParams {
@@ -18,7 +20,7 @@ public class CreateBookingLinkParams {
 
     private boolean expireOnBooking;
 
-    private List<String> recurrences;
+    private List<RecurringSpan> recurrences;
 
     private long projectId;
 
@@ -28,7 +30,7 @@ public class CreateBookingLinkParams {
     public CreateBookingLinkParams(
             String startDate, String endDate, String timezone,
             int slotSpan, int bufferInMin, boolean includeTaskWithoutDuration,
-            boolean expireOnBooking, List<String> recurrences, long projectId) {
+            boolean expireOnBooking, List<RecurringSpan> recurrences, long projectId) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.timezone = timezone;
@@ -96,11 +98,11 @@ public class CreateBookingLinkParams {
         this.expireOnBooking = expireOnBooking;
     }
 
-    public List<String> getRecurrences() {
+    public List<RecurringSpan> getRecurrences() {
         return recurrences;
     }
 
-    public void setRecurrences(List<String> recurrences) {
+    public void setRecurrences(List<RecurringSpan> recurrences) {
         this.recurrences = recurrences;
     }
 

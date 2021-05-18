@@ -1,6 +1,7 @@
 package com.bulletjournal.util;
 
 import com.bulletjournal.controller.models.BookingSlot;
+import com.bulletjournal.controller.models.RecurringSpan;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.models.BookingLink;
 import com.google.gson.Gson;
@@ -64,15 +65,15 @@ public class BookingUtil {
         return GSON.toJson(slots);
     }
 
-    public static String toString(List<String> recurrences) {
+    public static String toString(List<RecurringSpan> recurrences) {
         if (recurrences == null) {
             recurrences = Collections.emptyList();
         }
         return GSON.toJson(recurrences);
     }
 
-    public static List<String> toList(String recurrences) {
+    public static List<RecurringSpan> toList(String recurrences) {
         return StringUtils.isBlank(recurrences) ? new ArrayList<>() :
-                Arrays.asList(GSON.fromJson(recurrences, String[].class));
+                Arrays.asList(GSON.fromJson(recurrences, RecurringSpan[].class));
     }
 }

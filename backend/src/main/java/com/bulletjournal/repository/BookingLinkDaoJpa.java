@@ -2,6 +2,7 @@ package com.bulletjournal.repository;
 
 import com.bulletjournal.controller.models.BookingSlot;
 import com.bulletjournal.controller.models.ProjectType;
+import com.bulletjournal.controller.models.RecurringSpan;
 import com.bulletjournal.controller.models.params.CreateBookingLinkParams;
 import com.bulletjournal.controller.models.params.UpdateBookingLinkParams;
 import com.bulletjournal.exceptions.BadRequestException;
@@ -80,7 +81,7 @@ public class BookingLinkDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public BookingLink updateRecurrences(String requester, String bookingLinkId, final List<String> recurrences) {
+    public BookingLink updateRecurrences(String requester, String bookingLinkId, final List<RecurringSpan> recurrences) {
         BookingLink bookingLink = getBookingLink(requester, bookingLinkId);
         bookingLink.setRecurrences(BookingUtil.toString(recurrences));
         this.bookingLinkRepository.save(bookingLink);

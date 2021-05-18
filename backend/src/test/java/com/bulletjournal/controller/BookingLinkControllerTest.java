@@ -51,9 +51,9 @@ public class BookingLinkControllerTest {
     @Test
     public void testCRUD() throws Exception {
 
-        Group group = TestHelpers.createGroup(requestParams, expectedOwner, "bookingLink_group_test2");
+        Group group = TestHelpers.createGroup(requestParams, expectedOwner, "bookingLink_group");
 
-        Project p1 = TestHelpers.createProject(requestParams, expectedOwner, "bookingLink_test_second2", group, ProjectType.TODO);
+        Project p1 = TestHelpers.createProject(requestParams, expectedOwner, "bookingLink_test", group, ProjectType.TODO);
 
         BookingLink bookingLink1 = createBookingLink("2021-05-04", "2021-06-01", TIMEZONE, 30, 0, false, true, p1.getId());
         BookingLink bookingLink2 = createBookingLink("2021-06-01", "2021-06-04", TIMEZONE, 60, 0, false, true, p1.getId());
@@ -70,8 +70,11 @@ public class BookingLinkControllerTest {
         updateBookingLinkSlot(bookingLink1.getId(), bookingSlot);
 
         deleteBookingLinkSlot(bookingLink2.getId());
-        List<String> recurrences = new ArrayList<>();
-        recurrences.add("dddd");
+        List<RecurringSpan> recurrences = new ArrayList<>();
+        RecurringSpan recurrenceSpan =  new RecurringSpan();
+        recurrenceSpan.setDuration(30);
+        recurrenceSpan.setRecurrenceRule("18:10###8:00");
+        recurrences.add(recurrenceSpan);
         updateBookingLinkRecurrences(bookingLink1.getId(), recurrences);
     }
 
@@ -131,7 +134,7 @@ public class BookingLinkControllerTest {
         return bookingLink;
     }
 
-    private BookingLink updateBookingLinkRecurrences(String bookingLinkId, List<String> recurrences) {
+    private BookingLink updateBookingLinkRecurrences(String bookingLinkId, List<RecurringSpan> recurrences) {
 
         ResponseEntity<BookingLink> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + BookingLinksController.BOOKING_LINK_UPDATE_RECURRENCE_RULES_ROUTE,
@@ -142,7 +145,8 @@ public class BookingLinkControllerTest {
         BookingLink bookingLink = response.getBody();
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(bookingLink);
-        assertEquals(bookingLink.getRecurrences().get(0), recurrences.get(0));
+        assertEquals(bookingLink.getRecurrences().get(0).getDuration(), recurrences.get(0).getDuration());
+        assertEquals(bookingLink.getRecurrences().get(0).getRecurrenceRule(), recurrences.get(0).getRecurrenceRule());
         return bookingLink;
     }
 
@@ -156,4 +160,8 @@ public class BookingLinkControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         getBookingLink(bookingLinkId, TIMEZONE, HttpStatus.NOT_FOUND);
     }
+
+//    private void patchBookingLinkSlot(String bookingLinkId){
+//
+//    }
 }

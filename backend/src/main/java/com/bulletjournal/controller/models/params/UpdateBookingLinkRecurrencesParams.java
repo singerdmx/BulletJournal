@@ -1,24 +1,26 @@
 package com.bulletjournal.controller.models.params;
 
+import com.bulletjournal.controller.models.RecurringSpan;
+
 import java.util.List;
 
 public class UpdateBookingLinkRecurrencesParams {
-    private List<String> recurrences;
+    private List<RecurringSpan> recurrences;
     private String timezone;
 
     public UpdateBookingLinkRecurrencesParams() {
     }
 
-    public UpdateBookingLinkRecurrencesParams(List<String> recurrences, String timezone) {
+    public UpdateBookingLinkRecurrencesParams(List<RecurringSpan> recurrences, String timezone) {
         this.recurrences = recurrences;
         this.timezone = timezone;
     }
 
-    public List<String> getRecurrences() {
+    public List<RecurringSpan> getRecurrences() {
         return recurrences;
     }
 
-    public void setRecurrences(List<String> recurrences) {
+    public void setRecurrences(List<RecurringSpan> recurrences) {
         this.recurrences = recurrences;
     }
 
