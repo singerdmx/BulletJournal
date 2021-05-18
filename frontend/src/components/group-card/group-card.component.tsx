@@ -92,6 +92,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
       }
     })
     this.setState({users: users});
+    this.props.history.push('/groups');
   };
 
   deleteGroup = () => {

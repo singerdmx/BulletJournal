@@ -33,6 +33,7 @@ import {clearUser} from '../user/actions';
 import {actions as SystemActions} from '../system/reducer';
 import {reloadReceived} from "../myself/actions";
 import {GroupsWithOwner} from "./interface";
+import {actions as projectActions} from "../project/reducer";
 
 function* apiErrorReceived(action: PayloadAction<ApiErrorAction>) {
   yield call(message.error, `Group Error Received: ${action.payload.error}`);
@@ -115,7 +116,10 @@ function* addUserToGroup(action: PayloadAction<AddUserGroupAction>) {
 function* removeUserFromGroup(action: PayloadAction<RemoveUserGroupAction>) {
   try {
     const { groupId, username, groupName } = action.payload;
+    yield put(projectActions.projectReceived({ project: undefined }));
+
     yield call(removeUserGroup, groupId, username);
+
     yield all([
       yield put(groupsActions.groupsUpdate({})),
       yield put(groupsActions.getGroup({ groupId: groupId })),
@@ -124,6 +128,9 @@ function* removeUserFromGroup(action: PayloadAction<RemoveUserGroupAction>) {
       message.success,
       `User ${username} removed from Group ${groupName}`
     );
+
+    yield put(projectActions.projectsUpdate({}));
+
   } catch (error) {
     if (error.message === 'reload') {
       yield put(reloadReceived(true));
