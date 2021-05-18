@@ -28,8 +28,6 @@ public class BookingLink extends AuditModel {
 
     private String slots;
 
-    private String invitees;
-
     private String recurrences;
 
     private String timezone;
@@ -121,14 +119,6 @@ public class BookingLink extends AuditModel {
 
     public void setExpireOnBooking(boolean expireOnBooking) {
         this.expireOnBooking = expireOnBooking;
-    }
-
-    public String getInvitees() {
-        return invitees;
-    }
-
-    public void setInvitees(String invitees) {
-        this.invitees = invitees;
     }
 
     public int getBufferInMin() {
