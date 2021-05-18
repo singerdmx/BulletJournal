@@ -48,6 +48,8 @@ const BookMe: React.FC<BookMeProps> = (props) => {
 
     const getCardOnclick = () => {
         if(cardIsClicked && !disableCreateNewProjectOrBooking) {
+            // TODO: change to following line for dev purpose
+            //  return !hasTodoProject? getCreateBookingDrawer() : getAddProjectModal();
             return hasTodoProject? getCreateBookingDrawer() : getAddProjectModal();
         }
     }
