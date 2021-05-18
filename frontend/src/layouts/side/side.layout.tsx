@@ -18,9 +18,16 @@ const SideLayout: React.FC<SiderProps> = (props) => {
     const dragHandler = useCallback(
         _.throttle((e: MouseEvent) => {
             const ele = document.getElementById('sideMenuSlider');
-            ele!.style.left = `${e.pageX}px`;
-            setWidth((prevWidth) => e.pageX);
-            props.setLayoutMarginLeft(e.pageX);
+            var pageX = e.pageX;
+            if (pageX < 50) {
+                pageX = 0;
+            }
+            else if (pageX < 249) {
+                pageX = 249;
+            }
+            ele!.style.left = `${pageX}px`;
+            setWidth((prevWidth) => pageX);
+            props.setLayoutMarginLeft(pageX);
         }, 200),
         []
     );
