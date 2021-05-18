@@ -72,7 +72,12 @@ const AddProject: React.FC<GroupProps & ProjectProps> = (props) => {
   }, [visible]);
 
   const addProject = (history: History<History.PoorMansUnknown>) => {
-    let type: ProjectType = toProjectType(projectType);
+    let type: ProjectType;
+    if (props.mode === 'auto') {
+        type = projectType? toProjectType(projectType) : ProjectType.TODO;
+    } else {
+        type = toProjectType(projectType);
+    }
     const inPublic = inPublicPage();
     props.createProjectByName(description, groupId, name, type, inPublic ? undefined : history);
     if (inPublic) {
@@ -130,6 +135,7 @@ const AddProject: React.FC<GroupProps & ProjectProps> = (props) => {
                   name="projectType"
                   rules={[{required: true, message: 'Missing Type'}]}
                   style={{display: 'inline-block', width: '28%'}}
+                  initialValue={props.mode === 'auto'? "TODO" : undefined}
               >
                 <Select
                     placeholder="Choose Type"
