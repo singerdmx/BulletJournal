@@ -4,11 +4,9 @@ CREATE TABLE public.bookings
 (
     id               varchar(8) PRIMARY KEY,
     booking_link_id  varchar(8) NOT NULL,
-    task_id          bigint     NOT NULL, -- fk (1 to 1)
+    task_id          bigint     NOT NULL,
     invitee          text       NOT NULL,
     slot_index       int        NOT NULL
-    -- identify booked slot
-    -- other information goes here
 );
 
 -- booking links id fk
@@ -16,3 +14,9 @@ alter table bookings
     add constraint bookings_booking_link_id_fk
         foreign key (booking_link_id) references booking_links
             on delete cascade;
+
+-- task id fk. on delete set as null
+alter table bookings
+    add constraint bookings_tasks_id_fk
+        foreign key (task_id) references tasks
+            on delete set null;
