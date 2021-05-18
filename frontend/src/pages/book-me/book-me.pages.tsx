@@ -30,12 +30,11 @@ const BookMe: React.FC<BookMeProps> = (props) => {
         updateProjects = flattenOwnedProject(ownedProjects, updateProjects);
         updateProjects = flattenSharedProject(sharedProjects, updateProjects);
         setProjects(updateProjects.filter(p => !p.shared && p.projectType === ProjectType.TODO));
-        setHasTodoProject(projects.length === 0);
-    }, []);
+    }, [ownedProjects, sharedProjects]);
 
     useEffect(() => {
-        getCardOnclick()
-    },[cardIsClicked])
+        setHasTodoProject(projects && projects.length != 0);
+    }, [projects])
 
     const getCreateBookingDrawer = () => {
         return <p>drawer</p>;
