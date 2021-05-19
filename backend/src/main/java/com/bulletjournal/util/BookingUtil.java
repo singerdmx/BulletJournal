@@ -4,12 +4,16 @@ import com.bulletjournal.controller.models.BookingSlot;
 import com.bulletjournal.controller.models.RecurringSpan;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.models.BookingLink;
+import com.bulletjournal.repository.models.Task;
 import com.google.gson.Gson;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class BookingUtil {
     private static final Gson GSON = new Gson();
@@ -17,7 +21,21 @@ public class BookingUtil {
     public static List<BookingSlot> calculateSlots(
             String timezone,
             List<BookingSlot> slotsOverride,
-            String startDate, String endDate, int slotSpan) {
+            String startDate, String endDate, int slotSpan, boolean includeTaskWithoutDuration,
+            int bufferInMin, List<Task> tasksBetween) {
+
+        if (!includeTaskWithoutDuration) {
+            tasksBetween = tasksBetween.stream().filter(t -> t.hasDuration()).collect(Collectors.toList());
+        }
+        Map<Task, Pair<ZonedDateTime, ZonedDateTime>> taskTimes = new HashMap<>();
+        tasksBetween.forEach(t -> taskTimes.put(t, Pair.of(
+                ZonedDateTimeHelper.convertDateAndTime(t.getDueDate(), t.getDueTime(), t.getTimezone()).minusMinutes(bufferInMin),
+                t.hasDuration() ? ZonedDateTimeHelper.convertDateAndTime(t.getDueDate(), t.getDueTime(), t.getTimezone())
+                        .plusMinutes(t.getDuration()).plusMinutes(bufferInMin)
+                        : ZonedDateTimeHelper.convertDateAndTime(
+                        t.getDueDate(), t.getDueTime(), t.getTimezone()).plusMinutes(slotSpan).plusMinutes(bufferInMin)
+        )));
+
         List<BookingSlot> slots = new ArrayList<>();
         ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(startDate, null, timezone);
         ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(endDate, null, timezone);
@@ -32,11 +50,22 @@ public class BookingUtil {
         int totalIndexes = (24 * 60) / slotSpan;
 
         for (int i = 0; i < slotsNumber; i++) {
+            ZonedDateTime startT = startTime.plusMinutes(i * slotSpan);
+            ZonedDateTime endT = startTime.plusMinutes((i + 1) * slotSpan);
+            String date = ZonedDateTimeHelper.getDate(startT);
+
             BookingSlot bookingSlot = new BookingSlot();
             bookingSlot.setIndex(i % totalIndexes);
-            bookingSlot.setDate(ZonedDateTimeHelper.getDate(startTime.plusMinutes(i * slotSpan)));
-            bookingSlot.setStartTime(ZonedDateTimeHelper.getTime(startTime.plusMinutes(i * slotSpan)));
-            bookingSlot.setEndTime(ZonedDateTimeHelper.getTime(startTime.plusMinutes((i + 1) * slotSpan)));
+            bookingSlot.setDate(date);
+            bookingSlot.setStartTime(ZonedDateTimeHelper.getTime(startT));
+            bookingSlot.setEndTime(ZonedDateTimeHelper.getTime(endT));
+
+            Optional<Task> task = tasksBetween.stream().filter(t -> isBetweenSlot(taskTimes.get(t).getLeft(),
+                    taskTimes.get(t).getRight(), startT, endT)).findFirst();
+
+            if (task.isPresent()) {
+                bookingSlot.setOn(false);
+            }
 
             Optional<BookingSlot> match = slotsOverride.stream().filter(s -> Objects.equals(s, bookingSlot)).findFirst();
             if (match.isPresent()) {
@@ -46,6 +75,10 @@ public class BookingUtil {
         }
 
         return slots;
+    }
+
+    private static boolean isBetweenSlot(ZonedDateTime startTime, ZonedDateTime endTime, ZonedDateTime startT, ZonedDateTime endT) {
+        return startTime.compareTo(endT) < 0 && endTime.compareTo(startT) > 0;
     }
 
     public static List<BookingSlot> getBookingLinkSlots(BookingLink bookingLink) {

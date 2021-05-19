@@ -1,11 +1,9 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.*;
-import com.bulletjournal.controller.models.params.UpdateBookingLinkParams;
-import com.bulletjournal.controller.models.params.UpdateBookingLinkRecurrencesParams;
+import com.bulletjournal.controller.models.params.*;
 import com.bulletjournal.controller.utils.TestHelpers;
-import com.bulletjournal.controller.models.params.CreateBookingLinkParams;
-import com.bulletjournal.controller.models.params.UpdateBookingLinkSlotParams;
+import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,6 +44,8 @@ public class BookingLinkControllerTest {
 
     private final String expectedOwner = "BulletJournal";
 
+    private static final String USER = "BulletJournal";
+
     @LocalServerPort
     int randomServerPort;
     private TestRestTemplate restTemplate = new TestRestTemplate();
@@ -65,7 +65,7 @@ public class BookingLinkControllerTest {
         Project p1 = TestHelpers.createProject(requestParams, expectedOwner, "bookingLink_test", group, ProjectType.TODO);
 
         BookingLink bookingLink1 = createBookingLink("2021-05-04", "2021-06-01", TIMEZONE, 30, 0, false, true, p1.getId());
-        BookingLink bookingLink2 = createBookingLink("2021-06-01", "2021-06-04", TIMEZONE, 60, 0, false, true, p1.getId());
+        BookingLink bookingLink2 = createBookingLink("2021-06-01", "2021-06-05", TIMEZONE, 60, 0, false, true, p1.getId());
         bookingLink1 = getBookingLink(bookingLink1.getId(), TIMEZONE);
         bookingLink2 = getBookingLink(bookingLink2.getId(), TIMEZONE);
 
@@ -77,6 +77,9 @@ public class BookingLinkControllerTest {
         bookingSlot.setOn(true);
 
         updateBookingLinkSlot(bookingLink1.getId(), bookingSlot);
+
+        // test apply task
+        testApplyTask(bookingLink2);
 
         deleteBookingLinkSlot(bookingLink2.getId());
         List<RecurringSpan> recurrences = new ArrayList<>();
@@ -215,5 +218,68 @@ public class BookingLinkControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(bookingLinks.size(), 2);
         assertEquals(bookingLinks.get(1).getTimezone(), CENTRAL_TIMEZONE);
+    }
+
+    private void testApplyTask(BookingLink bookingLink) {
+        Group group = TestHelpers.createGroup(requestParams, USER, "G1");
+        List<String> users = new ArrayList<>();
+        users.add("xlf");
+        users.add("ccc");
+        users.add("Joker");
+        int count = 1;
+        for (String username : users) {
+            group = TestHelpers.addUserToGroup(this.requestParams, group, username, ++count, USER);
+        }
+        users.add(USER);
+        Project p1 = TestHelpers.createProject(requestParams, USER, "p1", group, ProjectType.TODO);
+
+        // test task with duration
+        Task t1 = createTask(p1, new CreateTaskParams("t1", "2021-06-01",
+                "10:00", 10, new ReminderSetting(), ImmutableList.of(USER), TIMEZONE, null));
+        // overlap
+        Task t2 = createTask(p1, new CreateTaskParams("t2", "2021-06-01",
+                "13:00", 120, new ReminderSetting(), ImmutableList.of(USER), TIMEZONE, null));
+        // in middle
+        Task t3 = createTask(p1, new CreateTaskParams("t3", "2021-06-02",
+                "15:30", 45, new ReminderSetting(), ImmutableList.of(USER), TIMEZONE, null));
+        // cross day
+        Task t4 = createTask(p1, new CreateTaskParams("t4", "2021-06-03",
+                "23:15", 60, new ReminderSetting(), ImmutableList.of(USER), TIMEZONE, null));
+
+        getBookingLink(bookingLink.getId(), TIMEZONE);
+
+        // with buffer
+        UpdateBookingLinkParams updateBookingLinkParams = new UpdateBookingLinkParams();
+        updateBookingLinkParams.setBufferInMin(60);
+        updateBookingLinkParams.setTimezone(TIMEZONE);
+        ResponseEntity<BookingLink> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + BookingLinksController.BOOKING_LINK_ROUTE,
+                HttpMethod.PATCH,
+                new HttpEntity<>(updateBookingLinkParams),
+                BookingLink.class,
+                bookingLink.getId()
+        );
+        bookingLink = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+
+        getBookingLink(bookingLink.getId(), TIMEZONE);
+
+
+    }
+
+    private Task createTask(Project project, CreateTaskParams params) {
+        ResponseEntity<Task> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(params),
+                Task.class,
+                project.getId());
+        Task created = response.getBody();
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(created);
+        assertEquals(params.getName(), created.getName());
+        assertEquals(project.getId(), created.getProjectId());
+        return created;
     }
 }

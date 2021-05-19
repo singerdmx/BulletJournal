@@ -76,20 +76,22 @@ public class BookingLinksController {
                 bookingLink.getEndDate(), null, bookingLink.getTimezone());
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Project> projects = this.projectDaoJpa.getUserProjects(username);
-        List<Task> tasks = this.taskDaoJpa.getTasksBetween(username, startTime, endTime, projects);
+        List<Task> tasks = this.taskDaoJpa.getTasksBetween(username, startTime, endTime, projects)
+                .stream().filter(t -> t.hasDueTime()).collect(Collectors.toList());
 
         BookingLink result = bookingLink.toPresentationModel();
         result.setSlots(BookingUtil.calculateSlots(
                 timezone,
                 BookingUtil.getBookingLinkSlots(bookingLink),
-                bookingLink.getStartDate(), bookingLink.getEndDate(), bookingLink.getSlotSpan()));
+                bookingLink.getStartDate(), bookingLink.getEndDate(), bookingLink.getSlotSpan(),
+                bookingLink.isIncludeTaskWithoutDuration(), bookingLink.getBufferInMin(), tasks));
 
         List<com.bulletjournal.repository.models.Booking> bookings = bookingLink.getBookings();
         if (bookings != null) {
             result.setBookings(
-                bookings.stream()
-                  .map(com.bulletjournal.repository.models.Booking::toPresentationModel)
-                  .collect(Collectors.toList())
+                    bookings.stream()
+                            .map(com.bulletjournal.repository.models.Booking::toPresentationModel)
+                            .collect(Collectors.toList())
             );
         }
         return result;

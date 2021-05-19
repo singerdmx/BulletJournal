@@ -98,6 +98,10 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
         this.dueDate = dueDate;
     }
 
+    public boolean hasDueTime() {
+        return StringUtils.isNotBlank(this.dueTime);
+    }
+
     public String getDueTime() {
         return dueTime;
     }
@@ -112,6 +116,10 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
 
     public void setTimezone(String timezone) {
         this.timezone = timezone;
+    }
+
+    public boolean hasDuration() {
+        return this.duration != null;
     }
 
     public Integer getDuration() {
