@@ -21,6 +21,10 @@ public class Booking extends AuditModel {
 
   private String invitee;
 
+  private String location;
+
+  private String note;
+
   @Column(name = "slot_index")
   private int slotIndex;
 
@@ -62,5 +66,21 @@ public class Booking extends AuditModel {
 
   public void setSlotIndex(int slotIndex) {
     this.slotIndex = slotIndex;
+  }
+
+  public String getLocation() {
+    return location;
+  }
+
+  public void setLocation(String location) {
+    this.location = location;
+  }
+
+  public String getNote() {
+    return note;
+  }
+
+  public void setNote(String note) {
+    this.note = note;
   }
 }

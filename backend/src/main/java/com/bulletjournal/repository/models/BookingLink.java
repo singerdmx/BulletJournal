@@ -33,6 +33,12 @@ public class BookingLink extends AuditModel {
 
     private String timezone;
 
+    private String location;
+
+    private String note;
+
+    private boolean removed;
+
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "project_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -155,6 +161,30 @@ public class BookingLink extends AuditModel {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public boolean isRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(boolean removed) {
+        this.removed = removed;
     }
 
     public com.bulletjournal.controller.models.BookingLink toPresentationModel() {
