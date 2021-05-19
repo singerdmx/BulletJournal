@@ -165,7 +165,8 @@ public class GoogleCalendarController {
             List<String> l = Arrays.stream(e.getContent().getText().split(System.lineSeparator()))
                     .map(s -> s.isEmpty() ? "<br/>" : "<p>" + s + "</p>").collect(Collectors.toList());
             String html = StringUtils.join(l, "");
-            text = "{\"delta\":{\"ops\":" + text + "},\"$$$html$$$\":\"" + html + "\"}";
+            text = "{\"delta\":{\"ops\":" + text + "},\"$$$html$$$\":\"" +
+                    html.replace("\n", "").replace("\r", "") + "\"}";
         }
         LOGGER.info("createTaskFromEvent: {}", text);
         taskDaoJpa.create(projectId, username,
