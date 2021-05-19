@@ -83,4 +83,14 @@ public class Booking extends AuditModel {
   public void setNote(String note) {
     this.note = note;
   }
+
+  public com.bulletjournal.controller.models.Booking toPresentationModel() {
+    return new com.bulletjournal.controller.models.Booking(
+        this.getId(),
+        this.getInvitee(),
+        this.getSlotIndex(),
+        this.getLocation(),
+        this.getNote()
+    );
+  }
 }
