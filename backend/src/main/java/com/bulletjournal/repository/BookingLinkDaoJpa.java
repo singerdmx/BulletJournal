@@ -93,10 +93,16 @@ public class BookingLinkDaoJpa {
         BookingLink bookingLink = getBookingLink(requester, bookingLinkId);
         DaoHelper.updateIfPresent(updateBookingLinkParams.hasBufferInMin(), updateBookingLinkParams.getBufferInMin(),
                 bookingLink::setBufferInMin);
-        DaoHelper.updateIfPresent(updateBookingLinkParams.hasExpireOnBooking(), updateBookingLinkParams.isExpireOnBooking(),
+        DaoHelper.updateIfPresent(updateBookingLinkParams.hasExpireOnBooking(), updateBookingLinkParams.getExpireOnBooking(),
                 bookingLink::setExpireOnBooking);
-        DaoHelper.updateIfPresent(updateBookingLinkParams.hasIncludeTaskWithoutDuration(), updateBookingLinkParams.isIncludeTaskWithoutDuration(),
+        DaoHelper.updateIfPresent(updateBookingLinkParams.hasIncludeTaskWithoutDuration(), updateBookingLinkParams.getIncludeTaskWithoutDuration(),
                 bookingLink::setIncludeTaskWithoutDuration);
+        DaoHelper.updateIfPresent(updateBookingLinkParams.hasNote(), updateBookingLinkParams.getNote(),
+                bookingLink::setNote);
+
+        DaoHelper.updateIfPresent(updateBookingLinkParams.hasLocation(), updateBookingLinkParams.getLocation(),
+                bookingLink::setLocation);
+
         DaoHelper.updateIfPresent(updateBookingLinkParams.hasStartDate(), updateBookingLinkParams.getStartDate(),
                 bookingLink::setStartDate);
         DaoHelper.updateIfPresent(updateBookingLinkParams.hasEndDate(), updateBookingLinkParams.getEndDate(),

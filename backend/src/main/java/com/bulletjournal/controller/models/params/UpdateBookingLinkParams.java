@@ -9,6 +9,34 @@ public class UpdateBookingLinkParams {
 
     private Boolean expireOnBooking;
 
+    private String note;
+
+    private String location;
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public boolean hasNote() {
+        return this.note != null;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public boolean hasLocation() {
+        return this.location != null;
+    }
+
     private String startDate;
 
     private String endDate;
@@ -21,28 +49,8 @@ public class UpdateBookingLinkParams {
     public UpdateBookingLinkParams() {
     }
 
-    public int getBufferInMin() {
+    public Integer getBufferInMin() {
         return bufferInMin;
-    }
-
-    public void setBufferInMin(int bufferInMin) {
-        this.bufferInMin = bufferInMin;
-    }
-
-    public boolean isIncludeTaskWithoutDuration() {
-        return includeTaskWithoutDuration;
-    }
-
-    public void setIncludeTaskWithoutDuration(boolean includeTaskWithoutDuration) {
-        this.includeTaskWithoutDuration = includeTaskWithoutDuration;
-    }
-
-    public boolean isExpireOnBooking() {
-        return expireOnBooking;
-    }
-
-    public void setExpireOnBooking(boolean expireOnBooking) {
-        this.expireOnBooking = expireOnBooking;
     }
 
     public boolean hasBufferInMin() {
@@ -57,20 +65,36 @@ public class UpdateBookingLinkParams {
         return this.expireOnBooking != null;
     }
 
-    public String getTimezone() {
-        return timezone;
+    public boolean hasStartDate() {
+        return this.startDate != null;
     }
 
-    public void setTimezone(String timezone) {
-        this.timezone = timezone;
+    public boolean hasEndDate() {
+        return this.endDate != null;
+    }
+
+    public void setBufferInMin(Integer bufferInMin) {
+        this.bufferInMin = bufferInMin;
+    }
+
+    public Boolean getIncludeTaskWithoutDuration() {
+        return includeTaskWithoutDuration;
+    }
+
+    public void setIncludeTaskWithoutDuration(Boolean includeTaskWithoutDuration) {
+        this.includeTaskWithoutDuration = includeTaskWithoutDuration;
+    }
+
+    public Boolean getExpireOnBooking() {
+        return expireOnBooking;
+    }
+
+    public void setExpireOnBooking(Boolean expireOnBooking) {
+        this.expireOnBooking = expireOnBooking;
     }
 
     public String getStartDate() {
         return startDate;
-    }
-
-    public boolean hasStartDate() {
-        return startDate != null;
     }
 
     public void setStartDate(String startDate) {
@@ -81,10 +105,6 @@ public class UpdateBookingLinkParams {
         return endDate;
     }
 
-    public boolean hasEndDate() {
-        return endDate != null;
-    }
-
     public void setEndDate(String endDate) {
         this.endDate = endDate;
     }
@@ -93,11 +113,15 @@ public class UpdateBookingLinkParams {
         return projectId;
     }
 
-    public boolean hasProjectId() {
-        return projectId != null;
-    }
-
     public void setProjectId(Long projectId) {
         this.projectId = projectId;
+    }
+
+    public String getTimezone() {
+        return timezone;
+    }
+
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
     }
 }

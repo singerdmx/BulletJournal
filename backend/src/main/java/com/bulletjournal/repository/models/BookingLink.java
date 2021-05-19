@@ -199,7 +199,9 @@ public class BookingLink extends AuditModel {
                 this.isExpireOnBooking(),
                 this.isIncludeTaskWithoutDuration(),
                 BookingUtil.toList(this.getRecurrences()),
-                this.project.toPresentationModel()
+                this.project.toPresentationModel(),
+                this.getLocation(),
+                this.getNote()
         );
         return bookingLink;
     }

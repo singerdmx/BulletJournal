@@ -40,6 +40,26 @@ public class BookingLink {
 
     private int bufferInMin;
 
+    private String location;
+
+    private String note;
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
     public BookingLink() {
     }
 
@@ -53,7 +73,9 @@ public class BookingLink {
                        boolean expireOnBooking,
                        boolean includeTaskWithoutDuration,
                        List<RecurringSpan> recurrences,
-                       @NotNull com.bulletjournal.controller.models.Project project) {
+                       @NotNull com.bulletjournal.controller.models.Project project,
+                       String location,
+                       String note) {
         this.id = id;
         this.owner = owner;
         this.startDate = startDate;
@@ -65,6 +87,8 @@ public class BookingLink {
         this.includeTaskWithoutDuration = includeTaskWithoutDuration;
         this.recurrences = recurrences;
         this.project = project;
+        this.location = location;
+        this.note = note;
     }
 
     public String getOwner() {

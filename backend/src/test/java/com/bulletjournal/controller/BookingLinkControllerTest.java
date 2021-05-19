@@ -1,6 +1,7 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.controller.models.*;
+import com.bulletjournal.controller.models.params.UpdateBookingLinkParams;
 import com.bulletjournal.controller.models.params.UpdateBookingLinkRecurrencesParams;
 import com.bulletjournal.controller.utils.TestHelpers;
 import com.bulletjournal.controller.models.params.CreateBookingLinkParams;
@@ -25,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -34,6 +36,10 @@ public class BookingLinkControllerTest {
     private static final String ROOT_URL = "http://localhost:";
 
     private static final String TIMEZONE = "America/Los_Angeles";
+
+    private static final String CENTRAL_TIMEZONE = "America/Chicago";
+
+    private static final String LOCATION = "HOUSTON";
 
     private final String expectedOwner = "BulletJournal";
 
@@ -71,11 +77,20 @@ public class BookingLinkControllerTest {
 
         deleteBookingLinkSlot(bookingLink2.getId());
         List<RecurringSpan> recurrences = new ArrayList<>();
-        RecurringSpan recurrenceSpan =  new RecurringSpan();
+        RecurringSpan recurrenceSpan = new RecurringSpan();
         recurrenceSpan.setDuration(30);
-        recurrenceSpan.setRecurrenceRule("18:10###8:00");
+        recurrenceSpan.setRecurrenceRule("DTSTART:20200420T000000Z RRULE:FREQ=DAILY;INTERVAL=1;UNTIL=20200520T000000Z");
         recurrences.add(recurrenceSpan);
         updateBookingLinkRecurrences(bookingLink1.getId(), recurrences);
+
+        UpdateBookingLinkParams updateBookingLinkParams = new UpdateBookingLinkParams();
+        updateBookingLinkParams.setTimezone(CENTRAL_TIMEZONE);
+        updateBookingLinkParams.setBufferInMin(60);
+        updateBookingLinkParams.setLocation(LOCATION);
+
+        patchBookingLink(bookingLink1.getId(), updateBookingLinkParams);
+
+
     }
 
     private BookingLink createBookingLink(String startDate, String endDate, String timezone, int slotSpan,
@@ -161,7 +176,21 @@ public class BookingLinkControllerTest {
         getBookingLink(bookingLinkId, TIMEZONE, HttpStatus.NOT_FOUND);
     }
 
-//    private void patchBookingLinkSlot(String bookingLinkId){
-//
-//    }
+    private void patchBookingLink(String bookingLinkId, UpdateBookingLinkParams updateBookingLinkParams) {
+
+        ResponseEntity<BookingLink> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + BookingLinksController.BOOKING_LINK_ROUTE,
+                HttpMethod.PATCH,
+                new HttpEntity<>(updateBookingLinkParams),
+                BookingLink.class,
+                bookingLinkId
+        );
+
+        BookingLink bookingLink = response.getBody();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(bookingLink.getBufferInMin(), 60);
+        assertEquals(bookingLink.getTimezone(), CENTRAL_TIMEZONE);
+        assertEquals(bookingLink.getLocation(), LOCATION);
+        assertNotNull(bookingLink);
+    }
 }
