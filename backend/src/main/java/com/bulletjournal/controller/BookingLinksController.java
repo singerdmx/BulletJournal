@@ -25,6 +25,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class BookingLinksController {
@@ -82,6 +83,15 @@ public class BookingLinksController {
                 timezone,
                 BookingUtil.getBookingLinkSlots(bookingLink),
                 bookingLink.getStartDate(), bookingLink.getEndDate(), bookingLink.getSlotSpan()));
+
+        List<com.bulletjournal.repository.models.Booking> bookings = bookingLink.getBookings();
+        if (bookings != null) {
+            result.setBookings(
+                bookings.stream()
+                  .map(com.bulletjournal.repository.models.Booking::toPresentationModel)
+                  .collect(Collectors.toList())
+            );
+        }
         return result;
     }
 
