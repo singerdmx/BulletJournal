@@ -22,6 +22,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,6 +41,8 @@ public class BookingLinkControllerTest {
     private static final String CENTRAL_TIMEZONE = "America/Chicago";
 
     private static final String LOCATION = "HOUSTON";
+
+    private static final String NOTE = "TEST BOOKING LINKS NOTE";
 
     private final String expectedOwner = "BulletJournal";
 
@@ -87,9 +90,14 @@ public class BookingLinkControllerTest {
         updateBookingLinkParams.setTimezone(CENTRAL_TIMEZONE);
         updateBookingLinkParams.setBufferInMin(60);
         updateBookingLinkParams.setLocation(LOCATION);
+        updateBookingLinkParams.setNote(NOTE);
 
         patchBookingLink(bookingLink1.getId(), updateBookingLinkParams);
 
+
+        BookingLink bookingLink3 = createBookingLink("2021-06-31", "2021-07-01", CENTRAL_TIMEZONE, 60, 0, false, true, p1.getId());
+
+        getBookingLinks();
 
     }
 
@@ -191,6 +199,21 @@ public class BookingLinkControllerTest {
         assertEquals(bookingLink.getBufferInMin(), 60);
         assertEquals(bookingLink.getTimezone(), CENTRAL_TIMEZONE);
         assertEquals(bookingLink.getLocation(), LOCATION);
+        assertEquals(bookingLink.getNote(), NOTE);
         assertNotNull(bookingLink);
+    }
+
+    private void getBookingLinks() {
+        ResponseEntity<BookingLink[]> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + BookingLinksController.BOOKING_LINKS_ROUTE,
+                HttpMethod.GET,
+                null,
+                BookingLink[].class
+        );
+
+        List<BookingLink> bookingLinks = Arrays.asList(response.getBody());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(bookingLinks.size(), 2);
+        assertEquals(bookingLinks.get(1).getTimezone(), CENTRAL_TIMEZONE);
     }
 }
