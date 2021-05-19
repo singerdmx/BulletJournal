@@ -11,6 +11,7 @@ import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.BookingLinkDaoJpa;
 import com.bulletjournal.repository.ProjectDaoJpa;
 import com.bulletjournal.repository.TaskDaoJpa;
+import com.bulletjournal.repository.models.Booking;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.util.BookingUtil;
@@ -87,10 +88,14 @@ public class BookingLinksController {
                 timezone,
                 BookingUtil.getBookingLinkSlots(bookingLink),
                 bookingLink.getStartDate(), bookingLink.getEndDate(), bookingLink.getSlotSpan()));
-        result.setInvitees(
-            bookingLink.getBookings().stream()
-                .map(item -> GSON.fromJson(item.getInvitee(), Invitee.class))
-                .collect(Collectors.toList()));
+
+        List<Booking> bookings = bookingLink.getBookings();
+        if (bookings != null) {
+            result.setInvitees(
+                    bookingLink.getBookings().stream()
+                            .map(booking -> GSON.fromJson(booking.getInvitee(), Invitee.class))
+                            .collect(Collectors.toList()));
+        }
         return result;
     }
 
