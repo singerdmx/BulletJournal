@@ -24,7 +24,8 @@ public class BookingUtil {
             String timezone,
             List<BookingSlot> slotsOverride,
             String startDate, String endDate, int slotSpan, boolean includeTaskWithoutDuration,
-            int bufferInMin, List<Task> tasksBetween) {
+            int bufferInMin, String requestTimezone,
+            List<Task> tasksBetween) {
 
         if (!includeTaskWithoutDuration) {
             tasksBetween = tasksBetween.stream().filter(t -> t.hasDuration()).collect(Collectors.toList());
@@ -59,8 +60,10 @@ public class BookingUtil {
             BookingSlot bookingSlot = new BookingSlot();
             bookingSlot.setIndex(i % totalIndexes);
             bookingSlot.setDate(date);
+            // TODO: use requestTimezone
             bookingSlot.setStartTime(ZonedDateTimeHelper.getTime(startT));
             bookingSlot.setEndTime(ZonedDateTimeHelper.getTime(endT));
+            bookingSlot.setDisplayDate(date);
 
             Optional<Task> task = tasksBetween.stream().filter(t -> isBetweenSlot(taskTimes.get(t).getLeft(),
                     taskTimes.get(t).getRight(), startT, endT)).findFirst();

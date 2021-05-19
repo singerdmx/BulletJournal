@@ -81,10 +81,12 @@ public class BookingLinksController {
 
         BookingLink result = bookingLink.toPresentationModel();
         result.setSlots(BookingUtil.calculateSlots(
-                timezone,
+                bookingLink.getTimezone(),
                 BookingUtil.getBookingLinkSlots(bookingLink),
                 bookingLink.getStartDate(), bookingLink.getEndDate(), bookingLink.getSlotSpan(),
-                bookingLink.isIncludeTaskWithoutDuration(), bookingLink.getBufferInMin(), tasks));
+                bookingLink.isIncludeTaskWithoutDuration(), bookingLink.getBufferInMin(),
+                timezone,
+                tasks));
 
         List<com.bulletjournal.repository.models.Booking> bookings = bookingLink.getBookings();
         if (bookings != null) {
