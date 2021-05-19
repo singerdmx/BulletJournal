@@ -1,13 +1,19 @@
 package com.bulletjournal.controller.models;
 
+import com.google.gson.annotations.Expose;
+
 import java.util.Objects;
 
 public class BookingSlot {
+    @Expose
     private boolean isOn;
+    @Expose
     private int index;
+    @Expose
+    private String date;
     private String startTime;
     private String endTime;
-    private String date;
+    private String displayDate;
 
     public boolean isOn() {
         return isOn;
@@ -47,6 +53,14 @@ public class BookingSlot {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public String getDisplayDate() {
+        return displayDate;
+    }
+
+    public void setDisplayDate(String displayDate) {
+        this.displayDate = displayDate;
     }
 
     @Override

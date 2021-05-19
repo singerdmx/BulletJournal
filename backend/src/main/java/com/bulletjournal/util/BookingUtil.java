@@ -6,17 +6,19 @@ import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.models.BookingLink;
 import com.bulletjournal.repository.models.Task;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class BookingUtil {
     private static final Gson GSON = new Gson();
+    private static final Gson EXPOSE_GSON = new GsonBuilder()
+            .excludeFieldsWithoutExposeAnnotation().create();
 
     public static List<BookingSlot> calculateSlots(
             String timezone,
@@ -83,7 +85,7 @@ public class BookingUtil {
 
     public static List<BookingSlot> getBookingLinkSlots(BookingLink bookingLink) {
         return StringUtils.isBlank(bookingLink.getSlots()) ? new ArrayList<>() :
-                Arrays.asList(GSON.fromJson(bookingLink.getSlots(), BookingSlot[].class));
+                Arrays.asList(EXPOSE_GSON.fromJson(bookingLink.getSlots(), BookingSlot[].class));
     }
 
     public static String updateBookingLinkSlot(BookingSlot slotOverride, BookingLink bookingLink) {
@@ -95,7 +97,7 @@ public class BookingUtil {
         } else {
             slots.add(slotOverride);
         }
-        return GSON.toJson(slots);
+        return EXPOSE_GSON.toJson(slots);
     }
 
     public static String toString(List<RecurringSpan> recurrences) {
