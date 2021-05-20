@@ -28,6 +28,9 @@ public class Booking extends AuditModel {
   @Column(name = "slot_index")
   private int slotIndex;
 
+  @Column(name = "slot_date")
+  private String slotDate;
+
   public String getId() {
     return id;
   }
@@ -84,11 +87,20 @@ public class Booking extends AuditModel {
     this.note = note;
   }
 
+  public String getSlotDate() {
+    return slotDate;
+  }
+
+  public void setSlotDate(String slotDate) {
+    this.slotDate = slotDate;
+  }
+
   public com.bulletjournal.controller.models.Booking toPresentationModel() {
     return new com.bulletjournal.controller.models.Booking(
         this.getId(),
         this.getInvitee(),
         this.getSlotIndex(),
+        this.getSlotDate(),
         this.getLocation(),
         this.getNote()
     );

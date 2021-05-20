@@ -8,13 +8,15 @@ public class Booking {
     private String id;
     private Invitee invitee;
     private int slotIndex;
+    private String slotDate;
     private String location;
     private String note;
 
-    public Booking(String id, String invitee, int slotIndex, String location, String note) {
+    public Booking(String id, String invitee, int slotIndex, String slotDate, String location, String note) {
         this.id = id;
         this.invitee = GSON.fromJson(invitee, Invitee.class);
         this.slotIndex = slotIndex;
+        this.slotDate = slotDate;
         this.location = location;
         this.note = note;
     }
@@ -59,4 +61,11 @@ public class Booking {
         this.note = note;
     }
 
+    public String getSlotDate() {
+        return slotDate;
+    }
+
+    public void setSlotDate(String slotDate) {
+        this.slotDate = slotDate;
+    }
 }
