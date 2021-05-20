@@ -21,7 +21,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -83,9 +82,8 @@ public class BookingLinkControllerTest {
 
         deleteBookingLinkSlot(bookingLink2.getId());
         List<RecurringSpan> recurrences = new ArrayList<>();
-        RecurringSpan recurrenceSpan = new RecurringSpan();
-        recurrenceSpan.setDuration(30);
-        recurrenceSpan.setRecurrenceRule("DTSTART:20200420T000000Z RRULE:FREQ=DAILY;INTERVAL=1;UNTIL=20200520T000000Z");
+        RecurringSpan recurrenceSpan = new RecurringSpan(
+                30,"DTSTART:20200420T000000Z RRULE:FREQ=DAILY;INTERVAL=1;UNTIL=20200520T000000Z");
         recurrences.add(recurrenceSpan);
         updateBookingLinkRecurrences(bookingLink1.getId(), recurrences);
 
@@ -109,7 +107,9 @@ public class BookingLinkControllerTest {
         CreateBookingLinkParams createBookingLinkParams = new CreateBookingLinkParams(
                 startDate, endDate, timezone,
                 slotSpan, bufferInMin, includeTaskWithoutDuration, expireOnBooking,
-                Collections.emptyList(), projectId);
+                ImmutableList.of(new RecurringSpan(
+                        30,"DTSTART:20200420T000000Z RRULE:FREQ=DAILY;INTERVAL=1;UNTIL=20200520T000000Z")),
+                projectId);
 
         ResponseEntity<BookingLink> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + BookingLinksController.BOOKING_LINKS_ROUTE,

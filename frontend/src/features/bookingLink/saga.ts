@@ -32,10 +32,6 @@ function* addBookingLink(action: PayloadAction<AddBookingLink>) {
             timezone
         );
         yield put(bookingLinksActions.linkReceived({link: data}));
-        yield call(
-            message.success,
-            `Booking link is created`
-        );
     } catch (error) {
         if (error.message === 'reload') {
             yield put(reloadReceived(true));

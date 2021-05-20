@@ -4,6 +4,14 @@ public class RecurringSpan {
     private int duration; // in min
     private String recurrenceRule;
 
+    public RecurringSpan() {
+    }
+
+    public RecurringSpan(int duration, String recurrenceRule) {
+        this.duration = duration;
+        this.recurrenceRule = recurrenceRule;
+    }
+
     public int getDuration() {
         return duration;
     }
