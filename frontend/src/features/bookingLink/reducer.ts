@@ -18,7 +18,7 @@ export type AddBookingLink = {
 };
 
 let initialState = {
-    link: undefined
+    link: undefined as BookingLink | undefined,
 };
 
 const slice = createSlice({

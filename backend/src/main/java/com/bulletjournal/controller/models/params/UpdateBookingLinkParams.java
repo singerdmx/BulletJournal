@@ -13,6 +13,15 @@ public class UpdateBookingLinkParams {
 
     private String location;
 
+    private String startDate;
+
+    private String endDate;
+
+    private Long projectId;
+
+    @NotNull
+    private String timezone;
+
     public String getNote() {
         return note;
     }
@@ -36,15 +45,6 @@ public class UpdateBookingLinkParams {
     public boolean hasLocation() {
         return this.location != null;
     }
-
-    private String startDate;
-
-    private String endDate;
-
-    private Long projectId;
-
-    @NotNull
-    private String timezone;
 
     public UpdateBookingLinkParams() {
     }
