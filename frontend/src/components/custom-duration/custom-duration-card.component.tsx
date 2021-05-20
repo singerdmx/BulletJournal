@@ -31,7 +31,7 @@ const mins = [0, 15, 30, 45];
 const minOptions = mins.map(min => <Option value={(min).toString()} key={(min).toString()}>{min}</Option>);
 
 const CustomDurationCard: React.FC<CustomDurationCardProps> = (props) => {
-    const {backgroundColor, img, imgHeight, imgWidth, setCardIsClicked, setDisableCreateNewProjectOrBooking} = props;
+    const {backgroundColor, img, imgHeight, imgWidth, setCardIsClicked, setDisableCreateNewProjectOrBooking, setCurrentSlotSpan} = props;
     const [hr, setHr] = useState("0");
     const [min, setMin] = useState("45");
     const [error, setError] = useState();
@@ -50,8 +50,15 @@ const CustomDurationCard: React.FC<CustomDurationCardProps> = (props) => {
         }
     }, [hr, min])
 
+
+    const handleBookMeCardClick = () => {
+        setCardIsClicked(true);
+        const span : number = Number(min) + Number(hr) * 60;
+        setCurrentSlotSpan(span);
+    }
+
     return <div className="book-me-card" style={{backgroundColor: backgroundColor}}
-                onClick={() => setCardIsClicked(true)}>
+                onClick={handleBookMeCardClick}>
         <div className="book-me-card-title">
             <h1><HistoryOutlined/> Custom Duration</h1>
             <div style={{color: "red", marginBottom:"1px"}}>{error}</div>

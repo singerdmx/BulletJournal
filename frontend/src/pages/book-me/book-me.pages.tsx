@@ -12,21 +12,38 @@ import {useHistory} from 'react-router-dom';
 import {ProjectType} from "../../features/project/constants";
 import AddProject from "../../components/modals/add-project.component";
 import BookMeDrawer from "../../components/book-me/book-me-drawer";
+import {RecurringSpan} from "../../features/bookingLink/interface";
+import {addBookingLink} from "../../features/bookingLink/actions";
+import moment from "moment-timezone";
+import {dateFormat} from "../../features/myBuJo/constants";
 
 const {TabPane} = Tabs;
 
 type BookMeProps = {
+    timezone: string,
     ownedProjects: Project[];
     sharedProjects: ProjectsWithOwner[];
+    addBookingLink: (
+        bufferInMin: number,
+        endDate: string,
+        expireOnBooking: boolean,
+        includeTaskWithoutDuration: boolean,
+        projectId: number,
+        recurrences: RecurringSpan[],
+        slotSpan: number,
+        startDate: string,
+        timezone: string
+    ) => void;
 }
 const BookMe: React.FC<BookMeProps> = (props) => {
-    const {ownedProjects, sharedProjects} = props;
+    const {timezone, ownedProjects, sharedProjects, addBookingLink} = props;
     const [projects, setProjects] = useState<Project[]>([]);
     const [hasTodoProject, setHasTodoProject] = useState(false);
     const [cardIsClicked, setCardIsClicked] = useState(false);
     const [disableCreateNewProjectOrBooking, setDisableCreateNewProjectOrBooking] = useState(false);
     const [currentSlotSpan, setCurrentSlotSpan] = useState();
     const history = useHistory();
+
 
     useEffect(() => {
         let updateProjects = [] as Project[];
@@ -43,20 +60,39 @@ const BookMe: React.FC<BookMeProps> = (props) => {
 
     }, [cardIsClicked])
 
+    const createDefaultBookingLink = () => {
+        const startDate = moment().add(1, 'days').format(dateFormat);
+        const endDate = moment().add(1, 'month').endOf('month').format(dateFormat);
+        const today = moment().format('YYYYMMDD');
+        const recurringSpan1: RecurringSpan = {
+            duration: 540,
+            recurrenceRule: "DTSTART:" + today + "T000000Z RRULE:FREQ=DAILY;INTERVAL=1"
+        }
+        const recurringSpan2: RecurringSpan = {
+            duration: 420,
+            recurrenceRule: "DTSTART:" + today + "T170000Z RRULE:FREQ=DAILY;INTERVAL=1"
+        }
+        const recurrences = [recurringSpan1, recurringSpan2];
+
+        addBookingLink(0, endDate, true, false, projects[0].id, recurrences, currentSlotSpan, startDate, timezone)
+    }
+
     const getCreateBookingDrawer = () => {
-        return <BookMeDrawer slotSpan={15} bookMeDrawerVisible={cardIsClicked} setBookMeDrawerVisible={setCardIsClicked}/>;
+        createDefaultBookingLink();
+        return <BookMeDrawer bookMeDrawerVisible={cardIsClicked} setBookMeDrawerVisible={setCardIsClicked}/>;
     }
 
     const getAddProjectModal = () => {
         message.info('Please create a BuJo of type TODO first');
-        return <AddProject history={history} mode={'auto'} visibleInBookMe={cardIsClicked} setVisibleInBookMe={setCardIsClicked}/>
+        return <AddProject history={history} mode={'auto'} visibleInBookMe={cardIsClicked}
+                           setVisibleInBookMe={setCardIsClicked}/>
     }
 
     const getCardOnclick = () => {
-        if(cardIsClicked && !disableCreateNewProjectOrBooking) {
+        if (cardIsClicked && !disableCreateNewProjectOrBooking) {
             // TODO: change to following line for dev purpose
             //  return !hasTodoProject? getCreateBookingDrawer() : getAddProjectModal();
-            return hasTodoProject? getCreateBookingDrawer() : getAddProjectModal();
+            return hasTodoProject ? getCreateBookingDrawer() : getAddProjectModal();
         }
     }
 
@@ -86,7 +122,8 @@ const BookMe: React.FC<BookMeProps> = (props) => {
                         <CustomDurationCard backgroundColor={'#C9CBE1'} imgHeight="60px" imgWidth="50px"
                                             img="https://user-images.githubusercontent.com/40779030/118413081-4a984a00-b652-11eb-8c01-af811b9032b2.png"
                                             setCardIsClicked={setCardIsClicked}
-                                            setDisableCreateNewProjectOrBooking={setDisableCreateNewProjectOrBooking} setCurrentSlotSpan={setCurrentSlotSpan}/>
+                                            setDisableCreateNewProjectOrBooking={setDisableCreateNewProjectOrBooking}
+                                            setCurrentSlotSpan={setCurrentSlotSpan}/>
                     </div>
                 </div>
             </TabPane>
@@ -106,6 +143,9 @@ const BookMe: React.FC<BookMeProps> = (props) => {
 const mapStateToProps = (state: IState) => ({
     ownedProjects: state.project.owned,
     sharedProjects: state.project.shared,
+    timezone: state.myself.timezone,
 });
 
-export default connect(mapStateToProps, {})(BookMe);
+export default connect(mapStateToProps, {
+    addBookingLink,
+})(BookMe);

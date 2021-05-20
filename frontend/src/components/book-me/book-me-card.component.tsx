@@ -34,8 +34,13 @@ const BookMeCard: React.FC<BookMeCardProps> = (props) => {
         }
     }
 
+    const handleBookMeCardClick = () => {
+        setCardIsClicked(true);
+        setCurrentSlotSpan(span);
+    }
+
     return <div className="book-me-card" style={{backgroundColor: backgroundColor}}
-                onClick={() => setCardIsClicked(true)}>
+                onClick={handleBookMeCardClick}>
         <div className="book-me-card-title">
             <h1> {getIcon(span)} {span} Minute Booking</h1>
             <span>{getSpan(span)}, One-on-One</span>
