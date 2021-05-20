@@ -10,10 +10,11 @@ type BookMeCardProps = {
     imgHeight: string,
     imgWidth: string,
     setCardIsClicked: (v: boolean) => void;
+    setCurrentSlotSpan: (s: number) => void;
 }
 
 const BookMeCard: React.FC<BookMeCardProps> = (props) => {
-    const {span, backgroundColor, img, imgHeight, imgWidth, setCardIsClicked} = props;
+    const {span, backgroundColor, img, imgHeight, imgWidth, setCardIsClicked, setCurrentSlotSpan} = props;
 
     const getIcon = (span: number) => {
         if (span == 15) {

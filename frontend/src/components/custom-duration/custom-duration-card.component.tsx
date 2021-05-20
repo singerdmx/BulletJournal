@@ -13,6 +13,7 @@ type CustomDurationCardProps = {
     imgWidth: string,
     setCardIsClicked: (visible: boolean) => void,
     setDisableCreateNewProjectOrBooking: (disable: boolean) => void,
+    setCurrentSlotSpan: (span: number) => void,
 }
 
 const getHours = () => {

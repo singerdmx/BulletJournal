@@ -11,6 +11,7 @@ import {flattenOwnedProject, flattenSharedProject} from "../projects/projects.pa
 import {useHistory} from 'react-router-dom';
 import {ProjectType} from "../../features/project/constants";
 import AddProject from "../../components/modals/add-project.component";
+import BookMeDrawer from "../../components/book-me/book-me-drawer";
 
 const {TabPane} = Tabs;
 
@@ -24,6 +25,7 @@ const BookMe: React.FC<BookMeProps> = (props) => {
     const [hasTodoProject, setHasTodoProject] = useState(false);
     const [cardIsClicked, setCardIsClicked] = useState(false);
     const [disableCreateNewProjectOrBooking, setDisableCreateNewProjectOrBooking] = useState(false);
+    const [currentSlotSpan, setCurrentSlotSpan] = useState();
     const history = useHistory();
 
     useEffect(() => {
@@ -37,8 +39,12 @@ const BookMe: React.FC<BookMeProps> = (props) => {
         setHasTodoProject(projects && projects.length != 0);
     }, [projects])
 
+    useEffect(() => {
+
+    }, [cardIsClicked])
+
     const getCreateBookingDrawer = () => {
-        return <p>drawer</p>;
+        return <BookMeDrawer slotSpan={15} bookMeDrawerVisible={cardIsClicked} setBookMeDrawerVisible={setCardIsClicked}/>;
     }
 
     const getAddProjectModal = () => {
@@ -70,17 +76,17 @@ const BookMe: React.FC<BookMeProps> = (props) => {
                     <div className="book-me-cards">
                         <BookMeCard span={15} backgroundColor={'#EFEFF1'} imgHeight="67px" imgWidth="60px"
                                     img="https://user-images.githubusercontent.com/59456058/118382802-b83e6a80-b5ad-11eb-8a69-07e47366c622.png"
-                                    setCardIsClicked={setCardIsClicked}/>
+                                    setCardIsClicked={setCardIsClicked} setCurrentSlotSpan={setCurrentSlotSpan}/>
                         <BookMeCard span={30} backgroundColor={'#ECD4D4'} imgHeight="60px" imgWidth="50px"
                                     img="https://user-images.githubusercontent.com/122956/118382659-6c3ef600-b5ac-11eb-8477-09e3fd4fa2ea.png"
-                                    setCardIsClicked={setCardIsClicked}/>
+                                    setCardIsClicked={setCardIsClicked} setCurrentSlotSpan={setCurrentSlotSpan}/>
                         <BookMeCard span={60} backgroundColor={'#CCDBE2'} imgHeight="60px" imgWidth="50px"
                                     img="https://user-images.githubusercontent.com/59456058/118382868-61856080-b5ae-11eb-88e4-2ac9fa688025.png"
-                                    setCardIsClicked={setCardIsClicked}/>
+                                    setCardIsClicked={setCardIsClicked} setCurrentSlotSpan={setCurrentSlotSpan}/>
                         <CustomDurationCard backgroundColor={'#C9CBE1'} imgHeight="60px" imgWidth="50px"
                                             img="https://user-images.githubusercontent.com/40779030/118413081-4a984a00-b652-11eb-8c01-af811b9032b2.png"
                                             setCardIsClicked={setCardIsClicked}
-                                            setDisableCreateNewProjectOrBooking={setDisableCreateNewProjectOrBooking}/>
+                                            setDisableCreateNewProjectOrBooking={setDisableCreateNewProjectOrBooking} setCurrentSlotSpan={setCurrentSlotSpan}/>
                     </div>
                 </div>
             </TabPane>
