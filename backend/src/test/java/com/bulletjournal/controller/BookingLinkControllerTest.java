@@ -83,7 +83,7 @@ public class BookingLinkControllerTest {
         deleteBookingLinkSlot(bookingLink2.getId());
         List<RecurringSpan> recurrences = new ArrayList<>();
         RecurringSpan recurrenceSpan = new RecurringSpan(
-                30,"DTSTART:20200420T000000Z RRULE:FREQ=DAILY;INTERVAL=1;UNTIL=20200520T000000Z");
+                30, "DTSTART:20200420T000000Z RRULE:FREQ=DAILY;INTERVAL=1;UNTIL=20200520T000000Z");
         recurrences.add(recurrenceSpan);
         updateBookingLinkRecurrences(bookingLink1.getId(), recurrences);
 
@@ -94,7 +94,6 @@ public class BookingLinkControllerTest {
         updateBookingLinkParams.setNote(NOTE);
 
         patchBookingLink(bookingLink1.getId(), updateBookingLinkParams);
-
 
         BookingLink bookingLink3 = createBookingLink("2021-06-31", "2021-07-01", CENTRAL_TIMEZONE, 60, 0, false, true, p1.getId());
 
@@ -108,7 +107,7 @@ public class BookingLinkControllerTest {
                 startDate, endDate, timezone,
                 slotSpan, bufferInMin, includeTaskWithoutDuration, expireOnBooking,
                 ImmutableList.of(new RecurringSpan(
-                        30,"DTSTART:20200420T000000Z RRULE:FREQ=DAILY;INTERVAL=1;UNTIL=20200520T000000Z")),
+                        30, "DTSTART:20200420T000000Z RRULE:FREQ=DAILY;INTERVAL=1;UNTIL=20200520T000000Z")),
                 projectId);
 
         ResponseEntity<BookingLink> response = this.restTemplate.exchange(
