@@ -1,0 +1,1 @@
+alter table public.bookings add column slot_date varchar(15) not null;
