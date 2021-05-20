@@ -17,6 +17,7 @@ import { reducer as admin } from '../features/admin/reducer';
 import { reducer as search } from '../features/search/reducer';
 import { reducer as content } from '../features/content/reducer';
 import { reducer as templates } from '../features/templates/reducer';
+import { reducer as bookingReducer} from "../features/bookingLink/reducer";
 
 export default {
   settings: settingsReducer,
@@ -38,4 +39,5 @@ export default {
   search: search,
   content: content,
   templates: templates,
+  bookingReducer: bookingReducer,
 };

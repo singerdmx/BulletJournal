@@ -16,6 +16,7 @@ import adminSaga from '../features/admin/saga';
 import recentSaga from '../features/recent/saga';
 import searchSaga from '../features/search/saga';
 import templatesSaga from '../features/templates/saga';
+import bookingLinkSaga from '../features/bookingLink/saga';
 
 export default function* root() {
   yield spawn(myselfSaga);
@@ -35,4 +36,5 @@ export default function* root() {
   yield spawn(recentSaga);
   yield spawn(searchSaga);
   yield spawn(templatesSaga);
+  yield spawn(bookingLinkSaga);
 }
