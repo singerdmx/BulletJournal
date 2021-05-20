@@ -21,22 +21,21 @@ public class BookingUtil {
             .excludeFieldsWithoutExposeAnnotation().create();
 
     public static List<BookingSlot> calculateSlots(
-            String timezone,
+            String timezone, String requestTimezone,
             List<BookingSlot> slotsOverride,
             String startDate, String endDate, int slotSpan, boolean includeTaskWithoutDuration,
-            int bufferInMin, String requestTimezone,
-            List<Task> tasksBetween) {
+            int bufferInMin, List<Task> tasksBetween) {
 
         if (!includeTaskWithoutDuration) {
             tasksBetween = tasksBetween.stream().filter(t -> t.hasDuration()).collect(Collectors.toList());
         }
         Map<Task, Pair<ZonedDateTime, ZonedDateTime>> taskTimes = new HashMap<>();
         tasksBetween.forEach(t -> taskTimes.put(t, Pair.of(
-                ZonedDateTimeHelper.convertDateAndTime(t.getDueDate(), t.getDueTime(), t.getTimezone()).minusMinutes(bufferInMin),
-                t.hasDuration() ? ZonedDateTimeHelper.convertDateAndTime(t.getDueDate(), t.getDueTime(), t.getTimezone())
+                ZonedDateTimeHelper.getDateTimeInDifferentZone(t.getDueDate(), t.getDueTime(), t.getTimezone(), requestTimezone).minusMinutes(bufferInMin),
+                t.hasDuration() ? ZonedDateTimeHelper.getDateTimeInDifferentZone(t.getDueDate(), t.getDueTime(), t.getTimezone(), requestTimezone)
                         .plusMinutes(t.getDuration()).plusMinutes(bufferInMin)
-                        : ZonedDateTimeHelper.convertDateAndTime(
-                        t.getDueDate(), t.getDueTime(), t.getTimezone()).plusMinutes(slotSpan).plusMinutes(bufferInMin)
+                        : ZonedDateTimeHelper.getDateTimeInDifferentZone(
+                        t.getDueDate(), t.getDueTime(), t.getTimezone(), requestTimezone).plusMinutes(slotSpan).plusMinutes(bufferInMin)
         )));
 
         List<BookingSlot> slots = new ArrayList<>();
@@ -60,13 +59,18 @@ public class BookingUtil {
             BookingSlot bookingSlot = new BookingSlot();
             bookingSlot.setIndex(i % totalIndexes);
             bookingSlot.setDate(date);
-            // TODO: use requestTimezone
-            bookingSlot.setStartTime(ZonedDateTimeHelper.getTime(startT));
-            bookingSlot.setEndTime(ZonedDateTimeHelper.getTime(endT));
-            bookingSlot.setDisplayDate(date);
+
+            // display to client
+            ZonedDateTime displayStartTime = ZonedDateTimeHelper.getDateTimeInDifferentZone(ZonedDateTimeHelper.getDate(startT),
+                    ZonedDateTimeHelper.getTime(startT), timezone, requestTimezone);
+            ZonedDateTime displayEndTime = ZonedDateTimeHelper.getDateTimeInDifferentZone(ZonedDateTimeHelper.getDate(endT),
+                    ZonedDateTimeHelper.getTime(endT), timezone, requestTimezone);
+            bookingSlot.setStartTime(ZonedDateTimeHelper.getTime(displayStartTime));
+            bookingSlot.setEndTime(ZonedDateTimeHelper.getTime(displayEndTime));
+            bookingSlot.setDisplayDate(ZonedDateTimeHelper.getDate(displayStartTime));
 
             Optional<Task> task = tasksBetween.stream().filter(t -> isBetweenSlot(taskTimes.get(t).getLeft(),
-                    taskTimes.get(t).getRight(), startT, endT)).findFirst();
+                    taskTimes.get(t).getRight(), displayStartTime, displayEndTime)).findFirst();
 
             if (task.isPresent()) {
                 bookingSlot.setOn(false);

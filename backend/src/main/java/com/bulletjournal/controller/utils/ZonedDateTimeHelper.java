@@ -201,6 +201,10 @@ public class ZonedDateTimeHelper {
                 .withMinute(0);
     }
 
+    public static ZonedDateTime getDateTimeInDifferentZone(String date, String time, String fromZone, String toZone) {
+        return convertDateAndTime(date, time, fromZone).withZoneSameInstant(ZoneId.of(toZone));
+    }
+
     /**
      * Convert ZonedDateTime to Date String
      */

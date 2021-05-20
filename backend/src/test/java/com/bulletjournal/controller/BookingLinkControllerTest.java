@@ -247,6 +247,8 @@ public class BookingLinkControllerTest {
 
         getBookingLink(bookingLink.getId(), TIMEZONE);
 
+        getBookingLink(bookingLink.getId(), CENTRAL_TIMEZONE);
+
         // with buffer
         UpdateBookingLinkParams updateBookingLinkParams = new UpdateBookingLinkParams();
         updateBookingLinkParams.setBufferInMin(60);
