@@ -222,7 +222,7 @@ public class BookingLinkControllerTest {
     }
 
     private void testApplyTask(BookingLink bookingLink) {
-        Group group = TestHelpers.createGroup(requestParams, USER, "G1");
+        Group group = TestHelpers.createGroup(requestParams, USER, "G_Booking");
         List<String> users = new ArrayList<>();
         users.add("xlf");
         users.add("ccc");
