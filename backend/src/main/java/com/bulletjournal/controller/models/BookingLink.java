@@ -30,6 +30,14 @@ public class BookingLink {
 
     private Project project;
 
+    private int beforeEventBuffer;
+
+    private int afterEventBuffer;
+
+    private String location;
+
+    private String note;
+
     public List<RecurringSpan> getRecurrences() {
         return recurrences;
     }
@@ -37,12 +45,6 @@ public class BookingLink {
     public void setRecurrences(List<RecurringSpan> recurrences) {
         this.recurrences = recurrences;
     }
-
-    private int bufferInMin;
-
-    private String location;
-
-    private String note;
 
     public String getLocation() {
         return location;
@@ -68,7 +70,8 @@ public class BookingLink {
                        String startDate,
                        String endDate,
                        int slotSpan,
-                       int bufferInMin,
+                       int beforeEventBuffer,
+                       int afterEventBuffer,
                        String timezone,
                        boolean expireOnBooking,
                        boolean includeTaskWithoutDuration,
@@ -81,7 +84,8 @@ public class BookingLink {
         this.startDate = startDate;
         this.endDate = endDate;
         this.slotSpan = slotSpan;
-        this.bufferInMin = bufferInMin;
+        this.beforeEventBuffer = beforeEventBuffer;
+        this.afterEventBuffer = afterEventBuffer;
         this.timezone = timezone;
         this.expireOnBooking = expireOnBooking;
         this.includeTaskWithoutDuration = includeTaskWithoutDuration;
@@ -181,12 +185,20 @@ public class BookingLink {
         this.expireOnBooking = expireOnBooking;
     }
 
-    public int getBufferInMin() {
-        return bufferInMin;
+    public int getBeforeEventBuffer() {
+        return beforeEventBuffer;
     }
 
-    public void setBufferInMin(int bufferInMin) {
-        this.bufferInMin = bufferInMin;
+    public void setBeforeEventBuffer(int beforeEventBuffer) {
+        this.beforeEventBuffer = beforeEventBuffer;
+    }
+
+    public int getAfterEventBuffer() {
+        return afterEventBuffer;
+    }
+
+    public void setAfterEventBuffer(int afterEventBuffer) {
+        this.afterEventBuffer = afterEventBuffer;
     }
 
     public List<Booking> getBookings() {

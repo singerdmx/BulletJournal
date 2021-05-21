@@ -14,7 +14,9 @@ public class CreateBookingLinkParams {
 
     private int slotSpan;
 
-    private int bufferInMin;
+    private int beforeEventBuffer;
+
+    private int afterEventBuffer;
 
     private boolean includeTaskWithoutDuration;
 
@@ -29,13 +31,14 @@ public class CreateBookingLinkParams {
 
     public CreateBookingLinkParams(
             String startDate, String endDate, String timezone,
-            int slotSpan, int bufferInMin, boolean includeTaskWithoutDuration,
+            int slotSpan, int beforeEventBuffer, int afterEventBuffer, boolean includeTaskWithoutDuration,
             boolean expireOnBooking, List<RecurringSpan> recurrences, long projectId) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.timezone = timezone;
         this.slotSpan = slotSpan;
-        this.bufferInMin = bufferInMin;
+        this.beforeEventBuffer = beforeEventBuffer;
+        this.afterEventBuffer = afterEventBuffer;
         this.includeTaskWithoutDuration = includeTaskWithoutDuration;
         this.expireOnBooking = expireOnBooking;
         this.recurrences = recurrences;
@@ -66,12 +69,20 @@ public class CreateBookingLinkParams {
         this.endDate = endDate;
     }
 
-    public int getBufferInMin() {
-        return bufferInMin;
+    public int getBeforeEventBuffer() {
+        return beforeEventBuffer;
     }
 
-    public void setBufferInMin(int bufferInMin) {
-        this.bufferInMin = bufferInMin;
+    public void setBeforeEventBuffer(int beforeEventBuffer) {
+        this.beforeEventBuffer = beforeEventBuffer;
+    }
+
+    public int getAfterEventBuffer() {
+        return afterEventBuffer;
+    }
+
+    public void setAfterEventBuffer(int afterEventBuffer) {
+        this.afterEventBuffer = afterEventBuffer;
     }
 
     public int getSlotSpan() {

@@ -72,8 +72,11 @@ public class BookingLink extends AuditModel {
     @Column(name = "expire_on_booking")
     private boolean expireOnBooking;
 
-    @Column(name = "buffer_in_min")
-    private int bufferInMin;
+    @Column(name = "before_event_buffer")
+    private int beforeEventBuffer;
+
+    @Column(name = "after_event_buffer")
+    private int afterEventBuffer;
 
     public String getId() {
         return id;
@@ -139,12 +142,20 @@ public class BookingLink extends AuditModel {
         this.expireOnBooking = expireOnBooking;
     }
 
-    public int getBufferInMin() {
-        return bufferInMin;
+    public int getBeforeEventBuffer() {
+        return beforeEventBuffer;
     }
 
-    public void setBufferInMin(int bufferInMin) {
-        this.bufferInMin = bufferInMin;
+    public void setBeforeEventBuffer(int beforeEventBuffer) {
+        this.beforeEventBuffer = beforeEventBuffer;
+    }
+
+    public int getAfterEventBuffer() {
+        return afterEventBuffer;
+    }
+
+    public void setAfterEventBuffer(int afterEventBuffer) {
+        this.afterEventBuffer = afterEventBuffer;
     }
 
     public String getSlots() {
@@ -194,7 +205,8 @@ public class BookingLink extends AuditModel {
                 this.getStartDate(),
                 this.getEndDate(),
                 this.getSlotSpan(),
-                this.getBufferInMin(),
+                this.getBeforeEventBuffer(),
+                this.getAfterEventBuffer(),
                 this.getTimezone(),
                 this.isExpireOnBooking(),
                 this.isIncludeTaskWithoutDuration(),

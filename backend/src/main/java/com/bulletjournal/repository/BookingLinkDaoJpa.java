@@ -49,7 +49,8 @@ public class BookingLinkDaoJpa {
         BookingLink bookingLink = new BookingLink();
         bookingLink.setId(id);
         bookingLink.setOwner(owner);
-        bookingLink.setBufferInMin(createBookingLinkParams.getBufferInMin());
+        bookingLink.setBeforeEventBuffer(createBookingLinkParams.getBeforeEventBuffer());
+        bookingLink.setAfterEventBuffer(createBookingLinkParams.getAfterEventBuffer());
         bookingLink.setStartDate(createBookingLinkParams.getStartDate());
         bookingLink.setEndDate(createBookingLinkParams.getEndDate());
         bookingLink.setExpireOnBooking(createBookingLinkParams.isExpireOnBooking());
@@ -91,8 +92,10 @@ public class BookingLinkDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public BookingLink partialUpdate(String requester, String bookingLinkId, UpdateBookingLinkParams updateBookingLinkParams) {
         BookingLink bookingLink = getBookingLink(requester, bookingLinkId);
-        DaoHelper.updateIfPresent(updateBookingLinkParams.hasBufferInMin(), updateBookingLinkParams.getBufferInMin(),
-                bookingLink::setBufferInMin);
+        DaoHelper.updateIfPresent(updateBookingLinkParams.hasBeforeEventBuffer(), updateBookingLinkParams.getBeforeEventBuffer(),
+                bookingLink::setBeforeEventBuffer);
+        DaoHelper.updateIfPresent(updateBookingLinkParams.hasAfterEventBuffer(), updateBookingLinkParams.getAfterEventBuffer(),
+                bookingLink::setAfterEventBuffer);
         DaoHelper.updateIfPresent(updateBookingLinkParams.hasExpireOnBooking(), updateBookingLinkParams.getExpireOnBooking(),
                 bookingLink::setExpireOnBooking);
         DaoHelper.updateIfPresent(updateBookingLinkParams.hasIncludeTaskWithoutDuration(), updateBookingLinkParams.getIncludeTaskWithoutDuration(),

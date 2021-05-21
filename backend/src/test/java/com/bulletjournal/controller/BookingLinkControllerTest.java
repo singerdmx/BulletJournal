@@ -89,7 +89,8 @@ public class BookingLinkControllerTest {
 
         UpdateBookingLinkParams updateBookingLinkParams = new UpdateBookingLinkParams();
         updateBookingLinkParams.setTimezone(CENTRAL_TIMEZONE);
-        updateBookingLinkParams.setBufferInMin(60);
+        updateBookingLinkParams.setBeforeEventBuffer(60);
+        updateBookingLinkParams.setAfterEventBuffer(60);
         updateBookingLinkParams.setLocation(LOCATION);
         updateBookingLinkParams.setNote(NOTE);
 
@@ -105,7 +106,7 @@ public class BookingLinkControllerTest {
                                           int bufferInMin, boolean includeTaskWithoutDuration, boolean expireOnBooking, long projectId) {
         CreateBookingLinkParams createBookingLinkParams = new CreateBookingLinkParams(
                 startDate, endDate, timezone,
-                slotSpan, bufferInMin, includeTaskWithoutDuration, expireOnBooking,
+                slotSpan, bufferInMin, bufferInMin, includeTaskWithoutDuration, expireOnBooking,
                 ImmutableList.of(new RecurringSpan(
                         30, "DTSTART:20200420T000000Z RRULE:FREQ=DAILY;INTERVAL=1;UNTIL=20200520T000000Z")),
                 projectId);
@@ -198,7 +199,8 @@ public class BookingLinkControllerTest {
 
         BookingLink bookingLink = response.getBody();
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(bookingLink.getBufferInMin(), 60);
+        assertEquals(bookingLink.getBeforeEventBuffer(), 60);
+        assertEquals(bookingLink.getAfterEventBuffer(), 60);
         assertEquals(bookingLink.getTimezone(), CENTRAL_TIMEZONE);
         assertEquals(bookingLink.getLocation(), LOCATION);
         assertEquals(bookingLink.getNote(), NOTE);
@@ -251,7 +253,8 @@ public class BookingLinkControllerTest {
 
         // with buffer
         UpdateBookingLinkParams updateBookingLinkParams = new UpdateBookingLinkParams();
-        updateBookingLinkParams.setBufferInMin(60);
+        updateBookingLinkParams.setBeforeEventBuffer(60);
+        updateBookingLinkParams.setAfterEventBuffer(60);
         updateBookingLinkParams.setTimezone(TIMEZONE);
         ResponseEntity<BookingLink> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + BookingLinksController.BOOKING_LINK_ROUTE,

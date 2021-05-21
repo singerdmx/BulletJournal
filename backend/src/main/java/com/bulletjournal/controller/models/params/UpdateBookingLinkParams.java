@@ -3,7 +3,9 @@ package com.bulletjournal.controller.models.params;
 import javax.validation.constraints.NotNull;
 
 public class UpdateBookingLinkParams {
-    private Integer bufferInMin;
+    private Integer beforeEventBuffer;
+
+    private Integer afterEventBuffer;
 
     private Boolean includeTaskWithoutDuration;
 
@@ -49,12 +51,28 @@ public class UpdateBookingLinkParams {
     public UpdateBookingLinkParams() {
     }
 
-    public Integer getBufferInMin() {
-        return bufferInMin;
+    public Integer getBeforeEventBuffer() {
+        return beforeEventBuffer;
     }
 
-    public boolean hasBufferInMin() {
-        return this.bufferInMin != null;
+    public void setBeforeEventBuffer(Integer beforeEventBuffer) {
+        this.beforeEventBuffer = beforeEventBuffer;
+    }
+
+    public Integer getAfterEventBuffer() {
+        return afterEventBuffer;
+    }
+
+    public void setAfterEventBuffer(Integer afterEventBuffer) {
+        this.afterEventBuffer = afterEventBuffer;
+    }
+
+    public boolean hasBeforeEventBuffer() {
+        return this.beforeEventBuffer != null;
+    }
+
+    public boolean hasAfterEventBuffer() {
+        return this.afterEventBuffer != null;
     }
 
     public boolean hasIncludeTaskWithoutDuration() {
@@ -71,10 +89,6 @@ public class UpdateBookingLinkParams {
 
     public boolean hasEndDate() {
         return this.endDate != null;
-    }
-
-    public void setBufferInMin(Integer bufferInMin) {
-        this.bufferInMin = bufferInMin;
     }
 
     public Boolean getIncludeTaskWithoutDuration() {
