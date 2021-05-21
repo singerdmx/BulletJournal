@@ -2,7 +2,8 @@ import {actions} from "./reducer";
 import {BookingLink, RecurringSpan} from "./interface";
 
 export const addBookingLink = (
-    bufferInMin: number,
+    afterEventBuffer: number,
+    beforeEventBuffer: number,
     endDate: string,
     expireOnBooking: boolean,
     includeTaskWithoutDuration: boolean,
@@ -13,7 +14,8 @@ export const addBookingLink = (
     timezone: string
 ) =>
     actions.AddBookingLink({
-        bufferInMin: bufferInMin,
+        afterEventBuffer: afterEventBuffer,
+        beforeEventBuffer: beforeEventBuffer,
         endDate: endDate,
         expireOnBooking: expireOnBooking,
         includeTaskWithoutDuration: includeTaskWithoutDuration,

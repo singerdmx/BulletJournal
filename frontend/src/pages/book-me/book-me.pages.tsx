@@ -24,7 +24,8 @@ type BookMeProps = {
     ownedProjects: Project[];
     sharedProjects: ProjectsWithOwner[];
     addBookingLink: (
-        bufferInMin: number,
+        afterEventBuffer: number,
+        beforeEventBuffer: number,
         endDate: string,
         expireOnBooking: boolean,
         includeTaskWithoutDuration: boolean,
@@ -74,7 +75,7 @@ const BookMe: React.FC<BookMeProps> = (props) => {
         }
         const recurrences = [recurringSpan1, recurringSpan2];
 
-        addBookingLink(0, endDate, true, false, projects[0].id, recurrences, currentSlotSpan, startDate, timezone)
+        addBookingLink(0, 0,endDate, true, true, projects[0].id, recurrences, currentSlotSpan, startDate, timezone)
     }
 
     const getCreateBookingDrawer = () => {

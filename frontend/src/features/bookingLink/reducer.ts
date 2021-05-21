@@ -6,7 +6,8 @@ export type LinkAction = {
 };
 
 export type AddBookingLink = {
-    bufferInMin: number,
+    afterEventBuffer: number,
+    beforeEventBuffer: number,
     endDate: string,
     expireOnBooking: boolean,
     includeTaskWithoutDuration: boolean,

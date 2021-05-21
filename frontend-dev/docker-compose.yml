@@ -1,7 +1,7 @@
 version: '2.1'
 services:
   controller:
-    image: mwangxx/bulletjournal-backend:1.1.202105201225
+    image: xcode1024/bulletjournal-backend:v115
     container_name: springboot_app
     ports:
       - '8080:8080'

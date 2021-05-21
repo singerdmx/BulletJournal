@@ -8,7 +8,8 @@ import {createBookingLink} from "../../apis/bookinglinkApis";
 function* addBookingLink(action: PayloadAction<AddBookingLink>) {
     try {
         const {
-            bufferInMin,
+            afterEventBuffer,
+            beforeEventBuffer,
             endDate,
             expireOnBooking,
             includeTaskWithoutDuration,
@@ -21,7 +22,8 @@ function* addBookingLink(action: PayloadAction<AddBookingLink>) {
 
         const data = yield call(
             createBookingLink,
-            bufferInMin,
+            afterEventBuffer,
+            beforeEventBuffer,
             endDate,
             expireOnBooking,
             includeTaskWithoutDuration,

@@ -16,7 +16,8 @@ export interface Slot {
 
 export interface BookingLink {
     id: string;
-    bufferInMin: number;
+    afterEventBuffer: number;
+    beforeEventBuffer: number;
     endDate: string;
     endTime: string;
     expireOnBooking: boolean;

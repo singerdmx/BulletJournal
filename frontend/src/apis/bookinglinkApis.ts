@@ -2,7 +2,8 @@ import {doPost} from "./api-helper";
 import {RecurringSpan} from "../features/bookingLink/interface";
 
 export const createBookingLink = (
-    bufferInMin: number,
+    afterEventBuffer: number,
+    beforeEventBuffer: number,
     endDate: string,
     expireOnBooking: boolean,
     includeTaskWithoutDuration: boolean,
@@ -13,7 +14,8 @@ export const createBookingLink = (
     timezone: string
 ) => {
     const postBody = JSON.stringify({
-        bufferInMin: bufferInMin,
+        afterEventBuffer: afterEventBuffer,
+        beforeEventBuffer: beforeEventBuffer,
         endDate: endDate,
         expireOnBooking: expireOnBooking,
         includeTaskWithoutDuration: includeTaskWithoutDuration,
