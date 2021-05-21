@@ -36,7 +36,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
     const options = result.map((time: string) => {
         return {value: time};
     });
-
+console.log(project)
     useEffect(() => {
         if (link) {
             setLocation(link.location);
@@ -135,7 +135,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                     />
                     <Select
                         showSearch={true}
-                        style={{width: 250, marginLeft: "40px"}}
+                        style={{width: 200, marginLeft: "40px"}}
                         placeholder='Select Time Zone'
                         onChange={handleTimezoneChange}
                         value={timezone}
@@ -148,41 +148,43 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                     </Select>
                 </div>
                 <span>Want to add time before or after your events?</span>
-                <div className="buffer booking-option-container">
-                    <div> Before event{' '}
-                        <Tooltip
-                            title="Give yourself some buffer time to prepare before the event">
+                <div className="buffer booking-option-container" style={{display:"flex", flexDirection:"row", justifyContent:"space-between", width:"300px"}}>
+                    <div>
+                        <div> Before event{' '}
+                            <Tooltip
+                                title="Give yourself some buffer time to prepare before the event">
                                 <span className="question-icon">
                                 <QuestionCircleOutlined/>
                             </span>
-                        </Tooltip>
+                            </Tooltip>
+                        </div>
+                        <AutoComplete
+                            style={{width: "100px"}}
+                            options={options}
+                            value={beforeEventBuffer ? beforeEventBuffer : 0}
+                            onChange={handleBeforeEventBufferChange}
+                        >
+                            <Input/>
+                        </AutoComplete>
                     </div>
-                    <AutoComplete
-                        style={{width: "210px"}}
-                        options={options}
-                        value={beforeEventBuffer ? beforeEventBuffer : 0}
-                        onChange={handleBeforeEventBufferChange}
-                    >
-                        <Input/>
-                    </AutoComplete>
-                    <br/>
-                    <br/>
-                    <div> After event{' '}
-                        <Tooltip
-                            title="Give yourself some buffer time to wrap-up after the event">
+                    <div>
+                        <div> After event{' '}
+                            <Tooltip
+                                title="Give yourself some buffer time to wrap-up after the event">
                                 <span className="question-icon">
                                 <QuestionCircleOutlined/>
                             </span>
-                        </Tooltip>
+                            </Tooltip>
+                        </div>
+                        <AutoComplete
+                            style={{width: "100px"}}
+                            options={options}
+                            value={afterEventBuffer ? afterEventBuffer : 0}
+                            onChange={handleAfterEventBufferChange}
+                        >
+                            <Input/>
+                        </AutoComplete>
                     </div>
-                    <AutoComplete
-                        style={{width: "210px"}}
-                        options={options}
-                        value={afterEventBuffer ? afterEventBuffer : 0}
-                        onChange={handleAfterEventBufferChange}
-                    >
-                        <Input/>
-                    </AutoComplete>
                 </div>
                 <div className="location booking-option-container">
                     <span style={{marginRight: "10px"}}>Where{' '}
@@ -208,7 +210,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                         Expire this once a booking is made
                     </Checkbox>
                 </div>
-                <div className="project booking-option-container">
+                <div className="booking-project booking-option-container">
                     <span style={{marginRight: "10px"}}> Save booked event in{' '}
                         <Tooltip
                             title="Once a booking is made,  a task is created under this BuJo">
@@ -220,7 +222,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                     <Select
                         style={{width: '256px'}}
                         placeholder='Select BuJo'
-                        value={project ? project.id : null}
+                        value={project}
                         onChange={
                             (id) => handleProjectChange(id)}
                     >
