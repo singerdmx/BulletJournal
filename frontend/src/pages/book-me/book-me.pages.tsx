@@ -79,7 +79,7 @@ const BookMe: React.FC<BookMeProps> = (props) => {
 
     const getCreateBookingDrawer = () => {
         createDefaultBookingLink();
-        return <BookMeDrawer bookMeDrawerVisible={cardIsClicked} setBookMeDrawerVisible={setCardIsClicked}/>;
+        return <BookMeDrawer bookMeDrawerVisible={cardIsClicked} setBookMeDrawerVisible={setCardIsClicked} projects={projects}/>;
     }
 
     const getAddProjectModal = () => {
