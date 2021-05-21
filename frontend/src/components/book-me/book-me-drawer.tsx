@@ -36,7 +36,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
     const options = result.map((time: string) => {
         return {value: time};
     });
-console.log(project)
+    console.log(project)
     useEffect(() => {
         if (link) {
             setLocation(link.location);
@@ -147,17 +147,18 @@ console.log(project)
                         ))}
                     </Select>
                 </div>
-                <span>Want to add time before or after your events?</span>
-                <div className="buffer booking-option-container" style={{display:"flex", flexDirection:"row", justifyContent:"space-between", width:"300px"}}>
+                <span>Want to add time before or after your events?{' '}
+                    <Tooltip
+                        title="Give yourself some buffer time to prepare or wrap-up before or after booked events.">
+                        <span className="question-icon">
+                                    <QuestionCircleOutlined/>
+                        </span>
+                    </Tooltip>
+                </span>
+                <div className="buffer booking-option-container"
+                     style={{display: "flex", flexDirection: "row", justifyContent: "space-between", width: "300px"}}>
                     <div>
-                        <div> Before event{' '}
-                            <Tooltip
-                                title="Give yourself some buffer time to prepare before the event">
-                                <span className="question-icon">
-                                <QuestionCircleOutlined/>
-                            </span>
-                            </Tooltip>
-                        </div>
+                        <div> Before event{' '}</div>
                         <AutoComplete
                             style={{width: "100px"}}
                             options={options}
@@ -168,14 +169,7 @@ console.log(project)
                         </AutoComplete>
                     </div>
                     <div>
-                        <div> After event{' '}
-                            <Tooltip
-                                title="Give yourself some buffer time to wrap-up after the event">
-                                <span className="question-icon">
-                                <QuestionCircleOutlined/>
-                            </span>
-                            </Tooltip>
-                        </div>
+                        <div> After event{' '}</div>
                         <AutoComplete
                             style={{width: "100px"}}
                             options={options}
