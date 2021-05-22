@@ -121,7 +121,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
         if (save && link) {
             patchBookingLink(link.id, link.timezone, undefined, undefined, undefined, undefined, undefined, location, undefined, undefined);
         } else {
-            setLocation(link? link.location : '');
+            setLocation(link ? link.location : '');
         }
     };
 
@@ -182,7 +182,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                     </span>
                     <Input
                         placeholder="web link, phone number or address"
-                        value={location? location: ''}
+                        value={location ? location : ''}
                         style={{width: "250px"}}
                         onChange={(e) => handleLocationChange(e)}
                     />
@@ -228,7 +228,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                 </span>
                 <div className="buffer booking-option-container"
                      style={{display: "flex", flexDirection: "row", justifyContent: "space-between", width: "350px"}}>
-                    <div>
+                    <div style={{textAlign: "center"}}>
                         <div> Before event (Minutes){' '}</div>
                         <AutoComplete
                             style={{width: "50px"}}
@@ -239,7 +239,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                             <Input/>
                         </AutoComplete>
                     </div>
-                    <div>
+                    <div style={{textAlign: "center"}}>
                         <div> After event (Minutes){' '}</div>
                         <AutoComplete
                             style={{width: "50px"}}
