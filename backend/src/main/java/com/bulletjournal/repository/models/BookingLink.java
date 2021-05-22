@@ -27,16 +27,22 @@ public class BookingLink extends AuditModel {
     @Column(name = "end_date")
     private String endDate;
 
+    @Column
     private String slots;
 
+    @Column
     private String recurrences;
 
+    @Column
     private String timezone;
 
+    @Column
     private String location;
 
+    @Column
     private String note;
 
+    @Column
     private boolean removed;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
