@@ -33,6 +33,7 @@ export type PatchBookingLink = {
 
 let initialState = {
     link: undefined as BookingLink | undefined,
+    bookMeUsername: ''
 };
 
 const slice = createSlice({
