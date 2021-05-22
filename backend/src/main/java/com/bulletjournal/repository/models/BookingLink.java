@@ -47,22 +47,6 @@ public class BookingLink extends AuditModel {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "bookingLink")
     private List<Booking> bookings;
 
-    public List<Booking> getBookings() {
-        return bookings;
-    }
-
-    public void setBookings(List<Booking> bookings) {
-        this.bookings = bookings;
-    }
-
-    public String getRecurrences() {
-        return recurrences;
-    }
-
-    public void setRecurrences(String recurrences) {
-        this.recurrences = recurrences;
-    }
-
     @Column(name = "slot_span")
     private int slotSpan;
 
@@ -196,6 +180,22 @@ public class BookingLink extends AuditModel {
 
     public void setRemoved(boolean removed) {
         this.removed = removed;
+    }
+
+    public List<Booking> getBookings() {
+        return bookings;
+    }
+
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
+    }
+
+    public String getRecurrences() {
+        return recurrences;
+    }
+
+    public void setRecurrences(String recurrences) {
+        this.recurrences = recurrences;
     }
 
     public com.bulletjournal.controller.models.BookingLink toPresentationModel() {
