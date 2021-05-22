@@ -16,6 +16,7 @@ import {RecurringSpan} from "../../features/bookingLink/interface";
 import {addBookingLink} from "../../features/bookingLink/actions";
 import moment from "moment-timezone";
 import {dateFormat} from "../../features/myBuJo/constants";
+import ManageBooking from "./manage-booking.pages";
 
 const {TabPane} = Tabs;
 
@@ -132,7 +133,7 @@ const BookMe: React.FC<BookMeProps> = (props) => {
                 tab={<span><CalendarOutlined/>Manage Booking</span>}
                 key="2"
             >
-                Tab 2
+                <ManageBooking/>
             </TabPane>
         </Tabs>
         <div>
