@@ -3,11 +3,13 @@ package com.bulletjournal.repository;
 import com.bulletjournal.controller.models.BookingSlot;
 import com.bulletjournal.controller.models.ProjectType;
 import com.bulletjournal.controller.models.RecurringSpan;
+import com.bulletjournal.controller.models.params.BookParams;
 import com.bulletjournal.controller.models.params.CreateBookingLinkParams;
 import com.bulletjournal.controller.models.params.UpdateBookingLinkParams;
 import com.bulletjournal.exceptions.BadRequestException;
 import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.exceptions.UnAuthorizedException;
+import com.bulletjournal.repository.models.Booking;
 import com.bulletjournal.repository.models.BookingLink;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.utils.DaoHelper;
@@ -29,6 +31,9 @@ public class BookingLinkDaoJpa {
 
     @Autowired
     private ProjectDaoJpa projectDaoJpa;
+
+    @Autowired
+    private BookingDaoJpa bookingDaoJpa;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public BookingLink getBookingLink(String id) {
@@ -136,4 +141,17 @@ public class BookingLinkDaoJpa {
                 .map(BookingLink::toPresentationModel)
                 .collect(Collectors.toList());
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public Booking book(String bookingLinkId, BookParams bookParams) {
+        BookingLink bookingLink = getBookingLink(bookingLinkId);
+        Booking booking = this.bookingDaoJpa.book(bookingLink,
+                bookParams.getInvitees(),
+                bookParams.getLocation(),
+                bookParams.getNote(),
+                bookParams.getSlotDate(),
+                bookParams.getSlotIndex());
+        return booking;
+    }
+
 }

@@ -1,0 +1,1 @@
+alter table bookings rename column invitee to invitees;

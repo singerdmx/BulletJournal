@@ -1,11 +1,9 @@
 package com.bulletjournal.controller;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.controller.models.Booking;
 import com.bulletjournal.controller.models.BookingLink;
-import com.bulletjournal.controller.models.params.CreateBookingLinkParams;
-import com.bulletjournal.controller.models.params.UpdateBookingLinkParams;
-import com.bulletjournal.controller.models.params.UpdateBookingLinkRecurrencesParams;
-import com.bulletjournal.controller.models.params.UpdateBookingLinkSlotParams;
+import com.bulletjournal.controller.models.params.*;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.BookingLinkDaoJpa;
 import com.bulletjournal.repository.ProjectDaoJpa;
@@ -38,6 +36,7 @@ public class BookingLinksController {
     public static final String BOOKING_LINK_ROUTE = "/api/bookingLinks/{bookingLinkId}";
     public static final String PUBLIC_BOOKING_LINKS_ROUTE_PREFIX = "/api/public/bookingLinks/";
     public static final String PUBLIC_BOOKING_LINK_ROUTE = PUBLIC_BOOKING_LINKS_ROUTE_PREFIX + "{bookingLinkId}";
+    public static final String PUBLIC_BOOKING_LINK_BOOK_ROUTE = PUBLIC_BOOKING_LINK_ROUTE + "/book";
 
     @Autowired
     private BookingLinkDaoJpa bookingLinkDaoJpa;
@@ -128,6 +127,11 @@ public class BookingLinksController {
     public void deleteBookingLink(@NotNull @PathVariable String bookingLinkId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.bookingLinkDaoJpa.deleteBookingLink(username, bookingLinkId);
+    }
+
+    @PostMapping(PUBLIC_BOOKING_LINK_BOOK_ROUTE)
+    public Booking book(@NotNull @PathVariable String bookingLinkId, BookParams bookParams){
+        return this.bookingLinkDaoJpa.book(bookingLinkId, bookParams).toPresentationModel();
     }
 
 }

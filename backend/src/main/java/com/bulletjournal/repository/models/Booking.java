@@ -19,10 +19,13 @@ public class Booking extends AuditModel {
   @OnDelete(action = OnDeleteAction.CASCADE)
   private BookingLink bookingLink;
 
-  private String invitee;
+  @Column
+  private String invitees;
 
+  @Column
   private String location;
 
+  @Column
   private String note;
 
   @Column(name = "slot_index")
@@ -55,12 +58,12 @@ public class Booking extends AuditModel {
     this.bookingLink = bookingLink;
   }
 
-  public String getInvitee() {
-    return invitee;
+  public String getInvitees() {
+    return invitees;
   }
 
-  public void setInvitee(String invitee) {
-    this.invitee = invitee;
+  public void setInvitees(String invitees) {
+    this.invitees = invitees;
   }
 
   public int getSlotIndex() {
@@ -98,7 +101,7 @@ public class Booking extends AuditModel {
   public com.bulletjournal.controller.models.Booking toPresentationModel() {
     return new com.bulletjournal.controller.models.Booking(
         this.getId(),
-        this.getInvitee(),
+        this.getInvitees(),
         this.getSlotIndex(),
         this.getSlotDate(),
         this.getLocation(),
