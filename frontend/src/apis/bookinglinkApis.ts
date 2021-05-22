@@ -1,4 +1,4 @@
-import {doPost} from "./api-helper";
+import {doPatch, doPost} from "./api-helper";
 import {RecurringSpan} from "../features/bookingLink/interface";
 
 export const createBookingLink = (
@@ -31,3 +31,32 @@ export const createBookingLink = (
             throw Error(err.message);
         });
 };
+
+export const updateBookingLink = (
+    bookingLinkId: string,
+    timezone: string,
+    afterEventBuffer?: number,
+    beforeEventBuffer?: number,
+    endDate?: string,
+    expireOnBooking?: boolean,
+    includeTaskWithoutDuration?: boolean,
+    location?: string,
+    projectId?: number,
+    startDate?: string,
+) => {
+    const patchBody = JSON.stringify({
+        afterEventBuffer: afterEventBuffer,
+        beforeEventBuffer: beforeEventBuffer,
+        endDate: endDate,
+        expireOnBooking: expireOnBooking,
+        includeTaskWithoutDuration: includeTaskWithoutDuration,
+        projectId: projectId,
+        startDate: startDate,
+        timezone: timezone
+    });
+    return doPatch(`/api/bookingLinks/${bookingLinkId}`, patchBody)
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}

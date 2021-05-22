@@ -18,6 +18,19 @@ export type AddBookingLink = {
     timezone: string,
 };
 
+export type PatchBookingLink = {
+    bookingLinkId: string,
+    timezone: string,
+    afterEventBuffer?: number,
+    beforeEventBuffer?: number,
+    endDate?: string,
+    expireOnBooking?: boolean,
+    includeTaskWithoutDuration?: boolean,
+    location?: string,
+    projectId?: number,
+    startDate?: string,
+};
+
 let initialState = {
     link: undefined as BookingLink | undefined,
 };
@@ -32,6 +45,7 @@ const slice = createSlice({
             state.link = link;
         },
         AddBookingLink: (state, action: PayloadAction<AddBookingLink>) => state,
+        PatchBookingLink: (state, action: PayloadAction<PatchBookingLink>) => state,
     }
 });
 
