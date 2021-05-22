@@ -5,6 +5,7 @@ import com.bulletjournal.controller.models.params.CreateTaskParams;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.models.Booking;
 import com.bulletjournal.repository.models.BookingLink;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class BookingDaoJpa {
     @Autowired
     private TaskDaoJpa taskDaoJpa;
 
+    @Autowired
+    private UserDaoJpa userDaoJpa;
+
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Booking book(BookingLink bookingLink,
                         List<Invitee> invitees,
@@ -40,14 +44,14 @@ public class BookingDaoJpa {
         booking.setSlotDate(slotDate);
         booking.setSlotIndex(slotIndex);
 
+        List<String> assignees = ImmutableList.of(bookingLink.getOwner());
+        ZonedDateTime zonedTime = ZonedDateTimeHelper.getStartTime(slotDate, null, bookingLink.getTimezone())
+                .plusMinutes(slotIndex * bookingLink.getSlotSpan());
 
-        List<String> assignees = new ArrayList<>();
-        assignees.add(bookingLink.getOwner());
-
-        ZonedDateTime zonedTime = ZonedDateTimeHelper.getStartTime(slotDate, null, bookingLink.getTimezone()).plusMinutes(slotIndex * bookingLink.getSlotSpan());
-
+        Invitee primaryInvitee = invitees.get(0);
         CreateTaskParams createTaskParams = new CreateTaskParams(
-                bookingLink.getOwner(),
+                this.userDaoJpa.getBookMeUsername(bookingLink.getOwner()) + " and "
+                        + primaryInvitee.getFirstName() + " " + primaryInvitee.getLastName(),
                 slotDate,
                 slotDate + " " + ZonedDateTimeHelper.getTime(zonedTime),
                 bookingLink.getSlotSpan(),
@@ -60,7 +64,6 @@ public class BookingDaoJpa {
         );
 
         taskDaoJpa.create(bookingLink.getProject().getId(), bookingLink.getOwner(), createTaskParams);
-
         return bookingRepository.save(booking);
     }
 }
