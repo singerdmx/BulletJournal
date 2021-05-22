@@ -1,4 +1,4 @@
-import {doPatch, doPost} from "./api-helper";
+import {doFetch, doPatch, doPost} from "./api-helper";
 import {RecurringSpan} from "../features/bookingLink/interface";
 
 export const createBookingLink = (
@@ -56,6 +56,20 @@ export const updateBookingLink = (
     });
     return doPatch(`/api/bookingLinks/${bookingLinkId}`, patchBody)
         .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}
+
+export const getBookMeUsername = () => {
+    return doFetch('/api/bookMeUsername')
+        .catch(err => {
+            throw Error(err.message);
+        });
+}
+
+export const updateBookMeUsername = (name: string) => {
+    return doPatch('/api/bookMeUsername', name)
         .catch((err) => {
             throw Error(err.message);
         });

@@ -178,4 +178,20 @@ public class UserDaoJpa {
         this.userRepository.save(user);
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public String getBookMeUsername(String name) {
+        User user = getByName(name);
+        if (StringUtils.isNotBlank(user.getBookMeUsername())) {
+            return user.getBookMeUsername();
+        }
+
+        return user.getName();
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void updateBookMeUsername(String requester, String name) {
+        User user = getByName(requester);
+        user.setBookMeUsername(name);
+        this.userRepository.save(user);
+    }
 }

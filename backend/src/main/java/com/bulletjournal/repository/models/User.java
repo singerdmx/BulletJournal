@@ -52,6 +52,9 @@ public class User extends NamedModel {
     @Column
     private String theme;
 
+    @Column(name = "book_me_username")
+    private String bookMeUsername;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "shared_tasks_project", referencedColumnName = "id")
     private Project sharedTasksProject;
@@ -223,4 +226,11 @@ public class User extends NamedModel {
         this.points = points;
     }
 
+    public String getBookMeUsername() {
+        return bookMeUsername;
+    }
+
+    public void setBookMeUsername(String bookMeUsername) {
+        this.bookMeUsername = bookMeUsername;
+    }
 }

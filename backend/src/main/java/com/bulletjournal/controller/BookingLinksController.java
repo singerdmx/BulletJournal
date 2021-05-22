@@ -8,6 +8,7 @@ import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.BookingLinkDaoJpa;
 import com.bulletjournal.repository.ProjectDaoJpa;
 import com.bulletjournal.repository.TaskDaoJpa;
+import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.util.BookingUtil;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
 
 @RestController
 public class BookingLinksController {
-
+    public static final String BOOK_ME_USERNAME = "/api/bookMeUsername";
     public static final String BOOKING_LINKS_ROUTE = "/api/bookingLinks";
     public static final String BOOKING_LINK_UPDATE_RECURRENCE_RULES_ROUTE =
             "/api/bookingLinks/{bookingLinkId}/updateRecurrenceRules";
@@ -39,6 +40,9 @@ public class BookingLinksController {
     private static final Logger LOGGER = LoggerFactory.getLogger(BookingLinksController.class);
     @Autowired
     private BookingLinkDaoJpa bookingLinkDaoJpa;
+
+    @Autowired
+    private UserDaoJpa userDaoJpa;
 
     @Autowired
     private TaskDaoJpa taskDaoJpa;
@@ -131,6 +135,18 @@ public class BookingLinksController {
     @PostMapping(PUBLIC_BOOKING_LINK_BOOK_ROUTE)
     public Booking book(@NotNull @PathVariable String bookingLinkId, BookParams bookParams) {
         return this.bookingLinkDaoJpa.book(bookingLinkId, bookParams).toPresentationModel();
+    }
+
+    @GetMapping(BOOK_ME_USERNAME)
+    public String getBookMeUsername() {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        return this.userDaoJpa.getBookMeUsername(username);
+    }
+
+    @PutMapping(BOOK_ME_USERNAME)
+    public void getBookMeUsername(String name) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+        this.userDaoJpa.updateBookMeUsername(username, name);
     }
 
 }

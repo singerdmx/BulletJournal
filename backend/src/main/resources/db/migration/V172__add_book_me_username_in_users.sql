@@ -1,0 +1,1 @@
+alter table users add book_me_username varchar(500);
