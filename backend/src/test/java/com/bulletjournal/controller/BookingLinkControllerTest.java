@@ -100,6 +100,18 @@ public class BookingLinkControllerTest {
 
         getBookingLinks();
 
+        List<Invitee> invitees = new ArrayList<>();
+        Invitee invitee1 = new Invitee();
+        invitee1.setEmail("test123@test123.com");
+        invitee1.setFirstName("test");
+        invitee1.setLastName("debug");
+        invitee1.setPhone("9794029450");
+        invitees.add(invitee1);
+
+        BookParams bookParams = new BookParams(invitees, 1, "2021-05-04", "Seatle", "test");
+
+        book(bookingLink1, bookParams);
+
     }
 
     private BookingLink createBookingLink(String startDate, String endDate, String timezone, int slotSpan,
@@ -284,6 +296,21 @@ public class BookingLinkControllerTest {
         assertNotNull(created);
         assertEquals(params.getName(), created.getName());
         assertEquals(project.getId(), created.getProjectId());
+        return created;
+    }
+
+    private Booking book(BookingLink bookingLink, BookParams bookParams){
+        ResponseEntity<Booking> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + BookingLinksController.PUBLIC_BOOKING_LINK_BOOK_ROUTE,
+                HttpMethod.POST,
+                new HttpEntity<>(bookParams),
+                Booking.class,
+                bookingLink.getId());
+        Booking created = response.getBody();
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(created);
+//        assertEquals(bookParams.getName(), created.getName());
+//        assertEquals(project.getId(), created.getProjectId());
         return created;
     }
 }
