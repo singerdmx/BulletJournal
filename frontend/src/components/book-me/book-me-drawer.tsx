@@ -32,11 +32,10 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
     const [project, setProject] = useState();
     const [expireOnBooking, setExpireOnBooking] = useState();
     const [includeTaskWithoutDuration, setIncludeTaskWithoutDuration] = useState();
-    const result = ['15', '30', '45', '60'];
+    const result = ['5', '10','15', '30', '45', '60'];
     const options = result.map((time: string) => {
         return {value: time};
     });
-    console.log(project)
     useEffect(() => {
         if (link) {
             setLocation(link.location);
@@ -156,11 +155,11 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                     </Tooltip>
                 </span>
                 <div className="buffer booking-option-container"
-                     style={{display: "flex", flexDirection: "row", justifyContent: "space-between", width: "300px"}}>
+                     style={{display: "flex", flexDirection: "row", justifyContent: "space-between", width: "350px"}}>
                     <div>
-                        <div> Before event{' '}</div>
+                        <div> Before event (Minutes){' '}</div>
                         <AutoComplete
-                            style={{width: "100px"}}
+                            style={{width: "50px"}}
                             options={options}
                             value={beforeEventBuffer ? beforeEventBuffer : 0}
                             onChange={handleBeforeEventBufferChange}
@@ -169,9 +168,9 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                         </AutoComplete>
                     </div>
                     <div>
-                        <div> After event{' '}</div>
+                        <div> After event (Minutes){' '}</div>
                         <AutoComplete
-                            style={{width: "100px"}}
+                            style={{width: "50px"}}
                             options={options}
                             value={afterEventBuffer ? afterEventBuffer : 0}
                             onChange={handleAfterEventBufferChange}
