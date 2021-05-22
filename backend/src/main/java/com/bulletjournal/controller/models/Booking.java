@@ -15,6 +15,9 @@ public class Booking {
     private String location;
     private String note;
 
+    public Booking() {
+    }
+
     public Booking(String id, String invitees, int slotIndex, String slotDate, String location, String note) {
         this.id = id;
         this.invitees = Arrays.asList(GSON.fromJson(invitees, Invitee[].class));

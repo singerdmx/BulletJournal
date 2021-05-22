@@ -299,7 +299,7 @@ public class BookingLinkControllerTest {
         return created;
     }
 
-    private Booking book(BookingLink bookingLink, BookParams bookParams){
+    private Booking book(BookingLink bookingLink, BookParams bookParams) {
         ResponseEntity<Booking> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + BookingLinksController.PUBLIC_BOOKING_LINK_BOOK_ROUTE,
                 HttpMethod.POST,
@@ -307,10 +307,11 @@ public class BookingLinkControllerTest {
                 Booking.class,
                 bookingLink.getId());
         Booking created = response.getBody();
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(created);
-//        assertEquals(bookParams.getName(), created.getName());
-//        assertEquals(project.getId(), created.getProjectId());
+        assertEquals(bookParams.getNote(), created.getNote());
+        assertEquals(bookParams.getInvitees().size(), created.getInvitees().size());
+        assertEquals(bookParams.getSlotDate(), created.getSlotDate());
         return created;
     }
 }

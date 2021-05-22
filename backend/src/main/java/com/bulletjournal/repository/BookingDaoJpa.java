@@ -1,10 +1,12 @@
 package com.bulletjournal.repository;
 
 import com.bulletjournal.controller.models.Invitee;
+import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.controller.models.params.CreateTaskParams;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.models.Booking;
 import com.bulletjournal.repository.models.BookingLink;
+import com.bulletjournal.repository.models.Task;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -49,13 +51,16 @@ public class BookingDaoJpa {
                 .plusMinutes(slotIndex * bookingLink.getSlotSpan());
 
         Invitee primaryInvitee = invitees.get(0);
+
+        ReminderSetting reminderSetting = new ReminderSetting(null, null, 3);
+
         CreateTaskParams createTaskParams = new CreateTaskParams(
                 this.userDaoJpa.getBookMeUsername(bookingLink.getOwner()) + " and "
                         + primaryInvitee.getFirstName() + " " + primaryInvitee.getLastName(),
                 slotDate,
-                slotDate + " " + ZonedDateTimeHelper.getTime(zonedTime),
+                ZonedDateTimeHelper.getTime(zonedTime),
                 bookingLink.getSlotSpan(),
-                null,
+                reminderSetting,
                 assignees,
                 bookingLink.getTimezone(),
                 null,
@@ -63,7 +68,8 @@ public class BookingDaoJpa {
                 location
         );
 
-        taskDaoJpa.create(bookingLink.getProject().getId(), bookingLink.getOwner(), createTaskParams);
+        Task task = taskDaoJpa.create(bookingLink.getProject().getId(), bookingLink.getOwner(), createTaskParams);
+        booking.setTask(task);
         return bookingRepository.save(booking);
     }
 }

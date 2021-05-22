@@ -133,7 +133,7 @@ public class BookingLinksController {
     }
 
     @PostMapping(PUBLIC_BOOKING_LINK_BOOK_ROUTE)
-    public Booking book(@NotNull @PathVariable String bookingLinkId, BookParams bookParams) {
+    public Booking book(@NotNull @PathVariable String bookingLinkId, @NotNull @RequestBody BookParams bookParams) {
         return this.bookingLinkDaoJpa.book(bookingLinkId, bookParams).toPresentationModel();
     }
 
