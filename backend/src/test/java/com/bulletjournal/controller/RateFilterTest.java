@@ -32,7 +32,7 @@ import static org.junit.Assert.assertNull;
 @ActiveProfiles("test")
 public class RateFilterTest {
 
-    private static final String USER = "BulletJournal";
+    private static final String USER = "bean";
 
     private static final String ROOT_URL = "http://localhost:";
 
