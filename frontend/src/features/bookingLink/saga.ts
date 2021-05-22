@@ -48,27 +48,29 @@ function* patchBookingLink(action: PayloadAction<PatchBookingLink>) {
     try {
         const {
             bookingLinkId,
+            timezone,
             afterEventBuffer,
             beforeEventBuffer,
             endDate,
             expireOnBooking,
             includeTaskWithoutDuration,
+            location,
             projectId,
             startDate,
-            timezone
         } = action.payload
 
         const data: BookingLink = yield call(
             updateBookingLink,
             bookingLinkId,
+            timezone,
             afterEventBuffer,
             beforeEventBuffer,
             endDate,
             expireOnBooking,
             includeTaskWithoutDuration,
+            location,
             projectId,
             startDate,
-            timezone
         );
         yield put(bookingLinksActions.linkReceived({link: data}));
     } catch (error) {
