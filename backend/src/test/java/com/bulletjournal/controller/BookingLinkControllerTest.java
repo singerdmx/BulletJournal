@@ -21,6 +21,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -278,6 +279,14 @@ public class BookingLinkControllerTest {
         bookingLink = response.getBody();
         assertEquals(HttpStatus.OK, response.getStatusCode());
 
+
+        getBookingLink(bookingLink.getId(), TIMEZONE);
+
+        // DTSTART:20210517T000000Z\nRRULE:FREQ=DAILY;INTERVAL=1, dur=9hr -> 540 min
+        // DTSTART:20210518T170000Z\nRRULE:FREQ=DAILY;INTERVAL=1, dur=7hr -> 420 min
+        List<RecurringSpan> list = new ArrayList<>();
+        list.add(new RecurringSpan(540, "DTSTART:20210517T000000Z\\nRRULE:FREQ=DAILY;INTERVAL=1"));
+        bookingLink = updateBookingLinkRecurrences(bookingLink.getId(), list);
 
         getBookingLink(bookingLink.getId(), TIMEZONE);
 

@@ -9,6 +9,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
+import org.dmfs.rfc5545.DateTime;
+import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
+import org.dmfs.rfc5545.recur.RecurrenceRuleIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -16,6 +21,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class BookingUtil {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BookingUtil.class);
     private static final Gson GSON = new Gson();
     private static final Gson EXPOSE_GSON = new GsonBuilder()
             .excludeFieldsWithoutExposeAnnotation().create();
@@ -24,7 +30,38 @@ public class BookingUtil {
             String timezone, String requestTimezone,
             List<BookingSlot> slotsOverride,
             String startDate, String endDate, int slotSpan, boolean includeTaskWithoutDuration,
-            int beforeBuffer, int afterBuffer, List<Task> tasksBetween) {
+            int beforeBuffer, int afterBuffer, List<Task> tasksBetween, String recurrences) {
+
+        List<RecurringSpan> recurringSpans = toList(recurrences);
+        List<Pair<ZonedDateTime, ZonedDateTime>> recurringTimes = new ArrayList<>();
+        recurringSpans.forEach(s -> {
+                    try {
+                        DateTime startDateTime = ZonedDateTimeHelper.getDateTime(ZonedDateTimeHelper.convertDateOnly(startDate, timezone));
+                        DateTime endDateTime = ZonedDateTimeHelper.getDateTime(ZonedDateTimeHelper.convertDateOnly(endDate, timezone));
+                        String recurrenceRule = s.getRecurrenceRule();
+                        BuJoRecurrenceRule rule = new BuJoRecurrenceRule(recurrenceRule, timezone);
+                        RecurrenceRuleIterator it = rule.getIterator();
+                        while (it.hasNext()) {
+                            DateTime currDateTime = it.nextDateTime();
+                            if (currDateTime.after(endDateTime)) {
+                                break;
+                            }
+                            if (currDateTime.before(startDateTime)) {
+                                continue;
+                            }
+                            recurringTimes.add(Pair.of(ZonedDateTimeHelper.getZonedDateTime(currDateTime),
+                                    ZonedDateTimeHelper.getZonedDateTime(currDateTime).plusMinutes(s.getDuration())));
+                        }
+                    } catch (InvalidRecurrenceRuleException e) {
+                        LOGGER.error("Error parsing recurrence rule: {} in BookingUtil.calculateSlot",
+                                e.toString());
+                    } catch (NumberFormatException e) {
+                        throw new IllegalArgumentException("Recurrence rule format invalid");
+                    }
+                }
+
+        );
+
 
         if (!includeTaskWithoutDuration) {
             tasksBetween = tasksBetween.stream().filter(t -> t.hasDuration()).collect(Collectors.toList());
@@ -72,7 +109,12 @@ public class BookingUtil {
             Optional<Task> task = tasksBetween.stream().filter(t -> isBetweenSlot(taskTimes.get(t).getLeft(),
                     taskTimes.get(t).getRight(), startT, endT)).findFirst();
 
-            if (task.isPresent()) {
+            if (tasksBetween.stream().anyMatch(t -> isBetweenSlot(taskTimes.get(t).getLeft(),
+                    taskTimes.get(t).getRight(), startT, endT))) {
+                bookingSlot.setOn(false);
+            }
+
+            if (recurringTimes.stream().anyMatch(r -> isBetweenSlot(r.getLeft(), r.getRight(), startT, endT))) {
                 bookingSlot.setOn(false);
             }
 

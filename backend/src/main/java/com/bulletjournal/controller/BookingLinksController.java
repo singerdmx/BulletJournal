@@ -87,7 +87,7 @@ public class BookingLinksController {
                 BookingUtil.getBookingLinkSlots(bookingLink),
                 bookingLink.getStartDate(), bookingLink.getEndDate(), bookingLink.getSlotSpan(),
                 bookingLink.isIncludeTaskWithoutDuration(), bookingLink.getBeforeEventBuffer(),
-                bookingLink.getAfterEventBuffer(), tasks));
+                bookingLink.getAfterEventBuffer(), tasks, bookingLink.getRecurrences()));
 
         List<com.bulletjournal.repository.models.Booking> bookings = bookingLink.getBookings();
         if (bookings != null) {
