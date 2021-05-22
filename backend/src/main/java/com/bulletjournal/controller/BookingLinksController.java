@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 @RestController
 public class BookingLinksController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BookingLinksController.class);
     public static final String BOOKING_LINKS_ROUTE = "/api/bookingLinks";
     public static final String BOOKING_LINK_UPDATE_RECURRENCE_RULES_ROUTE =
             "/api/bookingLinks/{bookingLinkId}/updateRecurrenceRules";
@@ -37,7 +36,7 @@ public class BookingLinksController {
     public static final String PUBLIC_BOOKING_LINKS_ROUTE_PREFIX = "/api/public/bookingLinks/";
     public static final String PUBLIC_BOOKING_LINK_ROUTE = PUBLIC_BOOKING_LINKS_ROUTE_PREFIX + "{bookingLinkId}";
     public static final String PUBLIC_BOOKING_LINK_BOOK_ROUTE = PUBLIC_BOOKING_LINK_ROUTE + "/book";
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(BookingLinksController.class);
     @Autowired
     private BookingLinkDaoJpa bookingLinkDaoJpa;
 
@@ -130,7 +129,7 @@ public class BookingLinksController {
     }
 
     @PostMapping(PUBLIC_BOOKING_LINK_BOOK_ROUTE)
-    public Booking book(@NotNull @PathVariable String bookingLinkId, BookParams bookParams){
+    public Booking book(@NotNull @PathVariable String bookingLinkId, BookParams bookParams) {
         return this.bookingLinkDaoJpa.book(bookingLinkId, bookParams).toPresentationModel();
     }
 
