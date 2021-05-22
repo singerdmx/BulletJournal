@@ -1,6 +1,10 @@
 import {actions} from "./reducer";
 import {BookingLink, RecurringSpan} from "./interface";
 
+export const getBookMeUsername = () => actions.GetBookMeUsername({});
+
+export const updateBookMeUsername = (name: string) => actions.UpdateBookMeUsername({name: name});
+
 export const addBookingLink = (
     afterEventBuffer: number,
     beforeEventBuffer: number,

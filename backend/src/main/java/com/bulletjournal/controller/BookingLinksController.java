@@ -144,7 +144,7 @@ public class BookingLinksController {
     }
 
     @PutMapping(BOOK_ME_USERNAME)
-    public void getBookMeUsername(String name) {
+    public void updateBookMeUsername(@RequestBody @NotNull String name) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.userDaoJpa.updateBookMeUsername(username, name);
     }

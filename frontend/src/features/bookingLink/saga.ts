@@ -1,11 +1,50 @@
 import {all, call, put, select, takeLatest} from "redux-saga/effects";
-import {actions as bookingLinksActions, AddBookingLink, PatchBookingLink} from "./reducer";
+import {
+    actions as bookingLinksActions,
+    AddBookingLink,
+    BookMeUsernameAction,
+    FetchBookMeUsername,
+    PatchBookingLink
+} from "./reducer";
 import {PayloadAction} from "redux-starter-kit";
 import {message} from "antd";
 import {reloadReceived} from "../myself/actions";
-import {createBookingLink, updateBookingLink} from "../../apis/bookinglinkApis";
+import {
+    createBookingLink,
+    getBookMeUsername,
+    updateBookingLink,
+    updateBookMeUsername
+} from "../../apis/bookinglinkApis";
 import {BookingLink} from "./interface";
 import {IState} from "../../store";
+
+function* fetchBookMeUsername(action: PayloadAction<FetchBookMeUsername>) {
+    try {
+        const data = yield call(getBookMeUsername);
+        const name : string = yield data.text();
+        yield put(bookingLinksActions.bookMeUsernameReceived({name: name}));
+    } catch (error) {
+        if (error.message === 'reload') {
+            yield put(reloadReceived(true));
+        } else {
+            yield call(message.error, `fetchBookMeUsername fail: ${error}`);
+        }
+    }
+}
+
+function* putBookMeUsername(action: PayloadAction<BookMeUsernameAction>) {
+    try {
+        const {name} = action.payload;
+        yield call(updateBookMeUsername, name);
+        yield put(bookingLinksActions.bookMeUsernameReceived({name: name}));
+    } catch (error) {
+        if (error.message === 'reload') {
+            yield put(reloadReceived(true));
+        } else {
+            yield call(message.error, `putBookMeUsername fail: ${error}`);
+        }
+    }
+}
 
 function* addBookingLink(action: PayloadAction<AddBookingLink>) {
     try {
@@ -115,5 +154,7 @@ export default function* groupSagas() {
     yield all([
         yield takeLatest(bookingLinksActions.AddBookingLink.type, addBookingLink),
         yield takeLatest(bookingLinksActions.PatchBookingLink.type, patchBookingLink),
+        yield takeLatest(bookingLinksActions.GetBookMeUsername.type, fetchBookMeUsername),
+        yield takeLatest(bookingLinksActions.UpdateBookMeUsername.type, putBookMeUsername),
     ]);
 }

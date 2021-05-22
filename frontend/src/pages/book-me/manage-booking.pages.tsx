@@ -5,16 +5,21 @@ import {CheckCircleOutlined, CloseCircleOutlined, QuestionCircleOutlined} from "
 import './book-me.styles.less';
 import {IState} from "../../store";
 import {connect} from "react-redux";
+import {getBookMeUsername, updateBookMeUsername} from "../../features/bookingLink/actions";
 
 type ManageBookingProps = {
     myself: string;
     bookMeUsername: string;
+    getBookMeUsername: () => void;
+    updateBookMeUsername: (name: string) => void;
 }
 
 const ManageBooking: React.FC<ManageBookingProps> = (
     {
         myself,
-        bookMeUsername
+        bookMeUsername,
+        getBookMeUsername,
+        updateBookMeUsername
     }
 ) => {
     const [name, setName] = useState(bookMeUsername ? bookMeUsername : myself);
@@ -23,6 +28,7 @@ const ManageBooking: React.FC<ManageBookingProps> = (
     useEffect(() => {
         if (!bookMeUsername) {
             // make GET request to retrieve
+            getBookMeUsername();
         } else {
             setName(bookMeUsername);
         }
@@ -31,6 +37,7 @@ const ManageBooking: React.FC<ManageBookingProps> = (
     const handleOnClick = (save: boolean) => {
         if (save) {
             // make PUT request to update bookMeUsername
+            updateBookMeUsername(name);
         } else {
             setName(bookMeUsername);
         }
@@ -83,4 +90,6 @@ const mapStateToProps = (state: IState) => ({
 });
 
 export default connect(mapStateToProps, {
+    getBookMeUsername,
+    updateBookMeUsername
 })(ManageBooking);
