@@ -636,13 +636,14 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void create(Long projectId, String owner, CreateTaskParams createTaskParams, String text) {
+    public Task create(Long projectId, String owner, CreateTaskParams createTaskParams, String text) {
         Task task = create(projectId, owner, createTaskParams);
         LOGGER.info("Created task {}", task);
         if (StringUtils.isNotBlank(text)) {
             LOGGER.info("Also created task content {}", text);
             addContent(task.getId(), owner, new TaskContent(text));
         }
+        return task;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)

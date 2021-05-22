@@ -68,7 +68,9 @@ public class BookingDaoJpa {
                 location
         );
 
-        Task task = taskDaoJpa.create(bookingLink.getProject().getId(), bookingLink.getOwner(), createTaskParams);
+        // TODO: prepend invitees info in note
+        Task task = taskDaoJpa.create(
+                bookingLink.getProject().getId(), bookingLink.getOwner(), createTaskParams, note);
         booking.setTask(task);
         return bookingRepository.save(booking);
     }
