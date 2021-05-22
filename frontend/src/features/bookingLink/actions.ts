@@ -46,13 +46,14 @@ export const patchBookingLink = (
     startDate?: string,
 ) =>
     actions.PatchBookingLink({
-        bookingLinkId:bookingLinkId,
+        bookingLinkId: bookingLinkId,
+        timezone: timezone,
         afterEventBuffer: afterEventBuffer,
         beforeEventBuffer: beforeEventBuffer,
         endDate: endDate,
         expireOnBooking: expireOnBooking,
         includeTaskWithoutDuration: includeTaskWithoutDuration,
+        location: location,
         projectId: projectId,
         startDate: startDate,
-        timezone: timezone
     });

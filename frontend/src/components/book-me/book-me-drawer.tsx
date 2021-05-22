@@ -5,13 +5,14 @@ import {AutoComplete, Avatar, Button, Checkbox, DatePicker, Drawer, Input, Selec
 import moment from "moment";
 import {dateFormat} from "../../features/myBuJo/constants";
 import {BookingLink} from "../../features/bookingLink/interface";
-import {ClockCircleOutlined, QuestionCircleOutlined} from "@ant-design/icons";
+import {CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, QuestionCircleOutlined} from "@ant-design/icons";
 import {Project} from "../../features/project/interface";
 import {zones} from "../settings/constants";
 import './book-me.styles.less';
 import {iconMapper} from "../side-menu/side-menu.component";
 import ReactQuill from "react-quill";
 import {formats, modules} from "../content-editor/content-editor-toolbar";
+import {patchBookingLink} from "../../features/bookingLink/actions";
 
 const {Option} = Select;
 
@@ -20,35 +21,35 @@ type BookMeDrawerProps = {
     setBookMeDrawerVisible: (v: boolean) => void;
     link: BookingLink | undefined;
     projects: Project[];
+    patchBookingLink: (
+        bookingLinkId: string,
+        timezone: string,
+        afterEventBuffer?: number,
+        beforeEventBuffer?: number,
+        endDate?: string,
+        expireOnBooking?: boolean,
+        includeTaskWithoutDuration?: boolean,
+        location?: string,
+        projectId?: number,
+        startDate?: string,
+    ) => void;
 };
 
 const {RangePicker} = DatePicker;
 
 const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
-    const {setBookMeDrawerVisible, bookMeDrawerVisible, link, projects} = props;
+    const {setBookMeDrawerVisible, bookMeDrawerVisible, link, projects, patchBookingLink} = props;
     const quillRef = useRef<ReactQuill>(null);
-    const [dateArray, setDateArray] = useState(['', '']);
     const [location, setLocation] = useState();
-    const [timezone, setTimezone] = useState();
-    const [afterEventBuffer, setAfterEventBuffer] = useState();
-    const [beforeEventBuffer, setBeforeEventBuffer] = useState();
-    const [project, setProject] = useState();
-    const [expireOnBooking, setExpireOnBooking] = useState();
-    const [includeTaskWithoutDuration, setIncludeTaskWithoutDuration] = useState();
-    const result = ['5', '10','15', '30', '45', '60'];
-    const options = result.map((time: string) => {
+    const [projectId, setProjectId] = useState();
+    const result = ['5', '10', '15', '30', '45', '60'];
+    const bufferOptions = result.map((time: string) => {
         return {value: time};
     });
     useEffect(() => {
         if (link) {
             setLocation(link.location);
-            setDateArray([link.startDate, link.endDate]);
-            setTimezone(link.timezone);
-            setAfterEventBuffer(link.afterEventBuffer);
-            setBeforeEventBuffer(link.beforeEventBuffer);
-            setProject(link.project.id);
-            setExpireOnBooking(link.expireOnBooking);
-            setIncludeTaskWithoutDuration(link.includeTaskWithoutDuration);
+            setProjectId(link.project.id);
         }
     }, [link])
 
@@ -76,33 +77,53 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
     }
 
     const handleRangeChange = (dates: any, dateStrings: string[]) => {
-        setDateArray([dateStrings[0], dateStrings[1]]);
+        if (link) {
+            patchBookingLink(link.id, link.timezone, undefined, undefined, dateStrings[1], undefined, undefined, undefined, undefined, dateStrings[0]);
+        }
     };
 
     const handleTimezoneChange = (value: string) => {
-        setTimezone(value);
+        if (link) {
+            patchBookingLink(link.id, value, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+        }
     }
 
     const handleBeforeEventBufferChange = (value: any) => {
-        setBeforeEventBuffer(value);
+        if (link) {
+            patchBookingLink(link.id, link.timezone, undefined, value, undefined, undefined, undefined, undefined, undefined, undefined);
+        }
     }
 
     const handleAfterEventBufferChange = (value: any) => {
-        setAfterEventBuffer(value);
+        if (link) {
+            patchBookingLink(link.id, link.timezone, value, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+        }
     }
 
-    const handleLocationChange = (inputLocation: string) => {
-        setLocation(inputLocation);
-    };
-
     const handleExpireOnBookingChange = (e: any) => {
-        setExpireOnBooking(e.target.checked);
+        if (link) {
+            patchBookingLink(link.id, link.timezone, undefined, undefined, undefined, e.target.checked, undefined, undefined, undefined, undefined);
+        }
     }
 
     const handleProjectChange = (id: any) => {
-        setProject(id);
+        setProjectId(id);
+        if (link) {
+            patchBookingLink(link.id, link.timezone, undefined, undefined, undefined, undefined, undefined, undefined, id, undefined);
+        }
     }
 
+    const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setLocation(e.target.value);
+    };
+
+    const handleLocationOnClick = (save: boolean) => {
+        if (save && link) {
+            patchBookingLink(link.id, link.timezone, undefined, undefined, undefined, undefined, undefined, location, undefined, undefined);
+        } else {
+            setLocation(link? link.location : '');
+        }
+    };
 
     if (link) {
         return <Drawer
@@ -126,7 +147,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                             ],
                         }}
                         value={
-                            dateArray[0] ? [moment(dateArray[0]), moment(dateArray[1])] : null
+                            link.startDate ? [moment(link.startDate), moment(link.endDate)] : null
                         }
                         size="small"
                         allowClear={false}
@@ -140,7 +161,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                         style={{width: 200, marginLeft: "40px"}}
                         placeholder='Select Time Zone'
                         onChange={handleTimezoneChange}
-                        value={timezone}
+                        value={link.timezone}
                     >
                         {zones.map((zone: string) => (
                             <Option key={zone} value={zone} title={zone}>
@@ -161,10 +182,41 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                     </span>
                     <Input
                         placeholder="web link, phone number or address"
-                        value={location}
+                        value={location? location: ''}
                         style={{width: "250px"}}
-                        onChange={(e) => handleLocationChange(e.target.value)}
+                        onChange={(e) => handleLocationChange(e)}
                     />
+                    <Tooltip placement='top' title='Save'>
+                        <CheckCircleOutlined
+                            onClick={() => handleLocationOnClick(true)}
+                            style={{
+                                marginLeft: '20px',
+                                cursor: 'pointer',
+                                color: '#00e600',
+                                fontSize: 20,
+                                visibility:
+                                    link.location !== location
+                                        ? 'visible'
+                                        : 'hidden'
+
+                            }}
+                        />
+                    </Tooltip>
+                    <Tooltip placement='top' title='Cancel'>
+                        <CloseCircleOutlined
+                            onClick={() => handleLocationOnClick(false)}
+                            style={{
+                                marginLeft: '20px',
+                                cursor: 'pointer',
+                                color: '#ff0000',
+                                fontSize: 20,
+                                visibility:
+                                    link.location !== location
+                                        ? 'visible'
+                                        : 'hidden'
+                            }}
+                        />
+                    </Tooltip>
                 </div>
                 <span>Want to add time before or after your events?{' '}
                     <Tooltip
@@ -180,8 +232,8 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                         <div> Before event (Minutes){' '}</div>
                         <AutoComplete
                             style={{width: "50px"}}
-                            options={options}
-                            value={beforeEventBuffer ? beforeEventBuffer : 0}
+                            options={bufferOptions}
+                            value={link.beforeEventBuffer.toString()}
                             onChange={handleBeforeEventBufferChange}
                         >
                             <Input/>
@@ -191,8 +243,8 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                         <div> After event (Minutes){' '}</div>
                         <AutoComplete
                             style={{width: "50px"}}
-                            options={options}
-                            value={afterEventBuffer ? afterEventBuffer : 0}
+                            options={bufferOptions}
+                            value={link.afterEventBuffer.toString()}
                             onChange={handleAfterEventBufferChange}
                         >
                             <Input/>
@@ -201,7 +253,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                 </div>
                 <div className="checkboxes booking-option-container">
                     <Checkbox
-                        checked={expireOnBooking}
+                        checked={link.expireOnBooking}
                         onChange={handleExpireOnBookingChange}>
                         Expire this once a booking is made
                     </Checkbox>
@@ -218,7 +270,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                     <Select
                         style={{width: '256px'}}
                         placeholder='Select BuJo'
-                        value={project}
+                        value={projectId}
                         onChange={
                             (id) => handleProjectChange(id)}
                     >
@@ -298,4 +350,6 @@ const mapStateToProps = (state: IState) => ({
     link: state.bookingReducer.link,
 });
 
-export default connect(mapStateToProps, {})(BookMeDrawer);
+export default connect(mapStateToProps, {
+    patchBookingLink,
+})(BookMeDrawer);

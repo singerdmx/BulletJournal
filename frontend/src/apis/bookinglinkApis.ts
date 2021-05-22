@@ -45,14 +45,16 @@ export const updateBookingLink = (
     startDate?: string,
 ) => {
     const patchBody = JSON.stringify({
+        bookingLinkId: bookingLinkId,
+        timezone: timezone,
         afterEventBuffer: afterEventBuffer,
         beforeEventBuffer: beforeEventBuffer,
         endDate: endDate,
         expireOnBooking: expireOnBooking,
         includeTaskWithoutDuration: includeTaskWithoutDuration,
+        location:location,
         projectId: projectId,
         startDate: startDate,
-        timezone: timezone
     });
     return doPatch(`/api/bookingLinks/${bookingLinkId}`, patchBody)
         .then((res) => res.json())
