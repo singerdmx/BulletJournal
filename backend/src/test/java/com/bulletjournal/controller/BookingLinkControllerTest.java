@@ -10,7 +10,6 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,9 +40,7 @@ public class BookingLinkControllerTest {
 
     private static final String NOTE = "TEST BOOKING LINKS NOTE";
 
-    private final String expectedOwner = "BulletJournal";
-
-    private static final String USER = "BulletJournal";
+    private static final String USER = "bean";
 
     @LocalServerPort
     int randomServerPort;
@@ -59,9 +56,9 @@ public class BookingLinkControllerTest {
     @Test
     public void testCRUD() throws Exception {
 
-        Group group = TestHelpers.createGroup(requestParams, expectedOwner, "bookingLink_group");
+        Group group = TestHelpers.createGroup(requestParams, USER, "bookingLink_group");
 
-        Project p1 = TestHelpers.createProject(requestParams, expectedOwner, "bookingLink_test", group, ProjectType.TODO);
+        Project p1 = TestHelpers.createProject(requestParams, USER, "bookingLink_test", group, ProjectType.TODO);
 
         BookingLink bookingLink1 = createBookingLink("2021-05-04", "2021-06-01", TIMEZONE, 30, 0, false, true, p1.getId());
         BookingLink bookingLink2 = createBookingLink("2021-06-01", "2021-06-05", TIMEZONE, 60, 0, false, true, p1.getId());
@@ -126,7 +123,7 @@ public class BookingLinkControllerTest {
         ResponseEntity<BookingLink> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + BookingLinksController.BOOKING_LINKS_ROUTE,
                 HttpMethod.POST,
-                new HttpEntity<>(createBookingLinkParams),
+                TestHelpers.actAsOtherUser(createBookingLinkParams, USER),
                 BookingLink.class);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         BookingLink bookingLink = response.getBody();
@@ -151,7 +148,7 @@ public class BookingLinkControllerTest {
         ResponseEntity<BookingLink> response = this.restTemplate.exchange(
                 url,
                 HttpMethod.GET,
-                null,
+                TestHelpers.actAsOtherUser(null, USER),
                 BookingLink.class);
         assertEquals(expectedStatusCode, response.getStatusCode());
         BookingLink bookingLink = response.getBody();
@@ -162,7 +159,7 @@ public class BookingLinkControllerTest {
         ResponseEntity<BookingLink> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + BookingLinksController.BOOKING_LINK_UPDATE_SLOT_ROUTE,
                 HttpMethod.POST,
-                new HttpEntity<>(new UpdateBookingLinkSlotParams(bookingSlot, TIMEZONE)),
+                TestHelpers.actAsOtherUser(new UpdateBookingLinkSlotParams(bookingSlot, TIMEZONE), USER),
                 BookingLink.class,
                 bookingLinkId);
         BookingLink bookingLink = response.getBody();
@@ -177,7 +174,7 @@ public class BookingLinkControllerTest {
         ResponseEntity<BookingLink> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + BookingLinksController.BOOKING_LINK_UPDATE_RECURRENCE_RULES_ROUTE,
                 HttpMethod.POST,
-                new HttpEntity<>(new UpdateBookingLinkRecurrencesParams(recurrences, TIMEZONE)),
+                TestHelpers.actAsOtherUser(new UpdateBookingLinkRecurrencesParams(recurrences, TIMEZONE), USER),
                 BookingLink.class,
                 bookingLinkId);
         BookingLink bookingLink = response.getBody();
@@ -192,7 +189,7 @@ public class BookingLinkControllerTest {
         ResponseEntity<?> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + BookingLinksController.BOOKING_LINK_ROUTE,
                 HttpMethod.DELETE,
-                null,
+                TestHelpers.actAsOtherUser(null, USER),
                 Void.class,
                 bookingLinkId);
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -204,7 +201,7 @@ public class BookingLinkControllerTest {
         ResponseEntity<BookingLink> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + BookingLinksController.BOOKING_LINK_ROUTE,
                 HttpMethod.PATCH,
-                new HttpEntity<>(updateBookingLinkParams),
+                TestHelpers.actAsOtherUser(updateBookingLinkParams, USER),
                 BookingLink.class,
                 bookingLinkId
         );
@@ -223,7 +220,7 @@ public class BookingLinkControllerTest {
         ResponseEntity<BookingLink[]> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + BookingLinksController.BOOKING_LINKS_ROUTE,
                 HttpMethod.GET,
-                null,
+                TestHelpers.actAsOtherUser(null, USER),
                 BookingLink[].class
         );
 
@@ -271,7 +268,7 @@ public class BookingLinkControllerTest {
         ResponseEntity<BookingLink> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + BookingLinksController.BOOKING_LINK_ROUTE,
                 HttpMethod.PATCH,
-                new HttpEntity<>(updateBookingLinkParams),
+                TestHelpers.actAsOtherUser(updateBookingLinkParams, USER),
                 BookingLink.class,
                 bookingLink.getId()
         );
@@ -296,7 +293,7 @@ public class BookingLinkControllerTest {
         ResponseEntity<Task> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + TaskController.TASKS_ROUTE,
                 HttpMethod.POST,
-                new HttpEntity<>(params),
+                TestHelpers.actAsOtherUser(params, USER),
                 Task.class,
                 project.getId());
         Task created = response.getBody();
@@ -311,7 +308,7 @@ public class BookingLinkControllerTest {
         ResponseEntity<Booking> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + BookingLinksController.PUBLIC_BOOKING_LINK_BOOK_ROUTE,
                 HttpMethod.POST,
-                new HttpEntity<>(bookParams),
+                TestHelpers.actAsOtherUser(bookParams, USER),
                 Booking.class,
                 bookingLink.getId());
         Booking created = response.getBody();
