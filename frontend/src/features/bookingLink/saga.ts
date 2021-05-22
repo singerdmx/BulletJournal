@@ -1,10 +1,11 @@
-import {all, call, put, takeLatest} from "redux-saga/effects";
+import {all, call, put, select, takeLatest} from "redux-saga/effects";
 import {actions as bookingLinksActions, AddBookingLink, PatchBookingLink} from "./reducer";
 import {PayloadAction} from "redux-starter-kit";
 import {message} from "antd";
 import {reloadReceived} from "../myself/actions";
 import {createBookingLink, updateBookingLink} from "../../apis/bookinglinkApis";
 import {BookingLink} from "./interface";
+import {IState} from "../../store";
 
 function* addBookingLink(action: PayloadAction<AddBookingLink>) {
     try {
@@ -59,6 +60,34 @@ function* patchBookingLink(action: PayloadAction<PatchBookingLink>) {
             startDate,
         } = action.payload
 
+        const state: IState = yield select();
+        const link : BookingLink = {...state.bookingReducer.link!};
+        link.timezone = timezone;
+        if (afterEventBuffer) {
+            link.afterEventBuffer = afterEventBuffer;
+        }
+        if (beforeEventBuffer) {
+            link.beforeEventBuffer = beforeEventBuffer;
+        }
+        if (endDate) {
+            link.endDate = endDate;
+        }
+        if (startDate) {
+            link.startDate = startDate;
+        }
+        if (expireOnBooking) {
+            link.expireOnBooking = expireOnBooking;
+        }
+        if (includeTaskWithoutDuration) {
+            link.includeTaskWithoutDuration = includeTaskWithoutDuration;
+        }
+        if (location) {
+            link.location = location;
+        }
+        if (projectId) {
+            // skip project for now
+        }
+        yield put(bookingLinksActions.linkReceived({link: link}));
         const data: BookingLink = yield call(
             updateBookingLink,
             bookingLinkId,
