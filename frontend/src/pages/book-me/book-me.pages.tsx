@@ -55,7 +55,7 @@ const BookMe: React.FC<BookMeProps> = (props) => {
     }, [ownedProjects, sharedProjects]);
 
     useEffect(() => {
-        setHasTodoProject(projects && projects.length != 0);
+        setHasTodoProject(projects && projects.length !== 0);
     }, [projects])
 
     useEffect(() => {

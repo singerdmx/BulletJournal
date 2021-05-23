@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from "react";
 
 import './book-me.styles.less';
 import {message, Tooltip} from "antd";
-import {CheckCircleOutlined, CloseCircleOutlined, QuestionCircleOutlined} from "@ant-design/icons";
+import {CheckCircleOutlined, QuestionCircleOutlined} from "@ant-design/icons";
 import ReactQuill from "react-quill";
 import {formats, modules} from "../content-editor/content-editor-toolbar";
 import Quill, {DeltaStatic} from "quill";
@@ -27,7 +27,6 @@ const BookMeNoteEditor: React.FC<BookMeNoteEditorProps> = (
     const [editorContent, setEditorContent] = useState({delta: delta});
     const [contentChanged, setContentChanged] = useState(false);
     const [error, setError] = useState('');
-    const oldContents = delta;
 
     useEffect(() => {
         setToolTips();

@@ -92,7 +92,6 @@ const EditTransaction: React.FC<
   const [transTimezone, setTransTimezone] = useState(transaction.timezone);
   const [bankAccountId, setBankAccountId] = useState<number | undefined>(transaction.bankAccount?.id);
   const [location, setLocation] = useState(transaction.location || '');
-  const [bankAccountVisible, setBankAccountVisible] = useState(transaction.payer.name === props.myself);
   const { projectId } = useParams();
 
   useEffect(() => {
@@ -174,7 +173,6 @@ const EditTransaction: React.FC<
         onChange={(e: any) => {
           setPayerName(e);
           const isPayerMyself = form.getFieldValue('payerName') === props.myself;
-          setBankAccountVisible(isPayerMyself);
           form.setFields([{ name: 'bankAccountId', value: isPayerMyself ? props.transaction.bankAccount?.id : undefined }]);
         }}
       >

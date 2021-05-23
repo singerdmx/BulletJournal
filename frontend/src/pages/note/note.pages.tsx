@@ -28,7 +28,7 @@ import ShareProjectItem from '../../components/modals/share-project-item.compone
 
 import './note-page.styles.less';
 import 'braft-editor/dist/index.css';
-import {ProjectItemType, ProjectItemUIType, ProjectType,} from '../../features/project/constants';
+import {ProjectItemUIType, ProjectType,} from '../../features/project/constants';
 import NoteDetailPage, {NoteProps} from './note-detail.pages';
 import LabelManagement from '../project/label-management.compoent';
 import {Button as FloatButton, Container, darkColors, lightColors,} from 'react-floating-action-button';

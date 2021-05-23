@@ -97,7 +97,6 @@ const AddTransaction: React.FC<
   const [manageRecurringTransDialogVisible, setManageRecurringTransDialogVisible] = useState(false);
   const { projectId } = useParams();
   const [recurrent, setRecurrent] = useState(false);
-  const [bankAccountVisible, setBankAccountVisible] = useState(true);
   const [location, setLocation] = useState('');
   const [typesFilter, setTypesFilter] = useState([0, 1]);
   const [sortMethod, setSortMethod] = useState('timeAscending');
@@ -179,7 +178,6 @@ const AddTransaction: React.FC<
     }
     return (
       <Select defaultValue={props.myself} style={{ marginLeft: '-8px' }} onChange={() => {
-        setBankAccountVisible(form.getFieldValue('payerName') === props.myself);
         form.setFields([{ name: 'bankAccountId', value: undefined }]);
       }}>
         {props.group.users

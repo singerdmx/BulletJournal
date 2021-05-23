@@ -49,7 +49,7 @@ export type PatchBookingLink = {
 let initialState = {
     link: undefined as BookingLink | undefined,
     bookMeUsername: '',
-    links: <BookingLink[]>[],
+    links: [] as BookingLink[],
 };
 
 const slice = createSlice({

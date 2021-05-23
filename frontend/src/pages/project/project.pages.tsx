@@ -9,7 +9,6 @@ import {deleteProject, getProject, updateSettingShown} from '../../features/proj
 import {iconMapper} from '../../components/side-menu/side-menu.component';
 import {DeleteOutlined, DownOutlined, TeamOutlined, UpOutlined, SettingOutlined,} from '@ant-design/icons';
 import EditProject from '../../components/modals/edit-project.component';
-import AddTransaction from '../../components/modals/add-transaction.component';
 import {ProjectType} from '../../features/project/constants';
 import {NoteTree} from '../../components/note-tree';
 import {History} from 'history';

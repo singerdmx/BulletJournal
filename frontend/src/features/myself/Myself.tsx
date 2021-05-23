@@ -166,11 +166,12 @@ class Myself extends React.Component<MyselfProps & PathProps, ModalState> {
                 {this.props.sendUserInvitation && <Drawer
                     title="Invite People to Bullet Journal"
                     placement="top"
-                    closable={false}
+                    closable={true}
                     visible={this.props.sendUserInvitation}
                 >
                     <div className="image-drawer">
                         <img width="55%"
+                             alt="Invite others"
                              src="https://user-images.githubusercontent.com/72245287/96920053-845cf580-1461-11eb-9785-844e02703de0.jpg"></img>
                     </div>
                     <div className='button-drawer'>

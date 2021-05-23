@@ -17,17 +17,17 @@ const BookMeCard: React.FC<BookMeCardProps> = (props) => {
     const {span, backgroundColor, img, imgHeight, imgWidth, setCardIsClicked, setCurrentSlotSpan} = props;
 
     const getIcon = (span: number) => {
-        if (span == 15) {
+        if (span === 15) {
             return <ClockCircleOutlined/>;
-        } else if (span == 30) {
+        } else if (span === 30) {
             return <DashboardOutlined/>;
-        } else if (span == 60) {
+        } else if (span === 60) {
             return <FieldTimeOutlined/>;
         }
     }
 
     const getSpan = (span: number) => {
-        if (span != 60) {
+        if (span !== 60) {
             return span + " mins"
         } else {
             return "1 hr"

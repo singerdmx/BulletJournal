@@ -134,7 +134,7 @@ const ProjectItemHistory: React.FC<ProjectHistoryProps> = (props) => {
                 <h1>{projectItem.name}</h1>
                 <ol style={{listStyle: "none", paddingLeft: "0px"}}>
                     <li>Payer:{getAvatarAndName(projectItem.payer)}</li>
-                    <li>{projectItem.transactionType == 0 ? "Income" : "Expense"}: {projectItem.amount} {LocaleCurrency.getCurrency(currency)}</li>
+                    <li>{projectItem.transactionType === 0 ? "Income" : "Expense"}: {projectItem.amount} {LocaleCurrency.getCurrency(currency)}</li>
                     {projectItem.recurrenceRule
                         ? <li>{convertToTextWithRRule(projectItem.recurrenceRule)} {projectItem.timezone}</li>
                         : <li>{projectItem.date} {projectItem.time} {projectItem.timezone}</li>}

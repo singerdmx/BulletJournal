@@ -5,7 +5,6 @@ import {
     BookMeUsernameAction,
     FetchBookMeUsername,
     PatchBookingLink,
-    BookingLinksAction,
     FetchBookingLinks,
 } from "./reducer";
 import {PayloadAction} from "redux-starter-kit";

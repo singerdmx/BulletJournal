@@ -11,7 +11,7 @@ import {
 } from "@ant-design/icons";
 import React from "react";
 import {stringToRGB} from "../../utils/Util";
-import {Card, Statistic, Switch, Tag, Tooltip} from "antd";
+import {Statistic, Switch, Tag, Tooltip} from "antd";
 import './bank.styles.less';
 import {IState} from "../../store";
 import {connect} from "react-redux";
@@ -19,8 +19,6 @@ import {updateTransactionBankAccount} from "../../features/transactions/actions"
 import {useHistory} from "react-router-dom";
 import {deleteBankAccount, getBankAccounts} from '../../features/myself/actions';
 import EditBankAccountModal from '../modals/edit-bank.component'
-
-const {Meta} = Card;
 
 const LocaleCurrency = require('locale-currency');
 
@@ -45,19 +43,6 @@ export const getBankAccountTypeIcon = (type: BankAccountType) => {
             return <BankOutlined/>;
         case BankAccountType.CREDIT_CARD:
             return <CreditCardOutlined/>;
-        default:
-            throw Error(`Invalid BankAccountType ${type}`);
-    }
-}
-
-const getBankAccountTypeImage = (type: BankAccountType) => {
-    switch (type) {
-        case BankAccountType.CHECKING_ACCOUNT:
-            return 'https://user-images.githubusercontent.com/122956/107489586-a5934000-6b3d-11eb-9802-f65fa433e07a.png';
-        case BankAccountType.SAVING_ACCOUNT:
-            return 'https://user-images.githubusercontent.com/122956/107489658-be9bf100-6b3d-11eb-90f8-807c2a718fc4.png';
-        case BankAccountType.CREDIT_CARD:
-            return 'https://user-images.githubusercontent.com/122956/107866544-e8e3fc00-6e26-11eb-857e-a619db3eeb80.png';
         default:
             throw Error(`Invalid BankAccountType ${type}`);
     }
@@ -101,7 +86,6 @@ const BankAccountElem: React.FC<BankAccountProps> = (
 
     const color = stringToRGB(bankAccount.name);
     const icon = getBankAccountTypeIcon(bankAccount.accountType);
-    const image = getBankAccountTypeImage(bankAccount.accountType);
     const balanceColor = bankAccount.netBalance >= 0 ? '#3f8600' : '#cf1322';
 
     const getColor = (type: BankAccountType) => {

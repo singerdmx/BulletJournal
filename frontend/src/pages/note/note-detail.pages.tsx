@@ -7,7 +7,7 @@ import { Note } from '../../features/notes/interface';
 // components
 import NoteContentList from '../../components/content/content-list.component';
 // antd imports
-import {Avatar, Button, Divider, Form, message, Modal, Tag, Tooltip} from 'antd';
+import {Avatar, Button, Divider, message, Modal, Tag, Tooltip} from 'antd';
 import './note-page.styles.less';
 import 'braft-editor/dist/index.css';
 import { ProjectType } from '../../features/project/constants';
