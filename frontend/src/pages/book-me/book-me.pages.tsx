@@ -68,13 +68,21 @@ const BookMe: React.FC<BookMeProps> = (props) => {
         const today = moment().format('YYYYMMDD');
         const recurringSpan1: RecurringSpan = {
             duration: 540,
-            recurrenceRule: "DTSTART:" + today + "T000000Z RRULE:FREQ=DAILY;INTERVAL=1"
+            recurrenceRule: "DTSTART:" + today + "T000000Z\nRRULE:FREQ=DAILY;INTERVAL=1"
         }
         const recurringSpan2: RecurringSpan = {
             duration: 420,
-            recurrenceRule: "DTSTART:" + today + "T170000Z RRULE:FREQ=DAILY;INTERVAL=1"
+            recurrenceRule: "DTSTART:" + today + "T170000Z\nRRULE:FREQ=DAILY;INTERVAL=1"
         }
-        const recurrences = [recurringSpan1, recurringSpan2];
+        const recurringSpan3: RecurringSpan = {
+            duration: 1440,
+            recurrenceRule: "DTSTART:" + today + "T000000Z\nRRULE:FREQ=WEEKLY;BYDAY=SA;INTERVAL=1"
+        }
+        const recurringSpan4: RecurringSpan = {
+            duration: 1440,
+            recurrenceRule: "DTSTART:" + today + "T000000Z\nRRULE:FREQ=WEEKLY;BYDAY=SU;INTERVAL=1"
+        }
+        const recurrences = [recurringSpan1, recurringSpan2, recurringSpan3, recurringSpan4];
 
         addBookingLink(0, 0,endDate, true, true, projects[0].id, recurrences, currentSlotSpan, startDate, timezone)
     }
