@@ -338,7 +338,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                             shape="round"
                             style={{width: "150px"}}
                         >
-                            Who Booked Me
+                            Who booked me
                         </Button>}
                         <Button
                             type="primary"
