@@ -95,7 +95,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
     if (task.recurrenceRule) {
       let taskDue = convertToTextWithRRule(task.recurrenceRule);
       if (task.duration) {
-        taskDue += `, duration ${getDuration(task.duration)}`;
+        taskDue += `, last ${getDuration(task.duration)}`;
       }
       return (
         <Tooltip title={taskDue}>
@@ -113,7 +113,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
 
     let dueDateTitle = leftTime.fromNow();
     if (task.duration) {
-      dueDateTitle += `, duration ${getDuration(task.duration)}`;
+      dueDateTitle += `, last ${getDuration(task.duration)}`;
     }
 
     const taskDue = `${task.dueDate} ${task.dueTime ? task.dueTime : ''}`;

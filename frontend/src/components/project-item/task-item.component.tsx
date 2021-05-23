@@ -241,7 +241,7 @@ export const getDueDateTime = (task: Task) => {
   if (task.recurrenceRule) {
     let s = convertToTextWithRRule(task.recurrenceRule);
     if (duration) {
-      s += `, duration ${duration}`;
+      s += `, last ${duration}`;
     }
     return (
       <Tooltip title={s} placement="bottom">
@@ -265,7 +265,7 @@ export const getDueDateTime = (task: Task) => {
       )
       .fromNow();
   if (duration) {
-    dueDateTitle += `, duration ${duration}`;
+    dueDateTitle += `, last ${duration}`;
   }
 
   return (
