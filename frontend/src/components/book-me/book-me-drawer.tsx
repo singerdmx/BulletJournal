@@ -341,6 +341,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                             type="primary"
                             shape="round"
                             style={{width: "100px"}}
+                            onClick={() => window.open(`${window.location.protocol}//${window.location.host}/#/bookingLinks/${link!.id}`)}
                         >
                             Preview
                         </Button>
