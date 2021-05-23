@@ -78,3 +78,11 @@ export const updateBookMeUsername = (name: string) => {
             throw Error(err.message);
         });
 }
+
+export const getBookingLinks = () => {
+    return doFetch('/api/bookingLinks')
+        .then((res) => res.json())
+        .catch(err => {
+            throw Error(err.message);
+        });
+}

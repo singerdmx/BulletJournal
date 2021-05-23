@@ -5,6 +5,8 @@ export const getBookMeUsername = () => actions.GetBookMeUsername({});
 
 export const updateBookMeUsername = (name: string) => actions.UpdateBookMeUsername({name: name});
 
+export const getBookingLinks = () => actions.GetBookingLinks({});
+
 export const addBookingLink = (
     afterEventBuffer: number,
     beforeEventBuffer: number,

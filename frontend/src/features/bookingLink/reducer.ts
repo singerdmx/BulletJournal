@@ -12,6 +12,13 @@ export type BookMeUsernameAction = {
 export type FetchBookMeUsername = {
 }
 
+export type BookingLinksAction = {
+    links: BookingLink[];
+}
+
+export type FetchBookingLinks = {
+}
+
 export type AddBookingLink = {
     afterEventBuffer: number,
     beforeEventBuffer: number,
@@ -41,7 +48,8 @@ export type PatchBookingLink = {
 
 let initialState = {
     link: undefined as BookingLink | undefined,
-    bookMeUsername: ''
+    bookMeUsername: '',
+    links: <BookingLink[]>[],
 };
 
 const slice = createSlice({
@@ -56,10 +64,15 @@ const slice = createSlice({
             const { name } = action.payload;
             state.bookMeUsername = name;
         },
+        bookingLinksReceived: (state, action: PayloadAction<BookingLinksAction>) => {
+            const { links } = action.payload;
+            state.links = links;
+        },
         AddBookingLink: (state, action: PayloadAction<AddBookingLink>) => state,
         PatchBookingLink: (state, action: PayloadAction<PatchBookingLink>) => state,
         GetBookMeUsername: (state, action: PayloadAction<FetchBookMeUsername>) => state,
         UpdateBookMeUsername: (state, action: PayloadAction<BookMeUsernameAction>) => state,
+        GetBookingLinks: (state, action: PayloadAction<FetchBookingLinks>) => state,
     }
 });
 
