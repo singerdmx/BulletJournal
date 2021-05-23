@@ -3,6 +3,7 @@ package com.bulletjournal.util;
 import com.bulletjournal.controller.models.BookingSlot;
 import com.bulletjournal.controller.models.RecurringSpan;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
+import com.bulletjournal.repository.models.Booking;
 import com.bulletjournal.repository.models.BookingLink;
 import com.bulletjournal.repository.models.Task;
 import com.google.gson.Gson;
@@ -30,7 +31,7 @@ public class BookingUtil {
             String timezone, String requestTimezone,
             List<BookingSlot> slotsOverride,
             String startDate, String endDate, int slotSpan, boolean includeTaskWithoutDuration,
-            int beforeBuffer, int afterBuffer, List<Task> tasksBetween, String recurrences) {
+            int beforeBuffer, int afterBuffer, List<Task> tasksBetween, String recurrences, List<Booking> bookings) {
 
         List<RecurringSpan> recurringSpans = toList(recurrences);
         List<Pair<ZonedDateTime, ZonedDateTime>> recurringTimes = new ArrayList<>();
@@ -92,9 +93,10 @@ public class BookingUtil {
             ZonedDateTime startT = startTime.plusMinutes(i * slotSpan);
             ZonedDateTime endT = startTime.plusMinutes((i + 1) * slotSpan);
             String date = ZonedDateTimeHelper.getDate(startT);
+            int index = i % totalIndexes;
 
             BookingSlot bookingSlot = new BookingSlot();
-            bookingSlot.setIndex(i % totalIndexes);
+            bookingSlot.setIndex(index);
             bookingSlot.setDate(date);
 
             // display to client
@@ -106,8 +108,6 @@ public class BookingUtil {
             bookingSlot.setEndTime(ZonedDateTimeHelper.getTime(displayEndTime));
             bookingSlot.setDisplayDate(ZonedDateTimeHelper.getDate(displayStartTime));
 
-            Optional<Task> task = tasksBetween.stream().filter(t -> isBetweenSlot(taskTimes.get(t).getLeft(),
-                    taskTimes.get(t).getRight(), startT, endT)).findFirst();
 
             if (tasksBetween.stream().anyMatch(t -> isBetweenSlot(taskTimes.get(t).getLeft(),
                     taskTimes.get(t).getRight(), startT, endT))) {
@@ -119,8 +119,15 @@ public class BookingUtil {
             }
 
             Optional<BookingSlot> match = slotsOverride.stream().filter(s -> Objects.equals(s, bookingSlot)).findFirst();
-            if (match.isPresent()) {
-                bookingSlot.setOn(match.get().isOn());
+            match.ifPresent(slot -> bookingSlot.setOn(slot.isOn()));
+
+            if (bookings != null) {
+                Optional<Booking> existingBooking = bookings.stream().filter(
+                        b -> b.getSlotIndex() == index && b.getSlotDate().equals(date)).findAny();
+                if (existingBooking.isPresent()) {
+                    bookingSlot.setBooking(existingBooking.get().toPresentationModel());
+                    bookingSlot.setOn(false);
+                }
             }
             slots.add(bookingSlot);
         }

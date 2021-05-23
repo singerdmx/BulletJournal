@@ -14,6 +14,15 @@ public class BookingSlot {
     private String startTime;
     private String endTime;
     private String displayDate;
+    private Booking booking;
+
+    public Booking getBooking() {
+        return booking;
+    }
+
+    public void setBooking(Booking booking) {
+        this.booking = booking;
+    }
 
     public boolean isOn() {
         return isOn;

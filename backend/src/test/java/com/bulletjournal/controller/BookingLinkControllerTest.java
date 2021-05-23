@@ -322,7 +322,7 @@ public class BookingLinkControllerTest {
         return created;
     }
 
-    private void deleteAllBookinglinks(String owner){
+    private void deleteAllBookinglinks(String owner) {
 
         List<BookingLink> allBookingLinks = getBookingLinks();
 
@@ -332,7 +332,7 @@ public class BookingLinkControllerTest {
                 TestHelpers.actAsOtherUser(null, USER),
                 Void.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        for(int i = 0; i < allBookingLinks.size(); i++){
+        for (int i = 0; i < allBookingLinks.size(); i++) {
             getBookingLink(allBookingLinks.get(i).getId(), TIMEZONE, HttpStatus.NOT_FOUND);
         }
     }

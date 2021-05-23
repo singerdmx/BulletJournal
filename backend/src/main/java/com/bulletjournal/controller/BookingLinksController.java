@@ -86,13 +86,6 @@ public class BookingLinksController {
                 .stream().filter(t -> t.hasDueTime()).collect(Collectors.toList());
 
         BookingLink result = bookingLink.toPresentationModel();
-        result.setSlots(BookingUtil.calculateSlots(
-                bookingLink.getTimezone(), timezone,
-                BookingUtil.getBookingLinkSlots(bookingLink),
-                bookingLink.getStartDate(), bookingLink.getEndDate(), bookingLink.getSlotSpan(),
-                bookingLink.isIncludeTaskWithoutDuration(), bookingLink.getBeforeEventBuffer(),
-                bookingLink.getAfterEventBuffer(), tasks, bookingLink.getRecurrences()));
-
         List<com.bulletjournal.repository.models.Booking> bookings = bookingLink.getBookings();
         if (bookings != null) {
             result.setBookings(
@@ -101,6 +94,13 @@ public class BookingLinksController {
                             .collect(Collectors.toList())
             );
         }
+        result.setSlots(BookingUtil.calculateSlots(
+                bookingLink.getTimezone(), timezone,
+                BookingUtil.getBookingLinkSlots(bookingLink),
+                bookingLink.getStartDate(), bookingLink.getEndDate(), bookingLink.getSlotSpan(),
+                bookingLink.isIncludeTaskWithoutDuration(), bookingLink.getBeforeEventBuffer(),
+                bookingLink.getAfterEventBuffer(), tasks, bookingLink.getRecurrences(), bookings));
+
 
         result.setOwner(this.userClient.getUser(result.getOwner().getName()));
         result.setOwnerName(this.userDaoJpa.getBookMeUsername(result.getOwnerName()));
