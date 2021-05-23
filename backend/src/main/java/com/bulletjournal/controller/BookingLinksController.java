@@ -13,6 +13,7 @@ import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.util.BookingUtil;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -72,10 +73,14 @@ public class BookingLinksController {
     }
 
     @GetMapping(PUBLIC_BOOKING_LINK_ROUTE)
-    public BookingLink getBookingLink(@NotNull @PathVariable String bookingLinkId, @RequestParam String timezone) {
+    public BookingLink getBookingLink(@NotNull @PathVariable String bookingLinkId,
+                                      @RequestParam(required = false) String timezone) {
         LOGGER.info("Create a new BookingLinks");
         com.bulletjournal.repository.models.BookingLink bookingLink =
                 this.bookingLinkDaoJpa.getBookingLink(bookingLinkId);
+        if (StringUtils.isBlank(timezone)) {
+            timezone = bookingLink.getTimezone();
+        }
         ZonedDateTime startTime = ZonedDateTimeHelper.getStartTime(
                 bookingLink.getStartDate(), null, bookingLink.getTimezone());
         ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(
