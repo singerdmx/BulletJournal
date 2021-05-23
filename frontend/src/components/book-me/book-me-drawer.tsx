@@ -12,8 +12,11 @@ import './book-me.styles.less';
 import {iconMapper} from "../side-menu/side-menu.component";
 import {patchBookingLink} from "../../features/bookingLink/actions";
 import BookMeNoteEditor from "./book-me-note-editor";
+import Quill from "quill";
 
 const {Option} = Select;
+
+const Delta = Quill.import('delta');
 
 type BookMeDrawerProps = {
     bookMeDrawerVisible: boolean,
@@ -308,7 +311,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                         </Tooltip>
                     </div>
                 </div>
-                <BookMeNoteEditor/>
+                <BookMeNoteEditor delta={new Delta()}/>
                 <div className="buttons" style={{marginTop: "50px", paddingTop: "10px"}}>
                     <Button
                         type="primary"

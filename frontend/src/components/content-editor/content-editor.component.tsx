@@ -310,7 +310,7 @@ const mapStateToProps = (state: IState) => ({
     content: state.content.content
 });
 
-const setToolTips = () => {
+export const setToolTips = () => {
     const toolbar = document.querySelector("div.ql-toolbar.ql-snow");
     if (!toolbar) {
         return;
