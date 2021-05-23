@@ -14,17 +14,19 @@ public class Booking {
     private String slotDate;
     private String location;
     private String note;
+    private String requesterTimeZone;
 
     public Booking() {
     }
 
-    public Booking(String id, String invitees, int slotIndex, String slotDate, String location, String note) {
+    public Booking(String id, String invitees, int slotIndex, String slotDate, String location, String note, String requesterTimeZone) {
         this.id = id;
         this.invitees = Arrays.asList(GSON.fromJson(invitees, Invitee[].class));
         this.slotIndex = slotIndex;
         this.slotDate = slotDate;
         this.location = location;
         this.note = note;
+        this.requesterTimeZone = requesterTimeZone;
     }
 
     public String getId() {
@@ -74,4 +76,8 @@ public class Booking {
     public void setSlotDate(String slotDate) {
         this.slotDate = slotDate;
     }
+
+    public String getRequesterTimeZone() { return requesterTimeZone; }
+
+    public void setRequesterTimeZone(String requestTimeZone) { this.requesterTimeZone = requestTimeZone; }
 }

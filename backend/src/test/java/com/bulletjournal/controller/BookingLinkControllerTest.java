@@ -105,7 +105,7 @@ public class BookingLinkControllerTest {
         invitee1.setPhone("9794029450");
         invitees.add(invitee1);
 
-        BookParams bookParams = new BookParams(invitees, 1, "2021-05-04", "Seatle", "test");
+        BookParams bookParams = new BookParams(invitees, 1, "2021-05-04", "Seatle", "test", "America/Chicago");
 
         book(bookingLink1, bookParams);
 
@@ -317,6 +317,7 @@ public class BookingLinkControllerTest {
         assertEquals(bookParams.getNote(), created.getNote());
         assertEquals(bookParams.getInvitees().size(), created.getInvitees().size());
         assertEquals(bookParams.getSlotDate(), created.getSlotDate());
+        assertEquals(bookParams.getRequesterTimeZone(), created.getRequesterTimeZone());
         return created;
     }
 }

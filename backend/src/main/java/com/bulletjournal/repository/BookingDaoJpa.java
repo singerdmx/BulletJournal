@@ -36,7 +36,7 @@ public class BookingDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Booking book(BookingLink bookingLink,
                         List<Invitee> invitees,
-                        String location, String note, String slotDate, int slotIndex) {
+                        String location, String note, String slotDate, int slotIndex, String requesterTimezone) {
         Booking booking = new Booking();
         booking.setId(RandomStringUtils.randomAlphabetic(8));
         booking.setInvitees(GSON.toJson(invitees));
@@ -45,6 +45,7 @@ public class BookingDaoJpa {
         booking.setNote(note);
         booking.setSlotDate(slotDate);
         booking.setSlotIndex(slotIndex);
+        booking.setRequesterTimeZone(requesterTimezone);
 
         List<String> assignees = ImmutableList.of(bookingLink.getOwner());
         ZonedDateTime zonedTime = ZonedDateTimeHelper.getStartTime(slotDate, null, bookingLink.getTimezone())
