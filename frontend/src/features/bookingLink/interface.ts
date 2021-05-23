@@ -19,7 +19,6 @@ export interface BookingLink {
     afterEventBuffer: number;
     beforeEventBuffer: number;
     endDate: string;
-    endTime: string;
     expireOnBooking: boolean;
     includeTaskWithoutDuration: boolean;
     location: string;
@@ -28,7 +27,6 @@ export interface BookingLink {
     project: Project;
     slotSpan: number;
     startDate: string;
-    startTime: string;
     timezone: string;
     slots: Slot[];
     recurrences: RecurringSpan[];

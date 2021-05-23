@@ -104,22 +104,6 @@ public class BookingLink {
         this.owner = owner;
     }
 
-    public String getEndTime() {
-        return endDate;
-    }
-
-    public void setEndTime(String endDate) {
-        this.endDate = endDate;
-    }
-
-    public String getStartTime() {
-        return startDate;
-    }
-
-    public void setStartTime(String startDate) {
-        this.startDate = startDate;
-    }
-
     public int getSlotSpan() {
         return slotSpan;
     }
@@ -168,7 +152,6 @@ public class BookingLink {
     public void setId(String id) {
         this.id = id;
     }
-
 
     public void setStartDate(String startDate) {
         this.startDate = startDate;
