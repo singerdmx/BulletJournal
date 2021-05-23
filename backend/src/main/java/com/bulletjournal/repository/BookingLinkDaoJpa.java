@@ -138,6 +138,7 @@ public class BookingLinkDaoJpa {
     public List<com.bulletjournal.controller.models.BookingLink> getBookingLinks(String requester) {
         List<BookingLink> links = this.bookingLinkRepository.findAllByOwnerAndRemoved(requester, false);
         return links.stream()
+                .sorted((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt()))
                 .map(BookingLink::toPresentationModel)
                 .collect(Collectors.toList());
     }
