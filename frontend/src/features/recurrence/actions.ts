@@ -116,10 +116,9 @@ export const convertToTextWithRRule = (rrule: string, includeStartingDate = true
         result = result.substring(0, result.toLowerCase().indexOf('month') + 6) + 'on the ' + which.toLowerCase() + ' ' + day.toLowerCase();
     }
 
-    let starting = ' starting at ';
+    let starting = ' at ' + rrule.substr(17, 2) + ':' + rrule.substr(19, 2);
     if (includeStartingDate) {
-        starting += rrule.substr(8, 4) + '-' + rrule.substr(12, 2) + '-' + rrule.substr(14, 2) + ' ';
+        starting += ', starting from ' + rrule.substr(8, 4) + '-' + rrule.substr(12, 2) + '-' + rrule.substr(14, 2) + ' ';
     }
-    starting += rrule.substr(17, 2) + ':' + rrule.substr(19, 2);
     return result + starting;
 };
