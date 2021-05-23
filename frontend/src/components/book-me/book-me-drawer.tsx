@@ -1,6 +1,6 @@
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {AutoComplete, Avatar, Button, Checkbox, DatePicker, Drawer, Input, Select, Tooltip} from "antd";
 import moment from "moment";
 import {dateFormat} from "../../features/myBuJo/constants";
@@ -10,9 +10,8 @@ import {Project} from "../../features/project/interface";
 import {zones} from "../settings/constants";
 import './book-me.styles.less';
 import {iconMapper} from "../side-menu/side-menu.component";
-import ReactQuill from "react-quill";
-import {formats, modules} from "../content-editor/content-editor-toolbar";
 import {patchBookingLink} from "../../features/bookingLink/actions";
+import BookMeNoteEditor from "./book-me-note-editor";
 
 const {Option} = Select;
 
@@ -39,7 +38,6 @@ const {RangePicker} = DatePicker;
 
 const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
     const {setBookMeDrawerVisible, bookMeDrawerVisible, link, projects, patchBookingLink} = props;
-    const quillRef = useRef<ReactQuill>(null);
     const [location, setLocation] = useState();
     const [projectId, setProjectId] = useState();
     const result = ['5', '10', '15', '30', '45', '60'];
@@ -299,8 +297,8 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                         })}
                     </Select>
                 </div>
-                <div className='note-editor'>
-                    <div className='note-editor-title'>
+                <div className='dns-panel'>
+                    <div className='dns-panel-title'>
                         Do Not Schedule&nbsp;&nbsp;
                         <Tooltip
                             title="Unavailable time on calendar">
@@ -310,25 +308,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                         </Tooltip>
                     </div>
                 </div>
-                <div className='note-editor'>
-                    <div className='note-editor-title'>
-                        Description/Instructions&nbsp;&nbsp;
-                        <Tooltip
-                            title="Use this optional field to provide a description of your event">
-                                    <span className="question-icon">
-                                    <QuestionCircleOutlined/>
-                                </span>
-                        </Tooltip>
-                    </div>
-                    <ReactQuill
-                        bounds={'.note-editor'}
-                        ref={quillRef}
-                        theme="snow"
-                        modules={modules}
-                        formats={formats}
-                        style={{height: '70px'}}
-                    />
-                </div>
+                <BookMeNoteEditor/>
                 <div className="buttons" style={{marginTop: "50px", paddingTop: "10px"}}>
                     <Button
                         type="primary"
