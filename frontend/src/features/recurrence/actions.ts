@@ -118,7 +118,7 @@ export const convertToTextWithRRule = (rrule: string, includeStartingDate = true
 
     let starting = ' at ' + rrule.substr(17, 2) + ':' + rrule.substr(19, 2);
     if (includeStartingDate) {
-        starting += ', starting from ' + rrule.substr(8, 4) + '-' + rrule.substr(12, 2) + '-' + rrule.substr(14, 2) + ' ';
+        starting += ', starting from ' + rrule.substr(8, 4) + '-' + rrule.substr(12, 2) + '-' + rrule.substr(14, 2);
     }
     return result + starting;
 };
