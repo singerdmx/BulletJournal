@@ -4,7 +4,7 @@ import React, {useEffect, useState} from "react";
 import {AutoComplete, Avatar, Button, Checkbox, DatePicker, Drawer, Input, Select, Tooltip} from "antd";
 import moment from "moment";
 import {dateFormat} from "../../features/myBuJo/constants";
-import {BookingLink} from "../../features/bookingLink/interface";
+import {BookingLink, RecurringSpan} from "../../features/bookingLink/interface";
 import {CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, QuestionCircleOutlined} from "@ant-design/icons";
 import {Project} from "../../features/project/interface";
 import {zones} from "../settings/constants";
@@ -323,7 +323,10 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                         </Tooltip>
                     </div>
                     <div className='recurring-span-cards'>
-                        <RecurringSpanCard index={-1} mode='add' recurrenceRule='' duration={0} backgroundColor={'#CB8A90'}/>
+                        <RecurringSpanCard
+                            index={-1} mode='add'
+                            recurrenceRule={"DTSTART:" + moment().format('YYYYMMDD') + "T000000Z\nRRULE:FREQ=DAILY;INTERVAL=1"}
+                            duration={540} backgroundColor={'#CB8A90'}/>
                         {link.recurrences.map((recurrence, index) => <RecurringSpanCard
                             index={index}
                             mode='card' recurrenceRule={recurrence.recurrenceRule} duration={recurrence.duration} backgroundColor={'#CB8A90'}/>)}

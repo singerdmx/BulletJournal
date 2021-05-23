@@ -32,7 +32,7 @@ const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
                 title="Do not schedule for the following time"
                 destroyOnClose
                 centered
-                okText="Update"
+                okText={mode === 'add' ? 'Block this on calendar' : 'Update'}
                 visible={visible}
                 onCancel={onCancel}
                 // TODO onOk={() => call updateBookingLinkRecurrences api}
@@ -43,23 +43,35 @@ const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
     }
 
     const getRule = () => {
+        if (mode === 'add') {
+            return <div>Add unavailable time</div>
+        }
         return <div>
             <div>{convertToTextWithRRule(recurrenceRule, false)}</div>
             <div>last {getDuration(duration)}</div>
         </div>
     }
 
-    if (mode === 'add') {
-        return <div key={index}
-                    className="recurring-span-card" style={{backgroundColor: backgroundColor, color:"white"}}>
-            <div className="recurring-span-card-content" >
-                Add unavailable time
-            </div>
-            {/*TODO call updateBookingLinkRecurrences*/}
-            <div className="recurring-span-card-operations">
-                <PlusCircleOutlined style={{fontSize: '30px'}} />
-            </div>
-        </div>
+    function getOperationDiv() {
+        if (mode === 'add') {
+            return <>
+                <PlusCircleOutlined style={{fontSize: '30px'}}/>
+            </>
+        }
+        return <>
+            <Tooltip title='Edit'>
+                <EditOutlined key='Edit' title='Edit'/>
+            </Tooltip>
+            <Tooltip title='Delete'>
+                <DeleteOutlined key='Delete' title='Delete'
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                }}
+                    //TODO onClick={() => call deleteBookingLink}
+                />
+            </Tooltip>
+        </>;
     }
 
     return <div>
@@ -70,7 +82,9 @@ const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
             onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                updateRruleString(recurrenceRule);
+                if (recurrenceRule) {
+                    updateRruleString(recurrenceRule);
+                }
                 openModal();
             }}
             style={{backgroundColor: backgroundColor, color: "white"}}>
@@ -78,18 +92,7 @@ const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
                 {getRule()}
             </div>
             <div className="recurring-span-card-operations">
-                <Tooltip title='Edit'>
-                    <EditOutlined key='Edit' title='Edit'/>
-                </Tooltip>
-                <Tooltip title='Delete'>
-                    <DeleteOutlined key='Delete' title='Delete'
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                    }}
-                        //TODO onClick={() => call deleteBookingLink}
-                    />
-                </Tooltip>
+                {getOperationDiv()}
             </div>
         </div>
     </div>
