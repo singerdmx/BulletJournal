@@ -13,7 +13,7 @@ import {ProjectType} from "../../features/project/constants";
 import AddProject from "../../components/modals/add-project.component";
 import BookMeDrawer from "../../components/book-me/book-me-drawer";
 import {RecurringSpan} from "../../features/bookingLink/interface";
-import {addBookingLink} from "../../features/bookingLink/actions";
+import {addBookingLink, getBookingLinks} from "../../features/bookingLink/actions";
 import moment from "moment-timezone";
 import {dateFormat} from "../../features/myBuJo/constants";
 import ManageBooking from "./manage-booking.pages";
@@ -36,9 +36,10 @@ type BookMeProps = {
         startDate: string,
         timezone: string
     ) => void;
+    getBookingLinks: () => void;
 }
 const BookMe: React.FC<BookMeProps> = (props) => {
-    const {timezone, ownedProjects, sharedProjects, addBookingLink} = props;
+    const {timezone, ownedProjects, sharedProjects, addBookingLink, getBookingLinks} = props;
     const [projects, setProjects] = useState<Project[]>([]);
     const [hasTodoProject, setHasTodoProject] = useState(false);
     const [cardIsClicked, setCardIsClicked] = useState(false);
@@ -107,7 +108,11 @@ const BookMe: React.FC<BookMeProps> = (props) => {
     }
 
     return <div className="book-me">
-        <Tabs defaultActiveKey="1">
+        <Tabs defaultActiveKey="1" onChange={(e) => {
+            if (e === '2') {
+                getBookingLinks();
+            }
+        }}>
             <TabPane
                 tab={<span><BookOutlined/>Create Booking</span>}
                 key="1"
@@ -158,4 +163,5 @@ const mapStateToProps = (state: IState) => ({
 
 export default connect(mapStateToProps, {
     addBookingLink,
+    getBookingLinks
 })(BookMe);

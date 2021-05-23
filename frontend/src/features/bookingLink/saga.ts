@@ -5,7 +5,7 @@ import {
     BookMeUsernameAction,
     FetchBookMeUsername,
     PatchBookingLink,
-    FetchBookingLinks, UpdateBookingLinkRecurrences,
+    FetchBookingLinks, UpdateBookingLinkRecurrences, FetchBookingLink,
 } from "./reducer";
 import {PayloadAction} from "redux-starter-kit";
 import {message} from "antd";
@@ -15,7 +15,7 @@ import {
     getBookMeUsername,
     updateBookingLink,
     updateBookMeUsername,
-    getBookingLinks, updateBookingLinkRecurrences,
+    getBookingLinks, updateBookingLinkRecurrences, getBookingLink,
 } from "../../apis/bookinglinkApis";
 import {BookingLink} from "./interface";
 import {IState} from "../../store";
@@ -48,10 +48,23 @@ function* putBookMeUsername(action: PayloadAction<BookMeUsernameAction>) {
     }
 }
 
+function* fetchBookingLink(action: PayloadAction<FetchBookingLink>) {
+    try {
+        const {bookingLinkId, timezone} = action.payload;
+        const link : BookingLink = yield call(getBookingLink, bookingLinkId, timezone);
+        yield put(bookingLinksActions.linkReceived({link: link}));
+    } catch (error) {
+        if (error.message === 'reload') {
+            yield put(reloadReceived(true));
+        } else {
+            yield call(message.error, `fetchBookingLink fail: ${error}`);
+        }
+    }
+}
+
 function* fetchBookingLinks(action: PayloadAction<FetchBookingLinks>) {
     try {
-        const data = yield call(getBookingLinks);
-        const links : BookingLink[] = yield data.text();
+        const links : BookingLink[] = yield call(getBookingLinks);
         yield put(bookingLinksActions.bookingLinksReceived({links: links}));
     } catch (error) {
         if (error.message === 'reload') {

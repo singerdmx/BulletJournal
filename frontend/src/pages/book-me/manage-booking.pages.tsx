@@ -5,21 +5,26 @@ import {CheckCircleOutlined, CloseCircleOutlined, QuestionCircleOutlined} from "
 import './book-me.styles.less';
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {getBookMeUsername, updateBookMeUsername} from "../../features/bookingLink/actions";
+import {getBookingLinks, getBookMeUsername, updateBookMeUsername} from "../../features/bookingLink/actions";
+import {BookingLink} from "../../features/bookingLink/interface";
 
 type ManageBookingProps = {
     myself: string;
     bookMeUsername: string;
+    links: BookingLink[];
     getBookMeUsername: () => void;
     updateBookMeUsername: (name: string) => void;
+    getBookingLinks: () => void;
 }
 
 const ManageBooking: React.FC<ManageBookingProps> = (
     {
         myself,
         bookMeUsername,
+        links,
         getBookMeUsername,
-        updateBookMeUsername
+        updateBookMeUsername,
+        getBookingLinks
     }
 ) => {
     const [name, setName] = useState(bookMeUsername ? bookMeUsername : myself);
@@ -33,6 +38,10 @@ const ManageBooking: React.FC<ManageBookingProps> = (
             setName(bookMeUsername);
         }
     }, [bookMeUsername]);
+
+    useEffect(() => {
+        getBookingLinks();
+    }, []);
 
     const handleOnClick = (save: boolean) => {
         if (save) {
@@ -80,16 +89,20 @@ const ManageBooking: React.FC<ManageBookingProps> = (
                     }} />
             </Tooltip>
         </div>
-        <Empty/>
+        {links.map(l => {
+            return <div>{l.slotSpan} {l.timezone}</div>
+        })}
     </div>
 }
 
 const mapStateToProps = (state: IState) => ({
     myself: state.myself.username,
-    bookMeUsername: state.bookingReducer.bookMeUsername
+    bookMeUsername: state.bookingReducer.bookMeUsername,
+    links: state.bookingReducer.links
 });
 
 export default connect(mapStateToProps, {
     getBookMeUsername,
-    updateBookMeUsername
+    updateBookMeUsername,
+    getBookingLinks
 })(ManageBooking);

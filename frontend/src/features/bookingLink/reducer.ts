@@ -19,6 +19,11 @@ export type BookingLinksAction = {
 export type FetchBookingLinks = {
 }
 
+export type FetchBookingLink = {
+    bookingLinkId: string,
+    timezone: string
+}
+
 export type UpdateBookingLinkRecurrences = {
     bookingLinkId: string,
     recurrences: RecurringSpan[],

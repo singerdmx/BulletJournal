@@ -101,3 +101,12 @@ export const getBookingLinks = () => {
             throw Error(err.message);
         });
 }
+
+export const getBookingLink = (bookingLinkId: string,
+                               timezone: string) => {
+    return doFetch(`/api/public/bookingLinks/${bookingLinkId}?timezone=${timezone}`)
+        .then((res) => res.json())
+        .catch(err => {
+            throw Error(err.message);
+        });
+}
