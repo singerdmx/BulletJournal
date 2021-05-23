@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface BookingLinkRepository extends JpaRepository<BookingLink, String> {
     List<BookingLink> findAllByOwnerAndRemoved(String owner, boolean removed);
+
+    void deleteAllByOwner(String owner);
 }

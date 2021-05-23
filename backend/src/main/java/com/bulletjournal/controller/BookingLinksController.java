@@ -33,6 +33,7 @@ public class BookingLinksController {
     public static final String BOOKING_LINK_UPDATE_RECURRENCE_RULES_ROUTE =
             "/api/bookingLinks/{bookingLinkId}/updateRecurrenceRules";
     public static final String BOOKING_LINK_UPDATE_SLOT_ROUTE = "/api/bookingLinks/{bookingLinkId}/updateSlot";
+    public static final String BOOKING_LINK_CLONE_ROUTE = "/api/bookingLinks/{bookingLinkId}/clone";
     public static final String BOOKING_LINK_ROUTE = "/api/bookingLinks/{bookingLinkId}";
     public static final String PUBLIC_BOOKING_LINKS_ROUTE_PREFIX = "/api/public/bookingLinks/";
     public static final String PUBLIC_BOOKING_LINK_ROUTE = PUBLIC_BOOKING_LINKS_ROUTE_PREFIX + "{bookingLinkId}";
@@ -156,4 +157,15 @@ public class BookingLinksController {
         this.userDaoJpa.updateBookMeUsername(username, name);
     }
 
+    @DeleteMapping(BOOKING_LINKS_ROUTE)
+    public void deleteAllBookingLinks() {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+    }
+
+    @PostMapping(BOOKING_LINK_CLONE_ROUTE)
+    public void cloneBookingLinks(
+            @NotNull @PathVariable String bookingLinkId,
+            @NotNull @RequestBody String slotSpan) {
+        String username = MDC.get(UserClient.USER_NAME_KEY);
+    }
 }
