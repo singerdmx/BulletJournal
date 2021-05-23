@@ -1,10 +1,10 @@
 import {IState} from "../../store";
 import {connect} from "react-redux";
 import React, {useEffect, useState} from "react";
-import {AutoComplete, Avatar, Button, Checkbox, DatePicker, Drawer, Input, Select, Tooltip} from "antd";
+import {AutoComplete, Avatar, Button, Checkbox, DatePicker, Drawer, Input, message, Select, Tooltip} from "antd";
 import moment from "moment";
 import {dateFormat} from "../../features/myBuJo/constants";
-import {BookingLink, RecurringSpan} from "../../features/bookingLink/interface";
+import {BookingLink} from "../../features/bookingLink/interface";
 import {CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, QuestionCircleOutlined} from "@ant-design/icons";
 import {Project} from "../../features/project/interface";
 import {zones} from "../settings/constants";
@@ -14,6 +14,7 @@ import {patchBookingLink} from "../../features/bookingLink/actions";
 import Quill, {DeltaStatic} from "quill";
 import RecurringSpanCard from "./recurring-span-card.component";
 import BookMeNoteEditor from "./book-me-note-editor";
+import CopyToClipboard from "react-copy-to-clipboard";
 
 const {Option} = Select;
 
@@ -352,13 +353,23 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                         >
                             Who booked me
                         </Button>}
-                        <Button
-                            type="primary"
-                            shape="round"
-                            style={{width: "100px"}}
+                        <CopyToClipboard
+                            text={`${window.location.protocol}//${window.location.host}/public/bookingLinks/${link!.id}`}
+                            onCopy={() => message.success('Sharable link copied to clipboard')}
                         >
-                            Share
-                        </Button>
+                            <Button
+                                type="primary"
+                                shape="round"
+                                style={{width: "100px"}}
+                                onClick={() => {
+                                    setTimeout(() => {
+                                        window.open(`${window.location.protocol}//${window.location.host}/public/bookingLinks/${link!.id}`);
+                                    }, 2000);
+                                }}
+                            >
+                                Share
+                            </Button>
+                        </CopyToClipboard>
                     </div>
                 </div>
             </div>
