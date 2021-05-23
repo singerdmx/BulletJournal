@@ -11,8 +11,9 @@ import {zones} from "../settings/constants";
 import './book-me.styles.less';
 import {iconMapper} from "../side-menu/side-menu.component";
 import {patchBookingLink} from "../../features/bookingLink/actions";
-import BookMeNoteEditor from "./book-me-note-editor";
 import Quill, {DeltaStatic} from "quill";
+import RecurringSpanCard from "./recurring-span-card.component";
+import BookMeNoteEditor from "./book-me-note-editor";
 
 const {Option} = Select;
 
@@ -44,6 +45,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
     const {setBookMeDrawerVisible, bookMeDrawerVisible, link, projects, patchBookingLink} = props;
     const [location, setLocation] = useState();
     const [projectId, setProjectId] = useState();
+    const [cardIsClicked, setCardIsClicked] =useState(false);
     const result = ['5', '10', '15', '30', '45', '60'];
     const bufferOptions = result.map((time: string) => {
         return {value: time};
@@ -310,7 +312,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                         })}
                     </Select>
                 </div>
-                <div className='dns-panel'>
+                <div className='dns-panel' style={{textAlign:"center"}}>
                     <div className='dns-panel-title'>
                         Do Not Schedule&nbsp;&nbsp;
                         <Tooltip
@@ -319,6 +321,11 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                                     <QuestionCircleOutlined/>
                                 </span>
                         </Tooltip>
+                    </div>
+                    <div className='recurring-span-cards'>
+                        <RecurringSpanCard mode='add' recurrenceRule='' duration={0} backgroundColor={'white'}/>
+                        {link.recurrences.map(recurrence => <RecurringSpanCard
+                            mode='card' recurrenceRule={recurrence.recurrenceRule} duration={recurrence.duration} backgroundColor={'#CB8A90'}/>)}
                     </div>
                 </div>
                 <BookMeNoteEditor
@@ -333,7 +340,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                         >
                             Preview
                         </Button>
-                        {link && link.bookings.length > 0 && <Button
+                        {link && link.bookings && link.bookings.length > 0 && <Button
                             type="primary"
                             shape="round"
                             style={{width: "150px"}}
