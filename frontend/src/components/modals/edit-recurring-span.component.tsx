@@ -40,27 +40,36 @@ const EditRecurringSpan: React.FC<RecurringSpanProps> = (props) => {
             <ReactRRuleGenerator/>
         </div>
         <div className='duration-div'>
-            <AutoComplete
-                placeholder="Duration"
-                options={options} value={last}
-                onChange={(e) => {
-                    let num = parseInt(e);
-                    if (isNaN(num)) {
-                        num = 0;
-                    }
-                    setLast(num.toString());
-                }}>
-                <Input style={{width: '100px'}}/>
-            </AutoComplete>
-            <Select defaultValue={unit}>
-                <Option value="Minutes">Minute(s)</Option>
-                <Option value="Hours">Hour(s)</Option>
-            </Select>
+            <div className='last'>
+                Last for&nbsp;&nbsp;
+            </div>
+            <div>
+                <AutoComplete
+                    placeholder="Duration"
+                    options={options} value={last}
+                    onChange={(e) => {
+                        let num = parseInt(e);
+                        if (isNaN(num)) {
+                            num = 0;
+                        }
+                        setLast(num.toString());
+                    }}>
+                    <Input style={{width: '100px'}}/>
+                </AutoComplete>
+            </div>
+            &nbsp;
+            <div>
+                <Select defaultValue={unit}>
+                    <Option value="Minutes">Minute(s)</Option>
+                    <Option value="Hours">Hour(s)</Option>
+                </Select>
+            </div>
         </div>
     </div>
 }
 const mapStateToProps = (state: IState) => ({
     groups: state.group.groups,
+    rRuleString: state.rRule.rRuleString,
 });
 
 export default connect(mapStateToProps, {})

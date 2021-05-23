@@ -4,7 +4,7 @@ import React, {useState} from "react";
 import {Modal, Tooltip} from "antd";
 import {DeleteOutlined, EditOutlined, PlusCircleOutlined} from "@ant-design/icons";
 import EditRecurringSpan from "../modals/edit-recurring-span.component";
-import {convertToTextWithRRule} from "../../features/recurrence/actions";
+import {convertToTextWithRRule, updateRruleString} from "../../features/recurrence/actions";
 import {getDuration} from "../project-item/task-item.component";
 
 type RecurringSpanProps = {
@@ -12,24 +12,24 @@ type RecurringSpanProps = {
     recurrenceRule: string,
     duration: number,
     backgroundColor: string,
-    index: number
+    index: number,
+    updateRruleString: (rruleString: string) => void;
 };
 
 const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
-    const {backgroundColor, duration, recurrenceRule, mode, index} = props;
+    const {backgroundColor, duration, recurrenceRule, mode, index, updateRruleString} = props;
     const [visible, setVisible] = useState(false);
 
     const openModal = () => {
         setVisible(true);
     };
     const onCancel = () => {
-        console.log('XXXX')
         setVisible(false);
     };
     const getModal = () => {
         return(
             <Modal
-                title="Edit Recurring Span"
+                title="Do not schedule for the following time"
                 destroyOnClose
                 centered
                 okText="Update"
@@ -37,7 +37,7 @@ const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
                 onCancel={onCancel}
                 // TODO onOk={() => call updateBookingLinkRecurrences api}
             >
-                <EditRecurringSpan rRuleString={recurrenceRule} duration={duration}/>
+                <EditRecurringSpan duration={duration}/>
             </Modal>
         )
     }
@@ -70,6 +70,7 @@ const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
             onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                updateRruleString(recurrenceRule);
                 openModal();
             }}
             style={{backgroundColor: backgroundColor, color: "white"}}>
@@ -97,5 +98,7 @@ const mapStateToProps = (state: IState) => ({
     groups: state.group.groups,
 });
 
-export default connect(mapStateToProps, {})
+export default connect(mapStateToProps, {
+    updateRruleString
+})
 (RecurringSpanCard);

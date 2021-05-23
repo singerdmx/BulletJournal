@@ -73,8 +73,8 @@ export const updateMonthlyOn = (monthlyOn: boolean) =>
 export const updateYearlyOn = (yearlyOn: boolean) =>
   actions.updateYearlyOn({ yearlyOn: yearlyOn });
 
-export const updateRruleString = (task: Task) =>
-  actions.updateRRuleString({ task: task });
+export const updateRruleString = (rruleString: string) =>
+  actions.updateRRuleString({ rruleString: rruleString });
 
 export const updateTransactionRruleString = (transaction: Transaction) =>
   actions.updateTransactionRRuleString({ transaction: transaction });

@@ -65,7 +65,7 @@ interface TaskEditFormProps {
     recurrenceRule?: string,
     labels?: number[]
   ) => void;
-  updateRruleString: (task: Task) => void;
+  updateRruleString: (rruleString: string) => void;
   updateExpandedMyself: (updateSettings: boolean) => void;
   timezone: string;
   start: any;
@@ -230,7 +230,7 @@ const EditTask: React.FC<
 
   const openModal = () => {
     if (task) {
-      task.recurrenceRule && props.updateRruleString(task);
+      task.recurrenceRule && props.updateRruleString(task.recurrenceRule);
     }
     setVisible(true);
   };

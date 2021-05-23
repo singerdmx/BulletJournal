@@ -71,8 +71,8 @@ export type YearlyOnAction = {
   yearlyOn: boolean;
 };
 
-export type RRuleStringFromTask = {
-  task: Task;
+export type RRuleStringUpdate = {
+  rruleString: string;
 };
 
 export type RRuleStringFromTransaction = {
@@ -339,9 +339,8 @@ const slice = createSlice({
         ...state.end,
       }).toString();
     },
-    updateRRuleString: (state, action: PayloadAction<RRuleStringFromTask>) => {
-      const {task} = action.payload;
-      const rruleString = task.recurrenceRule;
+    updateRRuleString: (state, action: PayloadAction<RRuleStringUpdate>) => {
+      const {rruleString} = action.payload;
       console.log(rruleString);
 
       if (!rruleString.startsWith("DTSTART:")) {
