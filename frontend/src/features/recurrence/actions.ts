@@ -103,7 +103,7 @@ export const getByWeekDay = (rule: RRule) => {
     return day;
 }
 
-export const convertToTextWithRRule = (rrule: string) => {
+export const convertToTextWithRRule = (rrule: string, includeStartingDate = true) => {
     const rule = RRule.fromString(rrule);
     const resultString = rule.toText();
     let result =
@@ -116,15 +116,10 @@ export const convertToTextWithRRule = (rrule: string) => {
         result = result.substring(0, result.toLowerCase().indexOf('month') + 6) + 'on the ' + which.toLowerCase() + ' ' + day.toLowerCase();
     }
 
-    const starting = ' starting at ' +
-        rrule.substr(8, 4) +
-        '-' +
-        rrule.substr(12, 2) +
-        '-' +
-        rrule.substr(14, 2) +
-        ' ' +
-        rrule.substr(17, 2) +
-        ':' +
-        rrule.substr(19, 2);
+    let starting = ' starting at ';
+    if (includeStartingDate) {
+        starting += rrule.substr(8, 4) + '-' + rrule.substr(12, 2) + '-' + rrule.substr(14, 2) + ' ';
+    }
+    starting += rrule.substr(17, 2) + ':' + rrule.substr(19, 2);
     return result + starting;
 };
