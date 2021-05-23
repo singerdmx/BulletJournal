@@ -90,21 +90,19 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
 
     const handleBeforeEventBufferChange = (value: any) => {
         if (link) {
-            if (!!isNaN(value)) {
-                value=0;
-            } else {
-                patchBookingLink(link.id, link.timezone, undefined, value, undefined, undefined, undefined, undefined, undefined, undefined);
+            if (isNaN(value)) {
+                value = 0;
             }
+            patchBookingLink(link.id, link.timezone, undefined, value, undefined, undefined, undefined, undefined, undefined, undefined);
         }
     }
 
     const handleAfterEventBufferChange = (value: any) => {
         if (link) {
-            if (!!isNaN(value)) {
-                value=0;
-            } else {
-                patchBookingLink(link.id, link.timezone, value, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+            if (isNaN(value)) {
+                value = 0;
             }
+            patchBookingLink(link.id, link.timezone, value, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
         }
     }
 
