@@ -152,7 +152,7 @@ public class BookingLinkDaoJpa {
                 bookParams.getNote(),
                 bookParams.getSlotDate(),
                 bookParams.getSlotIndex(),
-                bookParams.getRequesterTimeZone());
+                bookParams.getRequesterTimezone());
         return booking;
     }
 

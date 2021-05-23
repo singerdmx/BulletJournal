@@ -11,18 +11,18 @@ public class BookParams {
     private String slotDate;
     private String location;
     private String note;
-    private String requesterTimeZone;
+    private String requesterTimezone;
 
     public BookParams() {
     }
 
-    public BookParams(List<Invitee> invitees, int slotIndex, String slotDate, String location, String note, String requesterTimeZone) {
+    public BookParams(List<Invitee> invitees, int slotIndex, String slotDate, String location, String note, String requesterTimezone) {
         this.invitees = invitees;
         this.slotIndex = slotIndex;
         this.slotDate = slotDate;
         this.location = location;
         this.note = note;
-        this.requesterTimeZone = requesterTimeZone;
+        this.requesterTimezone = requesterTimezone;
     }
 
     public List<Invitee> getInvitees() {
@@ -65,7 +65,7 @@ public class BookParams {
         this.note = note;
     }
 
-    public String getRequesterTimeZone() { return requesterTimeZone; }
+    public String getRequesterTimezone() { return requesterTimezone; }
 
-    public void setRequesterTimeZone(String requesterTimeZone) { this.requesterTimeZone = requesterTimeZone; }
+    public void setRequesterTimezone(String requesterTimezone) { this.requesterTimezone = requesterTimezone; }
 }

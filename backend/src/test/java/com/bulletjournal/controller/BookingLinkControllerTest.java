@@ -317,7 +317,7 @@ public class BookingLinkControllerTest {
         assertEquals(bookParams.getNote(), created.getNote());
         assertEquals(bookParams.getInvitees().size(), created.getInvitees().size());
         assertEquals(bookParams.getSlotDate(), created.getSlotDate());
-        assertEquals(bookParams.getRequesterTimeZone(), created.getRequesterTimeZone());
+        assertEquals(bookParams.getRequesterTimezone(), created.getRequesterTimezone());
         return created;
     }
 }
