@@ -3,7 +3,6 @@ package com.bulletjournal.repository.models;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.TaskStatus;
-import com.bulletjournal.repository.auditing.NotificationEntityListeners;
 import com.bulletjournal.repository.auditing.TaskEntityListeners;
 import com.bulletjournal.templates.repository.model.SampleTask;
 import org.hibernate.annotations.OnDelete;
