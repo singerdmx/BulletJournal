@@ -3,6 +3,10 @@ import {connect} from "react-redux";
 import React, {useEffect, useState} from "react";
 import ReactRRuleGenerator from "../../features/recurrence/RRuleGenerator";
 import {convertToTextWithRRule} from "../../features/recurrence/actions";
+import {AutoComplete, Input, Select} from "antd";
+import './edit-recurring-span.styles.less';
+
+const { Option } = Select;
 
 type RecurringSpanProps = {
     rRuleString: string,
@@ -10,27 +14,49 @@ type RecurringSpanProps = {
 };
 
 const EditRecurringSpan: React.FC<RecurringSpanProps> = (props) => {
-    const {rRuleString} = props;
+    const {rRuleString, duration} = props;
+    const result = ['15', '30', '45', '60'];
+    const options = result.map((time: string) => {
+        return { value: time };
+    });
 
     const [rRuleText, setRRuleText] = useState(
         convertToTextWithRRule(rRuleString)
     );
+    const [last, setLast] = useState(duration % 60 === 0 ? (duration / 60).toString() : duration.toString());
+    const [unit, setUnit] = useState(duration % 60 === 0 ? 'Hours' : 'Minutes');
 
     useEffect(() => {
         setRRuleText(convertToTextWithRRule(rRuleString));
     }, [rRuleString]);
 
-    return <div
-        style={{
-            borderTop: '1px solid #E8E8E8',
-            borderBottom: '1px solid #E8E8E8',
-            paddingTop: '24px',
-            marginBottom: '24px',
-        }}
-    >
-        <div className="recurrence-title">{rRuleText}</div>
-        {/*TODO add Duration*/}
-        <ReactRRuleGenerator />
+    return <div>
+        <div
+            style={{
+                borderBottom: '1px solid #E8E8E8',
+            }}
+        >
+            <div className="recurrence-title">{rRuleText}</div>
+            <ReactRRuleGenerator/>
+        </div>
+        <div className='duration-div'>
+            <AutoComplete
+                placeholder="Duration"
+                options={options} value={last}
+                onChange={(e) => {
+                    let num = parseInt(e);
+                    if (isNaN(num)) {
+                        num = 0;
+                    }
+                    setLast(num.toString());
+                }}>
+                <Input style={{width: '100px'}}/>
+            </AutoComplete>
+            <Select defaultValue={unit}>
+                <Option value="Minutes">Minute(s)</Option>
+                <Option value="Hours">Hour(s)</Option>
+            </Select>
+        </div>
     </div>
 }
 const mapStateToProps = (state: IState) => ({

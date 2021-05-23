@@ -15,7 +15,7 @@ type RecurringSpanProps = {
 };
 
 const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
-    const {backgroundColor,duration, recurrenceRule,mode} = props;
+    const {backgroundColor, duration, recurrenceRule, mode} = props;
     const [visible, setVisible] = useState(false);
 
     const openModal = () => {
@@ -47,7 +47,7 @@ const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
         </div>
     }
 
-    if (mode == 'add') {
+    if (mode === 'add') {
         return <div className="recurring-span-card" style={{backgroundColor: '#C9DECF', color:"white"}}>
             <div className="recurring-span-card-content" >
                 <p>Add unavailable time</p>
