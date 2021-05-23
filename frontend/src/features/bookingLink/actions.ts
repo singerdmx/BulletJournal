@@ -17,7 +17,8 @@ export const addBookingLink = (
     recurrences: RecurringSpan[],
     slotSpan: number,
     startDate: string,
-    timezone: string
+    timezone: string,
+    onSuccess: Function
 ) =>
     actions.AddBookingLink({
         afterEventBuffer: afterEventBuffer,
@@ -29,7 +30,8 @@ export const addBookingLink = (
         recurrences: recurrences,
         slotSpan: slotSpan,
         startDate: startDate,
-        timezone: timezone
+        timezone: timezone,
+        onSuccess: onSuccess
     });
 
 export const linkReceived = (link: BookingLink) =>

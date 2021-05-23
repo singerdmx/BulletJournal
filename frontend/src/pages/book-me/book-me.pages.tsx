@@ -34,7 +34,8 @@ type BookMeProps = {
         recurrences: RecurringSpan[],
         slotSpan: number,
         startDate: string,
-        timezone: string
+        timezone: string,
+        onSuccess: Function
     ) => void;
     getBookingLinks: () => void;
 }
@@ -45,8 +46,8 @@ const BookMe: React.FC<BookMeProps> = (props) => {
     const [cardIsClicked, setCardIsClicked] = useState(false);
     const [disableCreateNewProjectOrBooking, setDisableCreateNewProjectOrBooking] = useState(false);
     const [currentSlotSpan, setCurrentSlotSpan] = useState();
+    const [activeKey, setActiveKey] = useState('1')
     const history = useHistory();
-
 
     useEffect(() => {
         let updateProjects = [] as Project[];
@@ -58,10 +59,6 @@ const BookMe: React.FC<BookMeProps> = (props) => {
     useEffect(() => {
         setHasTodoProject(projects && projects.length !== 0);
     }, [projects])
-
-    useEffect(() => {
-
-    }, [cardIsClicked])
 
     const createDefaultBookingLink = () => {
         const startDate = moment().add(1, 'days').format(dateFormat);
@@ -85,7 +82,12 @@ const BookMe: React.FC<BookMeProps> = (props) => {
         }
         const recurrences = [recurringSpan1, recurringSpan2, recurringSpan3, recurringSpan4];
 
-        addBookingLink(0, 0,endDate, true, true, projects[0].id, recurrences, currentSlotSpan, startDate, timezone)
+        addBookingLink(0, 0,endDate, true,
+            true, projects[0].id, recurrences, currentSlotSpan, startDate, timezone,
+            () => {
+                getBookingLinks();
+                setActiveKey('2');
+            });
     }
 
     const getCreateBookingDrawer = () => {
@@ -108,10 +110,11 @@ const BookMe: React.FC<BookMeProps> = (props) => {
     }
 
     return <div className="book-me">
-        <Tabs defaultActiveKey="1" onChange={(e) => {
+        <Tabs activeKey={activeKey} onChange={(e) => {
             if (e === '2') {
                 getBookingLinks();
             }
+            setActiveKey(e);
         }}>
             <TabPane
                 tab={<span><BookOutlined/>Create Booking</span>}

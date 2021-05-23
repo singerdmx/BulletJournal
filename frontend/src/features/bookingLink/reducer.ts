@@ -41,6 +41,7 @@ export type AddBookingLink = {
     slotSpan: number,
     startDate: string,
     timezone: string,
+    onSuccess: Function
 };
 
 export type PatchBookingLink = {

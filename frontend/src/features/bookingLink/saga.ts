@@ -87,7 +87,8 @@ function* addBookingLink(action: PayloadAction<AddBookingLink>) {
             recurrences,
             slotSpan,
             startDate,
-            timezone
+            timezone,
+            onSuccess
         } = action.payload;
 
         const data = yield call(
@@ -104,6 +105,7 @@ function* addBookingLink(action: PayloadAction<AddBookingLink>) {
             timezone
         );
         yield put(bookingLinksActions.linkReceived({link: data}));
+        onSuccess();
     } catch (error) {
         if (error.message === 'reload') {
             yield put(reloadReceived(true));
