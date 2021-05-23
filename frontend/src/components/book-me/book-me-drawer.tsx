@@ -12,7 +12,7 @@ import './book-me.styles.less';
 import {iconMapper} from "../side-menu/side-menu.component";
 import {patchBookingLink} from "../../features/bookingLink/actions";
 import BookMeNoteEditor from "./book-me-note-editor";
-import Quill from "quill";
+import Quill, {DeltaStatic} from "quill";
 
 const {Option} = Select;
 
@@ -34,6 +34,7 @@ type BookMeDrawerProps = {
         location?: string,
         projectId?: number,
         startDate?: string,
+        note?: string
     ) => void;
 };
 
@@ -94,7 +95,16 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
             if (isNaN(value)) {
                 value = 0;
             }
-            patchBookingLink(link.id, link.timezone, undefined, value, undefined, undefined, undefined, undefined, undefined, undefined);
+            patchBookingLink(link.id, link.timezone, undefined, value, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+        }
+    }
+
+    const handleNoteChange = (value: DeltaStatic) => {
+        if (link) {
+            patchBookingLink(link.id, link.timezone, undefined,
+                undefined, undefined, undefined,
+                undefined, undefined, undefined,
+                undefined, JSON.stringify({delta: value}));
         }
     }
 
@@ -311,7 +321,9 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                         </Tooltip>
                     </div>
                 </div>
-                <BookMeNoteEditor delta={new Delta()}/>
+                <BookMeNoteEditor
+                    delta={link.note ? JSON.parse(link.note)['delta'] : new Delta()}
+                    saveContent={(delta: DeltaStatic) => handleNoteChange(delta)}/>
                 <div className="buttons" style={{marginTop: "50px", paddingTop: "10px"}}>
                     <Button
                         type="primary"

@@ -43,6 +43,7 @@ export const updateBookingLink = (
     location?: string,
     projectId?: number,
     startDate?: string,
+    note?: string
 ) => {
     const patchBody = JSON.stringify({
         bookingLinkId: bookingLinkId,
@@ -55,6 +56,7 @@ export const updateBookingLink = (
         location:location,
         projectId: projectId,
         startDate: startDate,
+        note: note
     });
     return doPatch(`/api/bookingLinks/${bookingLinkId}`, patchBody)
         .then((res) => res.json())

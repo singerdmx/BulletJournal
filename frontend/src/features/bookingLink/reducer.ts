@@ -36,6 +36,7 @@ export type PatchBookingLink = {
     location?: string,
     projectId?: number,
     startDate?: string,
+    note?: string
 };
 
 let initialState = {

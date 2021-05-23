@@ -44,6 +44,7 @@ export const patchBookingLink = (
     location?: string,
     projectId?: number,
     startDate?: string,
+    note?: string
 ) =>
     actions.PatchBookingLink({
         bookingLinkId: bookingLinkId,
@@ -56,4 +57,5 @@ export const patchBookingLink = (
         location: location,
         projectId: projectId,
         startDate: startDate,
+        note: note
     });

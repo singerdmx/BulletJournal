@@ -97,6 +97,7 @@ function* patchBookingLink(action: PayloadAction<PatchBookingLink>) {
             location,
             projectId,
             startDate,
+            note
         } = action.payload
 
         const state: IState = yield select();
@@ -123,6 +124,9 @@ function* patchBookingLink(action: PayloadAction<PatchBookingLink>) {
         if (location) {
             link.location = location;
         }
+        if (note) {
+            link.note = note;
+        }
         if (projectId) {
             // skip project for now
         }
@@ -139,6 +143,7 @@ function* patchBookingLink(action: PayloadAction<PatchBookingLink>) {
             location,
             projectId,
             startDate,
+            note
         );
         yield put(bookingLinksActions.linkReceived({link: data}));
     } catch (error) {
