@@ -10,11 +10,14 @@ const { Option } = Select;
 
 type RecurringSpanProps = {
     rRuleString: string,
-    duration: number,
+    last: string,
+    unit: string,
+    setLast: (last: string) => void;
+    setUnit: (unit: string) => void;
 };
 
 const EditRecurringSpan: React.FC<RecurringSpanProps> = (props) => {
-    const {rRuleString, duration} = props;
+    const {rRuleString, last, unit, setLast, setUnit} = props;
     const result = ['15', '30', '45', '60'];
     const options = result.map((time: string) => {
         return { value: time };
@@ -23,8 +26,6 @@ const EditRecurringSpan: React.FC<RecurringSpanProps> = (props) => {
     const [rRuleText, setRRuleText] = useState(
         convertToTextWithRRule(rRuleString)
     );
-    const [last, setLast] = useState(duration % 60 === 0 ? (duration / 60).toString() : duration.toString());
-    const [unit, setUnit] = useState(duration % 60 === 0 ? 'Hours' : 'Minutes');
 
     useEffect(() => {
         setRRuleText(convertToTextWithRRule(rRuleString));
@@ -59,7 +60,7 @@ const EditRecurringSpan: React.FC<RecurringSpanProps> = (props) => {
             </div>
             &nbsp;
             <div>
-                <Select defaultValue={unit}>
+                <Select defaultValue={unit} onChange={(e) => setUnit(e)}>
                     <Option value="Minutes">Minute(s)</Option>
                     <Option value="Hours">Hour(s)</Option>
                 </Select>

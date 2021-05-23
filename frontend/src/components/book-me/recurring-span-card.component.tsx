@@ -12,7 +12,8 @@ import {BookingLink, RecurringSpan} from "../../features/bookingLink/interface";
 type RecurringSpanProps = {
     link: undefined | BookingLink,
     mode:string,
-    recurrenceRule: string,
+    originalRecurrenceRule: string,
+    rRuleString: string,
     duration: number,
     backgroundColor: string,
     index: number,
@@ -25,9 +26,11 @@ type RecurringSpanProps = {
 };
 
 const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
-    const {link, backgroundColor, duration, recurrenceRule, mode, index,
+    const {link, backgroundColor, duration, originalRecurrenceRule, mode, index, rRuleString,
         updateRruleString, updateBookingLinkRecurrences} = props;
     const [visible, setVisible] = useState(false);
+    const [last, setLast] = useState(duration % 60 === 0 ? (duration / 60).toString() : duration.toString());
+    const [unit, setUnit] = useState(duration % 60 === 0 ? 'Hours' : 'Minutes');
 
     const openModal = () => {
         setVisible(true);
@@ -44,9 +47,26 @@ const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
                 okText={mode === 'add' ? 'Block this on calendar' : 'Update'}
                 visible={visible}
                 onCancel={onCancel}
-                // TODO onOk={() => call updateBookingLinkRecurrences api}
+                onOk={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (link) {
+                        const recurrences: RecurringSpan[] = [...link.recurrences];
+                        const recurrence: RecurringSpan = {
+                            duration: parseInt(last) * (unit === 'Hours' ? 60 : 1),
+                            recurrenceRule: rRuleString
+                        };
+                        if (mode === 'add') {
+                            recurrences.unshift(recurrence);
+                        } else {
+                            recurrences[index] = recurrence;
+                        }
+                        updateBookingLinkRecurrences(link.id, recurrences, link.timezone);
+                    }
+                    setVisible(false);
+                }}
             >
-                <EditRecurringSpan duration={duration}/>
+                <EditRecurringSpan last={last} unit={unit} setLast={setLast} setUnit={setUnit}/>
             </Modal>
         )
     }
@@ -56,7 +76,7 @@ const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
             return <div>Add unavailable time</div>
         }
         return <div>
-            <div>{convertToTextWithRRule(recurrenceRule, false)}</div>
+            <div>{convertToTextWithRRule(originalRecurrenceRule, false)}</div>
             <div>last {getDuration(duration)}</div>
         </div>
     }
@@ -96,8 +116,8 @@ const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
             onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                if (recurrenceRule) {
-                    updateRruleString(recurrenceRule);
+                if (originalRecurrenceRule) {
+                    updateRruleString(originalRecurrenceRule);
                 }
                 openModal();
             }}
@@ -113,11 +133,11 @@ const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
 }
 const mapStateToProps = (state: IState) => ({
     groups: state.group.groups,
-    link: state.bookingReducer.link
+    link: state.bookingReducer.link,
+    rRuleString: state.rRule.rRuleString,
 });
 
 export default connect(mapStateToProps, {
     updateRruleString,
     updateBookingLinkRecurrences
-})
-(RecurringSpanCard);
+})(RecurringSpanCard);

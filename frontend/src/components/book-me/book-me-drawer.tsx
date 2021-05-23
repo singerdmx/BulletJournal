@@ -325,11 +325,11 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                     <div className='recurring-span-cards'>
                         <RecurringSpanCard
                             index={-1} mode='add'
-                            recurrenceRule={"DTSTART:" + moment().format('YYYYMMDD') + "T000000Z\nRRULE:FREQ=DAILY;INTERVAL=1"}
+                            originalRecurrenceRule={"DTSTART:" + moment().format('YYYYMMDD') + "T000000Z\nRRULE:FREQ=DAILY;INTERVAL=1"}
                             duration={540} backgroundColor={'#CB8A90'}/>
                         {link.recurrences.map((recurrence, index) => <RecurringSpanCard
                             index={index}
-                            mode='card' recurrenceRule={recurrence.recurrenceRule} duration={recurrence.duration} backgroundColor={'#CB8A90'}/>)}
+                            mode='card' originalRecurrenceRule={recurrence.recurrenceRule} duration={recurrence.duration} backgroundColor={'#CB8A90'}/>)}
                     </div>
                 </div>
                 <BookMeNoteEditor
