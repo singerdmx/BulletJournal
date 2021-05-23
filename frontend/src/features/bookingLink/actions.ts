@@ -61,3 +61,14 @@ export const patchBookingLink = (
         startDate: startDate,
         note: note
     });
+
+export const updateBookingLinkRecurrences = (
+    bookingLinkId: string,
+    recurrences: RecurringSpan[],
+    timezone: string,
+) =>
+    actions.UpdateBookingLinkRecurrences({
+            bookingLinkId: bookingLinkId,
+            recurrences: recurrences,
+            timezone: timezone
+    });

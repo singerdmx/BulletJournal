@@ -6,18 +6,27 @@ import {DeleteOutlined, EditOutlined, PlusCircleOutlined} from "@ant-design/icon
 import EditRecurringSpan from "../modals/edit-recurring-span.component";
 import {convertToTextWithRRule, updateRruleString} from "../../features/recurrence/actions";
 import {getDuration} from "../project-item/task-item.component";
+import {updateBookingLinkRecurrences} from "../../features/bookingLink/actions";
+import {BookingLink, RecurringSpan} from "../../features/bookingLink/interface";
 
 type RecurringSpanProps = {
+    link: undefined | BookingLink,
     mode:string,
     recurrenceRule: string,
     duration: number,
     backgroundColor: string,
     index: number,
     updateRruleString: (rruleString: string) => void;
+    updateBookingLinkRecurrences: (
+        bookingLinkId: string,
+        recurrences: RecurringSpan[],
+        timezone: string,
+    ) => void;
 };
 
 const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
-    const {backgroundColor, duration, recurrenceRule, mode, index, updateRruleString} = props;
+    const {link, backgroundColor, duration, recurrenceRule, mode, index,
+        updateRruleString, updateBookingLinkRecurrences} = props;
     const [visible, setVisible] = useState(false);
 
     const openModal = () => {
@@ -63,12 +72,17 @@ const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
                 <EditOutlined key='Edit' title='Edit'/>
             </Tooltip>
             <Tooltip title='Delete'>
-                <DeleteOutlined key='Delete' title='Delete'
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                }}
-                    //TODO onClick={() => call deleteBookingLink}
+                <DeleteOutlined
+                    key='Delete' title='Delete'
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (link) {
+                            const recurrences : RecurringSpan[] = [...link.recurrences];
+                            recurrences.splice(index, 1);
+                            updateBookingLinkRecurrences(link.id, recurrences, link.timezone);
+                        }
+                    }}
                 />
             </Tooltip>
         </>;
@@ -99,9 +113,11 @@ const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
 }
 const mapStateToProps = (state: IState) => ({
     groups: state.group.groups,
+    link: state.bookingReducer.link
 });
 
 export default connect(mapStateToProps, {
-    updateRruleString
+    updateRruleString,
+    updateBookingLinkRecurrences
 })
 (RecurringSpanCard);

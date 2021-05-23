@@ -65,6 +65,21 @@ export const updateBookingLink = (
         });
 }
 
+export const updateBookingLinkRecurrences = (
+    bookingLinkId: string,
+    recurrences: RecurringSpan[],
+    timezone: string) => {
+    const postBody = JSON.stringify({
+        recurrences: recurrences,
+        timezone: timezone,
+    });
+    return doPost(`/api/bookingLinks/${bookingLinkId}/updateRecurrenceRules`, postBody)
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}
+
 export const getBookMeUsername = () => {
     return doFetch('/api/bookMeUsername')
         .catch(err => {
