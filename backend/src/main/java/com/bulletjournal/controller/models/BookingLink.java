@@ -1,6 +1,7 @@
 package com.bulletjournal.controller.models;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BookingLink {
@@ -16,7 +17,7 @@ public class BookingLink {
 
     private int slotSpan;
 
-    private List<Booking> bookings;
+    private List<Booking> bookings = new ArrayList<>();
 
     private String timezone;
 

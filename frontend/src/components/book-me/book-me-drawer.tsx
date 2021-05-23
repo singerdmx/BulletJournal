@@ -324,21 +324,30 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                 <BookMeNoteEditor
                     delta={link.note ? JSON.parse(link.note)['delta'] : new Delta()}
                     saveContent={(delta: DeltaStatic) => handleNoteChange(delta)}/>
-                <div className="buttons" style={{marginTop: "50px", paddingTop: "10px"}}>
-                    <Button
-                        type="primary"
-                        shape="round"
-                        style={{marginRight: "50px", width: "100px"}}
-                    >
-                        Preview
-                    </Button>
-                    <Button
-                        type="primary"
-                        shape="round"
-                        style={{width: "100px"}}
-                    >
-                        Share
-                    </Button>
+                <div className="buttons-div">
+                    <div className="buttons">
+                        <Button
+                            type="primary"
+                            shape="round"
+                            style={{width: "100px"}}
+                        >
+                            Preview
+                        </Button>
+                        {link && link.bookings.length > 0 && <Button
+                            type="primary"
+                            shape="round"
+                            style={{width: "150px"}}
+                        >
+                            Who Booked Me
+                        </Button>}
+                        <Button
+                            type="primary"
+                            shape="round"
+                            style={{width: "100px"}}
+                        >
+                            Share
+                        </Button>
+                    </div>
                 </div>
             </div>
         </Drawer>

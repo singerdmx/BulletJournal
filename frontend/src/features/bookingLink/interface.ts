@@ -32,4 +32,21 @@ export interface BookingLink {
     timezone: string;
     slots: Slot[];
     recurrences: RecurringSpan[];
+    bookings: Booking[];
+}
+
+export interface Booking {
+    id: string;
+    invitees: Invitee[];
+    slotIndex: number;
+    slotDate: string;
+    location: string;
+    note: string;
+}
+
+export interface Invitee {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
 }
