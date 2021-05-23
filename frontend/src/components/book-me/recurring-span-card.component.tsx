@@ -2,7 +2,7 @@ import {IState} from "../../store";
 import {connect} from "react-redux";
 import React, {useState} from "react";
 import {Modal, Tooltip} from "antd";
-import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, PlusCircleOutlined} from "@ant-design/icons";
 import EditRecurringSpan from "../modals/edit-recurring-span.component";
 import {convertToTextWithRRule} from "../../features/recurrence/actions";
 import {getDuration} from "../project-item/task-item.component";
@@ -48,9 +48,14 @@ const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
     }
 
     if (mode == 'add') {
-        return <div className="recurring-span-card" style={{backgroundColor: backgroundColor}}>
-            <p>Add unavailable time</p>
+        return <div className="recurring-span-card" style={{backgroundColor: '#C9DECF', color:"white"}}>
+            <div className="recurring-span-card-content" >
+                <p>Add unavailable time</p>
+            </div>
             {/*TODO call updateBookingLinkRecurrences*/}
+            <div className="recurring-span-card-operations">
+                <PlusCircleOutlined style={{fontSize: '30px'}} />
+            </div>
         </div>
     }
 
