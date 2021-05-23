@@ -127,9 +127,10 @@ public class BookingLinksController {
     }
 
     @DeleteMapping(BOOKING_LINK_ROUTE)
-    public void deleteBookingLink(@NotNull @PathVariable String bookingLinkId) {
+    public List<BookingLink> deleteBookingLink(@NotNull @PathVariable String bookingLinkId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.bookingLinkDaoJpa.deleteBookingLink(username, bookingLinkId);
+        return getBookingLinks();
     }
 
     @PostMapping(PUBLIC_BOOKING_LINK_BOOK_ROUTE)
