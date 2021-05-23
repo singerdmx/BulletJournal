@@ -160,6 +160,7 @@ public class BookingLinksController {
     @DeleteMapping(BOOKING_LINKS_ROUTE)
     public void deleteAllBookingLinks() {
         String username = MDC.get(UserClient.USER_NAME_KEY);
+        bookingLinkDaoJpa.deleteAllBookingLinks(username);
     }
 
     @PostMapping(BOOKING_LINK_CLONE_ROUTE)

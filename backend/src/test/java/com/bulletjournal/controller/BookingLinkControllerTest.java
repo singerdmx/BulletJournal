@@ -108,7 +108,7 @@ public class BookingLinkControllerTest {
         BookParams bookParams = new BookParams(invitees, 1, "2021-05-04", "Seatle", "test", "America/Chicago");
 
         book(bookingLink1, bookParams);
-
+        deleteAllBookinglinks(USER);
     }
 
     private BookingLink createBookingLink(String startDate, String endDate, String timezone, int slotSpan,
@@ -216,7 +216,7 @@ public class BookingLinkControllerTest {
         assertNotNull(bookingLink);
     }
 
-    private void getBookingLinks() {
+    private List<BookingLink> getBookingLinks() {
         ResponseEntity<BookingLink[]> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + BookingLinksController.BOOKING_LINKS_ROUTE,
                 HttpMethod.GET,
@@ -228,6 +228,7 @@ public class BookingLinkControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(bookingLinks.size(), 2);
         assertEquals(bookingLinks.get(1).getTimezone(), CENTRAL_TIMEZONE);
+        return bookingLinks;
     }
 
     private void testApplyTask(BookingLink bookingLink) {
@@ -319,5 +320,20 @@ public class BookingLinkControllerTest {
         assertEquals(bookParams.getSlotDate(), created.getSlotDate());
         assertEquals(bookParams.getRequesterTimezone(), created.getRequesterTimezone());
         return created;
+    }
+
+    private void deleteAllBookinglinks(String owner){
+
+        List<BookingLink> allBookingLinks = getBookingLinks();
+
+        ResponseEntity<?> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + BookingLinksController.BOOKING_LINKS_ROUTE,
+                HttpMethod.DELETE,
+                TestHelpers.actAsOtherUser(null, USER),
+                Void.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        for(int i = 0; i < allBookingLinks.size(); i++){
+            getBookingLink(allBookingLinks.get(i).getId(), TIMEZONE, HttpStatus.NOT_FOUND);
+        }
     }
 }

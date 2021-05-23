@@ -156,4 +156,9 @@ public class BookingLinkDaoJpa {
         return booking;
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void deleteAllBookingLinks(String owner){
+        this.bookingLinkRepository.deleteAllByOwner(owner);
+    }
+
 }
