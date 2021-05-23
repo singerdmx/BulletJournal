@@ -48,7 +48,7 @@ const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
     }
 
     if (mode === 'add') {
-        return <div className="recurring-span-card" style={{backgroundColor: '#C9DECF', color:"white"}}>
+        return <div className="recurring-span-card" style={{backgroundColor: backgroundColor, color:"white"}}>
             <div className="recurring-span-card-content" >
                 <p>Add unavailable time</p>
             </div>
