@@ -12,16 +12,18 @@ type RecurringSpanProps = {
     recurrenceRule: string,
     duration: number,
     backgroundColor: string,
+    index: number
 };
 
 const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
-    const {backgroundColor, duration, recurrenceRule, mode} = props;
+    const {backgroundColor, duration, recurrenceRule, mode, index} = props;
     const [visible, setVisible] = useState(false);
 
     const openModal = () => {
         setVisible(true);
     };
     const onCancel = () => {
+        console.log('XXXX')
         setVisible(false);
     };
     const getModal = () => {
@@ -48,9 +50,10 @@ const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
     }
 
     if (mode === 'add') {
-        return <div className="recurring-span-card" style={{backgroundColor: backgroundColor, color:"white"}}>
+        return <div key={index}
+                    className="recurring-span-card" style={{backgroundColor: backgroundColor, color:"white"}}>
             <div className="recurring-span-card-content" >
-                <p>Add unavailable time</p>
+                Add unavailable time
             </div>
             {/*TODO call updateBookingLinkRecurrences*/}
             <div className="recurring-span-card-operations">
@@ -59,20 +62,34 @@ const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
         </div>
     }
 
-    return <div className="recurring-span-card" style={{backgroundColor: backgroundColor, color:"white"}}>
-        <div className="recurring-span-card-content" >
-            <p>{getRule()}</p>
-        </div>
-        <div className="recurring-span-card-operations">
-            <Tooltip title='Edit'>
-                <EditOutlined key='Edit' title='Edit' onClick={openModal}/>
-            </Tooltip>
-            {getModal()}
-            <Tooltip title='Delete'>
-                <DeleteOutlined key='Delete' title='Delete'
-                                //TODO onClick={() => call deleteBookingLink}
-                />
-            </Tooltip>
+    return <div>
+        {getModal()}
+        <div
+            key={index}
+            className="recurring-span-card"
+            onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                openModal();
+            }}
+            style={{backgroundColor: backgroundColor, color: "white"}}>
+            <div className="recurring-span-card-content">
+                {getRule()}
+            </div>
+            <div className="recurring-span-card-operations">
+                <Tooltip title='Edit'>
+                    <EditOutlined key='Edit' title='Edit'/>
+                </Tooltip>
+                <Tooltip title='Delete'>
+                    <DeleteOutlined key='Delete' title='Delete'
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                    }}
+                        //TODO onClick={() => call deleteBookingLink}
+                    />
+                </Tooltip>
+            </div>
         </div>
     </div>
 }

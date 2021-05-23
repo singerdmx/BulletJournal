@@ -323,8 +323,9 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                         </Tooltip>
                     </div>
                     <div className='recurring-span-cards'>
-                        <RecurringSpanCard mode='add' recurrenceRule='' duration={0} backgroundColor={'#CB8A90'}/>
-                        {link.recurrences.map(recurrence => <RecurringSpanCard
+                        <RecurringSpanCard index={-1} mode='add' recurrenceRule='' duration={0} backgroundColor={'#CB8A90'}/>
+                        {link.recurrences.map((recurrence, index) => <RecurringSpanCard
+                            index={index}
                             mode='card' recurrenceRule={recurrence.recurrenceRule} duration={recurrence.duration} backgroundColor={'#CB8A90'}/>)}
                     </div>
                 </div>
