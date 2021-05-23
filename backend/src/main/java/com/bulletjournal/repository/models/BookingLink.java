@@ -1,5 +1,6 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.controller.models.User;
 import com.bulletjournal.util.BookingUtil;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -207,7 +208,8 @@ public class BookingLink extends AuditModel {
     public com.bulletjournal.controller.models.BookingLink toPresentationModel() {
         com.bulletjournal.controller.models.BookingLink bookingLink = new com.bulletjournal.controller.models.BookingLink(
                 this.getId(),
-                this.getOwner(),
+                new User(this.getOwner()),
+                this.owner,
                 this.getStartDate(),
                 this.getEndDate(),
                 this.getSlotSpan(),

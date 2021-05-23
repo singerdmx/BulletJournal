@@ -9,7 +9,9 @@ public class BookingLink {
     private String id;
 
     @NotNull
-    protected String owner;
+    private User owner;
+
+    private String ownerName;
 
     private String startDate;
 
@@ -67,7 +69,8 @@ public class BookingLink {
     }
 
     public BookingLink(String id,
-                       @NotNull String owner,
+                       @NotNull User owner,
+                       String ownerName,
                        String startDate,
                        String endDate,
                        int slotSpan,
@@ -82,6 +85,7 @@ public class BookingLink {
                        String note) {
         this.id = id;
         this.owner = owner;
+        this.ownerName = ownerName;
         this.startDate = startDate;
         this.endDate = endDate;
         this.slotSpan = slotSpan;
@@ -96,12 +100,20 @@ public class BookingLink {
         this.note = note;
     }
 
-    public String getOwner() {
+    public User getOwner() {
         return owner;
     }
 
-    public void setOwner(String owner) {
+    public void setOwner(User owner) {
         this.owner = owner;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
     }
 
     public int getSlotSpan() {
@@ -147,7 +159,6 @@ public class BookingLink {
     public void setSlots(List<BookingSlot> slots) {
         this.slots = slots;
     }
-
 
     public void setId(String id) {
         this.id = id;

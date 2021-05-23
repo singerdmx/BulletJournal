@@ -50,6 +50,9 @@ public class BookingLinksController {
     @Autowired
     private ProjectDaoJpa projectDaoJpa;
 
+    @Autowired
+    private UserClient userClient;
+
     @PostMapping(BOOKING_LINKS_ROUTE)
     @ResponseStatus(HttpStatus.CREATED)
     public BookingLink createBookingLink(@Valid @RequestBody CreateBookingLinkParams createBookingLinkParams) {
@@ -97,6 +100,9 @@ public class BookingLinksController {
                             .collect(Collectors.toList())
             );
         }
+
+        result.setOwner(this.userClient.getUser(result.getOwner().getName()));
+        result.setOwnerName(this.userDaoJpa.getBookMeUsername(result.getOwnerName()));
         return result;
     }
 

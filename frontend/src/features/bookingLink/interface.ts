@@ -1,4 +1,5 @@
 import {Project} from "../project/interface";
+import {User} from "../group/interface";
 
 export interface RecurringSpan {
     duration: number;
@@ -23,7 +24,8 @@ export interface BookingLink {
     includeTaskWithoutDuration: boolean;
     location: string;
     note: string;
-    owner: string;
+    owner: User;
+    ownerName: string;
     project: Project;
     slotSpan: number;
     startDate: string;
