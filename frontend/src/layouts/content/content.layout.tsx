@@ -30,7 +30,7 @@ import AdminSampleTaskPage from "../../pages/admin/sample-task.pages";
 import SampleTaskPage from "../../pages/task/sample-task.pages";
 import {PaymentPage} from "../../pages/payment/payment.pages";
 import BankAccountPage from "../../pages/bank-account/bank-account.pages";
-import BookingLinkPreviewPage from "../../pages/booking/booking-link-preview.pages";
+import BookingLinkPreviewPage from "../../pages/book-me/booking-link-preview.pages";
 
 const { Content } = Layout;
 class ContentLayout extends React.Component {
