@@ -26,7 +26,7 @@ const BookingLinkPublicPage: React.FC<BookingLinkPublicProps> = (
     const fullHeight = global.window.innerHeight;
 
     useEffect(() => {
-        bookingLinkId && getBookingLink(bookingLinkId);
+        bookingLinkId && getBookingLink(bookingLinkId, Intl.DateTimeFormat().resolvedOptions().timeZone);
     }, [bookingLinkId]);
 
     if (!link) {

@@ -90,7 +90,7 @@ export const GetProjectHistory = (
   username: string
 ) => {
   return doFetch(
-    `/api/projects/${projectId}/history?timezone=${timezone}&startDate=${startDate}&endDate=${endDate}&action=${action}&username=${username}`
+    `/api/projects/${projectId}/history?timezone=${encodeURIComponent(timezone)}&startDate=${startDate}&endDate=${endDate}&action=${action}&username=${username}`
   )
     .then((res) => res.json())
     .catch((err) => {

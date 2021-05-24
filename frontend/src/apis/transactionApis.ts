@@ -365,7 +365,7 @@ export const getProjectItemRevisionHistory = (
     timezone?: string
 ) => {
   let url = `/api/transactions/${transactionId}/history?pageInd=${pageInd}&pageSize=${pageSize}`;
-  if (timezone) url += `&timezone=${timezone}`;
+  if (timezone) url += `&timezone=${encodeURIComponent(timezone)}`;
   if (startDate) url += `&startDate=${startDate}`;
   if (endDate) url += `&endDate=${endDate}`;
 

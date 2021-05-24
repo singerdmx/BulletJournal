@@ -14,8 +14,8 @@ export const fetchNotes = (
 ) => {
   let url = `/api/projects/${projectId}/notes`;
   if (owner) url += `?owner=${owner}`;
-  if (order) {
-    url += `?order=true&timezone=${timezone}`;
+  if (order && timezone) {
+    url += `?order=true&timezone=${encodeURIComponent(timezone)}`;
     if (startDate) url += `&startDate=${startDate}`;
     if (endDate) url += `&endDate=${endDate}`;
   }
@@ -316,7 +316,7 @@ export const getProjectItemRevisionHistory = (
     timezone?: string
 ) => {
     let url = `/api/notes/${noteId}/history?pageInd=${pageInd}&pageSize=${pageSize}`;
-    if (timezone) url += `&timezone=${timezone}`;
+    if (timezone) url += `&timezone=${encodeURIComponent(timezone)}`;
     if (startDate) url += `&startDate=${startDate}`;
     if (endDate) url += `&endDate=${endDate}`;
 

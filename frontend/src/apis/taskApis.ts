@@ -14,8 +14,8 @@ export const fetchTasks = (
 ) => {
   let url = `/api/projects/${projectId}/tasks`;
   if (assignee) url += `?assignee=${assignee}`;
-  if (order) {
-    url += `?order=true&timezone=${timezone}`;
+  if (order && timezone) {
+    url += `?order=true&timezone=${encodeURIComponent(timezone)}`;
     if (startDate) url += `&startDate=${startDate}`;
     if (endDate) url += `&endDate=${endDate}`;
   }
@@ -36,8 +36,8 @@ export const fetchCompletedTasks = (
   timezone?: string
 ) => {
   let url = `/api/projects/${projectId}/completedTasks?`;
-  if (startDate && startDate.length > 0) {
-    url += `assignee=${assignee}&startDate=${startDate}&endDate=${endDate}&timezone=${timezone}`;
+  if (startDate && startDate.length > 0 && timezone) {
+    url += `assignee=${assignee}&startDate=${startDate}&endDate=${endDate}&timezone=${encodeURIComponent(timezone)}`;
   } else {
     url += `pageNo=${pageNo}&pageSize=${pageSize}`;
   }
@@ -470,7 +470,7 @@ export const getProjectItemRevisionHistory = (
     timezone?: string
 ) => {
   let url = `/api/tasks/${taskId}/history?pageInd=${pageInd}&pageSize=${pageSize}`;
-  if (timezone) url += `&timezone=${timezone}`;
+  if (timezone) url += `&timezone=${encodeURIComponent(timezone)}`;
   if (startDate) url += `&startDate=${startDate}`;
   if (endDate) url += `&endDate=${endDate}`;
 

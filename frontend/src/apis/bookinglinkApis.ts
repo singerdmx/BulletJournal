@@ -106,7 +106,7 @@ export const getBookingLink = (bookingLinkId: string,
                                timezone?: string) => {
     let url = `/api/public/bookingLinks/${bookingLinkId}`;
     if (timezone) {
-        url += `?timezone=${timezone}`;
+        url += `?timezone=${encodeURIComponent(timezone)}`;
     }
     return doFetch(url)
         .then((res) => res.json())
