@@ -32,7 +32,13 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
     const [visibleSlot, setVisibleSlot] = useState('');
 
     useEffect(() => {
-        onDateChange(moment(link.startDate));
+        setVisibleSlot('');
+        setSlots(link.slots.filter(d => {
+            if (isPublic && !d.on) {
+                return false;
+            }
+            return d.displayDate === selectedDate.format('YYYY-MM-DD')
+        }));
     }, [link]);
 
     function onDateChange(date: moment.Moment) {

@@ -46,7 +46,11 @@ const BookingLinkPublicPage: React.FC<BookingLinkPublicProps> = (
               </span>
             </Tooltip>
             <h1 className="book-me-drawer-header">
-                <ClockCircleOutlined/> {getSlotSpan(link.slotSpan)} Booking&nbsp;&nbsp;{link.startDate} <SwapRightOutlined /> {link.endDate}
+                <ClockCircleOutlined/> {getSlotSpan(link.slotSpan)} Booking&nbsp;&nbsp;
+                <span style={{fontSize: 'small'}}>
+                    {link.startDate} <SwapRightOutlined/>
+                    {link.endDate}&nbsp;&nbsp;({Intl.DateTimeFormat().resolvedOptions().timeZone})
+                </span>
             </h1>
             <BookMeCalendar link={link}/>
         </div>
