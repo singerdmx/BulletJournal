@@ -1,12 +1,19 @@
 import React, {useEffect, useState} from "react";
 import {Empty, Input, Tooltip} from "antd";
-import {CheckCircleOutlined, CloseCircleOutlined, QuestionCircleOutlined} from "@ant-design/icons";
+import {
+    CheckCircleOutlined,
+    ClockCircleOutlined,
+    CloseCircleOutlined,
+    QuestionCircleOutlined,
+    SwapRightOutlined
+} from "@ant-design/icons";
 
 import './book-me.styles.less';
 import {IState} from "../../store";
 import {connect} from "react-redux";
 import {getBookingLinks, getBookMeUsername, updateBookMeUsername} from "../../features/bookingLink/actions";
 import {BookingLink} from "../../features/bookingLink/interface";
+import {getSlotSpan} from "../../components/book-me/book-me-drawer";
 
 type ManageBookingProps = {
     myself: string;
@@ -89,8 +96,15 @@ const ManageBooking: React.FC<ManageBookingProps> = (
                     }} />
             </Tooltip>
         </div>
-        {links.map(l => {
-            return <div>{l.slotSpan} {l.timezone}</div>
+        {links.map(link => {
+            return <div>
+                <div>
+                    <ClockCircleOutlined/> {getSlotSpan(link.slotSpan)} Booking
+                </div>
+                <div>
+                    {link.startDate} <SwapRightOutlined /> {link.endDate}
+                </div>
+            </div>
         })}
     </div>
 }
