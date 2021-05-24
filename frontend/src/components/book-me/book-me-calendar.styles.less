@@ -20,20 +20,32 @@ div.book-me-calendar {
     div.slots {
       display: flex;
       flex-direction: column;
-      div.slot {
-        grid-template-rows: 1fr 1fr 1fr 1fr;
-        margin: 3px;
-        width: 220px;
-        padding: 1vh 1vw 1vh 1vw;
-        border-radius: 8px;
-        box-shadow: 0 1px 2px 0 rgba(85, 85, 85, 0.08),
-        0 1px 20px 0 rgba(0, 0, 0, 0.07), 0px 1px 11px 0px rgba(0, 0, 0, 0.07);
-        transition: all 0.2s ease-in-out;
-        text-align: center;
 
-        &:hover {
-          transform: scale(1.05);
-          cursor: pointer;
+      div.slot-card {
+        width: 300px;
+        display: flex;
+        justify-content: center;
+
+        div.slot {
+          color: white;
+          grid-template-rows: 1fr 1fr 1fr 1fr;
+          margin: 3px;
+          width: 220px;
+          padding: 1vh 1vw 1vh 1vw;
+          border-radius: 8px;
+          box-shadow: 0 1px 2px 0 rgba(85, 85, 85, 0.08),
+          0 1px 20px 0 rgba(0, 0, 0, 0.07), 0px 1px 11px 0px rgba(0, 0, 0, 0.07);
+          transition: all 0.2s ease-in-out;
+          text-align: center;
+
+          &:hover {
+            transform: scale(1.05);
+            cursor: pointer;
+          }
+        }
+
+        div.slot-button {
+          padding-top: 12px;
         }
       }
     }
