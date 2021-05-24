@@ -1,5 +1,5 @@
 import {createSlice, PayloadAction} from "redux-starter-kit";
-import {BookingLink, RecurringSpan} from "./interface";
+import {BookingLink, RecurringSpan, Slot} from "./interface";
 
 export type LinkAction = {
     link: BookingLink;
@@ -27,6 +27,12 @@ export type FetchBookingLink = {
 export type UpdateBookingLinkRecurrences = {
     bookingLinkId: string,
     recurrences: RecurringSpan[],
+    timezone: string
+}
+
+export type UpdateBookingLinkSlot = {
+    bookingLinkId: string,
+    slot: Slot,
     timezone: string
 }
 
@@ -87,6 +93,7 @@ const slice = createSlice({
         GetBookingLinks: (state, action: PayloadAction<FetchBookingLinks>) => state,
         GetBookingLink: (state, action: PayloadAction<FetchBookingLink>) => state,
         UpdateBookingLinkRecurrences: (state, action: PayloadAction<UpdateBookingLinkRecurrences>) => state,
+        UpdateBookingLinkSlot: (state, action: PayloadAction<UpdateBookingLinkSlot>) => state,
     }
 });
 

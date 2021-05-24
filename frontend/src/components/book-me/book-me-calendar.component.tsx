@@ -6,14 +6,19 @@ import moment from "moment";
 import {BookingLink, Slot} from "../../features/bookingLink/interface";
 import {CheckCircleOutlined, CloseCircleOutlined, SwapRightOutlined} from "@ant-design/icons";
 import {inPublicPage} from "../../index";
+import {IState} from "../../store";
+import {connect} from "react-redux";
+import {updateBookingLinkSlot} from "../../features/bookingLink/actions";
 
 type BookMeCalendarProps = {
-    link: BookingLink
+    link: BookingLink,
+    updateBookingLinkSlot: (bookingLinkId: string, slot: Slot, timezone: string) => void;
 }
 
 const BookMeCalendar: React.FC<BookMeCalendarProps> = (
     {
-        link
+        link,
+        updateBookingLinkSlot
     }
 ) => {
     const isPublic = inPublicPage();
@@ -52,8 +57,11 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
     }
 
     function markSlot(slot: Slot, on: boolean) {
-        // send API request to mark
         setVisibleSlot('');
+        // send API request to mark
+        slot = {...slot};
+        slot.on = on;
+        updateBookingLinkSlot(link.id, slot, link.timezone);
     }
 
     function getSlotButtons(slot: Slot) {
@@ -128,4 +136,8 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
     </div>
 }
 
-export default BookMeCalendar;
+const mapStateToProps = (state: IState) => ({});
+
+export default connect(mapStateToProps, {
+    updateBookingLinkSlot
+})(BookMeCalendar);

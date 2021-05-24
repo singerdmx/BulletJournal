@@ -1,5 +1,5 @@
 import {doFetch, doPatch, doPost, doPut} from "./api-helper";
-import {RecurringSpan} from "../features/bookingLink/interface";
+import {RecurringSpan, Slot} from "../features/bookingLink/interface";
 
 export const createBookingLink = (
     afterEventBuffer: number,
@@ -74,6 +74,21 @@ export const updateBookingLinkRecurrences = (
         timezone: timezone,
     });
     return doPost(`/api/bookingLinks/${bookingLinkId}/updateRecurrenceRules`, postBody)
+        .then((res) => res.json())
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}
+
+export const updateBookingLinkSlot = (
+    bookingLinkId: string,
+    slot: Slot,
+    timezone: string) => {
+    const postBody = JSON.stringify({
+        bookingSlot: slot,
+        timezone: timezone,
+    });
+    return doPost(`/api/bookingLinks/${bookingLinkId}/updateSlot`, postBody)
         .then((res) => res.json())
         .catch((err) => {
             throw Error(err.message);

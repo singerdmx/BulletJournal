@@ -142,7 +142,7 @@ public class BookingUtil {
 
     public static List<BookingSlot> getBookingLinkSlots(BookingLink bookingLink) {
         return StringUtils.isBlank(bookingLink.getSlots()) ? new ArrayList<>() :
-                Arrays.asList(EXPOSE_GSON.fromJson(bookingLink.getSlots(), BookingSlot[].class));
+                new ArrayList<>(Arrays.asList(EXPOSE_GSON.fromJson(bookingLink.getSlots(), BookingSlot[].class)));
     }
 
     public static String updateBookingLinkSlot(BookingSlot slotOverride, BookingLink bookingLink) {
