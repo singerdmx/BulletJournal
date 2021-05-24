@@ -116,8 +116,11 @@ public class BookingLinkControllerTest {
         CreateBookingLinkParams createBookingLinkParams = new CreateBookingLinkParams(
                 startDate, endDate, timezone,
                 slotSpan, bufferInMin, bufferInMin, includeTaskWithoutDuration, expireOnBooking,
-                ImmutableList.of(new RecurringSpan(
-                        30, "DTSTART:20200420T000000Z RRULE:FREQ=DAILY;INTERVAL=1;UNTIL=20200520T000000Z")),
+//                ImmutableList.of(new RecurringSpan(
+//                        30, "DTSTART:20200420T000000Z RRULE:FREQ=DAILY;INTERVAL=1;UNTIL=20200520T000000Z")),
+                ImmutableList.of(
+                        new RecurringSpan(540, "DTSTART:20210517T000000Z\\nRRULE:FREQ=DAILY;INTERVAL=1"),
+                        new RecurringSpan(420, "DTSTART:20210518T170000Z\\nRRULE:FREQ=DAILY;INTERVAL=1")),
                 projectId);
 
         ResponseEntity<BookingLink> response = this.restTemplate.exchange(

@@ -37,8 +37,8 @@ public class BookingUtil {
         List<Pair<ZonedDateTime, ZonedDateTime>> recurringTimes = new ArrayList<>();
         recurringSpans.forEach(s -> {
                     try {
-                        DateTime startDateTime = ZonedDateTimeHelper.getDateTime(ZonedDateTimeHelper.convertDateOnly(startDate, timezone));
-                        DateTime endDateTime = ZonedDateTimeHelper.getDateTime(ZonedDateTimeHelper.convertDateOnly(endDate, timezone));
+                        DateTime startDateTime = ZonedDateTimeHelper.getDateTime(ZonedDateTimeHelper.getStartTime(startDate, null, timezone));
+                        DateTime endDateTime = ZonedDateTimeHelper.getDateTime(ZonedDateTimeHelper.getEndTime(endDate, null, timezone));
                         String recurrenceRule = s.getRecurrenceRule();
                         BuJoRecurrenceRule rule = new BuJoRecurrenceRule(recurrenceRule, timezone);
                         RecurrenceRuleIterator it = rule.getIterator();
