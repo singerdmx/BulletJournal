@@ -96,16 +96,18 @@ const ManageBooking: React.FC<ManageBookingProps> = (
                     }} />
             </Tooltip>
         </div>
-        {links.map(link => {
-            return <div>
-                <div>
-                    <ClockCircleOutlined/> {getSlotSpan(link.slotSpan)} Booking
+        <div className='link-cards'>
+            {links.map(link => {
+                return <div className='link-card'>
+                    <div>
+                        <ClockCircleOutlined/> {getSlotSpan(link.slotSpan)} Booking
+                    </div>
+                    <div>
+                        {link.startDate} <SwapRightOutlined /> {link.endDate}
+                    </div>
                 </div>
-                <div>
-                    {link.startDate} <SwapRightOutlined /> {link.endDate}
-                </div>
-            </div>
-        })}
+            })}
+        </div>
     </div>
 }
 

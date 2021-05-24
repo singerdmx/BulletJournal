@@ -44,7 +44,7 @@ const BookingLinkPreviewPage: React.FC<BookingLinkPreviewProps> = (
         <h1 className="book-me-drawer-header">
             <ClockCircleOutlined/> {getSlotSpan(link.slotSpan)} Booking&nbsp;&nbsp;{link.startDate} <SwapRightOutlined /> {link.endDate}
         </h1>
-        <BookMeCalendar/>
+        <BookMeCalendar link={link}/>
     </div>
 }
 
