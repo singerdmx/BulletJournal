@@ -129,8 +129,8 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
         </div>
         <div className='selector-div'>
             <div className='slots'>
-                {slots.map(slot => {
-                    return <div className='slot-card' onClick={() => handleOnSlotClick(slot)}>
+                {slots.map((slot, i) => {
+                    return <div key={i} className='slot-card' onClick={() => handleOnSlotClick(slot)}>
                         <div className='slot' style={{backgroundColor: `${slot.on ? '#52c41a' : '#f78cba'}`}}>
                             {slot.startTime}<SwapRightOutlined/>{slot.endTime}
                         </div>

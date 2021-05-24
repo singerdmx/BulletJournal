@@ -24,6 +24,7 @@ import {History} from "history";
 import {getCookie} from "../../index";
 import {sendInvitation} from '../../apis/userApis';
 import {randomString} from "../../utils/Util";
+import {getBookingLink} from "../bookingLink/actions";
 
 type MyselfProps = {
     username: string;
@@ -42,6 +43,7 @@ type MyselfProps = {
     updateTaskContents: (taskId: number) => void;
     updateNoteContents: (noteId: number) => void;
     updateTransactionContents: (transactionId: number) => void;
+    getBookingLink: (bookingLinkId: string, timezone?: string) => void;
 };
 
 type ModalState = {
@@ -76,7 +78,9 @@ class Myself extends React.Component<MyselfProps & PathProps, ModalState> {
     handleRefreshOnClick = () => {
         this.props.updateExpandedMyself(true);
         this.props.updateSystem(true, this.props.history);
-        const hash = window.location.hash.toLowerCase();
+        const h = window.location.hash;
+        const hash = h.toLowerCase();
+
         if (hash.startsWith('#/note/') && this.props.note) {
             this.props.updateNoteContents(this.props.note.id);
         }
@@ -88,8 +92,11 @@ class Myself extends React.Component<MyselfProps & PathProps, ModalState> {
         if (hash.startsWith('#/transaction/') && this.props.transaction) {
             this.props.updateTransactionContents(this.props.transaction.id);
         }
-    };
 
+        if (hash.startsWith('#/bookinglinks')) {
+            this.props.getBookingLink(h.substring(15));
+        }
+    };
 
     handleChange = (i: number, event: React.ChangeEvent<HTMLInputElement>) => {
         const values = [...this.state.inputList];
@@ -229,5 +236,6 @@ export default connect(mapStateToProps, {
     updateSystem,
     updateTaskContents,
     updateNoteContents,
-    updateTransactionContents
+    updateTransactionContents,
+    getBookingLink
 })(withRouter(Myself));
