@@ -15,7 +15,9 @@ import {
     getBookMeUsername,
     updateBookingLink,
     updateBookMeUsername,
-    getBookingLinks, updateBookingLinkRecurrences, getBookingLink,
+    getBookingLinks,
+    updateBookingLinkRecurrences,
+    getBookingLink,
 } from "../../apis/bookinglinkApis";
 import {BookingLink} from "./interface";
 import {IState} from "../../store";
@@ -218,5 +220,6 @@ export default function* groupSagas() {
         yield takeLatest(bookingLinksActions.UpdateBookMeUsername.type, putBookMeUsername),
         yield takeLatest(bookingLinksActions.GetBookingLinks.type, fetchBookingLinks),
         yield takeLatest(bookingLinksActions.UpdateBookingLinkRecurrences.type, changeBookingLinkRecurrences),
+        yield takeLatest(bookingLinksActions.GetBookingLink.type, fetchBookingLink),
     ]);
 }

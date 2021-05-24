@@ -21,7 +21,7 @@ export type FetchBookingLinks = {
 
 export type FetchBookingLink = {
     bookingLinkId: string,
-    timezone: string
+    timezone?: string
 }
 
 export type UpdateBookingLinkRecurrences = {
@@ -85,6 +85,7 @@ const slice = createSlice({
         GetBookMeUsername: (state, action: PayloadAction<FetchBookMeUsername>) => state,
         UpdateBookMeUsername: (state, action: PayloadAction<BookMeUsernameAction>) => state,
         GetBookingLinks: (state, action: PayloadAction<FetchBookingLinks>) => state,
+        GetBookingLink: (state, action: PayloadAction<FetchBookingLink>) => state,
         UpdateBookingLinkRecurrences: (state, action: PayloadAction<UpdateBookingLinkRecurrences>) => state,
     }
 });

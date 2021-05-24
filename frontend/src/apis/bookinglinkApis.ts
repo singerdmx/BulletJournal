@@ -103,8 +103,12 @@ export const getBookingLinks = () => {
 }
 
 export const getBookingLink = (bookingLinkId: string,
-                               timezone: string) => {
-    return doFetch(`/api/public/bookingLinks/${bookingLinkId}?timezone=${timezone}`)
+                               timezone?: string) => {
+    let url = `/api/public/bookingLinks/${bookingLinkId}`;
+    if (timezone) {
+        url += `?timezone=${timezone}`;
+    }
+    return doFetch(url)
         .then((res) => res.json())
         .catch(err => {
             throw Error(err.message);

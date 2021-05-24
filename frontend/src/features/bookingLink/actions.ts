@@ -7,6 +7,12 @@ export const updateBookMeUsername = (name: string) => actions.UpdateBookMeUserna
 
 export const getBookingLinks = () => actions.GetBookingLinks({});
 
+export const getBookingLink = (bookingLinkId: string,
+                               timezone?: string) => actions.GetBookingLink({
+    bookingLinkId: bookingLinkId,
+    timezone: timezone
+});
+
 export const addBookingLink = (
     afterEventBuffer: number,
     beforeEventBuffer: number,
