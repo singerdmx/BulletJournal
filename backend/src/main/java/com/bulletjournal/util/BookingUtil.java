@@ -98,6 +98,7 @@ public class BookingUtil {
             BookingSlot bookingSlot = new BookingSlot();
             bookingSlot.setIndex(index);
             bookingSlot.setDate(date);
+            bookingSlot.setOn(true);
 
             // display to client
             ZonedDateTime displayStartTime = ZonedDateTimeHelper.getDateTimeInDifferentZone(ZonedDateTimeHelper.getDate(startT),
