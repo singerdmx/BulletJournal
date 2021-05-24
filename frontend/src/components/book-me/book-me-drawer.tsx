@@ -42,6 +42,17 @@ type BookMeDrawerProps = {
 
 const {RangePicker} = DatePicker;
 
+export const getSlotSpan = (slotSpan: number) => {
+    if (slotSpan > 60) {
+        const min = slotSpan % 60;
+        const hr = Math.floor(slotSpan / 60);
+        return (hr === 0 ? "" : hr + " Hour ") + (min === 0 ? "" : min + " Minute");
+    } else if (slotSpan === 60) {
+        return "1 Hour";
+    } else {
+        return slotSpan + " Minute";
+    }
+}
 const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
     const {setBookMeDrawerVisible, bookMeDrawerVisible, link, projects, patchBookingLink} = props;
     const [location, setLocation] = useState();
@@ -68,18 +79,6 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
     const fullWidth = global.window.innerWidth;
     const drawerWidth =
         fullWidth > fullHeight ? fullWidth * 0.75 : fullWidth;
-
-    const getSlotSpan = (slotSpan: number) => {
-        if (slotSpan > 60) {
-            const min = slotSpan % 60;
-            const hr = Math.floor(slotSpan / 60);
-            return (hr === 0 ? "" : hr + " Hour ") + (min === 0 ? "" : min + " Minute");
-        } else if (slotSpan === 60) {
-            return "1 Hour";
-        } else {
-            return slotSpan + " Minute";
-        }
-    }
 
     const handleRangeChange = (dates: any, dateStrings: string[]) => {
         if (link) {

@@ -3,4 +3,31 @@
 div.booking-link-div {
     position: relative;
     .pages-property(unset);
+    background: rgba(255, 255, 255, 0.9);
+    
+    .link-avatar {
+        width: 50px;
+        height: 50px;
+        position: absolute;
+        box-shadow: 0px 0px 3px 4px rgba(207, 206, 206, 0.8);
+        -moz-box-shadow: 0px 0px 3px 4px rgba(207, 206, 206, 0.8);
+        -webkit-box-shadow: 0px 0px 3px 4px rgba(207, 206, 206, 0.8);
+        background-color: white;
+        left: -25px;
+        top: -25px;
+        border-radius: 50%;
+        .ant-avatar {
+            width: 100%;
+            height: 100%;
+        }
+    }
+}
+
+.public-container {
+    background-size: cover;
+    padding: 10vh 0;
+
+    @media screen and (max-width: 1024px) {
+        padding-top: 5vh;
+    }
 }
