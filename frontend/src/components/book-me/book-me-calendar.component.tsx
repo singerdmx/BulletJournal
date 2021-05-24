@@ -5,6 +5,7 @@ import './book-me-calendar.styles.less';
 import moment from "moment";
 import {BookingLink} from "../../features/bookingLink/interface";
 import {SwapRightOutlined} from "@ant-design/icons";
+import {inPublicPage} from "../../index";
 
 type BookMeCalendarProps = {
     link: BookingLink
@@ -26,7 +27,12 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
             date = moment(link.startDate);
         }
         setSelectedDate(date);
-        setSlots(link.slots.filter(d => d.displayDate === date.format('YYYY-MM-DD')));
+        setSlots(link.slots.filter(d => {
+            if (inPublicPage() && !d.on) {
+                return false;
+            }
+            return d.displayDate === date.format('YYYY-MM-DD')
+        }));
     }
 
     return <div className='book-me-calendar'>
