@@ -10,6 +10,7 @@ import {BookingLink} from "./features/bookingLink/interface";
 import {getRandomBackgroundImage} from "./assets/background";
 import {ClockCircleOutlined} from "@ant-design/icons";
 import {getSlotSpan} from "./components/book-me/book-me-drawer";
+import BookMeCalendar from "./components/book-me/book-me-calendar.component";
 
 type BookingLinkPublicProps = {
     link: undefined | BookingLink;
@@ -47,6 +48,7 @@ const BookingLinkPublicPage: React.FC<BookingLinkPublicProps> = (
             <h1 className="book-me-drawer-header">
                 <ClockCircleOutlined/> {getSlotSpan(link.slotSpan)} Booking
             </h1>
+            <BookMeCalendar/>
         </div>
     </div>
 }

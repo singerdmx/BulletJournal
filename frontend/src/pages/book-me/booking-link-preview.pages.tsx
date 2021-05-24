@@ -9,6 +9,7 @@ import {getBookingLink} from "../../features/bookingLink/actions";
 import {BookingLink} from "../../features/bookingLink/interface";
 import {ClockCircleOutlined} from "@ant-design/icons";
 import {getSlotSpan} from "../../components/book-me/book-me-drawer";
+import BookMeCalendar from "../../components/book-me/book-me-calendar.component";
 
 type BookingLinkPreviewProps = {
     link: undefined | BookingLink;
@@ -43,6 +44,7 @@ const BookingLinkPreviewPage: React.FC<BookingLinkPreviewProps> = (
         <h1 className="book-me-drawer-header">
             <ClockCircleOutlined/> {getSlotSpan(link.slotSpan)} Booking
         </h1>
+        <BookMeCalendar/>
     </div>
 }
 
