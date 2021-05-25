@@ -195,7 +195,7 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                 onClose={() => setDrawerVisible(false)}
                 visible={drawerVisible}
                 key='confirm_booking'
-                height='60vh'
+                height='65vh'
             >
                 <div className='enter-details'>
                     {invitees.map((invitee, index) => {
@@ -204,17 +204,14 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                                 <Tooltip title='Remove'>
                                     <MinusCircleOutlined onClick={() => {
                                         const arr = [...invitees];
-                                        console.log(arr)
-                                        console.log(index)
                                         arr.splice(index, 1);
-                                        console.log(arr)
                                         setInvitees(arr);
                                     }}/>
                                 </Tooltip>
                             </div>
                             <div>
                                 {showError && isInvalid(index, invitee, 'email') && <Badge dot={true} color='red'/>}
-                                <Input addonBefore="Email" style={{width: 200}} placeholder='Required'
+                                <Input addonBefore="Email" style={{width: 240}} placeholder='Required'
                                        value={invitee.email}
                                        onChange={(e) => {
                                            const arr = [...invitees];
@@ -224,7 +221,7 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                             </div>
                             <div>
                                 {showError && isInvalid(index, invitee, 'firstName') && <Badge dot={true} color='red'/>}
-                                <Input addonBefore="First Name" style={{width: 200}}
+                                <Input addonBefore="First Name" style={{width: 180}}
                                        placeholder={`${index === 0 ? 'Required' : 'Optional'}`}
                                        value={invitee.firstName}
                                        onChange={(e) => {
@@ -235,7 +232,7 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                             </div>
                             <div>
                                 {showError && isInvalid(index, invitee, 'lastName') && <Badge dot={true} color='red'/>}
-                                <Input addonBefore="Last Name" style={{width: 200}}
+                                <Input addonBefore="Last Name" style={{width: 180}}
                                        placeholder={`${index === 0 ? 'Required' : 'Optional'}`}
                                        value={invitee.lastName}
                                        onChange={(e) => {
