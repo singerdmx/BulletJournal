@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Button, Calendar, Drawer, Input, Tooltip} from "antd";
+import {Badge, Button, Calendar, Drawer, Input, Tooltip} from "antd";
 
 import './book-me-calendar.styles.less';
 import moment from "moment";
@@ -7,7 +7,7 @@ import {BookingLink, Invitee, Slot} from "../../features/bookingLink/interface";
 import {
     CheckCircleOutlined,
     CloseCircleOutlined,
-    InfoCircleOutlined,
+    InfoCircleOutlined, MinusCircleOutlined,
     QuestionCircleOutlined,
     SwapRightOutlined,
     UserAddOutlined
@@ -33,6 +33,7 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
     }
 ) => {
     const isPublic = inPublicPage();
+    const [showError, setShowError] = useState(false);
     const [drawerVisible, setDrawerVisible] = useState(false);
     const [selectedDate, setSelectedDate] = useState(moment(link.startDate));
     const [location, setLocation] = useState(link.location ? link.location : '');
@@ -186,7 +187,7 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                         return <div key={index} className='enter-names'>
                             <div className='remove-button' style={{ visibility: index === 0 ? 'hidden' : 'inherit' }}>
                                 <Tooltip title='Remove'>
-                                    <CloseCircleOutlined onClick={() => {
+                                    <MinusCircleOutlined onClick={() => {
                                         const arr = [...invitees];
                                         console.log(arr)
                                         console.log(index)
@@ -197,6 +198,7 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                                 </Tooltip>
                             </div>
                             <div>
+                                {showError && <Badge dot={true} color='red'/>}
                                 <Input addonBefore="Email" style={{width: 200}} placeholder='Required'
                                        value={invitee.email}
                                        onChange={(e) => {
@@ -281,7 +283,8 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                     </div>
                     <div className='schedule-button'>
                         <div>
-                            <Button type="primary" shape="round">
+                            <Button type="primary" shape="round"
+                                onClick={() => setShowError(true)}>
                                 Schedule Event
                             </Button>
                         </div>
