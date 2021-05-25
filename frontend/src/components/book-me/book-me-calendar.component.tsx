@@ -6,7 +6,7 @@ import moment from "moment";
 import {BookingLink, Invitee, Slot} from "../../features/bookingLink/interface";
 import {
     CheckCircleOutlined,
-    CloseCircleOutlined, CloseCircleTwoTone,
+    CloseCircleOutlined,
     InfoCircleOutlined,
     QuestionCircleOutlined,
     SwapRightOutlined,
@@ -184,6 +184,18 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                 <div className='enter-details'>
                     {invitees.map((invitee, index) => {
                         return <div key={index} className='enter-names'>
+                            <div className='remove-button' style={{ visibility: index === 0 ? 'hidden' : 'inherit' }}>
+                                <Tooltip title='Remove'>
+                                    <CloseCircleOutlined onClick={() => {
+                                        const arr = [...invitees];
+                                        console.log(arr)
+                                        console.log(index)
+                                        arr.splice(index, 1);
+                                        console.log(arr)
+                                        setInvitees(arr);
+                                    }}/>
+                                </Tooltip>
+                            </div>
                             <div>
                                 <Input addonBefore="Email" style={{width: 200}} placeholder='Required'
                                        value={invitee.email}
@@ -222,18 +234,6 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                                            setInvitees(arr);
                                        }}/>
                             </div>
-                            {index > 0 && <div>
-                                <Tooltip title='Remove'>
-                                    <CloseCircleTwoTone onClick={() => {
-                                        const arr = [...invitees];
-                                        console.log(arr)
-                                        console.log(index)
-                                        arr.splice(index, 1);
-                                        console.log(arr)
-                                        setInvitees(arr);
-                                    }}/>
-                                </Tooltip>
-                            </div>}
                         </div>
                     })}
                     <div className='add-guest-button'>
