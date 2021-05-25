@@ -1,10 +1,16 @@
 import React, {useEffect, useState} from "react";
-import {Calendar, Tooltip} from "antd";
+import {Button, Calendar, Drawer, Input, Tooltip} from "antd";
 
 import './book-me-calendar.styles.less';
 import moment from "moment";
 import {BookingLink, Slot} from "../../features/bookingLink/interface";
-import {CheckCircleOutlined, CloseCircleOutlined, SwapRightOutlined} from "@ant-design/icons";
+import {
+    CheckCircleOutlined,
+    CloseCircleOutlined,
+    InfoCircleOutlined,
+    SwapRightOutlined,
+    UserAddOutlined
+} from "@ant-design/icons";
 import {inPublicPage} from "../../index";
 import {IState} from "../../store";
 import {connect} from "react-redux";
@@ -22,6 +28,7 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
     }
 ) => {
     const isPublic = inPublicPage();
+    const [drawerVisible, setDrawerVisible] = useState(false);
     const [selectedDate, setSelectedDate] = useState(moment(link.startDate));
     const [slots, setSlots] = useState(link.slots.filter(d => {
         if (isPublic && !d.on) {
@@ -78,7 +85,7 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
             return <div className='slot-button'>
                 <Tooltip placement="top" title="Book">
                     <CheckCircleOutlined
-                        // onClick={() => this.handleOnThemeClick(true)}
+                        onClick={() => setDrawerVisible(true)}
                         style={{
                             marginLeft: '20px',
                             cursor: 'pointer',
@@ -120,6 +127,14 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
             </div>;
     }
 
+    function getSelectedSlot() {
+        let slot = slots.filter(slot => slot.date + '#' + slot.index === visibleSlot)[0];
+        if (!slot) {
+            slot = slots[0];
+        }
+        return slot;
+    }
+
     return <div className='book-me-calendar'>
         <div className='calendar-div'>
             <Calendar fullscreen={false}
@@ -138,6 +153,52 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                     </div>
                 })}
             </div>
+        </div>
+        <div>
+            <Drawer
+                title={<span style={{color: '#52c41a'}}>
+                    <InfoCircleOutlined /> Enter details for {selectedDate.format('YYYY-MM-DD')}&nbsp;&nbsp;
+                    {getSelectedSlot().startTime} <SwapRightOutlined /> {getSelectedSlot().endTime}
+                </span>}
+                placement='top'
+                closable={true}
+                destroyOnClose={true}
+                onClose={() => setDrawerVisible(false)}
+                visible={drawerVisible}
+                key='confirm_booking'
+            >
+                <div className='enter-details'>
+                    <div className='enter-names'>
+                        <div>
+                            <Input addonBefore="Email" style={{ width: 200 }} placeholder='Required'/>
+                        </div>
+                        <div>
+                            <Input addonBefore="First Name" style={{ width: 200 }} placeholder='Required'/>
+                        </div>
+                        <div>
+                            <Input addonBefore="Last Name" style={{ width: 200 }} placeholder='Required'/>
+                        </div>
+                        <div>
+                            <Input addonBefore="Phone" style={{ width: 150 }} placeholder='Optional'/>
+                        </div>
+                    </div>
+                    <div className='add-guest-button'>
+                        <div>
+                            <Button type="primary" shape="round" icon={<UserAddOutlined />}>
+                                Add Guests
+                            </Button>
+                        </div>
+                    </div>
+                    <div className='schedule-button'>
+                        <div>
+                            <Button type="primary" shape="round">
+                                Schedule Event
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+
+            </Drawer>
         </div>
     </div>
 }
