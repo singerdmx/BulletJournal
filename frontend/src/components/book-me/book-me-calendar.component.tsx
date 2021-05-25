@@ -8,6 +8,7 @@ import {
     CheckCircleOutlined,
     CloseCircleOutlined,
     InfoCircleOutlined,
+    QuestionCircleOutlined,
     SwapRightOutlined,
     UserAddOutlined
 } from "@ant-design/icons";
@@ -15,11 +16,15 @@ import {inPublicPage} from "../../index";
 import {IState} from "../../store";
 import {connect} from "react-redux";
 import {updateBookingLinkSlot} from "../../features/bookingLink/actions";
+import BookMeNoteEditor from "./book-me-note-editor";
+import Quill, {DeltaStatic} from "quill";
 
 type BookMeCalendarProps = {
     link: BookingLink,
     updateBookingLinkSlot: (bookingLinkId: string, slot: Slot, timezone: string) => void;
 }
+
+const Delta = Quill.import('delta');
 
 const BookMeCalendar: React.FC<BookMeCalendarProps> = (
     {
@@ -166,6 +171,7 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                 onClose={() => setDrawerVisible(false)}
                 visible={drawerVisible}
                 key='confirm_booking'
+                height='90vh'
             >
                 <div className='enter-details'>
                     <div className='enter-names'>
@@ -188,6 +194,28 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                                 Add Guests
                             </Button>
                         </div>
+                    </div>
+                    <div className='location'>
+                        <span style={{marginRight: "10px"}}>Where{' '}
+                            <Tooltip
+                                title={<span>Use the "Where" field to specify how and where both parties will connect at the scheduled time.<br/><br/>What is entered here will appear on the confirmation page after events are scheduled and in the calendar event added to both you and your invitee's calendars.</span>}
+                            >
+                                <span className="question-icon">
+                                    <QuestionCircleOutlined/>
+                                </span>
+                            </Tooltip>
+                        </span>
+                        <Input
+                            placeholder="web link, phone number or address"
+                            value={link.location ? link.location : ''}
+                            style={{width: "250px"}}
+                            onChange={(e) => console.log(e)}
+                        />
+                    </div>
+                    <div className='note'>
+                        <BookMeNoteEditor
+                            delta={link.note ? JSON.parse(link.note)['delta'] : new Delta()}
+                            saveContent={(delta: DeltaStatic) => console.log(delta)}/>
                     </div>
                     <div className='schedule-button'>
                         <div>
