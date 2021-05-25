@@ -3,10 +3,10 @@ import {Button, Calendar, Drawer, Input, Tooltip} from "antd";
 
 import './book-me-calendar.styles.less';
 import moment from "moment";
-import {BookingLink, Slot} from "../../features/bookingLink/interface";
+import {BookingLink, Invitee, Slot} from "../../features/bookingLink/interface";
 import {
     CheckCircleOutlined,
-    CloseCircleOutlined,
+    CloseCircleOutlined, CloseCircleTwoTone,
     InfoCircleOutlined,
     QuestionCircleOutlined,
     SwapRightOutlined,
@@ -17,7 +17,7 @@ import {IState} from "../../store";
 import {connect} from "react-redux";
 import {updateBookingLinkSlot} from "../../features/bookingLink/actions";
 import BookMeNoteEditor from "./book-me-note-editor";
-import Quill, {DeltaStatic} from "quill";
+import Quill from "quill";
 
 type BookMeCalendarProps = {
     link: BookingLink,
@@ -37,6 +37,12 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
     const [selectedDate, setSelectedDate] = useState(moment(link.startDate));
     const [location, setLocation] = useState(link.location ? link.location : '');
     const [note, setNote] = useState(link.note ? JSON.parse(link.note)['delta'] : new Delta());
+    const [invitees, setInvitees] = useState<Invitee[]>([{
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: ''
+    }])
     const [slots, setSlots] = useState(link.slots.filter(d => {
         if (isPublic && !d.on) {
             return false;
@@ -176,23 +182,75 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                 height='60vh'
             >
                 <div className='enter-details'>
-                    <div className='enter-names'>
-                        <div>
-                            <Input addonBefore="Email" style={{ width: 200 }} placeholder='Required'/>
+                    {invitees.map((invitee, index) => {
+                        return <div key={index} className='enter-names'>
+                            <div>
+                                <Input addonBefore="Email" style={{width: 200}} placeholder='Required'
+                                       value={invitee.email}
+                                       onChange={(e) => {
+                                           const arr = [...invitees];
+                                           arr[index].email = e.target.value;
+                                           setInvitees(arr);
+                                       }}/>
+                            </div>
+                            <div>
+                                <Input addonBefore="First Name" style={{width: 200}}
+                                       placeholder={`${index === 0 ? 'Required' : 'Optional'}`}
+                                       value={invitee.firstName}
+                                       onChange={(e) => {
+                                           const arr = [...invitees];
+                                           arr[index].firstName = e.target.value;
+                                           setInvitees(arr);
+                                       }}/>
+                            </div>
+                            <div>
+                                <Input addonBefore="Last Name" style={{width: 200}}
+                                       placeholder={`${index === 0 ? 'Required' : 'Optional'}`}
+                                       value={invitee.lastName}
+                                       onChange={(e) => {
+                                           const arr = [...invitees];
+                                           arr[index].lastName = e.target.value;
+                                           setInvitees(arr);
+                                       }}/>
+                            </div>
+                            <div>
+                                <Input addonBefore="Phone" style={{width: 150}} placeholder='Optional'
+                                       value={invitee.phone}
+                                       onChange={(e) => {
+                                           const arr = [...invitees];
+                                           arr[index].phone = e.target.value;
+                                           setInvitees(arr);
+                                       }}/>
+                            </div>
+                            {index > 0 && <div>
+                                <Tooltip title='Remove'>
+                                    <CloseCircleTwoTone onClick={() => {
+                                        const arr = [...invitees];
+                                        console.log(arr)
+                                        console.log(index)
+                                        arr.splice(index, 1);
+                                        console.log(arr)
+                                        setInvitees(arr);
+                                    }}/>
+                                </Tooltip>
+                            </div>}
                         </div>
-                        <div>
-                            <Input addonBefore="First Name" style={{ width: 200 }} placeholder='Required'/>
-                        </div>
-                        <div>
-                            <Input addonBefore="Last Name" style={{ width: 200 }} placeholder='Required'/>
-                        </div>
-                        <div>
-                            <Input addonBefore="Phone" style={{ width: 150 }} placeholder='Optional'/>
-                        </div>
-                    </div>
+                    })}
                     <div className='add-guest-button'>
                         <div>
-                            <Button type="primary" shape="round" icon={<UserAddOutlined />}>
+                            <Button type="primary"
+                                    shape="round"
+                                    onClick={() => {
+                                        const arr = [...invitees];
+                                        arr.push({
+                                            firstName: '',
+                                            lastName: '',
+                                            email: '',
+                                            phone: ''
+                                        });
+                                        setInvitees(arr);
+                                    }}
+                                    icon={<UserAddOutlined />}>
                                 Add Guest
                             </Button>
                         </div>
