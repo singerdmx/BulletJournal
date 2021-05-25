@@ -149,6 +149,21 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
         return slot;
     }
 
+    function isInvalid(index: number, invitee: Invitee, field: string) {
+        if ((!field || field === 'email') &&
+            (!invitee.email || !/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(invitee.email))) {
+            return true;
+        }
+        if ((!field || field === 'lastName') && index === 0 && !invitee.lastName) {
+            return true;
+        }
+        if ((!field || field === 'firstName') && index === 0 && !invitee.firstName) {
+            return true;
+        }
+
+        return false;
+    }
+
     return <div className='book-me-calendar'>
         <div className='calendar-div'>
             <Calendar fullscreen={false}
@@ -198,7 +213,7 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                                 </Tooltip>
                             </div>
                             <div>
-                                {showError && <Badge dot={true} color='red'/>}
+                                {showError && isInvalid(index, invitee, 'email') && <Badge dot={true} color='red'/>}
                                 <Input addonBefore="Email" style={{width: 200}} placeholder='Required'
                                        value={invitee.email}
                                        onChange={(e) => {
@@ -208,6 +223,7 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                                        }}/>
                             </div>
                             <div>
+                                {showError && isInvalid(index, invitee, 'firstName') && <Badge dot={true} color='red'/>}
                                 <Input addonBefore="First Name" style={{width: 200}}
                                        placeholder={`${index === 0 ? 'Required' : 'Optional'}`}
                                        value={invitee.firstName}
@@ -218,6 +234,7 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                                        }}/>
                             </div>
                             <div>
+                                {showError && isInvalid(index, invitee, 'lastName') && <Badge dot={true} color='red'/>}
                                 <Input addonBefore="Last Name" style={{width: 200}}
                                        placeholder={`${index === 0 ? 'Required' : 'Optional'}`}
                                        value={invitee.lastName}
@@ -228,7 +245,7 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                                        }}/>
                             </div>
                             <div>
-                                <Input addonBefore="Phone" style={{width: 150}} placeholder='Optional'
+                                <Input addonBefore="Phone" style={{width: 180}} placeholder='Optional'
                                        value={invitee.phone}
                                        onChange={(e) => {
                                            const arr = [...invitees];
@@ -284,7 +301,13 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                     <div className='schedule-button'>
                         <div>
                             <Button type="primary" shape="round"
-                                onClick={() => setShowError(true)}>
+                                onClick={() => {
+                                    setShowError(true);
+                                    const found = invitees.find((invitee, index) => isInvalid(index, invitee, ""));
+                                    if (found) {
+                                        return;
+                                    }
+                                }}>
                                 Schedule Event
                             </Button>
                         </div>
