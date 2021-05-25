@@ -334,7 +334,8 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                 </div>
                 <BookMeNoteEditor
                     delta={link.note ? JSON.parse(link.note)['delta'] : new Delta()}
-                    saveContent={(delta: DeltaStatic) => handleNoteChange(delta)}/>
+                    saveContent={(delta: DeltaStatic) => handleNoteChange(delta)}
+                    height={160}/>
                 <div className="buttons-div">
                     <div className="buttons">
                         <Button

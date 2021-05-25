@@ -215,7 +215,8 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                     <div className='note'>
                         <BookMeNoteEditor
                             delta={link.note ? JSON.parse(link.note)['delta'] : new Delta()}
-                            saveContent={(delta: DeltaStatic) => console.log(delta)}/>
+                            saveContent={(delta: DeltaStatic) => console.log(delta)}
+                            height={200}/>
                     </div>
                     <div className='schedule-button'>
                         <div>

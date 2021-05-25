@@ -15,12 +15,14 @@ const Delta = Quill.import('delta');
 type BookMeNoteEditorProps = {
     delta: DeltaStatic;
     saveContent: (delta: DeltaStatic) => void;
+    height: number;
 }
 
 const BookMeNoteEditor: React.FC<BookMeNoteEditorProps> = (
     {
         delta,
-        saveContent
+        saveContent,
+        height
     }
 ) => {
     const quillRef = useRef<ReactQuill>(null);
@@ -169,7 +171,7 @@ const BookMeNoteEditor: React.FC<BookMeNoteEditorProps> = (
         });
     };
 
-    return <div className='note-editor'>
+    return <div className='note-editor' style={{height: `${height}px`}}>
         <div className='note-editor-title'>
             Description/Instructions&nbsp;&nbsp;
             <Tooltip
@@ -197,7 +199,7 @@ const BookMeNoteEditor: React.FC<BookMeNoteEditorProps> = (
             modules={modules}
             formats={formats}
             onChange={handleChange}
-            style={{height: '70px'}}
+            style={{height: `${height - 80}px`}}
         />
     </div>
 }
