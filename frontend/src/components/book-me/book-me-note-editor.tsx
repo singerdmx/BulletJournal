@@ -14,17 +14,20 @@ const Delta = Quill.import('delta');
 
 type BookMeNoteEditorProps = {
     delta: DeltaStatic;
-    saveContent: (delta: DeltaStatic) => void;
     height: number;
+    saveContent?: (delta: DeltaStatic) => void;
+    onContentChange?: (delta: DeltaStatic) => void;
 }
 
 const BookMeNoteEditor: React.FC<BookMeNoteEditorProps> = (
     {
         delta,
         saveContent,
-        height
+        height,
+        onContentChange
     }
 ) => {
+    const oldContents = delta;
     const quillRef = useRef<ReactQuill>(null);
     const [editorContent, setEditorContent] = useState({delta: delta});
     const [contentChanged, setContentChanged] = useState(false);
@@ -156,7 +159,9 @@ const BookMeNoteEditor: React.FC<BookMeNoteEditorProps> = (
     const handleOnClick = () => {
         setContentChanged(false);
         const newContent : DeltaStatic = new Delta(editorContent['delta']);
-        saveContent(newContent);
+        if (saveContent) {
+            saveContent(newContent);
+        }
     }
 
     const handleChange = (
@@ -169,6 +174,9 @@ const BookMeNoteEditor: React.FC<BookMeNoteEditorProps> = (
         setEditorContent({
             delta: editor.getContents(),
         });
+        if (onContentChange) {
+            onContentChange(editor.getContents());
+        }
     };
 
     return <div className='note-editor' style={{height: `${height}px`}}>
@@ -180,7 +188,7 @@ const BookMeNoteEditor: React.FC<BookMeNoteEditorProps> = (
                                     <QuestionCircleOutlined/>
                                 </span>
             </Tooltip>
-            <Tooltip placement="top" title='Save'>
+            {saveContent && <Tooltip placement="top" title='Save'>
                 <CheckCircleOutlined
                     onClick={() => handleOnClick()}
                     style={{
@@ -190,13 +198,14 @@ const BookMeNoteEditor: React.FC<BookMeNoteEditorProps> = (
                         fontSize: 20,
                         visibility: contentChanged ? 'visible' : 'hidden'
                     }} />
-            </Tooltip>
+            </Tooltip>}
         </div>
         <ReactQuill
             bounds={'.note-editor'}
             ref={quillRef}
             theme="snow"
             modules={modules}
+            defaultValue={oldContents}
             formats={formats}
             onChange={handleChange}
             style={{height: `${height - 80}px`}}

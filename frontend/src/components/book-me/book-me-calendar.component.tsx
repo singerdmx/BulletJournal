@@ -35,6 +35,8 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
     const isPublic = inPublicPage();
     const [drawerVisible, setDrawerVisible] = useState(false);
     const [selectedDate, setSelectedDate] = useState(moment(link.startDate));
+    const [location, setLocation] = useState(link.location ? link.location : '');
+    const [note, setNote] = useState(link.note ? JSON.parse(link.note)['delta'] : new Delta());
     const [slots, setSlots] = useState(link.slots.filter(d => {
         if (isPublic && !d.on) {
             return false;
@@ -171,7 +173,7 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                 onClose={() => setDrawerVisible(false)}
                 visible={drawerVisible}
                 key='confirm_booking'
-                height='90vh'
+                height='60vh'
             >
                 <div className='enter-details'>
                     <div className='enter-names'>
@@ -191,7 +193,7 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                     <div className='add-guest-button'>
                         <div>
                             <Button type="primary" shape="round" icon={<UserAddOutlined />}>
-                                Add Guests
+                                Add Guest
                             </Button>
                         </div>
                     </div>
@@ -207,16 +209,17 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                         </span>
                         <Input
                             placeholder="web link, phone number or address"
-                            value={link.location ? link.location : ''}
+                            value={location}
                             style={{width: "250px"}}
-                            onChange={(e) => console.log(e)}
+                            onChange={(e) => setLocation(e.target.value)}
                         />
                     </div>
                     <div className='note'>
                         <BookMeNoteEditor
-                            delta={link.note ? JSON.parse(link.note)['delta'] : new Delta()}
-                            saveContent={(delta: DeltaStatic) => console.log(delta)}
-                            height={200}/>
+                            delta={note}
+                            height={200}
+                            onContentChange={(delta) => setNote(delta)}
+                        />
                     </div>
                     <div className='schedule-button'>
                         <div>
