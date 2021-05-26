@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Badge, Button, Calendar, Drawer, Input, message, Tooltip} from "antd";
+import {Badge, Button, Calendar, Drawer, Input, message, Result, Tooltip} from "antd";
 
 import './book-me-calendar.styles.less';
 import moment from "moment";
@@ -176,114 +176,117 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
         return false;
     }
 
-    return <div className='book-me-calendar'>
-        <div className='calendar-div'>
-            <Calendar fullscreen={false}
-                      value={selectedDate}
-                      validRange={[moment(link.startDate), moment(link.endDate).endOf('month').add(25, 'days')]}
-                      onSelect={onDateChange}/>
-        </div>
-        <div className='selector-div'>
-            <div className='slots'>
-                {slots.map((slot, i) => {
-                    return <div key={i} className='slot-card' onClick={() => handleOnSlotClick(slot)}>
-                        <div className='slot' style={{backgroundColor: `${slot.on ? '#52c41a' : '#f78cba'}`}}>
-                            {slot.startTime}<SwapRightOutlined/>{slot.endTime}
-                        </div>
-                        {getSlotButtons(slot)}
-                    </div>
-                })}
+    function getCalendarDiv() {
+        return <>
+            <div className='calendar-div'>
+                <Calendar fullscreen={false}
+                          value={selectedDate}
+                          validRange={[moment(link.startDate), moment(link.endDate).endOf('month').add(25, 'days')]}
+                          onSelect={onDateChange}/>
             </div>
-        </div>
-        <div>
-            <Drawer
-                title={<span style={{color: '#52c41a'}}>
-                    <InfoCircleOutlined /> Enter details for {selectedDate.format('YYYY-MM-DD')}&nbsp;&nbsp;
-                    {getSelectedSlot().startTime} <SwapRightOutlined /> {getSelectedSlot().endTime}
-                </span>}
-                placement='top'
-                closable={true}
-                destroyOnClose={true}
-                onClose={() => setDrawerVisible(false)}
-                visible={drawerVisible}
-                key='confirm_booking'
-                height='65vh'
-            >
-                <div className='enter-details'>
-                    {invitees.map((invitee, index) => {
-                        return <div key={index} className='enter-names'>
-                            <div className='remove-button' style={{ visibility: index === 0 ? 'hidden' : 'inherit' }}>
-                                <Tooltip title='Remove'>
-                                    <MinusCircleOutlined onClick={() => {
-                                        const arr = [...invitees];
-                                        arr.splice(index, 1);
-                                        setInvitees(arr);
-                                    }}/>
-                                </Tooltip>
+            <div className='selector-div'>
+                <div className='slots'>
+                    {slots.map((slot, i) => {
+                        return <div key={i} className='slot-card' onClick={() => handleOnSlotClick(slot)}>
+                            <div className='slot' style={{backgroundColor: `${slot.on ? '#52c41a' : '#f78cba'}`}}>
+                                {slot.startTime}<SwapRightOutlined/>{slot.endTime}
                             </div>
-                            <div>
-                                {showError && isInvalid(index, invitee, 'email') && <Badge dot={true} color='red'/>}
-                                <Input addonBefore="Email" style={{width: 240}} placeholder='Required'
-                                       value={invitee.email}
-                                       onChange={(e) => {
-                                           const arr = [...invitees];
-                                           arr[index].email = e.target.value;
-                                           setInvitees(arr);
-                                       }}/>
-                            </div>
-                            <div>
-                                {showError && isInvalid(index, invitee, 'firstName') && <Badge dot={true} color='red'/>}
-                                <Input addonBefore="First Name" style={{width: 180}}
-                                       placeholder={`${index === 0 ? 'Required' : 'Optional'}`}
-                                       value={invitee.firstName}
-                                       onChange={(e) => {
-                                           const arr = [...invitees];
-                                           arr[index].firstName = e.target.value;
-                                           setInvitees(arr);
-                                       }}/>
-                            </div>
-                            <div>
-                                {showError && isInvalid(index, invitee, 'lastName') && <Badge dot={true} color='red'/>}
-                                <Input addonBefore="Last Name" style={{width: 180}}
-                                       placeholder={`${index === 0 ? 'Required' : 'Optional'}`}
-                                       value={invitee.lastName}
-                                       onChange={(e) => {
-                                           const arr = [...invitees];
-                                           arr[index].lastName = e.target.value;
-                                           setInvitees(arr);
-                                       }}/>
-                            </div>
-                            <div>
-                                <Input addonBefore="Phone" style={{width: 180}} placeholder='Optional'
-                                       value={invitee.phone}
-                                       onChange={(e) => {
-                                           const arr = [...invitees];
-                                           arr[index].phone = e.target.value;
-                                           setInvitees(arr);
-                                       }}/>
-                            </div>
+                            {getSlotButtons(slot)}
                         </div>
                     })}
-                    <div className='add-guest-button'>
-                        <div>
-                            <Button type="primary"
-                                    shape="round"
-                                    onClick={() => {
-                                        const arr = [...invitees];
-                                        arr.push({
-                                            firstName: '',
-                                            lastName: '',
-                                            email: '',
-                                            phone: ''
-                                        });
-                                        setInvitees(arr);
-                                    }}
-                                    icon={<UserAddOutlined />}>
-                                Add Guest
-                            </Button>
+                </div>
+            </div>
+            <div>
+                <Drawer
+                    title={<span style={{color: '#52c41a'}}>
+                    <InfoCircleOutlined/> Enter details for {selectedDate.format('YYYY-MM-DD')}&nbsp;&nbsp;
+                        {getSelectedSlot().startTime} <SwapRightOutlined/> {getSelectedSlot().endTime}
+                </span>}
+                    placement='top'
+                    closable={true}
+                    destroyOnClose={true}
+                    onClose={() => setDrawerVisible(false)}
+                    visible={drawerVisible}
+                    key='confirm_booking'
+                    height='65vh'
+                >
+                    <div className='enter-details'>
+                        {invitees.map((invitee, index) => {
+                            return <div key={index} className='enter-names'>
+                                <div className='remove-button' style={{visibility: index === 0 ? 'hidden' : 'inherit'}}>
+                                    <Tooltip title='Remove'>
+                                        <MinusCircleOutlined onClick={() => {
+                                            const arr = [...invitees];
+                                            arr.splice(index, 1);
+                                            setInvitees(arr);
+                                        }}/>
+                                    </Tooltip>
+                                </div>
+                                <div>
+                                    {showError && isInvalid(index, invitee, 'email') && <Badge dot={true} color='red'/>}
+                                    <Input addonBefore="Email" style={{width: 240}} placeholder='Required'
+                                           value={invitee.email}
+                                           onChange={(e) => {
+                                               const arr = [...invitees];
+                                               arr[index].email = e.target.value;
+                                               setInvitees(arr);
+                                           }}/>
+                                </div>
+                                <div>
+                                    {showError && isInvalid(index, invitee, 'firstName') &&
+                                    <Badge dot={true} color='red'/>}
+                                    <Input addonBefore="First Name" style={{width: 180}}
+                                           placeholder={`${index === 0 ? 'Required' : 'Optional'}`}
+                                           value={invitee.firstName}
+                                           onChange={(e) => {
+                                               const arr = [...invitees];
+                                               arr[index].firstName = e.target.value;
+                                               setInvitees(arr);
+                                           }}/>
+                                </div>
+                                <div>
+                                    {showError && isInvalid(index, invitee, 'lastName') &&
+                                    <Badge dot={true} color='red'/>}
+                                    <Input addonBefore="Last Name" style={{width: 180}}
+                                           placeholder={`${index === 0 ? 'Required' : 'Optional'}`}
+                                           value={invitee.lastName}
+                                           onChange={(e) => {
+                                               const arr = [...invitees];
+                                               arr[index].lastName = e.target.value;
+                                               setInvitees(arr);
+                                           }}/>
+                                </div>
+                                <div>
+                                    <Input addonBefore="Phone" style={{width: 180}} placeholder='Optional'
+                                           value={invitee.phone}
+                                           onChange={(e) => {
+                                               const arr = [...invitees];
+                                               arr[index].phone = e.target.value;
+                                               setInvitees(arr);
+                                           }}/>
+                                </div>
+                            </div>
+                        })}
+                        <div className='add-guest-button'>
+                            <div>
+                                <Button type="primary"
+                                        shape="round"
+                                        onClick={() => {
+                                            const arr = [...invitees];
+                                            arr.push({
+                                                firstName: '',
+                                                lastName: '',
+                                                email: '',
+                                                phone: ''
+                                            });
+                                            setInvitees(arr);
+                                        }}
+                                        icon={<UserAddOutlined/>}>
+                                    Add Guest
+                                </Button>
+                            </div>
                         </div>
-                    </div>
-                    <div className='location'>
+                        <div className='location'>
                         <span style={{marginRight: "10px"}}>Where{' '}
                             <Tooltip
                                 title={<span>Use the "Where" field to specify how and where both parties will connect at the scheduled time.<br/><br/>What is entered here will appear on the confirmation page after events are scheduled and in the calendar event added to both you and your invitee's calendars.</span>}
@@ -293,46 +296,61 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                                 </span>
                             </Tooltip>
                         </span>
-                        <Input
-                            placeholder="web link, phone number or address"
-                            value={location}
-                            style={{width: "250px"}}
-                            onChange={(e) => setLocation(e.target.value)}
-                        />
-                    </div>
-                    <div className='note'>
-                        <BookMeNoteEditor
-                            delta={note}
-                            height={200}
-                            onContentChange={(delta) => setNote(delta)}
-                        />
-                    </div>
-                    <div className='schedule-button'>
-                        <div>
-                            <Button type="primary" shape="round"
-                                onClick={() => {
-                                    setShowError(true);
-                                    const found = invitees.find((invitee, index) => isInvalid(index, invitee, ""));
-                                    if (found) {
-                                        return;
-                                    }
-                                    book(link.id, invitees, parseInt(visibleSlot.split('#')[1]),
-                                        visibleSlot.split('#')[0], location, JSON.stringify(note),
-                                        Intl.DateTimeFormat().resolvedOptions().timeZone,
-                                        (bookingId) => {
-                                            message.success('A calendar invitation has been sent to your email address.');
-                                            // go to reschedule/cancel page
-                                        });
-                                    setDrawerVisible(false);
-                                }}>
-                                Schedule Event
-                            </Button>
+                            <Input
+                                placeholder="web link, phone number or address"
+                                value={location}
+                                style={{width: "250px"}}
+                                onChange={(e) => setLocation(e.target.value)}
+                            />
+                        </div>
+                        <div className='note'>
+                            <BookMeNoteEditor
+                                delta={note}
+                                height={200}
+                                onContentChange={(delta) => setNote(delta)}
+                            />
+                        </div>
+                        <div className='schedule-button'>
+                            <div>
+                                <Button type="primary" shape="round"
+                                        onClick={() => {
+                                            setShowError(true);
+                                            const found = invitees.find((invitee, index) => isInvalid(index, invitee, ""));
+                                            if (found) {
+                                                return;
+                                            }
+                                            book(link.id, invitees, parseInt(visibleSlot.split('#')[1]),
+                                                visibleSlot.split('#')[0], location, JSON.stringify(note),
+                                                Intl.DateTimeFormat().resolvedOptions().timeZone,
+                                                (bookingId) => {
+                                                    message.success('A calendar invitation has been sent to your email address.');
+                                                    // go to reschedule/cancel page
+                                                });
+                                            setDrawerVisible(false);
+                                        }}>
+                                    Schedule Event
+                                </Button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-            </Drawer>
-        </div>
+                </Drawer>
+            </div>
+        </>;
+    }
+
+    function getRemovedDiv() {
+        return <Result
+            status="404"
+            title="Sorry, the page you visited no longer exists"
+            subTitle="It is likely that the link expired after a booking is made"
+            extra={<Button type="primary" onClick={() => window.open('https://bulletjournal.us/home/index.html')}>Home</Button>}
+        />
+    }
+
+    return <div className='book-me-calendar'>
+        {!link.removed && getCalendarDiv()}
+        {link.removed && getRemovedDiv()}
     </div>
 }
 
