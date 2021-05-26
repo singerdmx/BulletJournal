@@ -33,6 +33,7 @@ export interface BookingLink {
     slots: Slot[];
     recurrences: RecurringSpan[];
     bookings: Booking[];
+    removed: boolean;
 }
 
 export interface Booking {
