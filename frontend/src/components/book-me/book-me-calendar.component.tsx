@@ -317,7 +317,7 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                                         return;
                                     }
                                     book(link.id, invitees, parseInt(visibleSlot.split('#')[1]),
-                                        visibleSlot.split('#')[2], location, JSON.stringify(note),
+                                        visibleSlot.split('#')[0], location, JSON.stringify(note),
                                         Intl.DateTimeFormat().resolvedOptions().timeZone,
                                         (bookingId) => {
                                             message.success('A calendar invitation has been sent to your email address.');
