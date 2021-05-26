@@ -7,7 +7,6 @@ import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.models.Booking;
 import com.bulletjournal.repository.models.BookingLink;
 import com.bulletjournal.repository.models.Task;
-import com.bulletjournal.util.StringUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.RandomStringUtils;
