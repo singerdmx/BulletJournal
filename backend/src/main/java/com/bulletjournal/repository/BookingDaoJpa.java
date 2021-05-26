@@ -7,9 +7,11 @@ import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.models.Booking;
 import com.bulletjournal.repository.models.BookingLink;
 import com.bulletjournal.repository.models.Task;
+import com.bulletjournal.util.StringUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -72,7 +74,39 @@ public class BookingDaoJpa {
                 location
         );
 
-        // TODO: prepend invitees info in note
+        StringBuilder sb = new StringBuilder();
+
+        String primaryPhone = StringUtils.isBlank(primaryInvitee.getPhone()) ? "" : ", " + primaryInvitee.getPhone();
+
+        String info = "{\"delta\" : {\"ops\": [{\"attributes\": {\"bold\": true},\"insert\": \""
+                + bookingLink.getOwner() + "\"},{\"insert\": \" - " + this.userDaoJpa.getByName(bookingLink.getOwner()).getEmail()
+                + "\"},{\"attributes\": {\"list\": \"bullet\"},\"insert\": \"\\n\"},{\"insert\": \""
+                + primaryInvitee.getFirstName() + " " + primaryInvitee.getLastName() + " - " + primaryInvitee.getEmail()
+                + primaryPhone + "\"},{\"attributes\": {\"list\": \"bullet\"},\"insert\": \"\\n\"}";
+        sb.append(info);
+
+        for (int i = 1; i < invitees.size(); i++)  {
+            Invitee invitee = invitees.get(i);
+            sb.append(",{\"insert\": \"");
+            if (!StringUtils.isBlank(invitee.getFirstName())) sb.append(invitee.getFirstName());
+            if (!StringUtils.isBlank(invitee.getLastName())) sb.append(invitee.getLastName());
+            if (!StringUtils.isBlank(invitee.getFirstName()) || !StringUtils.isBlank(invitee.getLastName())) sb.append(" - ");
+            sb.append(invitee.getEmail());
+            if (!StringUtils.isBlank(invitee.getPhone())){
+                sb.append(", ");
+                sb.append(invitee.getPhone());
+            }
+            sb.append("\"},{\"attributes\": {\"list\": \"bullet\"},\"insert\": \"\\n\"}");
+        }
+        sb.append(",{\"insert\": \"\\n        \"}");
+        sb.append(",{\"insert\":\"").append(note).append("\\n\"}");
+        sb.append(",{\"insert\": \"\\n        \"},{\"attributes\":{\"link\":\"https://bulletjournal.us/public/bookingLinks/");
+        sb.append(bookingLink.getId());
+        sb.append("\"},\"insert\":\"View event in Bullet Journal\"},{\"insert\": \"\\n\"}");
+        sb.append("]}}");
+
+        note = sb.toString();
+
         Task task = taskDaoJpa.create(
                 bookingLink.getProject().getId(), bookingLink.getOwner(), createTaskParams, note);
         booking.setTask(task);

@@ -105,6 +105,11 @@ public class BookingLinkControllerTest {
         invitee1.setPhone("9794029450");
         invitees.add(invitee1);
 
+        Invitee invitee2 = new Invitee();
+        invitee2.setLastName("lastname");
+        invitee2.setEmail("test@mail.com");
+        invitees.add(invitee2);
+
         BookParams bookParams = new BookParams(invitees, 1, "2021-05-04", "Seatle", "test", "America/Chicago");
 
         book(bookingLink1, bookParams);
