@@ -31,7 +31,7 @@ type BookMeCalendarProps = {
         location: string,
         note: string,
         requesterTimezone: string,
-        onSuccess: Function
+        onSuccess: (bookingId: string) => void
     ) => void;
 }
 
@@ -319,9 +319,11 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                                     book(link.id, invitees, parseInt(visibleSlot.split('#')[1]),
                                         visibleSlot.split('#')[2], location, note,
                                         Intl.DateTimeFormat().resolvedOptions().timeZone,
-                                        () => {
+                                        (bookingId) => {
                                             message.success('A calendar invitation has been sent to your email address.');
+                                            // go to reschedule/cancel page
                                         });
+                                    setDrawerVisible(false);
                                 }}>
                                 Schedule Event
                             </Button>

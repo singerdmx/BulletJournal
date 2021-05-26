@@ -20,7 +20,7 @@ import {
     updateBookingLinkSlot,
     getBookingLink, book,
 } from "../../apis/bookinglinkApis";
-import {BookingLink, Invitee} from "./interface";
+import {Booking, BookingLink, Invitee} from "./interface";
 import {IState} from "../../store";
 
 function* fetchBookMeUsername(action: PayloadAction<FetchBookMeUsername>) {
@@ -197,7 +197,7 @@ function* changeBookingLinkRecurrences(action: PayloadAction<UpdateBookingLinkRe
             timezone
         } = action.payload;
 
-        const data = yield call(
+        const data : BookingLink = yield call(
             updateBookingLinkRecurrences,
             bookingLinkId,
             recurrences,
@@ -221,7 +221,7 @@ function* changeBookingLinkSlot(action: PayloadAction<UpdateBookingLinkSlot>) {
             timezone
         } = action.payload;
 
-        const data = yield call(
+        const data : BookingLink = yield call(
             updateBookingLinkSlot,
             bookingLinkId,
             slot,
@@ -250,7 +250,7 @@ function* createBooking(action: PayloadAction<CreateBooking>) {
             onSuccess
         } = action.payload;
 
-        yield call(
+        const data : Booking = yield call(
             book,
             bookingLinkId,
             invitees,
@@ -260,7 +260,7 @@ function* createBooking(action: PayloadAction<CreateBooking>) {
             note,
             requesterTimezone
         );
-        onSuccess();
+        onSuccess(data.id);
     } catch (error) {
         if (error.message === 'reload') {
             yield put(reloadReceived(true));

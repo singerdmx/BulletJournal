@@ -71,8 +71,8 @@ export type CreateBooking = {
     slotDate: string,
     location: string,
     note: string,
-    requesterTimezone: string
-    onSuccess: Function
+    requesterTimezone: string,
+    onSuccess: (bookingId: string) => void
 }
 
 let initialState = {

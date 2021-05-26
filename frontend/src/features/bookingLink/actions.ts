@@ -100,7 +100,7 @@ export const book = (
     location: string,
     note: string,
     requesterTimezone: string,
-    onSuccess: Function
+    onSuccess: (bookingId: string) => void
 ) => actions.CreateBooking({
     bookingLinkId: bookingLinkId,
     invitees: invitees,
