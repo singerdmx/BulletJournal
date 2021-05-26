@@ -110,7 +110,8 @@ public class BookingLinkControllerTest {
         invitee2.setEmail("test@mail.com");
         invitees.add(invitee2);
 
-        BookParams bookParams = new BookParams(invitees, 1, "2021-05-04", "Seatle", "test", "America/Chicago");
+        BookParams bookParams = new BookParams(invitees, 1, "2021-05-04", "Seatle",
+                "{\"delta\":{\"ops\":[{\"insert\":\"test content\\n\"}]}}", "America/Chicago");
 
         book(bookingLink1, bookParams);
         deleteAllBookinglinks(USER);

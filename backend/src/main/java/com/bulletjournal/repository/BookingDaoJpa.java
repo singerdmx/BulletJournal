@@ -74,8 +74,24 @@ public class BookingDaoJpa {
                 location
         );
 
+
+        note = prependInfoToNote(note, bookingLink, invitees);
+
+        Task task = taskDaoJpa.create(
+                bookingLink.getProject().getId(), bookingLink.getOwner(), createTaskParams, note);
+        booking.setTask(task);
+        booking = bookingRepository.save(booking);
+        if (bookingLink.isExpireOnBooking()) {
+            bookingLink.setRemoved(true);
+        }
+        this.bookingLinkRepository.save(bookingLink);
+        return booking;
+    }
+
+    private String prependInfoToNote(String note, BookingLink bookingLink, List<Invitee> invitees) {
         StringBuilder sb = new StringBuilder();
 
+        Invitee primaryInvitee = invitees.get(0);
         String primaryPhone = StringUtils.isBlank(primaryInvitee.getPhone()) ? "" : ", " + primaryInvitee.getPhone();
 
         String info = "{\"delta\" : {\"ops\": [{\"attributes\": {\"bold\": true},\"insert\": \""
@@ -99,22 +115,15 @@ public class BookingDaoJpa {
             sb.append("\"},{\"attributes\": {\"list\": \"bullet\"},\"insert\": \"\\n\"}");
         }
         sb.append(",{\"insert\": \"\\n        \"}");
-        sb.append(",{\"insert\":\"").append(note).append("\\n\"}");
+        if (!StringUtils.isBlank(note)) {
+            sb.append(",");
+            String originalNote = note.substring(note.indexOf('[') + 1, note.indexOf(']'));
+            sb.append(originalNote);
+        }
         sb.append(",{\"insert\": \"\\n        \"},{\"attributes\":{\"link\":\"https://bulletjournal.us/public/bookingLinks/");
         sb.append(bookingLink.getId());
         sb.append("\"},\"insert\":\"View event in Bullet Journal\"},{\"insert\": \"\\n\"}");
         sb.append("]}}");
-
-        note = sb.toString();
-
-        Task task = taskDaoJpa.create(
-                bookingLink.getProject().getId(), bookingLink.getOwner(), createTaskParams, note);
-        booking.setTask(task);
-        booking = bookingRepository.save(booking);
-        if (bookingLink.isExpireOnBooking()) {
-            bookingLink.setRemoved(true);
-        }
-        this.bookingLinkRepository.save(bookingLink);
-        return booking;
+        return sb.toString();
     }
 }
