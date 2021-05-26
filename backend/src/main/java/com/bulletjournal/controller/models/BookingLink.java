@@ -41,6 +41,8 @@ public class BookingLink {
 
     private String note;
 
+    private boolean removed;
+
     public List<RecurringSpan> getRecurrences() {
         return recurrences;
     }
@@ -82,7 +84,7 @@ public class BookingLink {
                        List<RecurringSpan> recurrences,
                        @NotNull com.bulletjournal.controller.models.Project project,
                        String location,
-                       String note) {
+                       String note, boolean removed) {
         this.id = id;
         this.owner = owner;
         this.ownerName = ownerName;
@@ -98,6 +100,7 @@ public class BookingLink {
         this.project = project;
         this.location = location;
         this.note = note;
+        this.removed = removed;
     }
 
     public User getOwner() {
@@ -210,5 +213,13 @@ public class BookingLink {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public boolean isRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(boolean removed) {
+        this.removed = removed;
     }
 }
