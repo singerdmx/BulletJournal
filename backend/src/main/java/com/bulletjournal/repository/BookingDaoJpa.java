@@ -92,12 +92,16 @@ public class BookingDaoJpa {
 
         Invitee primaryInvitee = invitees.get(0);
         String primaryPhone = StringUtils.isBlank(primaryInvitee.getPhone()) ? "" : ", " + primaryInvitee.getPhone();
+        String ownerEmail = this.userDaoJpa.getByName(bookingLink.getOwner()).getEmail();
+        if (StringUtils.isBlank(ownerEmail)) {
+            ownerEmail = "";
+        } else {
+            ownerEmail = " - " + ownerEmail;
+        }
 
-        String info = "{\"delta\" : {\"ops\": [{\"attributes\": {\"bold\": true},\"insert\": \""
-                + bookingLink.getOwner() + "\"},{\"insert\": \" - " + this.userDaoJpa.getByName(bookingLink.getOwner()).getEmail()
-                + "\"},{\"attributes\": {\"list\": \"bullet\"},\"insert\": \"\\n\"},{\"insert\": \""
-                + primaryInvitee.getFirstName() + " " + primaryInvitee.getLastName() + " - " + primaryInvitee.getEmail()
-                + primaryPhone + "\"},{\"attributes\": {\"list\": \"bullet\"},\"insert\": \"\\n\"}";
+        String info = "{\"delta\": {\"ops\": [" + "{\"insert\": \""+ this.userDaoJpa.getBookMeUsername(bookingLink.getOwner())
+                + "\"}" + ",{\"insert\": \"" + ownerEmail + "\\n\"},{\"insert\": \"" + primaryInvitee.getFirstName()
+                + primaryInvitee.getLastName() + " - " + primaryInvitee.getEmail() + primaryPhone + "\\n\"}";
         sb.append(info);
 
         for (int i = 1; i < invitees.size(); i++)  {
@@ -111,15 +115,15 @@ public class BookingDaoJpa {
                 sb.append(", ");
                 sb.append(invitee.getPhone());
             }
-            sb.append("\"},{\"attributes\": {\"list\": \"bullet\"},\"insert\": \"\\n\"}");
+            sb.append("\\n\"}");
         }
-        sb.append(",{\"insert\": \"\\n        \"}");
+        sb.append(",{\"insert\": \"\\n\"}");
         if (!StringUtils.isBlank(note)) {
             sb.append(",");
             String originalNote = note.substring(note.indexOf('[') + 1, note.indexOf(']'));
             sb.append(originalNote);
         }
-        sb.append(",{\"insert\": \"\\n        \"},{\"attributes\":{\"link\":\"https://bulletjournal.us/public/bookingLinks/");
+        sb.append(",{\"attributes\":{\"link\":\"https://bulletjournal.us/public/bookingLinks/");
         sb.append(bookingLink.getId());
         sb.append("\"},\"insert\":\"View event in Bullet Journal\"},{\"insert\": \"\\n\"}");
         sb.append("]}}");
