@@ -1,5 +1,5 @@
 import {actions} from "./reducer";
-import {BookingLink, RecurringSpan, Slot} from "./interface";
+import {BookingLink, Invitee, RecurringSpan, Slot} from "./interface";
 
 export const getBookMeUsername = () => actions.GetBookMeUsername({});
 
@@ -91,3 +91,23 @@ export const updateBookingLinkSlot = (
         slot: slot,
         timezone: timezone
     });
+
+export const book = (
+    bookingLinkId: string,
+    invitees: Invitee[],
+    slotIndex: number,
+    slotDate: string,
+    location: string,
+    note: string,
+    requesterTimezone: string,
+    onSuccess: Function
+) => actions.CreateBooking({
+    bookingLinkId: bookingLinkId,
+    invitees: invitees,
+    slotIndex: slotIndex,
+    slotDate: slotDate,
+    location: location,
+    note: note,
+    requesterTimezone: requesterTimezone,
+    onSuccess: onSuccess
+});

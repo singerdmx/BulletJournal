@@ -5,7 +5,7 @@ import {
     BookMeUsernameAction,
     FetchBookMeUsername,
     PatchBookingLink,
-    FetchBookingLinks, UpdateBookingLinkRecurrences, FetchBookingLink, UpdateBookingLinkSlot,
+    FetchBookingLinks, UpdateBookingLinkRecurrences, FetchBookingLink, UpdateBookingLinkSlot, CreateBooking,
 } from "./reducer";
 import {PayloadAction} from "redux-starter-kit";
 import {message} from "antd";
@@ -18,9 +18,9 @@ import {
     getBookingLinks,
     updateBookingLinkRecurrences,
     updateBookingLinkSlot,
-    getBookingLink,
+    getBookingLink, book,
 } from "../../apis/bookinglinkApis";
-import {BookingLink} from "./interface";
+import {BookingLink, Invitee} from "./interface";
 import {IState} from "../../store";
 
 function* fetchBookMeUsername(action: PayloadAction<FetchBookMeUsername>) {
@@ -237,6 +237,39 @@ function* changeBookingLinkSlot(action: PayloadAction<UpdateBookingLinkSlot>) {
     }
 }
 
+function* createBooking(action: PayloadAction<CreateBooking>) {
+    try {
+        const {
+            bookingLinkId,
+            invitees,
+            slotIndex,
+            slotDate,
+            location,
+            note,
+            requesterTimezone,
+            onSuccess
+        } = action.payload;
+
+        yield call(
+            book,
+            bookingLinkId,
+            invitees,
+            slotIndex,
+            slotDate,
+            location,
+            note,
+            requesterTimezone
+        );
+        onSuccess();
+    } catch (error) {
+        if (error.message === 'reload') {
+            yield put(reloadReceived(true));
+        } else {
+            yield call(message.error, `createBooking fail: ${error}`);
+        }
+    }
+}
+
 export default function* groupSagas() {
     yield all([
         yield takeLatest(bookingLinksActions.AddBookingLink.type, addBookingLink),
@@ -247,5 +280,6 @@ export default function* groupSagas() {
         yield takeLatest(bookingLinksActions.UpdateBookingLinkRecurrences.type, changeBookingLinkRecurrences),
         yield takeLatest(bookingLinksActions.GetBookingLink.type, fetchBookingLink),
         yield takeLatest(bookingLinksActions.UpdateBookingLinkSlot.type, changeBookingLinkSlot),
+        yield takeLatest(bookingLinksActions.CreateBooking.type, createBooking),
     ]);
 }

@@ -1,5 +1,5 @@
 import {doFetch, doPatch, doPost, doPut} from "./api-helper";
-import {RecurringSpan, Slot} from "../features/bookingLink/interface";
+import {Invitee, RecurringSpan, Slot} from "../features/bookingLink/interface";
 
 export const createBookingLink = (
     afterEventBuffer: number,
@@ -126,6 +126,29 @@ export const getBookingLink = (bookingLinkId: string,
     return doFetch(url)
         .then((res) => res.json())
         .catch(err => {
+            throw Error(err.message);
+        });
+}
+
+export const book = (bookingLinkId: string,
+                     invitees: Invitee[],
+                     slotIndex: number,
+                     slotDate: string,
+                     location: string,
+                     note: string,
+                     requesterTimezone: string) => {
+
+    const postBody = JSON.stringify({
+        invitees: invitees,
+        slotIndex: slotIndex,
+        slotDate: slotDate,
+        location: location,
+        note: note,
+        requesterTimezone: requesterTimezone
+    });
+    return doPost(`/api/public/bookingLinks/${bookingLinkId}/book`, postBody)
+        .then((res) => res.json())
+        .catch((err) => {
             throw Error(err.message);
         });
 }

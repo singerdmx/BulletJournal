@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Badge, Button, Calendar, Drawer, Input, Tooltip} from "antd";
+import {Badge, Button, Calendar, Drawer, Input, message, Tooltip} from "antd";
 
 import './book-me-calendar.styles.less';
 import moment from "moment";
@@ -7,7 +7,8 @@ import {BookingLink, Invitee, Slot} from "../../features/bookingLink/interface";
 import {
     CheckCircleOutlined,
     CloseCircleOutlined,
-    InfoCircleOutlined, MinusCircleOutlined,
+    InfoCircleOutlined,
+    MinusCircleOutlined,
     QuestionCircleOutlined,
     SwapRightOutlined,
     UserAddOutlined
@@ -15,13 +16,23 @@ import {
 import {inPublicPage} from "../../index";
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {updateBookingLinkSlot} from "../../features/bookingLink/actions";
+import {book, updateBookingLinkSlot} from "../../features/bookingLink/actions";
 import BookMeNoteEditor from "./book-me-note-editor";
 import Quill from "quill";
 
 type BookMeCalendarProps = {
     link: BookingLink,
     updateBookingLinkSlot: (bookingLinkId: string, slot: Slot, timezone: string) => void;
+    book: (
+        bookingLinkId: string,
+        invitees: Invitee[],
+        slotIndex: number,
+        slotDate: string,
+        location: string,
+        note: string,
+        requesterTimezone: string,
+        onSuccess: Function
+    ) => void;
 }
 
 const Delta = Quill.import('delta');
@@ -29,7 +40,8 @@ const Delta = Quill.import('delta');
 const BookMeCalendar: React.FC<BookMeCalendarProps> = (
     {
         link,
-        updateBookingLinkSlot
+        updateBookingLinkSlot,
+        book
     }
 ) => {
     const isPublic = inPublicPage();
@@ -304,6 +316,12 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                                     if (found) {
                                         return;
                                     }
+                                    book(link.id, invitees, parseInt(visibleSlot.split('#')[1]),
+                                        visibleSlot.split('#')[2], location, note,
+                                        Intl.DateTimeFormat().resolvedOptions().timeZone,
+                                        () => {
+                                            message.success('A calendar invitation has been sent to your email address.');
+                                        });
                                 }}>
                                 Schedule Event
                             </Button>
@@ -319,5 +337,6 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
 const mapStateToProps = (state: IState) => ({});
 
 export default connect(mapStateToProps, {
-    updateBookingLinkSlot
+    updateBookingLinkSlot,
+    book
 })(BookMeCalendar);

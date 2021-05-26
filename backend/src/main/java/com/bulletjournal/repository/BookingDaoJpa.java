@@ -28,6 +28,9 @@ public class BookingDaoJpa {
     private BookingRepository bookingRepository;
 
     @Autowired
+    private BookingLinkRepository bookingLinkRepository;
+
+    @Autowired
     private TaskDaoJpa taskDaoJpa;
 
     @Autowired
@@ -73,6 +76,11 @@ public class BookingDaoJpa {
         Task task = taskDaoJpa.create(
                 bookingLink.getProject().getId(), bookingLink.getOwner(), createTaskParams, note);
         booking.setTask(task);
-        return bookingRepository.save(booking);
+        booking = bookingRepository.save(booking);
+        if (bookingLink.isExpireOnBooking()) {
+            bookingLink.setRemoved(true);
+        }
+        this.bookingLinkRepository.save(bookingLink);
+        return booking;
     }
 }
