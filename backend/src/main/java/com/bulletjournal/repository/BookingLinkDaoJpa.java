@@ -161,4 +161,28 @@ public class BookingLinkDaoJpa {
         this.bookingLinkRepository.deleteAllByOwner(owner);
     }
 
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public BookingLink cloneBookingLink(String id, String owner, String bookingLinkId, int slotSpan) {
+        BookingLink bookingLink = getBookingLink(bookingLinkId);
+        BookingLink res = new BookingLink();
+        if (slotSpan != bookingLink.getSlotSpan()) {
+            throw new BadRequestException("SlotSpan is different, cannot clone!");
+        }
+        res.setId(id);
+        res.setAfterEventBuffer(bookingLink.getAfterEventBuffer());
+        res.setBeforeEventBuffer(bookingLink.getBeforeEventBuffer());
+        res.setSlotSpan(slotSpan);
+        res.setLocation(bookingLink.getLocation());
+        res.setEndDate(bookingLink.getEndDate());
+        res.setExpireOnBooking(bookingLink.isExpireOnBooking());
+        res.setStartDate(bookingLink.getStartDate());
+        res.setNote(bookingLink.getNote());
+        res.setSlots(bookingLink.getSlots());
+        res.setProject(bookingLink.getProject());
+        res.setOwner(owner);
+        res.setRecurrences(bookingLink.getRecurrences());
+        this.bookingLinkRepository.save(res);
+        return res;
+    }
 }

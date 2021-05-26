@@ -169,9 +169,12 @@ public class BookingLinksController {
     }
 
     @PostMapping(BOOKING_LINK_CLONE_ROUTE)
-    public void cloneBookingLinks(
+    public BookingLink cloneBookingLinks(
             @NotNull @PathVariable String bookingLinkId,
             @NotNull @RequestBody String slotSpan) {
+        String uuid = RandomStringUtils.randomAlphabetic(8);
         String username = MDC.get(UserClient.USER_NAME_KEY);
+
+        return bookingLinkDaoJpa.cloneBookingLink(uuid, username, bookingLinkId, Integer.parseInt(slotSpan)).toPresentationModel();
     }
 }
