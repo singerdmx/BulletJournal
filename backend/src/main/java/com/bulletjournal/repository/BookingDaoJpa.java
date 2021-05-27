@@ -120,10 +120,11 @@ public class BookingDaoJpa {
             sb.append("\\n\"}");
         }
         sb.append(",{\"insert\": \"\\n\"}");
-        if (!StringUtils.isBlank(note)) {
-            sb.append(",");
+        if (StringUtils.isNotBlank(note)) {
             String originalNote = note.substring(note.indexOf('[') + 1, note.indexOf(']'));
-            sb.append(originalNote);
+            if (StringUtils.isNotBlank(originalNote)) {
+                sb.append(",").append(originalNote);
+            }
         }
         sb.append(",{\"attributes\":{\"link\":\"https://bulletjournal.us/public/bookingLinks/");
         sb.append(bookingLink.getId());
