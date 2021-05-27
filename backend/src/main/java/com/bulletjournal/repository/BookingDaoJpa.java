@@ -99,21 +99,22 @@ public class BookingDaoJpa {
             ownerEmail = " - " + ownerEmail;
         }
 
-        String info = "{\"delta\": {\"ops\": [" + "{\"insert\": \""+ this.userDaoJpa.getBookMeUsername(bookingLink.getOwner())
+        String info = "{\"delta\": {\"ops\": [" + "{\"insert\": \"" + this.userDaoJpa.getBookMeUsername(bookingLink.getOwner())
                 + "\"}" + ",{\"insert\": \"" + ownerEmail + "\\n\"},{\"insert\": \"" + primaryInvitee.getFirstName()
                 + " " + primaryInvitee.getLastName() + " - " + primaryInvitee.getEmail() + primaryPhone + "\\n\"}";
         sb.append(info);
 
-        for (int i = 1; i < invitees.size(); i++)  {
+        for (int i = 1; i < invitees.size(); i++) {
             Invitee invitee = invitees.get(i);
             sb.append(",{\"insert\": \"");
             if (!StringUtils.isBlank(invitee.getFirstName())) {
                 sb.append(invitee.getFirstName()).append(" ");
             }
             if (!StringUtils.isBlank(invitee.getLastName())) sb.append(invitee.getLastName());
-            if (!StringUtils.isBlank(invitee.getFirstName()) || !StringUtils.isBlank(invitee.getLastName())) sb.append(" - ");
+            if (!StringUtils.isBlank(invitee.getFirstName()) || !StringUtils.isBlank(invitee.getLastName()))
+                sb.append(" - ");
             sb.append(invitee.getEmail());
-            if (!StringUtils.isBlank(invitee.getPhone())){
+            if (!StringUtils.isBlank(invitee.getPhone())) {
                 sb.append(", ");
                 sb.append(invitee.getPhone());
             }

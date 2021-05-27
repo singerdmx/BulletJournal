@@ -326,7 +326,9 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                                                 Intl.DateTimeFormat().resolvedOptions().timeZone,
                                                 (bookingId) => {
                                                     message.success('A calendar invitation has been sent to your email address.');
-                                                    // go to reschedule/cancel page
+                                                    if (link.removed) {
+                                                        // go to reschedule/cancel page
+                                                    }
                                                 });
                                             setDrawerVisible(false);
                                         }}>
