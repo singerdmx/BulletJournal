@@ -1,6 +1,6 @@
 import React, {useEffect} from "react";
 import {useParams} from "react-router-dom";
-import {Avatar, BackTop, Button, Result, Tooltip} from "antd";
+import {Avatar, BackTop, Button, message, Result, Tooltip} from "antd";
 
 import './booking-link.pages.styles.less';
 import {IState} from "./store";
@@ -56,7 +56,12 @@ const BookingPublicPage: React.FC<BookingLinkPublicProps> = (
                     icon={<ClockCircleFilled />}
                     title={`${booking.bookingLink.ownerName} and ${booking.invitees[0].firstName} ${booking.invitees[0].lastName}`}
                     extra={
-                        <Button type="primary" key="cancel">
+                        <Button type="primary" key="cancel"
+                            onClick={() => {
+                                    // call cancel api
+                                    message.success('This event has been cancelled. We are forwarding you to the page where you can reschedule.');
+                                }
+                            }>
                             Cancel / Reschedule
                         </Button>
                     }

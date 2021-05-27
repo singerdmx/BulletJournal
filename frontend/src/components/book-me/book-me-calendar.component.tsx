@@ -333,12 +333,10 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                                                 slot.endTime,
                                                 (bookingId) => {
                                                     message.success('A calendar invitation has been sent to your email address.');
-                                                    if (link.expireOnBooking) {
-                                                        // go to reschedule/cancel page
-                                                        setTimeout(() => {
-                                                            window.location.href = `${window.location.protocol}//${window.location.host}/public/bookings/${bookingId}`;
-                                                        }, 2000);
-                                                    }
+                                                    // go to reschedule/cancel page
+                                                    setTimeout(() => {
+                                                        window.location.href = `${window.location.protocol}//${window.location.host}/public/bookings/${bookingId}`;
+                                                    }, 2000);
                                                 });
                                             setDrawerVisible(false);
                                         }}>
