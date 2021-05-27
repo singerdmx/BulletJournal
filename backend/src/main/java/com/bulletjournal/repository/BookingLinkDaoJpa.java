@@ -116,6 +116,13 @@ public class BookingLinkDaoJpa {
                 bookingLink::setStartDate);
         DaoHelper.updateIfPresent(updateBookingLinkParams.hasEndDate(), updateBookingLinkParams.getEndDate(),
                 bookingLink::setEndDate);
+
+        if (!updateBookingLinkParams.getTimezone().equals(bookingLink.getTimezone())) {
+            if (bookingLink.getBookings() != null && bookingLink.getBookings().size() > 0) {
+                throw new BadRequestException("Timezone can't be modified after bookings are made");
+            }
+            bookingLink.setSlots(null);
+        }
         bookingLink.setTimezone(updateBookingLinkParams.getTimezone());
         if (updateBookingLinkParams.getProjectId() != null) {
             Project project = this.projectDaoJpa.getProject(updateBookingLinkParams.getProjectId(), requester);
