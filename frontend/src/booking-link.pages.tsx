@@ -34,7 +34,7 @@ const BookingLinkPublicPage: React.FC<BookingLinkPublicProps> = (
     }
     return <div style={{backgroundImage: `url(${getRandomBackgroundImage()})`, height: `${fullHeight}px`}}
                 className='public-container'>
-            <div className='booking-link-div'>
+        <div className='booking-link-div'>
             <BackTop/>
             <Tooltip
                 placement="top"
