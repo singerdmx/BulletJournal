@@ -105,13 +105,7 @@ public class BookingLinkControllerTest {
         invitee1.setPhone("9794029450");
         invitees.add(invitee1);
 
-        Invitee invitee2 = new Invitee();
-        invitee2.setLastName("lastname");
-        invitee2.setEmail("test@mail.com");
-        invitees.add(invitee2);
-
-        BookParams bookParams = new BookParams(invitees, 1, "2021-05-04", "Seatle",
-                "{\"delta\":{\"ops\":[{\"insert\":\"test content\\n\"}]}}", "America/Chicago");
+        BookParams bookParams = new BookParams(invitees, 1, "2021-05-04", "Seatle", "\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"test content\\\\n\\\"}]}}\"", "America/Chicago", "00:30", "01:00", "2021-06-01");
 
         book(bookingLink1, bookParams);
         deleteAllBookinglinks(USER);
@@ -202,7 +196,8 @@ public class BookingLinkControllerTest {
                 Void.class,
                 bookingLinkId);
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        getBookingLink(bookingLinkId, TIMEZONE, HttpStatus.NOT_FOUND);
+        assertEquals(getBookingLink(bookingLinkId, TIMEZONE).isRemoved(), true);
+        getBookingLink(bookingLinkId, TIMEZONE, HttpStatus.OK);
     }
 
     private void patchBookingLink(String bookingLinkId, UpdateBookingLinkParams updateBookingLinkParams) {
@@ -235,8 +230,6 @@ public class BookingLinkControllerTest {
 
         List<BookingLink> bookingLinks = Arrays.asList(response.getBody());
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(bookingLinks.size(), 2);
-        assertEquals(bookingLinks.get(1).getTimezone(), CENTRAL_TIMEZONE);
         return bookingLinks;
     }
 
@@ -342,7 +335,8 @@ public class BookingLinkControllerTest {
                 Void.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         for (int i = 0; i < allBookingLinks.size(); i++) {
-            getBookingLink(allBookingLinks.get(i).getId(), TIMEZONE, HttpStatus.NOT_FOUND);
+            getBookingLink(allBookingLinks.get(i).getId(), TIMEZONE, HttpStatus.OK);
+            assertEquals(false, allBookingLinks.get(i).isRemoved());
         }
     }
 }

@@ -37,6 +37,15 @@ public class Booking extends AuditModel {
   @Column(name = "requester_timezone")
   private String requesterTimeZone;
 
+  @Column(name = "start_time")
+  private String startTime;
+
+  @Column(name = "end_time")
+  private String endTime;
+
+  @Column(name = "display_date")
+  private String displayDate;
+
   public String getId() {
     return id;
   }
@@ -109,7 +118,31 @@ public class Booking extends AuditModel {
     this.requesterTimeZone = requestTimeZone;
   }
 
-    public com.bulletjournal.controller.models.Booking toPresentationModel() {
+  public String getStartTime() {
+    return startTime;
+  }
+
+  public void setStartTime(String startTime) {
+    this.startTime = startTime;
+  }
+
+  public String getEndTime() {
+    return endTime;
+  }
+
+  public void setEndTime(String endTime) {
+    this.endTime = endTime;
+  }
+
+  public String getDisplayDate() {
+    return displayDate;
+  }
+
+  public void setDisplayDate(String displayDate) {
+    this.displayDate = displayDate;
+  }
+
+  public com.bulletjournal.controller.models.Booking toPresentationModel() {
     return new com.bulletjournal.controller.models.Booking(
         this.getId(),
         this.getInvitees(),
@@ -117,7 +150,10 @@ public class Booking extends AuditModel {
         this.getSlotDate(),
         this.getLocation(),
         this.getNote(),
-        this.getRequesterTimeZone()
+        this.getRequesterTimeZone(),
+        this.getStartTime(),
+        this.getEndTime(),
+        this.getDisplayDate()
     );
   }
 }

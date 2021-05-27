@@ -12,6 +12,9 @@ public class Booking {
     private List<Invitee> invitees;
     private int slotIndex;
     private String slotDate;
+    private String startTime;
+    private String endTime;
+    private String displayDate;
     private String location;
     private String note;
     private String requesterTimezone;
@@ -19,7 +22,7 @@ public class Booking {
     public Booking() {
     }
 
-    public Booking(String id, String invitees, int slotIndex, String slotDate, String location, String note, String requesterTimezone) {
+    public Booking(String id, String invitees, int slotIndex, String slotDate, String location, String note, String requesterTimezone, String startTime, String endTime, String displayDate) {
         this.id = id;
         this.invitees = Arrays.asList(GSON.fromJson(invitees, Invitee[].class));
         this.slotIndex = slotIndex;
@@ -27,6 +30,9 @@ public class Booking {
         this.location = location;
         this.note = note;
         this.requesterTimezone = requesterTimezone;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.displayDate = displayDate;
     }
 
     public String getId() {
@@ -80,4 +86,28 @@ public class Booking {
     public String getRequesterTimezone() { return requesterTimezone; }
 
     public void setRequesterTimezone(String requestTimezone) { this.requesterTimezone = requestTimezone; }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getDisplayDate() {
+        return displayDate;
+    }
+
+    public void setDisplayDate(String displayDate) {
+        this.displayDate = displayDate;
+    }
 }

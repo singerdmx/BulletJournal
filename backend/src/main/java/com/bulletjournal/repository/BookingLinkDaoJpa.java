@@ -44,7 +44,8 @@ public class BookingLinkDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void deleteBookingLink(String requester, String id) {
         BookingLink bookingLink = getBookingLink(requester, id);
-        this.bookingLinkRepository.delete(bookingLink);
+        bookingLink.setRemoved(true);
+        this.bookingLinkRepository.save(bookingLink);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -152,13 +153,18 @@ public class BookingLinkDaoJpa {
                 bookParams.getNote(),
                 bookParams.getSlotDate(),
                 bookParams.getSlotIndex(),
-                bookParams.getRequesterTimezone());
+                bookParams.getRequesterTimezone(),
+                bookParams.getStartTime(),
+                bookParams.getEndTime(),
+                bookParams.getDisplayDate());
         return booking;
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void deleteAllBookingLinks(String owner) {
-        this.bookingLinkRepository.deleteAllByOwner(owner);
+        List<BookingLink> lists = this.bookingLinkRepository.findAllByOwnerAndRemoved(owner, false);
+        lists.stream().peek(item -> item.setRemoved(true));
+        this.bookingLinkRepository.saveAll(lists);
     }
 
 
