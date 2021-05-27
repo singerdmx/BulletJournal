@@ -1,8 +1,12 @@
 import {createSlice, PayloadAction} from "redux-starter-kit";
-import {BookingLink, Invitee, RecurringSpan, Slot} from "./interface";
+import {Booking, BookingLink, Invitee, RecurringSpan, Slot} from "./interface";
 
 export type LinkAction = {
     link: BookingLink;
+};
+
+export type BookingAction = {
+    booking: Booking;
 };
 
 export type BookMeUsernameAction = {
@@ -22,6 +26,10 @@ export type FetchBookingLinks = {
 export type FetchBookingLink = {
     bookingLinkId: string,
     timezone?: string
+}
+
+export type FetchBooking = {
+    bookingId: string,
 }
 
 export type UpdateBookingLinkRecurrences = {
@@ -80,6 +88,7 @@ export type CreateBooking = {
 
 let initialState = {
     link: undefined as BookingLink | undefined,
+    booking: undefined as Booking | undefined,
     bookMeUsername: '',
     links: [] as BookingLink[],
 };
@@ -91,6 +100,10 @@ const slice = createSlice({
         linkReceived: (state, action: PayloadAction<LinkAction>) => {
             const { link } = action.payload;
             state.link = link;
+        },
+        bookingReceived: (state, action: PayloadAction<BookingAction>) => {
+            const { booking } = action.payload;
+            state.booking = booking;
         },
         bookMeUsernameReceived: (state, action: PayloadAction<BookMeUsernameAction>) => {
             const { name } = action.payload;
@@ -109,6 +122,7 @@ const slice = createSlice({
         UpdateBookingLinkRecurrences: (state, action: PayloadAction<UpdateBookingLinkRecurrences>) => state,
         UpdateBookingLinkSlot: (state, action: PayloadAction<UpdateBookingLinkSlot>) => state,
         CreateBooking: (state, action: PayloadAction<CreateBooking>) => state,
+        GetBooking: (state, action: PayloadAction<FetchBooking>) => state,
     }
 });
 

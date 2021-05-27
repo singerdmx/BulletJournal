@@ -18,6 +18,7 @@ public class Booking {
     private String location;
     private String note;
     private String requesterTimezone;
+    private BookingLink bookingLink;
 
     public Booking() {
     }
@@ -109,5 +110,13 @@ public class Booking {
 
     public void setDisplayDate(String displayDate) {
         this.displayDate = displayDate;
+    }
+
+    public BookingLink getBookingLink() {
+        return bookingLink;
+    }
+
+    public void setBookingLink(BookingLink bookingLink) {
+        this.bookingLink = bookingLink;
     }
 }

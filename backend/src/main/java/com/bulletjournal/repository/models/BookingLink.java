@@ -1,6 +1,8 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.User;
+import com.bulletjournal.repository.UserDaoJpa;
 import com.bulletjournal.util.BookingUtil;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -224,6 +226,14 @@ public class BookingLink extends AuditModel {
                 this.getNote(),
                 this.isRemoved()
         );
+        return bookingLink;
+    }
+
+    public com.bulletjournal.controller.models.BookingLink toPresentationModel(
+            UserClient userClient, UserDaoJpa userDaoJpa) {
+        com.bulletjournal.controller.models.BookingLink bookingLink = toPresentationModel();
+        bookingLink.setOwner(userClient.getUser(bookingLink.getOwner().getName()));
+        bookingLink.setOwnerName(userDaoJpa.getBookMeUsername(bookingLink.getOwnerName()));
         return bookingLink;
     }
 }

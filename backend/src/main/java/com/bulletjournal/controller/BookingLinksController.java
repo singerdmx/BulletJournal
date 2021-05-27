@@ -5,10 +5,8 @@ import com.bulletjournal.controller.models.Booking;
 import com.bulletjournal.controller.models.BookingLink;
 import com.bulletjournal.controller.models.params.*;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
-import com.bulletjournal.repository.BookingLinkDaoJpa;
-import com.bulletjournal.repository.ProjectDaoJpa;
-import com.bulletjournal.repository.TaskDaoJpa;
-import com.bulletjournal.repository.UserDaoJpa;
+import com.bulletjournal.exceptions.ResourceNotFoundException;
+import com.bulletjournal.repository.*;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.util.BookingUtil;
@@ -39,9 +37,13 @@ public class BookingLinksController {
     public static final String PUBLIC_BOOKING_LINKS_ROUTE_PREFIX = "/api/public/bookingLinks/";
     public static final String PUBLIC_BOOKING_LINK_ROUTE = PUBLIC_BOOKING_LINKS_ROUTE_PREFIX + "{bookingLinkId}";
     public static final String PUBLIC_BOOKING_LINK_BOOK_ROUTE = PUBLIC_BOOKING_LINK_ROUTE + "/book";
+    public static final String PUBLIC_BOOKING_ROUTE = "/api/public/bookings/{bookingId}";
     private static final Logger LOGGER = LoggerFactory.getLogger(BookingLinksController.class);
     @Autowired
     private BookingLinkDaoJpa bookingLinkDaoJpa;
+
+    @Autowired
+    private BookingRepository bookingRepository;
 
     @Autowired
     private UserDaoJpa userDaoJpa;
@@ -75,9 +77,18 @@ public class BookingLinksController {
     @GetMapping(PUBLIC_BOOKING_LINK_ROUTE)
     public BookingLink getBookingLink(@NotNull @PathVariable String bookingLinkId,
                                       @RequestParam(required = false) String timezone) {
-        LOGGER.info("Create a new BookingLinks");
         com.bulletjournal.repository.models.BookingLink bookingLink =
                 this.bookingLinkDaoJpa.getBookingLink(bookingLinkId);
+        BookingLink result = bookingLink.toPresentationModel(this.userClient, this.userDaoJpa);
+
+        List<com.bulletjournal.repository.models.Booking> bookings = bookingLink.getBookings();
+        if (bookings != null) {
+            result.setBookings(
+                    bookings.stream()
+                            .map(com.bulletjournal.repository.models.Booking::toPresentationModel)
+                            .collect(Collectors.toList())
+            );
+        }
         if (StringUtils.isBlank(timezone)) {
             timezone = bookingLink.getTimezone();
         }
@@ -89,16 +100,6 @@ public class BookingLinksController {
         List<Project> projects = this.projectDaoJpa.getUserProjects(username);
         List<Task> tasks = this.taskDaoJpa.getTasksBetween(username, startTime, endTime, projects)
                 .stream().filter(t -> t.hasDueTime()).collect(Collectors.toList());
-
-        BookingLink result = bookingLink.toPresentationModel();
-        List<com.bulletjournal.repository.models.Booking> bookings = bookingLink.getBookings();
-        if (bookings != null) {
-            result.setBookings(
-                    bookings.stream()
-                            .map(com.bulletjournal.repository.models.Booking::toPresentationModel)
-                            .collect(Collectors.toList())
-            );
-        }
         result.setSlots(BookingUtil.calculateSlots(
                 bookingLink.getTimezone(), timezone,
                 BookingUtil.getBookingLinkSlots(bookingLink),
@@ -106,9 +107,6 @@ public class BookingLinksController {
                 bookingLink.isIncludeTaskWithoutDuration(), bookingLink.getBeforeEventBuffer(),
                 bookingLink.getAfterEventBuffer(), tasks, bookingLink.getRecurrences(), bookings));
 
-
-        result.setOwner(this.userClient.getUser(result.getOwner().getName()));
-        result.setOwnerName(this.userDaoJpa.getBookMeUsername(result.getOwnerName()));
         return result;
     }
 
@@ -177,5 +175,14 @@ public class BookingLinksController {
 
         bookingLinkDaoJpa.cloneBookingLink(uuid, username, bookingLinkId, Integer.parseInt(slotSpan));
         return getBookingLinks();
+    }
+
+    @GetMapping(PUBLIC_BOOKING_ROUTE)
+    public Booking getBooking(@NotNull @PathVariable String bookingId) {
+        com.bulletjournal.repository.models.Booking booking = this.bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking " + bookingId + " not found"));
+        Booking result = booking.toPresentationModel();
+        result.setBookingLink(booking.getBookingLink().toPresentationModel(this.userClient, this.userDaoJpa));
+        return result;
     }
 }

@@ -323,8 +323,8 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                                                 return;
                                             }
                                             const slot = slots.filter(slot => slot.date + '#' + slot.index === visibleSlot)[0];
-                                            book(link.id, invitees, parseInt(visibleSlot.split('#')[1]),
-                                                visibleSlot.split('#')[0], location, JSON.stringify({
+                                            book(link.id, invitees, slot.index,
+                                                slot.date, location, JSON.stringify({
                                                     delta: note
                                                 }),
                                                 Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -333,8 +333,9 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                                                 slot.endTime,
                                                 (bookingId) => {
                                                     message.success('A calendar invitation has been sent to your email address.');
-                                                    if (link.removed) {
+                                                    if (link.expireOnBooking) {
                                                         // go to reschedule/cancel page
+                                                        window.open(`${window.location.protocol}//${window.location.host}/public/bookings/${bookingId}`);
                                                     }
                                                 });
                                             setDrawerVisible(false);

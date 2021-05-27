@@ -117,3 +117,6 @@ export const book = (
     endTime: endTime,
     onSuccess: onSuccess
 });
+
+export const getBooking = (bookingId: string) =>
+    actions.GetBooking({bookingId: bookingId});

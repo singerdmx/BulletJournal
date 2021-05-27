@@ -158,3 +158,12 @@ export const book = (bookingLinkId: string,
             throw Error(err.message);
         });
 }
+
+export const getBooking = (bookingId: string) => {
+    const url = `/api/public/bookings/${bookingId}`;
+    return doFetch(url)
+        .then((res) => res.json())
+        .catch(err => {
+            throw Error(err.message);
+        });
+}

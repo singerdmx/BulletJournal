@@ -46,6 +46,8 @@ export interface Booking {
     displayDate: string;
     startTime: string;
     endTime: string;
+    requesterTimezone: string;
+    bookingLink: BookingLink;
 }
 
 export interface Invitee {
