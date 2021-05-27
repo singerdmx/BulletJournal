@@ -101,13 +101,15 @@ public class BookingDaoJpa {
 
         String info = "{\"delta\": {\"ops\": [" + "{\"insert\": \""+ this.userDaoJpa.getBookMeUsername(bookingLink.getOwner())
                 + "\"}" + ",{\"insert\": \"" + ownerEmail + "\\n\"},{\"insert\": \"" + primaryInvitee.getFirstName()
-                + primaryInvitee.getLastName() + " - " + primaryInvitee.getEmail() + primaryPhone + "\\n\"}";
+                + " " + primaryInvitee.getLastName() + " - " + primaryInvitee.getEmail() + primaryPhone + "\\n\"}";
         sb.append(info);
 
         for (int i = 1; i < invitees.size(); i++)  {
             Invitee invitee = invitees.get(i);
             sb.append(",{\"insert\": \"");
-            if (!StringUtils.isBlank(invitee.getFirstName())) sb.append(invitee.getFirstName());
+            if (!StringUtils.isBlank(invitee.getFirstName())) {
+                sb.append(invitee.getFirstName()).append(" ");
+            }
             if (!StringUtils.isBlank(invitee.getLastName())) sb.append(invitee.getLastName());
             if (!StringUtils.isBlank(invitee.getFirstName()) || !StringUtils.isBlank(invitee.getLastName())) sb.append(" - ");
             sb.append(invitee.getEmail());
