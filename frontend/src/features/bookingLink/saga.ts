@@ -20,7 +20,7 @@ import {
     updateBookingLinkSlot,
     getBookingLink, book,
 } from "../../apis/bookinglinkApis";
-import {Booking, BookingLink, Invitee} from "./interface";
+import {Booking, BookingLink} from "./interface";
 import {IState} from "../../store";
 
 function* fetchBookMeUsername(action: PayloadAction<FetchBookMeUsername>) {
@@ -247,6 +247,9 @@ function* createBooking(action: PayloadAction<CreateBooking>) {
             location,
             note,
             requesterTimezone,
+            displayDate,
+            startTime,
+            endTime,
             onSuccess
         } = action.payload;
 
@@ -258,7 +261,10 @@ function* createBooking(action: PayloadAction<CreateBooking>) {
             slotDate,
             location,
             note,
-            requesterTimezone
+            requesterTimezone,
+            displayDate,
+            startTime,
+            endTime
         );
         onSuccess(data.id);
     } catch (error) {

@@ -31,6 +31,9 @@ type BookMeCalendarProps = {
         location: string,
         note: string,
         requesterTimezone: string,
+        displayDate: string,
+        startTime: string,
+        endTime: string,
         onSuccess: (bookingId: string) => void
     ) => void;
 }
@@ -319,11 +322,15 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                                             if (found) {
                                                 return;
                                             }
+                                            const slot = slots.filter(slot => slot.date + '#' + slot.index === visibleSlot)[0];
                                             book(link.id, invitees, parseInt(visibleSlot.split('#')[1]),
                                                 visibleSlot.split('#')[0], location, JSON.stringify({
                                                     delta: note
                                                 }),
                                                 Intl.DateTimeFormat().resolvedOptions().timeZone,
+                                                slot.displayDate,
+                                                slot.startTime,
+                                                slot.endTime,
                                                 (bookingId) => {
                                                     message.success('A calendar invitation has been sent to your email address.');
                                                     if (link.removed) {

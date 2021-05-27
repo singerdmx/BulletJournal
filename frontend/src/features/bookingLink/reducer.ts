@@ -72,6 +72,9 @@ export type CreateBooking = {
     location: string,
     note: string,
     requesterTimezone: string,
+    displayDate: string;
+    startTime: string;
+    endTime: string;
     onSuccess: (bookingId: string) => void
 }
 

@@ -1,7 +1,6 @@
 import {actions} from './reducer';
 import {bySetPosMap, byWeekDayMap, MonthlyOn, MonthlyOnThe, Weekly, YearlyOn, YearlyOnThe,} from './interface';
 import RRule, {Frequency} from 'rrule';
-import {Task} from "../tasks/interface";
 import { Transaction } from '../transactions/interface';
 
 export const updateFreq = (freq: Frequency) =>

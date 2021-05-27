@@ -136,7 +136,10 @@ export const book = (bookingLinkId: string,
                      slotDate: string,
                      location: string,
                      note: string,
-                     requesterTimezone: string) => {
+                     requesterTimezone: string,
+                     displayDate: string,
+                     startTime: string,
+                     endTime: string) => {
 
     const postBody = JSON.stringify({
         invitees: invitees,
@@ -144,7 +147,10 @@ export const book = (bookingLinkId: string,
         slotDate: slotDate,
         location: location,
         note: note,
-        requesterTimezone: requesterTimezone
+        requesterTimezone: requesterTimezone,
+        displayDate: displayDate,
+        startTime: startTime,
+        endTime: endTime
     });
     return doPost(`/api/public/bookingLinks/${bookingLinkId}/book`, postBody)
         .then((res) => res.json())

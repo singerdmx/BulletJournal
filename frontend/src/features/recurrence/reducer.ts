@@ -4,7 +4,6 @@ import {bySetPosMap, byWeekDayMap, MonthlyOn, MonthlyOnThe, Weekly, YearlyOn, Ye
 import {MONTHS} from './constants';
 import moment from 'moment';
 import {dateFormat} from '../myBuJo/constants';
-import {Task} from "../tasks/interface";
 import {getBySetPosWhich, getByWeekDay} from "./actions";
 import { Transaction } from '../transactions/interface';
 

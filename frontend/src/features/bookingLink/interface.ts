@@ -43,6 +43,9 @@ export interface Booking {
     slotDate: string;
     location: string;
     note: string;
+    displayDate: string;
+    startTime: string;
+    endTime: string;
 }
 
 export interface Invitee {

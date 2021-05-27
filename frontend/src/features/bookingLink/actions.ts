@@ -100,6 +100,9 @@ export const book = (
     location: string,
     note: string,
     requesterTimezone: string,
+    displayDate: string,
+    startTime: string,
+    endTime: string,
     onSuccess: (bookingId: string) => void
 ) => actions.CreateBooking({
     bookingLinkId: bookingLinkId,
@@ -109,5 +112,8 @@ export const book = (
     location: location,
     note: note,
     requesterTimezone: requesterTimezone,
+    displayDate: displayDate,
+    startTime: startTime,
+    endTime: endTime,
     onSuccess: onSuccess
 });
