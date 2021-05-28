@@ -180,6 +180,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                         style={{width: 200, marginLeft: "40px"}}
                         placeholder='Select Time Zone'
                         onChange={handleTimezoneChange}
+                        disabled={link.bookings.length > 0}
                         value={link.timezone}
                     >
                         {zones.map((zone: string) => (

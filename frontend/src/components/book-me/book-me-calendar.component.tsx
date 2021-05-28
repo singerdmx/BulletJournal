@@ -335,7 +335,7 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                                                     message.success('A calendar invitation has been sent to your email address.');
                                                     // go to reschedule/cancel page
                                                     setTimeout(() => {
-                                                        window.location.href = `${window.location.protocol}//${window.location.host}/public/bookings/${bookingId}`;
+                                                        window.location.href = `${window.location.protocol}//${window.location.host}/public/bookings/${bookingId}?name=${invitees[0].firstName}%20${invitees[0].lastName}`;
                                                     }, 2000);
                                                 });
                                             setDrawerVisible(false);
