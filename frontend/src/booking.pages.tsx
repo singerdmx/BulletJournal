@@ -31,6 +31,9 @@ const BookingPublicPage: React.FC<BookingLinkPublicProps> = (
     if (!booking) {
         return <div></div>
     }
+
+    const name = decodeURIComponent(window.location.search.substring(6));
+
     return <div style={{backgroundImage: `url(${getRandomBackgroundImage()})`, height: `${fullHeight}px`}}
                 className='public-container'>
         <div className='booking-link-div'>
