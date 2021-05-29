@@ -170,7 +170,7 @@ public class BookingLinkDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void deleteAllBookingLinks(String owner) {
         List<BookingLink> lists = this.bookingLinkRepository.findAllByOwnerAndRemoved(owner, false);
-        lists.stream().peek(item -> item.setRemoved(true));
+        lists.forEach(item -> item.setRemoved(true));
         this.bookingLinkRepository.saveAll(lists);
     }
 

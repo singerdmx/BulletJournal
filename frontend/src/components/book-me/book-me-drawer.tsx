@@ -1,11 +1,29 @@
 import {IState} from "../../store";
 import {connect} from "react-redux";
 import React, {useEffect, useState} from "react";
-import {AutoComplete, Avatar, Button, Checkbox, DatePicker, Drawer, Input, message, Select, Tooltip} from "antd";
+import {
+    AutoComplete,
+    Avatar,
+    Button,
+    Checkbox,
+    DatePicker,
+    Drawer,
+    Input,
+    message,
+    Popover,
+    Select,
+    Tooltip
+} from "antd";
 import moment from "moment";
 import {dateFormat} from "../../features/myBuJo/constants";
 import {BookingLink} from "../../features/bookingLink/interface";
-import {CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, QuestionCircleOutlined} from "@ant-design/icons";
+import {
+    CheckCircleOutlined,
+    ClockCircleOutlined,
+    CloseCircleOutlined,
+    QuestionCircleOutlined,
+    SwapRightOutlined
+} from "@ant-design/icons";
 import {Project} from "../../features/project/interface";
 import {zones} from "../settings/constants";
 import './book-me.styles.less';
@@ -143,6 +161,17 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
             setLocation(link ? link.location : '');
         }
     };
+
+    function getWhoBookedMe() {
+        if (!link) {
+            return <div/>
+        }
+        return link.bookings.map(booking => {
+            return <div>
+                {booking.startTime} <SwapRightOutlined /> {booking.endTime} ({booking.requesterTimezone})
+            </div>
+        });
+    }
 
     if (link) {
         return <Drawer
@@ -347,13 +376,15 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                         >
                             Preview
                         </Button>
-                        {link && link.bookings && link.bookings.length > 0 && <Button
-                            type="primary"
-                            shape="round"
-                            style={{width: "150px"}}
-                        >
-                            Who booked me
-                        </Button>}
+                        {link && link.bookings && link.bookings.length > 0 && <Popover content={getWhoBookedMe()} title="Bookings">
+                            <Button
+                                type="primary"
+                                shape="round"
+                                style={{width: "150px"}}
+                            >
+                                Who booked me
+                            </Button>
+                        </Popover>}
                         <CopyToClipboard
                             text={`${window.location.protocol}//${window.location.host}/public/bookingLinks/${link!.id}`}
                             onCopy={() => message.success('Sharable link copied to clipboard')}

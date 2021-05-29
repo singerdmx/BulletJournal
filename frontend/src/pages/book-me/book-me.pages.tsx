@@ -44,8 +44,6 @@ const BookMe: React.FC<BookMeProps> = (props) => {
     const [projects, setProjects] = useState<Project[]>([]);
     const [hasTodoProject, setHasTodoProject] = useState(false);
     const [cardIsClicked, setCardIsClicked] = useState(false);
-    const [disableCreateNewProjectOrBooking, setDisableCreateNewProjectOrBooking] = useState(false);
-    const [currentSlotSpan, setCurrentSlotSpan] = useState();
     const [activeKey, setActiveKey] = useState('1')
     const history = useHistory();
 
@@ -60,7 +58,7 @@ const BookMe: React.FC<BookMeProps> = (props) => {
         setHasTodoProject(projects && projects.length !== 0);
     }, [projects])
 
-    const createDefaultBookingLink = () => {
+    const createDefaultBookingLink = (slotSpan: number) => {
         const startDate = moment().add(1, 'days').format(dateFormat);
         const endDate = moment().add(1, 'month').endOf('month').format(dateFormat);
         const today = moment().format('YYYYMMDD');
@@ -83,7 +81,7 @@ const BookMe: React.FC<BookMeProps> = (props) => {
         const recurrences = [recurringSpan1, recurringSpan2, recurringSpan3, recurringSpan4];
 
         addBookingLink(0, 0,endDate, true,
-            true, projects[0].id, recurrences, currentSlotSpan, startDate, timezone,
+            true, projects[0].id, recurrences, slotSpan, startDate, timezone,
             () => {
                 getBookingLinks();
                 setActiveKey('2');
@@ -91,7 +89,6 @@ const BookMe: React.FC<BookMeProps> = (props) => {
     }
 
     const getCreateBookingDrawer = () => {
-        createDefaultBookingLink();
         return <BookMeDrawer bookMeDrawerVisible={cardIsClicked} setBookMeDrawerVisible={setCardIsClicked} projects={projects}/>;
     }
 
@@ -102,11 +99,15 @@ const BookMe: React.FC<BookMeProps> = (props) => {
     }
 
     const getCardOnclick = () => {
-        if (cardIsClicked && !disableCreateNewProjectOrBooking) {
-            // TODO: change to following line for dev purpose
-            //  return !hasTodoProject? getCreateBookingDrawer() : getAddProjectModal();
+        if (cardIsClicked) {
             return hasTodoProject ? getCreateBookingDrawer() : getAddProjectModal();
         }
+        return <div/>;
+    }
+
+    function onClickCard(slotSpan: number) {
+        setCardIsClicked(true);
+        createDefaultBookingLink(slotSpan);
     }
 
     return <div className="book-me">
@@ -130,18 +131,22 @@ const BookMe: React.FC<BookMeProps> = (props) => {
                     <div className="book-me-cards">
                         <BookMeCard span={15} backgroundColor={'#EFEFF1'} imgHeight="67px" imgWidth="60px"
                                     img="https://user-images.githubusercontent.com/59456058/118382802-b83e6a80-b5ad-11eb-8a69-07e47366c622.png"
-                                    setCardIsClicked={setCardIsClicked} setCurrentSlotSpan={setCurrentSlotSpan}/>
+                                    onClick={() => {
+                                        onClickCard(15);
+                                    }}/>
                         <BookMeCard span={30} backgroundColor={'#ECD4D4'} imgHeight="60px" imgWidth="50px"
                                     img="https://user-images.githubusercontent.com/122956/118382659-6c3ef600-b5ac-11eb-8477-09e3fd4fa2ea.png"
-                                    setCardIsClicked={setCardIsClicked} setCurrentSlotSpan={setCurrentSlotSpan}/>
+                                    onClick={() => {
+                                        onClickCard(30);
+                                    }}/>
                         <BookMeCard span={60} backgroundColor={'#CCDBE2'} imgHeight="60px" imgWidth="50px"
                                     img="https://user-images.githubusercontent.com/59456058/118382868-61856080-b5ae-11eb-88e4-2ac9fa688025.png"
-                                    setCardIsClicked={setCardIsClicked} setCurrentSlotSpan={setCurrentSlotSpan}/>
+                                    onClick={() => {
+                                        onClickCard(60);
+                                    }}/>
                         <CustomDurationCard backgroundColor={'#C9CBE1'} imgHeight="60px" imgWidth="50px"
                                             img="https://user-images.githubusercontent.com/40779030/118413081-4a984a00-b652-11eb-8c01-af811b9032b2.png"
-                                            setCardIsClicked={setCardIsClicked}
-                                            setDisableCreateNewProjectOrBooking={setDisableCreateNewProjectOrBooking}
-                                            setCurrentSlotSpan={setCurrentSlotSpan}/>
+                                            onClick={(span) => onClickCard(span)}/>
                     </div>
                 </div>
             </TabPane>
