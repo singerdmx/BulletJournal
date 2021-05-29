@@ -11,31 +11,54 @@ import {
 import './book-me.styles.less';
 import {IState} from "../../store";
 import {connect} from "react-redux";
-import {getBookingLinks, getBookMeUsername, updateBookMeUsername} from "../../features/bookingLink/actions";
+import {
+    getBookingLink,
+    getBookingLinks,
+    getBookMeUsername,
+    updateBookMeUsername
+} from "../../features/bookingLink/actions";
 import {BookingLink} from "../../features/bookingLink/interface";
-import {getSlotSpan} from "../../components/book-me/book-me-drawer";
+import BookMeDrawer, {getSlotSpan} from "../../components/book-me/book-me-drawer";
+import {Project, ProjectsWithOwner} from "../../features/project/interface";
+import {flattenOwnedProject, flattenSharedProject} from "../projects/projects.pages";
+import {ProjectType} from "../../features/project/constants";
 
 type ManageBookingProps = {
+    ownedProjects: Project[];
+    sharedProjects: ProjectsWithOwner[];
     myself: string;
     bookMeUsername: string;
     links: BookingLink[];
     getBookMeUsername: () => void;
     updateBookMeUsername: (name: string) => void;
     getBookingLinks: () => void;
+    getBookingLink: (bookingLinkId: string, timezone?: string) => void;
 }
 
 const ManageBooking: React.FC<ManageBookingProps> = (
     {
+        ownedProjects,
+        sharedProjects,
         myself,
         bookMeUsername,
         links,
         getBookMeUsername,
         updateBookMeUsername,
-        getBookingLinks
+        getBookingLinks,
+        getBookingLink
     }
 ) => {
     const [name, setName] = useState(bookMeUsername ? bookMeUsername : myself);
     const [nameChanged, setNameChanged] = useState(false);
+    const [cardIsClicked, setCardIsClicked] = useState(false);
+    const [projects, setProjects] = useState<Project[]>([]);
+
+    useEffect(() => {
+        let updateProjects = [] as Project[];
+        updateProjects = flattenOwnedProject(ownedProjects, updateProjects);
+        updateProjects = flattenSharedProject(sharedProjects, updateProjects);
+        setProjects(updateProjects.filter(p => !p.shared && p.projectType === ProjectType.TODO));
+    }, [ownedProjects, sharedProjects]);
 
     useEffect(() => {
         if (!bookMeUsername) {
@@ -96,9 +119,18 @@ const ManageBooking: React.FC<ManageBookingProps> = (
                     }} />
             </Tooltip>
         </div>
+        <div>
+            <BookMeDrawer bookMeDrawerVisible={cardIsClicked}
+                          setBookMeDrawerVisible={setCardIsClicked}
+                          projects={projects}/>
+        </div>
         <div className='link-cards'>
             {links.map(link => {
-                return <div className='link-card'>
+                return <div className='link-card'
+                        onClick={() => {
+                            getBookingLink(link.id);
+                            setCardIsClicked(true)
+                        }}>
                     <div>
                         <ClockCircleOutlined/> {getSlotSpan(link.slotSpan)} Booking
                     </div>
@@ -112,6 +144,8 @@ const ManageBooking: React.FC<ManageBookingProps> = (
 }
 
 const mapStateToProps = (state: IState) => ({
+    ownedProjects: state.project.owned,
+    sharedProjects: state.project.shared,
     myself: state.myself.username,
     bookMeUsername: state.bookingReducer.bookMeUsername,
     links: state.bookingReducer.links
@@ -120,5 +154,6 @@ const mapStateToProps = (state: IState) => ({
 export default connect(mapStateToProps, {
     getBookMeUsername,
     updateBookMeUsername,
-    getBookingLinks
+    getBookingLinks,
+    getBookingLink
 })(ManageBooking);
