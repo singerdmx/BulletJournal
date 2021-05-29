@@ -16,7 +16,7 @@ import {
 } from "antd";
 import moment from "moment";
 import {dateFormat} from "../../features/myBuJo/constants";
-import {BookingLink} from "../../features/bookingLink/interface";
+import {BookingLink, Invitee} from "../../features/bookingLink/interface";
 import {
     CheckCircleOutlined,
     ClockCircleOutlined,
@@ -167,8 +167,15 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
             return <div/>
         }
         return link.bookings.map(booking => {
-            return <div>
-                {booking.startTime} <SwapRightOutlined /> {booking.endTime} ({booking.requesterTimezone})
+            return <div key={booking.id} className='booking-card'>
+                <div>
+                    {booking.displayDate} {booking.startTime} <SwapRightOutlined /> {booking.endTime} ({booking.requesterTimezone})
+                </div>
+                <div className='invitee-div'>
+                    {booking.invitees.map((invitee: Invitee) => {
+                        return <div>{invitee.firstName} {invitee.lastName} {invitee.email} {invitee.phone}</div>
+                    })}
+                </div>
             </div>
         });
     }
@@ -376,7 +383,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                         >
                             Preview
                         </Button>
-                        {link && link.bookings && link.bookings.length > 0 && <Popover content={getWhoBookedMe()} title="Bookings">
+                        {link && link.bookings && link.bookings.length > 0 && <Popover content={getWhoBookedMe()} title="Events">
                             <Button
                                 type="primary"
                                 shape="round"
