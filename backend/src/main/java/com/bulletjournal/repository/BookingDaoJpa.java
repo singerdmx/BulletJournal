@@ -138,7 +138,7 @@ public class BookingDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void cancel( String bookingId){
+    public void cancel(String bookingId) {
         this.bookingRepository.deleteById(bookingId);
     }
 }

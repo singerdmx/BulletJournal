@@ -199,7 +199,7 @@ public class BookingLinkDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void cancel(String bookingId, String bookingLinkId, String username){
+    public void cancel(String bookingId, String bookingLinkId, String username) {
         this.bookingDaoJpa.cancel(bookingId);
         BookingLink bookingLink = getBookingLink(bookingLinkId);
         bookingLink.setRemoved(false);
