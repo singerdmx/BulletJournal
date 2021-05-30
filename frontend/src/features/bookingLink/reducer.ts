@@ -32,6 +32,12 @@ export type FetchBooking = {
     bookingId: string,
 }
 
+export type CancelBooking = {
+    bookingId: string,
+    name: string,
+    onSuccess: Function
+}
+
 export type UpdateBookingLinkRecurrences = {
     bookingLinkId: string,
     recurrences: RecurringSpan[],
@@ -123,6 +129,7 @@ const slice = createSlice({
         UpdateBookingLinkSlot: (state, action: PayloadAction<UpdateBookingLinkSlot>) => state,
         CreateBooking: (state, action: PayloadAction<CreateBooking>) => state,
         GetBooking: (state, action: PayloadAction<FetchBooking>) => state,
+        CancelBooking: (state, action: PayloadAction<CancelBooking>) => state,
     }
 });
 

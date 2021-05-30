@@ -159,6 +159,16 @@ export const book = (bookingLinkId: string,
         });
 }
 
+export const cancelBooking = (bookingId: string, name: string) => {
+    const postBody = JSON.stringify({
+        name: name,
+    });
+    return doPost(`/api/public/bookings/${bookingId}/cancel`, postBody)
+        .catch((err) => {
+            throw Error(err.message);
+        });
+}
+
 export const getBooking = (bookingId: string) => {
     const url = `/api/public/bookings/${bookingId}`;
     return doFetch(url)

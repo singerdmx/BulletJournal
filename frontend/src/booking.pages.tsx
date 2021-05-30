@@ -5,7 +5,7 @@ import {Avatar, BackTop, Button, message, Result, Tooltip} from "antd";
 import './booking-link.pages.styles.less';
 import {IState} from "./store";
 import {connect} from "react-redux";
-import {getBooking} from "./features/bookingLink/actions";
+import {cancelBooking, getBooking} from "./features/bookingLink/actions";
 import {Booking} from "./features/bookingLink/interface";
 import {getRandomBackgroundImage} from "./assets/background";
 import {ClockCircleFilled, ClockCircleOutlined, SwapRightOutlined} from "@ant-design/icons";
@@ -14,12 +14,14 @@ import {getSlotSpan} from "./components/book-me/book-me-drawer";
 type BookingLinkPublicProps = {
     booking: undefined | Booking;
     getBooking: (bookingId: string) => void;
+    cancelBooking: (bookingId: string, name: string, onSuccess: Function) => void;
 }
 
 const BookingPublicPage: React.FC<BookingLinkPublicProps> = (
     {
         booking,
-        getBooking
+        getBooking,
+        cancelBooking
     }) => {
     const {bookingId} = useParams();
     const fullHeight = global.window.innerHeight;
@@ -62,6 +64,11 @@ const BookingPublicPage: React.FC<BookingLinkPublicProps> = (
                         <Button type="primary" key="cancel"
                             onClick={() => {
                                     // call cancel api
+                                    cancelBooking(booking.id, name, () => {
+                                        setTimeout(() => {
+                                            window.location.href = `${window.location.protocol}//${window.location.host}/public/bookingLinks/${booking!.bookingLink.id}`;
+                                        }, 1500);
+                                    });
                                     message.success('This event has been cancelled. We are forwarding you to the page where you can reschedule.');
                                 }
                             }>
@@ -79,5 +86,6 @@ const mapStateToProps = (state: IState) => ({
 });
 
 export default connect(mapStateToProps, {
-    getBooking
+    getBooking,
+    cancelBooking
 })(BookingPublicPage);

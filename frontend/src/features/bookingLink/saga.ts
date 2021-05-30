@@ -10,7 +10,7 @@ import {
     FetchBookingLink,
     UpdateBookingLinkSlot,
     CreateBooking,
-    FetchBooking,
+    FetchBooking, CancelBooking,
 } from "./reducer";
 import {PayloadAction} from "redux-starter-kit";
 import {message} from "antd";
@@ -23,7 +23,7 @@ import {
     getBookingLinks,
     updateBookingLinkRecurrences,
     updateBookingLinkSlot,
-    getBookingLink, book, getBooking,
+    getBookingLink, book, getBooking, cancelBooking,
 } from "../../apis/bookinglinkApis";
 import {Booking, BookingLink} from "./interface";
 import {IState} from "../../store";
@@ -295,6 +295,20 @@ function* fetchBooking(action: PayloadAction<FetchBooking>) {
     }
 }
 
+function* cancelCurrentBooking(action: PayloadAction<CancelBooking>) {
+    try {
+        const {bookingId, name, onSuccess} = action.payload;
+        yield call(cancelBooking, bookingId, name);
+        onSuccess();
+    } catch (error) {
+        if (error.message === 'reload') {
+            yield put(reloadReceived(true));
+        } else {
+            yield call(message.error, `cancelCurrentBooking fail: ${error}`);
+        }
+    }
+}
+
 export default function* groupSagas() {
     yield all([
         yield takeLatest(bookingLinksActions.AddBookingLink.type, addBookingLink),
@@ -307,5 +321,6 @@ export default function* groupSagas() {
         yield takeLatest(bookingLinksActions.UpdateBookingLinkSlot.type, changeBookingLinkSlot),
         yield takeLatest(bookingLinksActions.CreateBooking.type, createBooking),
         yield takeLatest(bookingLinksActions.GetBooking.type, fetchBooking),
+        yield takeLatest(bookingLinksActions.CancelBooking.type, cancelCurrentBooking),
     ]);
 }

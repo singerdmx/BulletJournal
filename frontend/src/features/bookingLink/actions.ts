@@ -120,3 +120,6 @@ export const book = (
 
 export const getBooking = (bookingId: string) =>
     actions.GetBooking({bookingId: bookingId});
+
+export const cancelBooking = (bookingId: string, name: string, onSuccess: Function) =>
+    actions.CancelBooking({bookingId: bookingId, name: name, onSuccess: onSuccess});
