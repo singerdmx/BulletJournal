@@ -188,9 +188,9 @@ public class BookingLinksController {
     }
 
     @PostMapping(PUBLIC_BOOKING_CANCEL_ROUTE)
-    public void cancel(@NotNull @PathVariable String bookingId, @NotNull @RequestParam String username) {
+    public void cancel(@NotNull @PathVariable String bookingId, @NotNull @RequestBody CancelBookingParams cancelBookingParams) {
         com.bulletjournal.repository.models.Booking booking = this.bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking " + bookingId + " not found"));
-        this.bookingLinkDaoJpa.cancel(bookingId, booking.getBookingLink().getId(), username);
+        this.bookingLinkDaoJpa.cancel(bookingId, booking.getBookingLink().getId(), cancelBookingParams.getName());
     }
 }
