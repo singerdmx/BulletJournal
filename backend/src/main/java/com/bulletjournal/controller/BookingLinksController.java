@@ -38,6 +38,7 @@ public class BookingLinksController {
     public static final String PUBLIC_BOOKING_LINK_ROUTE = PUBLIC_BOOKING_LINKS_ROUTE_PREFIX + "{bookingLinkId}";
     public static final String PUBLIC_BOOKING_LINK_BOOK_ROUTE = PUBLIC_BOOKING_LINK_ROUTE + "/book";
     public static final String PUBLIC_BOOKING_ROUTE = "/api/public/bookings/{bookingId}";
+    public static final String PUBLIC_BOOKING_CANCEL_ROUTE = "/api/public/bookings/{bookingId}/cancel";
     private static final Logger LOGGER = LoggerFactory.getLogger(BookingLinksController.class);
     @Autowired
     private BookingLinkDaoJpa bookingLinkDaoJpa;
@@ -184,5 +185,12 @@ public class BookingLinksController {
         Booking result = booking.toPresentationModel();
         result.setBookingLink(booking.getBookingLink().toPresentationModel(this.userClient, this.userDaoJpa));
         return result;
+    }
+
+    @PostMapping(PUBLIC_BOOKING_CANCEL_ROUTE)
+    public void CancelBooking(@NotNull @PathVariable String bookingId, @NotNull @RequestParam String username) {
+        com.bulletjournal.repository.models.Booking booking = this.bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking " + bookingId + " not found"));
+        this.bookingLinkDaoJpa.cancel(bookingId, booking.getBookingLink().getId(), username);
     }
 }

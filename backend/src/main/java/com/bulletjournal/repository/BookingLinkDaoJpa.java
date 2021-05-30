@@ -197,4 +197,12 @@ public class BookingLinkDaoJpa {
         this.bookingLinkRepository.save(res);
         return res;
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void cancel(String bookingId, String bookingLinkId, String username){
+        this.bookingDaoJpa.cancel(bookingId);
+        BookingLink bookingLink = getBookingLink(bookingLinkId);
+        bookingLink.setRemoved(false);
+        this.bookingLinkRepository.save(bookingLink);
+    }
 }

@@ -136,4 +136,9 @@ public class BookingDaoJpa {
         sb.append("]}}");
         return sb.toString();
     }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void cancel( String bookingId){
+        this.bookingRepository.deleteById(bookingId);
+    }
 }
