@@ -80,7 +80,7 @@ const BookMe: React.FC<BookMeProps> = (props) => {
         }
         const recurrences = [recurringSpan1, recurringSpan2, recurringSpan3, recurringSpan4];
 
-        addBookingLink(0, 0,endDate, true,
+        addBookingLink(0, 0, endDate, false,
             true, projects[0].id, recurrences, slotSpan, startDate, timezone,
             () => {
                 getBookingLinks();
