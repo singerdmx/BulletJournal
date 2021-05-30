@@ -15,6 +15,7 @@ RUN mkdir -p /usr/share/nginx/html/public/sampleTasks
 RUN mkdir -p /usr/share/nginx/html/public/groups
 RUN mkdir -p /usr/share/nginx/html/tokens
 RUN mkdir -p /usr/share/nginx/html/public/bookingLinks
+RUN mkdir -p /usr/share/nginx/html/public/bookings
 RUN ln -s /usr/share/nginx/html/static /usr/share/nginx/html/public/items/static
 RUN ln -s /usr/share/nginx/html/static /usr/share/nginx/html/public/sampleTasks/static
 RUN ln -s /usr/share/nginx/html/static /usr/share/nginx/html/public/notifications/static
@@ -22,6 +23,7 @@ RUN ln -s /usr/share/nginx/html/static /usr/share/nginx/html/public/groups/stati
 RUN ln -s /usr/share/nginx/html/static /usr/share/nginx/html/public/static
 RUN ln -s /usr/share/nginx/html/static /usr/share/nginx/html/tokens/static
 RUN ln -s /usr/share/nginx/html/static /usr/share/nginx/html/public/bookingLinks/static
+RUN ln -s /usr/share/nginx/html/static /usr/share/nginx/html/public/bookings/static
 
 # Copy the default nginx.conf provided by tiangolo/node-frontend
 # COPY --from=build-stage /nginx.conf /etc/nginx/conf.d/default.conf
