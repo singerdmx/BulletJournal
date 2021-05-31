@@ -1,27 +1,32 @@
-import React, {useEffect, useState} from "react";
-import {Empty, Input, Tooltip} from "antd";
+import React, { useEffect, useState } from "react";
+import { Empty, Input, Tooltip } from "antd";
 import {
     CheckCircleOutlined,
     ClockCircleOutlined,
     CloseCircleOutlined,
     QuestionCircleOutlined,
-    SwapRightOutlined
+    SwapRightOutlined,
+    DeleteOutlined,
+    CopyOutlined,
+    EditOutlined
 } from "@ant-design/icons";
 
 import './book-me.styles.less';
-import {IState} from "../../store";
-import {connect} from "react-redux";
+import { IState } from "../../store";
+import { connect } from "react-redux";
 import {
     getBookingLink,
     getBookingLinks,
     getBookMeUsername,
     updateBookMeUsername
 } from "../../features/bookingLink/actions";
-import {BookingLink} from "../../features/bookingLink/interface";
-import BookMeDrawer, {getSlotSpan} from "../../components/book-me/book-me-drawer";
-import {Project, ProjectsWithOwner} from "../../features/project/interface";
-import {flattenOwnedProject, flattenSharedProject} from "../projects/projects.pages";
-import {ProjectType} from "../../features/project/constants";
+import { BookingLink } from "../../features/bookingLink/interface";
+import BookMeDrawer, { getSlotSpan } from "../../components/book-me/book-me-drawer";
+import { Project, ProjectsWithOwner } from "../../features/project/interface";
+import { flattenOwnedProject, flattenSharedProject } from "../projects/projects.pages";
+import { ProjectType } from "../../features/project/constants";
+import getThemeColorVars from "../../utils/theme";
+import { getTaskBackgroundColor } from "../../features/tasks/interface";
 
 type ManageBookingProps = {
     ownedProjects: Project[];
@@ -88,14 +93,14 @@ const ManageBooking: React.FC<ManageBookingProps> = (
             Name&nbsp;&nbsp;
             <Tooltip
                 title="This is your name as it appears on your booking page and in email notifications.">
-                                    <span className="question-icon">
-                                    <QuestionCircleOutlined/>
-                                </span>
+                <span className="question-icon">
+                    <QuestionCircleOutlined />
+                </span>
             </Tooltip>
             <Input className='book-me-name-input' value={name} onChange={(e) => {
                 setNameChanged(true);
                 setName(e.target.value);
-            }}/>
+            }} />
             <Tooltip placement="top" title='Save'>
                 <CheckCircleOutlined
                     onClick={() => handleOnClick(true)}
@@ -121,21 +126,50 @@ const ManageBooking: React.FC<ManageBookingProps> = (
         </div>
         <div>
             <BookMeDrawer bookMeDrawerVisible={cardIsClicked}
-                          setBookMeDrawerVisible={setCardIsClicked}
-                          projects={projects}/>
+                setBookMeDrawerVisible={setCardIsClicked}
+                projects={projects} />
         </div>
         <div className='link-cards'>
             {links.map(link => {
+                const slotspan = getSlotSpan(link.slotSpan);
+                const getBackgroundColor = (slotspan: string) => {
+                    const tmp = slotspan.split(" ")[0];
+                    switch (tmp) {
+                        case "15":
+                            return "#EFEFF1";
+                        case "30":
+                            return "#ECD4D4";
+                        case "45":
+                            return "#C9CBE1";
+                        case "1":
+                            return "#CCDBE2";
+                        default:
+                            return "#E5ADB5"
+                    }
+                }
+
                 return <div className='link-card'
-                        onClick={() => {
-                            getBookingLink(link.id);
-                            setCardIsClicked(true)
-                        }}>
-                    <div>
-                        <ClockCircleOutlined/> {getSlotSpan(link.slotSpan)} Booking
+                    style={{ backgroundColor: getBackgroundColor(slotspan) }}
+                    onClick={() => {
+                        getBookingLink(link.id);
+                        setCardIsClicked(true)
+                    }}>
+                    <div className="link-card-title">
+                        <ClockCircleOutlined /> {slotspan} Booking
                     </div>
-                    <div>
+                    <div className="link-card-dates">
                         {link.startDate} <SwapRightOutlined /> {link.endDate}
+                    </div>
+                    <div className='link-card-operations'>
+                        <Tooltip title="Clone">
+                            <CopyOutlined />
+                        </Tooltip>
+                        <Tooltip title="Edit">
+                            <EditOutlined />
+                        </Tooltip>
+                        <Tooltip title="Delete">
+                            <DeleteOutlined />
+                        </Tooltip>
                     </div>
                 </div>
             })}
