@@ -31,7 +31,16 @@ const BookingPublicPage: React.FC<BookingLinkPublicProps> = (
     }, [bookingId]);
 
     if (!booking) {
-        return <div></div>
+        return <div style={{backgroundImage: `url(${getRandomBackgroundImage()})`, height: `${fullHeight}px`}}
+                    className='public-container'>
+            <div className='booking-link-div'>
+                <Result
+                    status="404"
+                    title="The event does not exist any more"
+                    subTitle="It is possible this event is cancelled"
+                />
+            </div>
+        </div>
     }
 
     const name = decodeURIComponent(window.location.search.substring(6));

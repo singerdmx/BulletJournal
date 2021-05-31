@@ -6,7 +6,7 @@ export type LinkAction = {
 };
 
 export type BookingAction = {
-    booking: Booking;
+    booking: Booking | undefined;
 };
 
 export type BookMeUsernameAction = {

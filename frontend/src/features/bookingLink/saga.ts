@@ -290,7 +290,7 @@ function* fetchBooking(action: PayloadAction<FetchBooking>) {
         if (error.message === 'reload') {
             yield put(reloadReceived(true));
         } else {
-            yield call(message.error, `fetchBooking fail: ${error}`);
+            yield put(bookingLinksActions.bookingReceived({booking: undefined}));
         }
     }
 }
