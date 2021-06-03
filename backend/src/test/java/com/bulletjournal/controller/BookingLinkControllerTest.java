@@ -107,7 +107,16 @@ public class BookingLinkControllerTest {
 
         BookParams bookParams = new BookParams(invitees, 1, "2021-05-04", "Seatle", "\"{\\\"delta\\\":{\\\"ops\\\":[{\\\"insert\\\":\\\"test content\\\\n\\\"}]}}\"", "America/Chicago", "00:30", "01:00", "2021-06-01");
 
-        book(bookingLink1, bookParams);
+        Booking booking = book(bookingLink1, bookParams);
+        booking.setBookingLink(bookingLink1);
+
+        getBooking(booking.getId(), HttpStatus.OK);
+
+        CancelBookingParams cancelBookingParams = new CancelBookingParams("test");
+        cancelBooking(booking, cancelBookingParams);
+
+        getBooking(booking.getId(), HttpStatus.NOT_FOUND);
+
         deleteAllBookinglinks(USER);
     }
 
@@ -322,6 +331,30 @@ public class BookingLinkControllerTest {
         assertEquals(bookParams.getSlotDate(), created.getSlotDate());
         assertEquals(bookParams.getRequesterTimezone(), created.getRequesterTimezone());
         return created;
+    }
+
+    private Booking getBooking(String bookingId, HttpStatus expectedStatusCode) {
+        ResponseEntity<Booking> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + BookingLinksController.PUBLIC_BOOKING_ROUTE,
+                HttpMethod.GET,
+                null,
+                Booking.class,
+                bookingId);
+
+        Booking booking = response.getBody();
+        assertEquals(response.getStatusCode(), expectedStatusCode);
+        return booking;
+    }
+
+    private void cancelBooking(Booking booking, CancelBookingParams cancelBookingParams) {
+        ResponseEntity<?> response = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + BookingLinksController.PUBLIC_BOOKING_CANCEL_ROUTE,
+                HttpMethod.POST,
+                TestHelpers.actAsOtherUser(cancelBookingParams, cancelBookingParams.getName()),
+                Void.class,
+                booking.getId());
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     private void deleteAllBookinglinks(String owner) {
