@@ -107,7 +107,7 @@ public class Converter {
             for (char c : description.toCharArray()) {
                 if (c == '\n' || c == '\r') {
                     if (sb.length() > 0) {
-                        baseText.append(String.format(INSERT_STR_FORMAT, sb.toString()));
+                        baseText.append(String.format(INSERT_STR_FORMAT, sb.toString().replace("\"", "\\\"")));
                     }
                     baseText.append(INSERT_LINE_BREAK);
                     sb.setLength(0);
@@ -116,7 +116,7 @@ public class Converter {
                 }
             }
             if (sb.length() > 0) {
-                baseText.append(String.format(INSERT_STR_FORMAT, sb.toString()));
+                baseText.append(String.format(INSERT_STR_FORMAT, sb.toString().replace("\"", "\\\"")));
                 baseText.append(INSERT_LINE_BREAK);
             }
         }
@@ -151,7 +151,8 @@ public class Converter {
     private static String getText(Event event, Task task) {
         StringBuilder text = new StringBuilder();
         if (event.getDescription() != null) {
-            text.append(event.getDescription().replace(System.lineSeparator(), "<br/>"))
+            text.append(event.getDescription().replace(System.lineSeparator(), "<br/>")
+                    .replace("\"", "\\\""))
                     .append("<br/>").append(System.lineSeparator());
         }
         if (event.getLocation() != null) {
