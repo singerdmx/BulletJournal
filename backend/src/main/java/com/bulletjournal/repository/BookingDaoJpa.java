@@ -1,29 +1,41 @@
 package com.bulletjournal.repository;
 
+import com.bulletjournal.clients.DaemonServiceClient;
 import com.bulletjournal.controller.models.Invitee;
 import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.controller.models.params.CreateTaskParams;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
+import com.bulletjournal.messaging.MessagingService;
 import com.bulletjournal.repository.models.Booking;
 import com.bulletjournal.repository.models.BookingLink;
 import com.bulletjournal.repository.models.Task;
+import com.bulletjournal.util.DeltaContent;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class BookingDaoJpa {
 
     private static final Gson GSON = new Gson();
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BookingDaoJpa.class);
+
+    public static final String BASE_URL = "https://bulletjournal.us/public/";
 
     @Autowired
     private BookingRepository bookingRepository;
@@ -36,6 +48,12 @@ public class BookingDaoJpa {
 
     @Autowired
     private UserDaoJpa userDaoJpa;
+
+    @Autowired
+    private DaemonServiceClient daemonServiceClient;
+
+    @Autowired
+    private MessagingService messagingService;
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Booking book(BookingLink bookingLink,
@@ -77,22 +95,35 @@ public class BookingDaoJpa {
         );
 
 
-        note = prependInfoToNote(note, bookingLink, invitees);
+        String ownerBookMeUsername = this.userDaoJpa.getBookMeUsername(bookingLink.getOwner());
+        String deltaNote = "{\"delta\": {\"ops\": [" + prependInfoToNote(note, bookingLink, invitees)
+                + prependLinkInContent(bookingLink, ownerBookMeUsername, false);
+        deltaNote += "]}}";
 
         Task task = taskDaoJpa.create(
-                bookingLink.getProject().getId(), bookingLink.getOwner(), createTaskParams, note);
+                bookingLink.getProject().getId(), bookingLink.getOwner(), createTaskParams, deltaNote);
         booking.setTask(task);
         booking = bookingRepository.save(booking);
         if (bookingLink.isExpireOnBooking()) {
             bookingLink.setRemoved(true);
         }
         this.bookingLinkRepository.save(bookingLink);
+
+        // send booking email
+        List<String> contents = new ArrayList<>();
+        contents.add(createContent(note, bookingLink, invitees, booking, this.userDaoJpa.getBookMeUsername(bookingLink.getOwner())));
+        contents.add(createContent(note, bookingLink, invitees, booking, invitees.get(0).getFirstName() + " " + invitees.get(0).getLastName()));
+        Booking finalBooking = booking;
+        contents.addAll(invitees.stream().skip(1).map(i ->
+                createContent(note, bookingLink, invitees, finalBooking, null)).collect(Collectors.toList()));
+        sendBookingEmail(contents, invitees, booking, bookingLink);
+
+
         return booking;
     }
 
     private String prependInfoToNote(String note, BookingLink bookingLink, List<Invitee> invitees) {
         StringBuilder sb = new StringBuilder();
-
         Invitee primaryInvitee = invitees.get(0);
         String primaryPhone = StringUtils.isBlank(primaryInvitee.getPhone()) ? "" : ", " + primaryInvitee.getPhone();
         String ownerEmail = this.userDaoJpa.getByName(bookingLink.getOwner()).getEmail();
@@ -102,7 +133,8 @@ public class BookingDaoJpa {
             ownerEmail = " - " + ownerEmail;
         }
 
-        String info = "{\"delta\": {\"ops\": [" + "{\"insert\": \"" + this.userDaoJpa.getBookMeUsername(bookingLink.getOwner())
+        String info =
+                "{\"insert\": \"" + this.userDaoJpa.getBookMeUsername(bookingLink.getOwner())
                 + "\"}" + ",{\"insert\": \"" + ownerEmail + "\\n\"},{\"insert\": \"" + primaryInvitee.getFirstName()
                 + " " + primaryInvitee.getLastName() + " - " + primaryInvitee.getEmail() + primaryPhone + "\\n\"}";
         sb.append(info);
@@ -130,15 +162,118 @@ public class BookingDaoJpa {
                 sb.append(",").append(originalNote);
             }
         }
-        sb.append(",{\"attributes\":{\"link\":\"https://bulletjournal.us/public/bookingLinks/");
-        sb.append(bookingLink.getId());
-        sb.append("\"},\"insert\":\"View event in Bullet Journal\"},{\"insert\": \"\\n\"}");
-        sb.append("]}}");
+
+//        sb.append(",{\"attributes\":{\"link\":\"https://bulletjournal.us/public/bookingLinks/");
+//        sb.append(bookingLink.getId());
+//        sb.append("\"},\"insert\":\"View event in Bullet Journal\"},{\"insert\": \"\\n\"}");
+
+        //        sb.append("]}}");
         return sb.toString();
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void cancel(String bookingId) {
         this.bookingRepository.deleteById(bookingId);
+    }
+
+    private String prependLinkInContent(BookingLink bookingLink, String user, boolean isForEmail) {
+//        sb.append(",{\"attributes\":{\"link\":\"https://bulletjournal.us/public/bookingLinks/");
+//        sb.append(bookingLink.getId());
+//        sb.append("\"},\"insert\":\"Cancel / Reschedule event in Bullet Journal\"},{\"insert\": \"\\n\"}");
+        String s =  ",{\"attributes\":{\"link\":\"" + BASE_URL;
+        if (!isForEmail) {
+            return s + "bookingLinks/" + bookingLink.getId()
+                    + "\"},\"insert\":\"View event in Bullet Journal\"},{\"insert\": \"\\n\"}";
+        }
+        else {
+            return s + "bookings/" + bookingLink.getId() + "?name=" + user
+                    + "\"},\"insert\":\"Cancel / reschedule event in Bullet Journal\"},{\"insert\": \"\\n\"}";
+        }
+
+    }
+
+    private void sendBookingEmail(List<String> contents, List<Invitee> invitees, Booking booking, BookingLink bookingLink) {
+        List<String> html = contents.stream().map(c -> this.daemonServiceClient.convertDeltaToHtml(c)).collect(Collectors.toList());
+//        List<String> html = contents;
+        String primaryName = invitees.get(0).getFirstName() + " " + invitees.get(0).getLastName(); // need encoding?
+        String emailSubject = "New Event: " + bookingLink.getSlotSpan() + " Minutes Meeting - " + primaryName + " and "
+                + this.userDaoJpa.getBookMeUsername(bookingLink.getOwner()) + " on " + booking.getDisplayDate() + ": from "
+                + booking.getStartTime() + " to " + booking.getEndTime();
+
+        messagingService.sendBookingEmailsToUser(this.userDaoJpa.getBookMeUsername(bookingLink.getOwner()), invitees, emailSubject, html);
+
+    }
+
+    private String createContent(String note, BookingLink bookingLink, List<Invitee> invitees, Booking booking, String receiver) {
+        // receiver is null if is guests
+        // owner's book me username
+        // firstname lastname
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+
+        // event info
+        String info = "{\"insert\": \"A booking has been scheduled:\\n\\n\"},{\"attributes\": {\"bold\": true},\"insert\": " +
+                "\"Event Type:\"},{\"insert\": \"\\n\"},{\"insert\": \"" + bookingLink.getSlotSpan()
+                + " minutes meeting\\n\"},{\"insert\": \"\\n\"},{\"attributes\": {\"bold\": true},\"insert\": " +
+                "\"Event Date/Time:\"},{\"insert\": \"\\n\"},{\"insert\": \"" + booking.getStartTime() + " to "
+                + booking.getEndTime() + " on " + booking.getDisplayDate() + "\\n\"},{\"insert\": \"\\n\"}"
+                + ",{\"attributes\": {\"bold\": true},\"insert\": \"Invitee Time Zone:\"},{\"insert\": \"\\n\"},{\"insert\": \""
+                + booking.getRequesterTimeZone() + "\\n\"},{\"insert\": \"\\n\"}" + ",{\"attributes\": {\"bold\": true}," +
+                "\"insert\": \"Owner and Invitees:\"},{\"insert\": \"\\n\"},";
+
+        sb.append(info);
+
+        // add invitees info
+        sb.append(prependInfoToNote(note, bookingLink, invitees));
+
+
+        if (!StringUtils.isBlank(receiver)) {
+            receiver = encodeValue(receiver);
+            sb.append(prependLinkInContent(bookingLink, receiver, true));
+//            sb.append(",{\"attributes\":{\"link\":\"");
+//            sb.append("https://bulletjournal.us/public/bookings/uuid?name=").append(receiver)
+//                    .append("\"},\"insert\":\"reschedule / cancel\"},{\"insert\": \"\\n\"}");
+        }
+        sb.append("]");
+
+        return sb.toString();
+        
+
+    }
+
+    private String encodeValue(String value) {
+        try {
+            return URLEncoder.encode(value, "UTF-8")
+                    .replaceAll("\\+", "%20")
+                    .replaceAll("\\%21", "!")
+                    .replaceAll("\\%27", "'")
+                    .replaceAll("\\%28", "(")
+                    .replaceAll("\\%29", ")")
+                    .replaceAll("\\%7E", "~");
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.error("Fail to encode value {}", value);
+            return null;
+        }
+    }
+
+
+    // dunno what's this step for yet
+    private void temp(String newText) {
+        if (newText.contains("$$$html$$$")) {
+            LOGGER.info("Skip convertDeltaToHtml");
+            return;
+        }
+        try {
+            DeltaContent newContent = new DeltaContent(newText);
+            String htmlString = this.daemonServiceClient.convertDeltaToHtml(newContent.getDeltaOpsString());
+            LOGGER.info("htmlString: {}", htmlString);
+            newContent.setHtml(htmlString);
+
+
+
+        } catch (Exception ex) {
+            LOGGER.error("Fail to adjustContentText: {}", newText);
+        }
     }
 }

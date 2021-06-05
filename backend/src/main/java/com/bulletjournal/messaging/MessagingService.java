@@ -2,6 +2,7 @@ package com.bulletjournal.messaging;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.Content;
+import com.bulletjournal.controller.models.Invitee;
 import com.bulletjournal.messaging.firebase.FcmClient;
 import com.bulletjournal.messaging.firebase.FcmMessageParams;
 import com.bulletjournal.messaging.mailjet.MailjetEmailClient;
@@ -10,10 +11,7 @@ import com.bulletjournal.messaging.mailjet.MailjetEmailParams;
 import com.bulletjournal.repository.DeviceTokenDaoJpa;
 import com.bulletjournal.repository.UserAliasDaoJpa;
 import com.bulletjournal.repository.UserDaoJpa;
-import com.bulletjournal.repository.models.DeviceToken;
-import com.bulletjournal.repository.models.Notification;
-import com.bulletjournal.repository.models.Task;
-import com.bulletjournal.repository.models.User;
+import com.bulletjournal.repository.models.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -359,6 +357,50 @@ public class MessagingService {
             inviter,
             APP_INVITER_AVATAR_PROPERTY,
             inviterAvatar
+        );
+    }
+
+    public void sendBookingEmailsToUser(String inviter, List<Invitee> invitees, String subject, List<String> html) {
+        LOGGER.info("Sending booking emails...");
+        try {
+            List<MailjetEmailParams> emailParamsList = new ArrayList<>();
+            // userClient.getUser(inviter).getEmail()
+            MailjetEmailParams mailjetEmailParams =
+                    createEmailPramsForBookingEmail(inviter, userClient.getUser(inviter).getEmail(), subject, html.get(0));
+            emailParamsList.add(mailjetEmailParams);
+            html.remove(0);
+            for (int i = 0; i < invitees.size(); i++) {
+                String receiver = "";
+                if (!StringUtils.isBlank(invitees.get(i).getFirstName())) {
+                    receiver = invitees.get(i).getFirstName();
+                }
+                if (!StringUtils.isBlank(invitees.get(i).getLastName())) {
+                    receiver += invitees.get(i).getLastName();
+                }
+                mailjetEmailParams = createEmailPramsForBookingEmail(receiver, invitees.get(i).getEmail(), subject, html.get(i));
+                if (mailjetEmailParams != null) {
+                    emailParamsList.add(mailjetEmailParams);
+                }
+            }
+            mailjetClient.sendAllEmailAsync(emailParamsList);
+        } catch (Exception e) {
+            LOGGER.error("sendBookingEmailsToUser failed", e);
+        }
+    }
+
+    public MailjetEmailParams createEmailPramsForBookingEmail(String receiver, String email, String subject, String htmlContent) {
+        if (!this.isValidEmailAddr(email)) {
+            LOGGER.error("Invalid booking email address: {}", email);
+            return null;
+        }
+
+        return new MailjetEmailParams(
+                Arrays.asList(new ImmutablePair(receiver, email)),
+                subject,
+                null,
+                Template.BOOKING_EMAIL,
+                HTML_CONTENT_PROPERTY,
+                htmlContent
         );
     }
 
