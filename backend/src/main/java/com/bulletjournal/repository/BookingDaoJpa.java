@@ -120,7 +120,7 @@ public class BookingDaoJpa {
         Booking finalBooking = booking;
         contents.addAll(invitees.stream().skip(1).map(i ->
                 createContent(note, bookingLink, invitees, finalBooking, null, dayOfWeek)).collect(Collectors.toList()));
-        sendBookingEmail(contents, invitees, booking, bookingLink);
+        sendBookingEmail(contents, invitees, booking, bookingLink, dayOfWeek);
 
         return booking;
     }
@@ -160,7 +160,7 @@ public class BookingDaoJpa {
         }
         sb.append(",{\"insert\": \"\\n\"}");
         if (StringUtils.isNotBlank(note)) {
-            String originalNote = note.substring(note.indexOf('[') + 1, note.indexOf(']'));
+            String originalNote = note.substring(note.indexOf('[') + 1, note.lastIndexOf(']'));
             if (StringUtils.isNotBlank(originalNote)) {
                 sb.append(",").append(originalNote);
             }
@@ -184,11 +184,12 @@ public class BookingDaoJpa {
                 + "\"},\"insert\":\"Cancel / reschedule event\"},{\"insert\": \"\\n\"}";
     }
 
-    private void sendBookingEmail(List<String> contents, List<Invitee> invitees, Booking booking, BookingLink bookingLink) {
+    private void sendBookingEmail(List<String> contents, List<Invitee> invitees,
+                                  Booking booking, BookingLink bookingLink, String dayOfWeek) {
         List<String> html = contents.stream().map(this::convert).collect(Collectors.toList());
         String primaryName = invitees.get(0).getFirstName() + " " + invitees.get(0).getLastName();
-        String emailSubject = "New Event: " + bookingLink.getSlotSpan() + " Minutes Meeting - " + primaryName + " and "
-                + this.userDaoJpa.getBookMeUsername(bookingLink.getOwner()) + " on " + booking.getDisplayDate() + ": from "
+        String emailSubject = bookingLink.getSlotSpan() + " Minutes Booking - " + this.userDaoJpa.getBookMeUsername(bookingLink.getOwner()) + " and "
+                + primaryName + " on " + dayOfWeek + " " + booking.getDisplayDate() + " from "
                 + booking.getStartTime() + " to " + booking.getEndTime();
 
         messagingService.sendBookingEmailsToUser(this.userDaoJpa.getBookMeUsername(bookingLink.getOwner()), invitees, emailSubject, html);
@@ -204,9 +205,9 @@ public class BookingDaoJpa {
         sb.append("{\"delta\": {\"ops\": [");
 
         // event info
-        String info = "{\"insert\": \"A new event has been scheduled:\\n\\n\"},{\"attributes\": {\"bold\": true},\"insert\": " +
+        String info = "{\"insert\": \"A new event has been scheduled.\\n\\n\"},{\"attributes\": {\"bold\": true},\"insert\": " +
                 "\"Event Type:\"},{\"insert\": \"\\n\"},{\"insert\": \"" + bookingLink.getSlotSpan()
-                + " minutes meeting\\n\"},{\"insert\": \"\\n\"},{\"attributes\": {\"bold\": true},\"insert\": " +
+                + " minutes\\n\"},{\"insert\": \"\\n\"},{\"attributes\": {\"bold\": true},\"insert\": " +
                 "\"Event Date/Time:\"},{\"insert\": \"\\n\"},{\"insert\": \"" + booking.getStartTime() + " - "
                 + booking.getEndTime() + " on " + dayOfWeek + " " + booking.getDisplayDate() + " (" + booking.getRequesterTimeZone()
                 + ")\\n\"}"
