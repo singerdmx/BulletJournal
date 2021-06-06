@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
@@ -123,7 +122,6 @@ public class BookingDaoJpa {
                 createContent(note, bookingLink, invitees, finalBooking, null, dayOfWeek)).collect(Collectors.toList()));
         sendBookingEmail(contents, invitees, booking, bookingLink);
 
-
         return booking;
     }
 
@@ -137,7 +135,6 @@ public class BookingDaoJpa {
         } else {
             ownerEmail = " " + ownerEmail;
         }
-
 
         String info =
                 "{\"insert\": \"" + this.userDaoJpa.getBookMeUsername(bookingLink.getOwner())
@@ -169,11 +166,6 @@ public class BookingDaoJpa {
             }
         }
 
-//        sb.append(",{\"attributes\":{\"link\":\"https://bulletjournal.us/public/bookingLinks/");
-//        sb.append(bookingLink.getId());
-//        sb.append("\"},\"insert\":\"View event in Bullet Journal\"},{\"insert\": \"\\n\"}");
-
-        //        sb.append("]}}");
         return sb.toString();
     }
 
@@ -183,23 +175,18 @@ public class BookingDaoJpa {
     }
 
     private String prependLinkInContent(BookingLink bookingLink, String user, boolean isForEmail) {
-//        sb.append(",{\"attributes\":{\"link\":\"https://bulletjournal.us/public/bookingLinks/");
-//        sb.append(bookingLink.getId());
-//        sb.append("\"},\"insert\":\"Cancel / Reschedule event in Bullet Journal\"},{\"insert\": \"\\n\"}");
         String s = ",{\"attributes\":{\"link\":\"" + BASE_URL;
         if (!isForEmail) {
             return s + "bookingLinks/" + bookingLink.getId()
                     + "\"},\"insert\":\"View event in Bullet Journal\"},{\"insert\": \"\\n\"}";
-        } else {
-            return s + "bookings/" + bookingLink.getId() + "?name=" + user
-                    + "\"},\"insert\":\"Cancel / reschedule event\"},{\"insert\": \"\\n\"}";
         }
-
+        return s + "bookings/" + bookingLink.getId() + "?name=" + user
+                + "\"},\"insert\":\"Cancel / reschedule event\"},{\"insert\": \"\\n\"}";
     }
 
     private void sendBookingEmail(List<String> contents, List<Invitee> invitees, Booking booking, BookingLink bookingLink) {
-        List<String> html = contents.stream().map(c -> convert(c)).collect(Collectors.toList());
-        String primaryName = invitees.get(0).getFirstName() + " " + invitees.get(0).getLastName(); // need encoding?
+        List<String> html = contents.stream().map(this::convert).collect(Collectors.toList());
+        String primaryName = invitees.get(0).getFirstName() + " " + invitees.get(0).getLastName();
         String emailSubject = "New Event: " + bookingLink.getSlotSpan() + " Minutes Meeting - " + primaryName + " and "
                 + this.userDaoJpa.getBookMeUsername(bookingLink.getOwner()) + " on " + booking.getDisplayDate() + ": from "
                 + booking.getStartTime() + " to " + booking.getEndTime();
@@ -213,7 +200,6 @@ public class BookingDaoJpa {
         // receiver is null if is guests
         // owner's book me username
         // firstname lastname
-
         StringBuilder sb = new StringBuilder();
         sb.append("{\"delta\": {\"ops\": [");
 
@@ -225,26 +211,19 @@ public class BookingDaoJpa {
                 + booking.getEndTime() + " on " + dayOfWeek + " " + booking.getDisplayDate() + " (" + booking.getRequesterTimeZone()
                 + ")\\n\"}"
                 + ",{\"insert\": \"\\n\"}" + ",{\"attributes\": {\"bold\": true}," +
-                "\"insert\": \"Owner and Attendees:\"},{\"insert\": \"\\n\"},";
+                "\"insert\": \"Attendees:\"},{\"insert\": \"\\n\"},";
 
         sb.append(info);
-
         // add invitees info
         sb.append(prependInfoToNote(note, bookingLink, invitees));
-
 
         if (!StringUtils.isBlank(receiver)) {
             receiver = encodeValue(receiver);
             sb.append(prependLinkInContent(bookingLink, receiver, true));
-//            sb.append(",{\"attributes\":{\"link\":\"");
-//            sb.append("https://bulletjournal.us/public/bookings/uuid?name=").append(receiver)
-//                    .append("\"},\"insert\":\"reschedule / cancel\"},{\"insert\": \"\\n\"}");
         }
         sb.append("]}}");
 
         return sb.toString();
-
-
     }
 
     private String encodeValue(String value) {
@@ -256,12 +235,7 @@ public class BookingDaoJpa {
         }
     }
 
-
     private String convert(String newText) {
-        if (newText.contains("$$$html$$$")) {
-            LOGGER.info("Skip convertDeltaToHtml");
-            return null;
-        }
         try {
             DeltaContent newContent = new DeltaContent(newText);
             return this.daemonServiceClient.convertDeltaToHtml(newContent.getDeltaOpsString());
