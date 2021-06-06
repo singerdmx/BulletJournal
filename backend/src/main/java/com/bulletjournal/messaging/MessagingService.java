@@ -360,13 +360,13 @@ public class MessagingService {
         );
     }
 
-    public void sendBookingEmailsToUser(String inviter, List<Invitee> invitees, String subject, List<String> html) {
+    public void sendBookingEmailsToUser(String inviterUsername, String inviter,
+                                        List<Invitee> invitees, String subject, List<String> html) {
         LOGGER.info("Sending booking emails...");
         try {
             List<MailjetEmailParams> emailParamsList = new ArrayList<>();
-            // userClient.getUser(inviter).getEmail()
             MailjetEmailParams mailjetEmailParams =
-                    createEmailPramsForBookingEmail(inviter, userClient.getUser(inviter).getEmail(), subject, html.get(0));
+                    createEmailPramsForBookingEmail(inviter, userClient.getUser(inviterUsername).getEmail(), subject, html.get(0));
             emailParamsList.add(mailjetEmailParams);
             html.remove(0);
             for (int i = 0; i < invitees.size(); i++) {

@@ -192,7 +192,9 @@ public class BookingDaoJpa {
                 + primaryName + " on " + dayOfWeek + " " + booking.getDisplayDate() + " from "
                 + booking.getStartTime() + " to " + booking.getEndTime();
 
-        messagingService.sendBookingEmailsToUser(this.userDaoJpa.getBookMeUsername(bookingLink.getOwner()), invitees, emailSubject, html);
+        messagingService.sendBookingEmailsToUser(
+                bookingLink.getOwner(),
+                this.userDaoJpa.getBookMeUsername(bookingLink.getOwner()), invitees, emailSubject, html);
 
     }
 
