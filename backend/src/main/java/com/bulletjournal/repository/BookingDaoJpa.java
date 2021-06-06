@@ -23,9 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Repository
@@ -94,6 +97,8 @@ public class BookingDaoJpa {
                 location
         );
 
+        ZonedDateTime dateTime = ZonedDateTimeHelper.convertDateAndTime(displayDate, startTime, requesterTimezone);
+        String dayOfWeek = dateTime.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault());
 
         String ownerBookMeUsername = this.userDaoJpa.getBookMeUsername(bookingLink.getOwner());
         String deltaNote = "{\"delta\": {\"ops\": [" + prependInfoToNote(note, bookingLink, invitees)
@@ -111,11 +116,11 @@ public class BookingDaoJpa {
 
         // send booking email
         List<String> contents = new ArrayList<>();
-        contents.add(createContent(note, bookingLink, invitees, booking, this.userDaoJpa.getBookMeUsername(bookingLink.getOwner())));
-        contents.add(createContent(note, bookingLink, invitees, booking, invitees.get(0).getFirstName() + " " + invitees.get(0).getLastName()));
+        contents.add(createContent(note, bookingLink, invitees, booking, this.userDaoJpa.getBookMeUsername(bookingLink.getOwner()), dayOfWeek));
+        contents.add(createContent(note, bookingLink, invitees, booking, invitees.get(0).getFirstName() + " " + invitees.get(0).getLastName(), dayOfWeek));
         Booking finalBooking = booking;
         contents.addAll(invitees.stream().skip(1).map(i ->
-                createContent(note, bookingLink, invitees, finalBooking, null)).collect(Collectors.toList()));
+                createContent(note, bookingLink, invitees, finalBooking, null, dayOfWeek)).collect(Collectors.toList()));
         sendBookingEmail(contents, invitees, booking, bookingLink);
 
 
@@ -125,18 +130,19 @@ public class BookingDaoJpa {
     private String prependInfoToNote(String note, BookingLink bookingLink, List<Invitee> invitees) {
         StringBuilder sb = new StringBuilder();
         Invitee primaryInvitee = invitees.get(0);
-        String primaryPhone = StringUtils.isBlank(primaryInvitee.getPhone()) ? "" : ", " + primaryInvitee.getPhone();
+        String primaryPhone = StringUtils.isBlank(primaryInvitee.getPhone()) ? "" : " " + primaryInvitee.getPhone();
         String ownerEmail = this.userDaoJpa.getByName(bookingLink.getOwner()).getEmail();
         if (StringUtils.isBlank(ownerEmail)) {
             ownerEmail = "";
         } else {
-            ownerEmail = " - " + ownerEmail;
+            ownerEmail = " " + ownerEmail;
         }
+
 
         String info =
                 "{\"insert\": \"" + this.userDaoJpa.getBookMeUsername(bookingLink.getOwner())
-                + "\"}" + ",{\"insert\": \"" + ownerEmail + "\\n\"},{\"insert\": \"" + primaryInvitee.getFirstName()
-                + " " + primaryInvitee.getLastName() + " - " + primaryInvitee.getEmail() + primaryPhone + "\\n\"}";
+                        + "\"}" + ",{\"insert\": \"" + ownerEmail + "\\n\"},{\"insert\": \"" + primaryInvitee.getFirstName()
+                        + " " + primaryInvitee.getLastName() + " " + primaryInvitee.getEmail() + primaryPhone + "\\n\"}";
         sb.append(info);
 
         for (int i = 1; i < invitees.size(); i++) {
@@ -147,10 +153,10 @@ public class BookingDaoJpa {
             }
             if (!StringUtils.isBlank(invitee.getLastName())) sb.append(invitee.getLastName());
             if (!StringUtils.isBlank(invitee.getFirstName()) || !StringUtils.isBlank(invitee.getLastName()))
-                sb.append(" - ");
+                sb.append(" ");
             sb.append(invitee.getEmail());
             if (!StringUtils.isBlank(invitee.getPhone())) {
-                sb.append(", ");
+                sb.append(" ");
                 sb.append(invitee.getPhone());
             }
             sb.append("\\n\"}");
@@ -180,21 +186,19 @@ public class BookingDaoJpa {
 //        sb.append(",{\"attributes\":{\"link\":\"https://bulletjournal.us/public/bookingLinks/");
 //        sb.append(bookingLink.getId());
 //        sb.append("\"},\"insert\":\"Cancel / Reschedule event in Bullet Journal\"},{\"insert\": \"\\n\"}");
-        String s =  ",{\"attributes\":{\"link\":\"" + BASE_URL;
+        String s = ",{\"attributes\":{\"link\":\"" + BASE_URL;
         if (!isForEmail) {
             return s + "bookingLinks/" + bookingLink.getId()
                     + "\"},\"insert\":\"View event in Bullet Journal\"},{\"insert\": \"\\n\"}";
-        }
-        else {
+        } else {
             return s + "bookings/" + bookingLink.getId() + "?name=" + user
-                    + "\"},\"insert\":\"Cancel / reschedule event in Bullet Journal\"},{\"insert\": \"\\n\"}";
+                    + "\"},\"insert\":\"Cancel / reschedule event\"},{\"insert\": \"\\n\"}";
         }
 
     }
 
     private void sendBookingEmail(List<String> contents, List<Invitee> invitees, Booking booking, BookingLink bookingLink) {
-        List<String> html = contents.stream().map(c -> this.daemonServiceClient.convertDeltaToHtml(c)).collect(Collectors.toList());
-//        List<String> html = contents;
+        List<String> html = contents.stream().map(c -> convert(c)).collect(Collectors.toList());
         String primaryName = invitees.get(0).getFirstName() + " " + invitees.get(0).getLastName(); // need encoding?
         String emailSubject = "New Event: " + bookingLink.getSlotSpan() + " Minutes Meeting - " + primaryName + " and "
                 + this.userDaoJpa.getBookMeUsername(bookingLink.getOwner()) + " on " + booking.getDisplayDate() + ": from "
@@ -204,23 +208,24 @@ public class BookingDaoJpa {
 
     }
 
-    private String createContent(String note, BookingLink bookingLink, List<Invitee> invitees, Booking booking, String receiver) {
+    private String createContent(String note, BookingLink bookingLink, List<Invitee> invitees, Booking booking,
+                                 String receiver, String dayOfWeek) {
         // receiver is null if is guests
         // owner's book me username
         // firstname lastname
 
         StringBuilder sb = new StringBuilder();
-        sb.append("[");
+        sb.append("{\"delta\": {\"ops\": [");
 
         // event info
-        String info = "{\"insert\": \"A booking has been scheduled:\\n\\n\"},{\"attributes\": {\"bold\": true},\"insert\": " +
+        String info = "{\"insert\": \"A new event has been scheduled:\\n\\n\"},{\"attributes\": {\"bold\": true},\"insert\": " +
                 "\"Event Type:\"},{\"insert\": \"\\n\"},{\"insert\": \"" + bookingLink.getSlotSpan()
                 + " minutes meeting\\n\"},{\"insert\": \"\\n\"},{\"attributes\": {\"bold\": true},\"insert\": " +
-                "\"Event Date/Time:\"},{\"insert\": \"\\n\"},{\"insert\": \"" + booking.getStartTime() + " to "
-                + booking.getEndTime() + " on " + booking.getDisplayDate() + "\\n\"},{\"insert\": \"\\n\"}"
-                + ",{\"attributes\": {\"bold\": true},\"insert\": \"Invitee Time Zone:\"},{\"insert\": \"\\n\"},{\"insert\": \""
-                + booking.getRequesterTimeZone() + "\\n\"},{\"insert\": \"\\n\"}" + ",{\"attributes\": {\"bold\": true}," +
-                "\"insert\": \"Owner and Invitees:\"},{\"insert\": \"\\n\"},";
+                "\"Event Date/Time:\"},{\"insert\": \"\\n\"},{\"insert\": \"" + booking.getStartTime() + " - "
+                + booking.getEndTime() + " on " + dayOfWeek + " " + booking.getDisplayDate() + " (" + booking.getRequesterTimeZone()
+                + ")\\n\"}"
+                + ",{\"insert\": \"\\n\"}" + ",{\"attributes\": {\"bold\": true}," +
+                "\"insert\": \"Owner and Attendees:\"},{\"insert\": \"\\n\"},";
 
         sb.append(info);
 
@@ -235,22 +240,16 @@ public class BookingDaoJpa {
 //            sb.append("https://bulletjournal.us/public/bookings/uuid?name=").append(receiver)
 //                    .append("\"},\"insert\":\"reschedule / cancel\"},{\"insert\": \"\\n\"}");
         }
-        sb.append("]");
+        sb.append("]}}");
 
         return sb.toString();
-        
+
 
     }
 
     private String encodeValue(String value) {
         try {
-            return URLEncoder.encode(value, "UTF-8")
-                    .replaceAll("\\+", "%20")
-                    .replaceAll("\\%21", "!")
-                    .replaceAll("\\%27", "'")
-                    .replaceAll("\\%28", "(")
-                    .replaceAll("\\%29", ")")
-                    .replaceAll("\\%7E", "~");
+            return URLEncoder.encode(value, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             LOGGER.error("Fail to encode value {}", value);
             return null;
@@ -258,22 +257,17 @@ public class BookingDaoJpa {
     }
 
 
-    // dunno what's this step for yet
-    private void temp(String newText) {
+    private String convert(String newText) {
         if (newText.contains("$$$html$$$")) {
             LOGGER.info("Skip convertDeltaToHtml");
-            return;
+            return null;
         }
         try {
             DeltaContent newContent = new DeltaContent(newText);
-            String htmlString = this.daemonServiceClient.convertDeltaToHtml(newContent.getDeltaOpsString());
-            LOGGER.info("htmlString: {}", htmlString);
-            newContent.setHtml(htmlString);
-
-
-
+            return this.daemonServiceClient.convertDeltaToHtml(newContent.getDeltaOpsString());
         } catch (Exception ex) {
             LOGGER.error("Fail to adjustContentText: {}", newText);
+            return null;
         }
     }
 }
