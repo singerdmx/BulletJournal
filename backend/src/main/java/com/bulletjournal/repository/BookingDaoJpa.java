@@ -193,8 +193,8 @@ public class BookingDaoJpa {
                 + booking.getStartTime() + " to " + booking.getEndTime();
 
         messagingService.sendBookingEmailsToUser(
-                bookingLink.getOwner(),
-                this.userDaoJpa.getBookMeUsername(bookingLink.getOwner()), invitees, emailSubject, html);
+                bookingLink.getOwner(), this.userDaoJpa.getBookMeUsername(bookingLink.getOwner()),
+                this.userDaoJpa.getByName(bookingLink.getOwner()).getEmail(), invitees, emailSubject, html);
 
     }
 
