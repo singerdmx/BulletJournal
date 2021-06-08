@@ -157,7 +157,7 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
     }
 
     function getSelectedSlot() {
-        if (!slots || slots.length == 0) {
+        if (!slots || slots.length === 0) {
             return {
                 date: '2021-12-12',
                 displayDate: '2021-12-12',

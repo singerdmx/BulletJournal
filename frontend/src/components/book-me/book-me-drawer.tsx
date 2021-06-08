@@ -75,7 +75,6 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
     const {setBookMeDrawerVisible, bookMeDrawerVisible, link, projects, patchBookingLink} = props;
     const [location, setLocation] = useState();
     const [projectId, setProjectId] = useState();
-    const [cardIsClicked, setCardIsClicked] =useState(false);
     const result = ['5', '10', '15', '30', '45', '60'];
     const bufferOptions = result.map((time: string) => {
         return {value: time};
