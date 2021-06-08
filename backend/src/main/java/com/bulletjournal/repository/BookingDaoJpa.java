@@ -116,14 +116,14 @@ public class BookingDaoJpa {
         String ownerEndTime = ZonedDateTimeHelper.getTime(zonedTime.plusMinutes(bookingLink.getSlotSpan()));
 
         List<String> contents = new ArrayList<>();
-        contents.add(createContent(note, bookingLink, invitees, booking, ownerBookMeName,
+        contents.add(createContent(note, bookingLink, invitees, booking, ownerBookMeName, true,
                 getDayOfWeek(booking.getSlotDate(), ownerStartTime, bookingLink.getTimezone()), ownerBookMeName));
         String inviteeDayOfWeek = getDayOfWeek(booking.getDisplayDate(), booking.getStartTime(), requesterTimezone);
         contents.add(createContent(note, bookingLink, invitees, booking, invitees.get(0).getFirstName()
-                + " " + invitees.get(0).getLastName(), inviteeDayOfWeek, ownerBookMeName));
+                + " " + invitees.get(0).getLastName(), false, inviteeDayOfWeek, ownerBookMeName));
         Booking finalBooking = booking;
         contents.addAll(invitees.stream().skip(1).map(i ->
-                createContent(note, bookingLink, invitees, finalBooking, null, inviteeDayOfWeek, ownerBookMeName)).collect(Collectors.toList()));
+                createContent(note, bookingLink, invitees, finalBooking, null, false, inviteeDayOfWeek, ownerBookMeName)).collect(Collectors.toList()));
         sendBookingEmail(contents, invitees, booking, bookingLink, ownerBookMeName, ownerStartTime, ownerEndTime);
 
         return booking;
@@ -206,7 +206,7 @@ public class BookingDaoJpa {
     }
 
     private String createContent(String note, BookingLink bookingLink, List<Invitee> invitees, Booking booking,
-                                 String receiver, String dayOfWeek, String ownerBookMeName) {
+                                 String receiver, boolean isOwner, String dayOfWeek, String ownerBookMeName) {
 
         String startTime = booking.getStartTime();
         String endTime = booking.getEndTime();
@@ -214,7 +214,7 @@ public class BookingDaoJpa {
         String timeZone = booking.getRequesterTimeZone();
 
 
-        if (receiver != null && receiver.equals(ownerBookMeName)) {
+        if (isOwner) {
             ZonedDateTime startDateTime = ZonedDateTimeHelper.convertDateOnly(booking.getSlotDate(),
                     bookingLink.getTimezone()).plusMinutes(bookingLink.getSlotSpan() * booking.getSlotIndex());
             endTime = ZonedDateTimeHelper.getTime(startDateTime.plusMinutes(bookingLink.getSlotSpan()));

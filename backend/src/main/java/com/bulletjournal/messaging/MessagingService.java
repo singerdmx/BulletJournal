@@ -505,10 +505,10 @@ public class MessagingService {
                     continue;
                 }
                 String alias = aliasMap.get(receiver).getOrDefault(otherName, otherName);
-                String avator = avatarMap.getOrDefault(otherName, NONE_STRING);
+                String avatar = avatarMap.getOrDefault(otherName, NONE_STRING);
                 JSONObject obj = new JSONObject();
                 obj.put(ALIAS_PROPERTY, alias);
-                obj.put(AVATAR_PROPERTY, avator);
+                obj.put(AVATAR_PROPERTY, avatar);
                 assigneeInfoList.put(obj);
             }
             params.addKv(ASSIGNEES_PROPERTY, assigneeInfoList);
