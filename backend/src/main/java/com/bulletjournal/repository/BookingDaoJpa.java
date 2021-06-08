@@ -99,7 +99,7 @@ public class BookingDaoJpa {
         );
 
         String deltaNote = "{\"delta\": {\"ops\": [" + prependInfoToNote(note, bookingLink, invitees, ownerBookMeName)
-                + prependLinkInContent(bookingLink, ownerBookMeName, false);
+                + prependLinkInContent(booking, ownerBookMeName);
         deltaNote += "]}}";
 
         Task task = taskDaoJpa.create(
@@ -178,13 +178,9 @@ public class BookingDaoJpa {
         this.bookingRepository.deleteById(bookingId);
     }
 
-    private String prependLinkInContent(BookingLink bookingLink, String user, boolean isForEmail) {
+    private String prependLinkInContent(Booking booking, String user) {
         String s = ",{\"attributes\":{\"link\":\"" + BASE_URL;
-        if (!isForEmail) {
-            return s + "bookingLinks/" + bookingLink.getId()
-                    + "\"},\"insert\":\"View event in Bullet Journal\"},{\"insert\": \"\\n\"}";
-        }
-        return s + "bookings/" + bookingLink.getId() + "?name=" + user
+        return s + "bookings/" + booking.getId() + "?name=" + user
                 + "\"},\"insert\":\"Cancel / reschedule event\"},{\"insert\": \"\\n\"}";
     }
 
@@ -243,7 +239,7 @@ public class BookingDaoJpa {
 
         if (!StringUtils.isBlank(receiver)) {
             receiver = encodeValue(receiver);
-            sb.append(prependLinkInContent(bookingLink, receiver, true));
+            sb.append(prependLinkInContent(booking, receiver));
         }
         sb.append("]}}");
 
