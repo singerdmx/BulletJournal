@@ -126,8 +126,6 @@ public class BookingDaoJpa {
                 createContent(note, bookingLink, invitees, finalBooking, null, inviteeDayOfWeek, ownerBookMeName)).collect(Collectors.toList()));
         sendBookingEmail(contents, invitees, booking, bookingLink, ownerBookMeName, ownerStartTime, ownerEndTime);
 
-        // TODO : cancel sends email too
-
         return booking;
     }
 
@@ -254,8 +252,8 @@ public class BookingDaoJpa {
 
     private String getSlotSpan(int slotSpan) {
         if (slotSpan > 60) {
-                int min = slotSpan % 60;
-                int hr = slotSpan / 60;
+            int min = slotSpan % 60;
+            int hr = slotSpan / 60;
             return (hr + " Hour ") + (min == 0 ? "" : min + " Minutes");
         } else if (slotSpan == 60) {
             return "1 Hour";
