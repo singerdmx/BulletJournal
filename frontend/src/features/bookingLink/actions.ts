@@ -1,17 +1,17 @@
-import {actions} from "./reducer";
-import {BookingLink, Invitee, RecurringSpan, Slot} from "./interface";
+import { actions } from "./reducer";
+import { BookingLink, Invitee, RecurringSpan, Slot } from "./interface";
 
 export const getBookMeUsername = () => actions.GetBookMeUsername({});
 
-export const updateBookMeUsername = (name: string) => actions.UpdateBookMeUsername({name: name});
+export const updateBookMeUsername = (name: string) => actions.UpdateBookMeUsername({ name: name });
 
 export const getBookingLinks = () => actions.GetBookingLinks({});
 
 export const getBookingLink = (bookingLinkId: string,
-                               timezone?: string) => actions.GetBookingLink({
-    bookingLinkId: bookingLinkId,
-    timezone: timezone
-});
+    timezone?: string) => actions.GetBookingLink({
+        bookingLinkId: bookingLinkId,
+        timezone: timezone
+    });
 
 export const addBookingLink = (
     afterEventBuffer: number,
@@ -40,8 +40,12 @@ export const addBookingLink = (
         onSuccess: onSuccess
     });
 
+export const deleteBookingLink = (id: number) => actions.deleteBooking({
+    bookingLinkId: id
+})
+
 export const linkReceived = (link: BookingLink) =>
-    actions.linkReceived({link: link});
+    actions.linkReceived({ link: link });
 
 export const patchBookingLink = (
     bookingLinkId: string,
@@ -76,9 +80,9 @@ export const updateBookingLinkRecurrences = (
     timezone: string,
 ) =>
     actions.UpdateBookingLinkRecurrences({
-            bookingLinkId: bookingLinkId,
-            recurrences: recurrences,
-            timezone: timezone
+        bookingLinkId: bookingLinkId,
+        recurrences: recurrences,
+        timezone: timezone
     });
 
 export const updateBookingLinkSlot = (
@@ -119,7 +123,7 @@ export const book = (
 });
 
 export const getBooking = (bookingId: string) =>
-    actions.GetBooking({bookingId: bookingId});
+    actions.GetBooking({ bookingId: bookingId });
 
 export const cancelBooking = (bookingId: string, name: string, onSuccess: Function) =>
-    actions.CancelBooking({bookingId: bookingId, name: name, onSuccess: onSuccess});
+    actions.CancelBooking({ bookingId: bookingId, name: name, onSuccess: onSuccess });

@@ -18,7 +18,8 @@ import {
     getBookingLink,
     getBookingLinks,
     getBookMeUsername,
-    updateBookMeUsername
+    updateBookMeUsername,
+    deleteBookingLink,
 } from "../../features/bookingLink/actions";
 import { BookingLink } from "../../features/bookingLink/interface";
 import BookMeDrawer, { getSlotSpan } from "../../components/book-me/book-me-drawer";
@@ -38,6 +39,7 @@ type ManageBookingProps = {
     updateBookMeUsername: (name: string) => void;
     getBookingLinks: () => void;
     getBookingLink: (bookingLinkId: string, timezone?: string) => void;
+    deleteBookingLink: (id: number) => void;
 }
 
 const ManageBooking: React.FC<ManageBookingProps> = (
@@ -50,7 +52,8 @@ const ManageBooking: React.FC<ManageBookingProps> = (
         getBookMeUsername,
         updateBookMeUsername,
         getBookingLinks,
-        getBookingLink
+        getBookingLink,
+        deleteBookingLink,
     }
 ) => {
     const [name, setName] = useState(bookMeUsername ? bookMeUsername : myself);
@@ -86,6 +89,12 @@ const ManageBooking: React.FC<ManageBookingProps> = (
             setName(bookMeUsername);
         }
         setNameChanged(false);
+    }
+
+    const handleDelete = (id: number | undefined) => () => {
+        if (id) {
+            deleteBookingLink(id);
+        }
     }
 
     return <div>
@@ -168,7 +177,7 @@ const ManageBooking: React.FC<ManageBookingProps> = (
                             <EditOutlined />
                         </Tooltip>
                         <Tooltip title="Delete">
-                            <DeleteOutlined />
+                            <DeleteOutlined onClick={handleDelete(parseInt(link.id))} />
                         </Tooltip>
                     </div>
                 </div>

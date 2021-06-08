@@ -1,5 +1,5 @@
-import {doFetch, doPatch, doPost, doPut} from "./api-helper";
-import {Invitee, RecurringSpan, Slot} from "../features/bookingLink/interface";
+import { doDelete, doFetch, doPatch, doPost, doPut } from "./api-helper";
+import { Invitee, RecurringSpan, Slot } from "../features/bookingLink/interface";
 
 export const createBookingLink = (
     afterEventBuffer: number,
@@ -53,7 +53,7 @@ export const updateBookingLink = (
         endDate: endDate,
         expireOnBooking: expireOnBooking,
         includeTaskWithoutDuration: includeTaskWithoutDuration,
-        location:location,
+        location: location,
         projectId: projectId,
         startDate: startDate,
         note: note
@@ -64,6 +64,14 @@ export const updateBookingLink = (
             throw Error(err.message);
         });
 }
+
+export const deleteBooking = (bookingLinkId: string) => {
+    return doDelete(`/api/bookingLinks/${bookingLinkId}`)
+        .then(res => res)
+        .catch(err => {
+            throw Error(err.message);
+        });
+};
 
 export const updateBookingLinkRecurrences = (
     bookingLinkId: string,
@@ -118,7 +126,7 @@ export const getBookingLinks = () => {
 }
 
 export const getBookingLink = (bookingLinkId: string,
-                               timezone?: string) => {
+    timezone?: string) => {
     let url = `/api/public/bookingLinks/${bookingLinkId}`;
     if (timezone) {
         url += `?timezone=${encodeURIComponent(timezone)}`;
@@ -131,15 +139,15 @@ export const getBookingLink = (bookingLinkId: string,
 }
 
 export const book = (bookingLinkId: string,
-                     invitees: Invitee[],
-                     slotIndex: number,
-                     slotDate: string,
-                     location: string,
-                     note: string,
-                     requesterTimezone: string,
-                     displayDate: string,
-                     startTime: string,
-                     endTime: string) => {
+    invitees: Invitee[],
+    slotIndex: number,
+    slotDate: string,
+    location: string,
+    note: string,
+    requesterTimezone: string,
+    displayDate: string,
+    startTime: string,
+    endTime: string) => {
 
     const postBody = JSON.stringify({
         invitees: invitees,

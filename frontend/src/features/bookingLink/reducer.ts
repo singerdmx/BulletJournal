@@ -1,5 +1,5 @@
-import {createSlice, PayloadAction} from "redux-starter-kit";
-import {Booking, BookingLink, Invitee, RecurringSpan, Slot} from "./interface";
+import { createSlice, PayloadAction } from "redux-starter-kit";
+import { Booking, BookingLink, Invitee, RecurringSpan, Slot } from "./interface";
 
 export type LinkAction = {
     link: BookingLink;
@@ -92,6 +92,10 @@ export type CreateBooking = {
     onSuccess: (bookingId: string) => void
 }
 
+export type DeleteBookingAction = {
+    bookingLinkId: number,
+}
+
 let initialState = {
     link: undefined as BookingLink | undefined,
     booking: undefined as Booking | undefined,
@@ -119,6 +123,7 @@ const slice = createSlice({
             const { links } = action.payload;
             state.links = links;
         },
+        deleteBooking: (state, action: PayloadAction<DeleteBookingAction>) => state,
         AddBookingLink: (state, action: PayloadAction<AddBookingLink>) => state,
         PatchBookingLink: (state, action: PayloadAction<PatchBookingLink>) => state,
         GetBookMeUsername: (state, action: PayloadAction<FetchBookMeUsername>) => state,
