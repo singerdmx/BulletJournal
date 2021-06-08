@@ -118,6 +118,16 @@ public class BookingLinkControllerTest {
         getBooking(booking.getId(), HttpStatus.NOT_FOUND);
 
         deleteAllBookinglinks(USER);
+
+        BookingLink bookingLink4 = createBookingLink("2021-05-04", "2021-06-01", TIMEZONE, 90, 0, false, true, p1.getId());
+        bookingSlot = new BookingSlot();
+        bookingSlot.setIndex(1);
+        bookingSlot.setStartTime("01:30");
+        bookingSlot.setEndTime("03:00");
+        bookingSlot.setDate("2021-05-04");
+        bookingSlot.setOn(true);
+        bookParams = new BookParams(invitees, 1, "2021-05-04", "Seatle", null, "America/Chicago", "03:30", "05:00", "2021-05-04");
+        booking = book(bookingLink1, bookParams);
     }
 
     private BookingLink createBookingLink(String startDate, String endDate, String timezone, int slotSpan,
@@ -141,6 +151,15 @@ public class BookingLinkControllerTest {
         BookingLink bookingLink = response.getBody();
         assertNotNull(bookingLink);
         assertNotNull(bookingLink.getId());
+
+        ResponseEntity<?> bookMeResponse = this.restTemplate.exchange(
+                ROOT_URL + randomServerPort + BookingLinksController.BOOK_ME_USERNAME,
+                HttpMethod.PUT,
+                TestHelpers.actAsOtherUser("bean bean", USER),
+                Void.class);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+
+
         return bookingLink;
     }
 

@@ -360,13 +360,13 @@ public class MessagingService {
         );
     }
 
-    public void sendBookingEmailsToUser(String inviterUsername, String inviter, String inviterEmail,
-                                        List<Invitee> invitees, String subject, List<String> html) {
+    public void sendBookingEmailsToUser(String inviter, String inviterEmail, List<Invitee> invitees,
+                                        String emailSubjectOwner, String emailSubjectInvitee, List<String> html) {
         LOGGER.info("Sending booking emails...");
         try {
             List<MailjetEmailParams> emailParamsList = new ArrayList<>();
             MailjetEmailParams mailjetEmailParams =
-                    createEmailPramsForBookingEmail(inviter, inviterEmail, subject, html.get(0));
+                    createEmailPramsForBookingEmail(inviter, inviterEmail, emailSubjectOwner, html.get(0));
             emailParamsList.add(mailjetEmailParams);
             html.remove(0);
             for (int i = 0; i < invitees.size(); i++) {
@@ -377,7 +377,8 @@ public class MessagingService {
                 if (!StringUtils.isBlank(invitees.get(i).getLastName())) {
                     receiver += invitees.get(i).getLastName();
                 }
-                mailjetEmailParams = createEmailPramsForBookingEmail(receiver, invitees.get(i).getEmail(), subject, html.get(i));
+                mailjetEmailParams = createEmailPramsForBookingEmail(receiver, invitees.get(i).getEmail(),
+                        emailSubjectInvitee, html.get(i));
                 if (mailjetEmailParams != null) {
                     emailParamsList.add(mailjetEmailParams);
                 }
