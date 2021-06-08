@@ -108,7 +108,7 @@ const RecurringSpanCard: React.FC<RecurringSpanProps> = (props) => {
         </>;
     }
 
-    return <div>
+    return <div key={`k${index}`}>
         {getModal()}
         <div
             key={index}

@@ -67,7 +67,7 @@ export const updateBookingLink = (
 
 export const deleteBooking = (bookingLinkId: string) => {
     return doDelete(`/api/bookingLinks/${bookingLinkId}`)
-        .then(res => res)
+        .then(res => res.json())
         .catch(err => {
             throw Error(err.message);
         });

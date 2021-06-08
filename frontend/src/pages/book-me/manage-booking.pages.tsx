@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Empty, Input, Tooltip } from "antd";
+import { Input, Tooltip } from "antd";
 import {
     CheckCircleOutlined,
     ClockCircleOutlined,
@@ -26,8 +26,6 @@ import BookMeDrawer, { getSlotSpan } from "../../components/book-me/book-me-draw
 import { Project, ProjectsWithOwner } from "../../features/project/interface";
 import { flattenOwnedProject, flattenSharedProject } from "../projects/projects.pages";
 import { ProjectType } from "../../features/project/constants";
-import getThemeColorVars from "../../utils/theme";
-import { getTaskBackgroundColor } from "../../features/tasks/interface";
 
 type ManageBookingProps = {
     ownedProjects: Project[];
@@ -39,7 +37,7 @@ type ManageBookingProps = {
     updateBookMeUsername: (name: string) => void;
     getBookingLinks: () => void;
     getBookingLink: (bookingLinkId: string, timezone?: string) => void;
-    deleteBookingLink: (id: number) => void;
+    deleteBookingLink: (id: string) => void;
 }
 
 const ManageBooking: React.FC<ManageBookingProps> = (
@@ -91,12 +89,6 @@ const ManageBooking: React.FC<ManageBookingProps> = (
         setNameChanged(false);
     }
 
-    const handleDelete = (id: number | undefined) => () => {
-        if (id) {
-            deleteBookingLink(id);
-        }
-    }
-
     return <div>
         <div className='book-me-name'>
             Name&nbsp;&nbsp;
@@ -139,8 +131,8 @@ const ManageBooking: React.FC<ManageBookingProps> = (
                 projects={projects} />
         </div>
         <div className='link-cards'>
-            {links.map(link => {
-                const slotspan = getSlotSpan(link.slotSpan);
+            {links.map((link, index) => {
+                const slotSpan = getSlotSpan(link.slotSpan);
                 const getBackgroundColor = (slotspan: string) => {
                     const tmp = slotspan.split(" ")[0];
                     switch (tmp) {
@@ -158,18 +150,19 @@ const ManageBooking: React.FC<ManageBookingProps> = (
                 }
 
                 return <div className='link-card'
-                    style={{ backgroundColor: getBackgroundColor(slotspan) }}
+                            key={`link-card${index}`}
+                    style={{ backgroundColor: getBackgroundColor(slotSpan) }}
                     onClick={() => {
                         getBookingLink(link.id);
                         setCardIsClicked(true)
                     }}>
-                    <div className="link-card-title">
-                        <ClockCircleOutlined /> {slotspan} Booking
+                    <div className="link-card-title" key={`link-card-title${index}`}>
+                        <ClockCircleOutlined /> {slotSpan} Booking
                     </div>
-                    <div className="link-card-dates">
+                    <div className="link-card-dates" key={`link-card-dates${index}`}>
                         {link.startDate} <SwapRightOutlined /> {link.endDate}
                     </div>
-                    <div className='link-card-operations'>
+                    <div className='link-card-operations' key={`link-card-operations${index}`}>
                         <Tooltip title="Clone">
                             <CopyOutlined />
                         </Tooltip>
@@ -177,7 +170,11 @@ const ManageBooking: React.FC<ManageBookingProps> = (
                             <EditOutlined />
                         </Tooltip>
                         <Tooltip title="Delete">
-                            <DeleteOutlined onClick={handleDelete(parseInt(link.id))} />
+                            <DeleteOutlined onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                deleteBookingLink(link.id);
+                            }} />
                         </Tooltip>
                     </div>
                 </div>
@@ -198,5 +195,6 @@ export default connect(mapStateToProps, {
     getBookMeUsername,
     updateBookMeUsername,
     getBookingLinks,
-    getBookingLink
+    getBookingLink,
+    deleteBookingLink
 })(ManageBooking);

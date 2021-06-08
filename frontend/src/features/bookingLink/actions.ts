@@ -40,7 +40,7 @@ export const addBookingLink = (
         onSuccess: onSuccess
     });
 
-export const deleteBookingLink = (id: number) => actions.deleteBooking({
+export const deleteBookingLink = (id: string) => actions.deleteBooking({
     bookingLinkId: id
 })
 

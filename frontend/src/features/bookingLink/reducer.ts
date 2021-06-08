@@ -93,7 +93,7 @@ export type CreateBooking = {
 }
 
 export type DeleteBookingAction = {
-    bookingLinkId: number,
+    bookingLinkId: string,
 }
 
 let initialState = {
