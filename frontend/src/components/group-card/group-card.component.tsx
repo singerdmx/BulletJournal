@@ -252,7 +252,7 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
               )}
             </h3>
           </div>
-          <div className="invitation-generator">
+          {this.props.myself.username === group.owner.name && <div className="invitation-generator">
             <div>
               <Tooltip title={`${!group.uid ? 'Click to share group via link' : 'Click to disable link'}`}>
                 <Switch className="invitation-slider" size="small"
@@ -270,19 +270,18 @@ class GroupCard extends React.Component<GroupProps & PathProps, GroupCardState> 
                           <span className='join-group-url'>
                             Copy Link
                             <Tooltip title='Share link to join group'>
-                            <Button
-                                type="default"
-                                size="small"
-                                style={{marginLeft: '6px'}}
-                                icon={<CopyOutlined/>}
-                            ></Button>
-                                                  </Tooltip>
-
+                              <Button
+                                  type="default"
+                                  size="small"
+                                  style={{marginLeft: '6px'}}
+                                  icon={<CopyOutlined/>}
+                              />
+                            </Tooltip>
                           </span>
                   </CopyToClipboard>
               )}
             </div>
-          </div>
+          </div>}
           <div className="group-users">
             <List
                 dataSource={this.state.users}
