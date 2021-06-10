@@ -193,7 +193,7 @@ public class BookingLinkDaoJpa {
         ZonedDateTime now = ZonedDateTimeHelper.getNow(bookingLink.getTimezone());
         String today = ZonedDateTimeHelper.getDate(now);
         res.setStartDate(today);
-        ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(FrequencyType.MONTHLY, bookingLink.getTimezone());
+        ZonedDateTime endTime = ZonedDateTimeHelper.getEndTime(FrequencyType.MONTHLY, bookingLink.getTimezone()).plusMonths(1);
         res.setEndDate(ZonedDateTimeHelper.getDate(endTime));
         res.setExpireOnBooking(bookingLink.isExpireOnBooking());
         res.setNote(bookingLink.getNote());
