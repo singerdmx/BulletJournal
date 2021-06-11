@@ -215,9 +215,8 @@ public class BookingDaoJpa {
                 + primaryName + " on " + getDayOfWeek(booking.getDisplayDate(), booking.getStartTime(),
                 booking.getRequesterTimeZone()) + " " + booking.getDisplayDate() + " from " + booking.getStartTime()
                 + " to " + booking.getEndTime();
-
-        // this.userDaoJpa.getByName(bookingLink.getOwner()).getEmail()
-        messagingService.sendBookingEmailsToUser(ownerBookMeName, "bookworm223485@gmail.com",
+        
+        messagingService.sendBookingEmailsToUser(ownerBookMeName, this.userDaoJpa.getByName(bookingLink.getOwner()).getEmail(),
                 invitees, emailSubjectOwner, emailSubjectInvitee, html);
 
     }
