@@ -5,6 +5,7 @@ import com.bulletjournal.controller.models.Invitee;
 import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.controller.models.params.CreateTaskParams;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
+import com.bulletjournal.exceptions.ResourceNotFoundException;
 import com.bulletjournal.messaging.MessagingService;
 import com.bulletjournal.repository.models.Booking;
 import com.bulletjournal.repository.models.BookingLink;
@@ -26,6 +27,7 @@ import java.net.URLEncoder;
 import java.time.ZonedDateTime;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -112,19 +114,7 @@ public class BookingDaoJpa {
         this.bookingLinkRepository.save(bookingLink);
 
         // send booking email
-        String ownerStartTime = ZonedDateTimeHelper.getTime(zonedTime);
-        String ownerEndTime = ZonedDateTimeHelper.getTime(zonedTime.plusMinutes(bookingLink.getSlotSpan()));
-
-        List<String> contents = new ArrayList<>();
-        contents.add(createContent(note, bookingLink, invitees, booking, ownerBookMeName, true,
-                getDayOfWeek(booking.getSlotDate(), ownerStartTime, bookingLink.getTimezone()), ownerBookMeName));
-        String inviteeDayOfWeek = getDayOfWeek(booking.getDisplayDate(), booking.getStartTime(), requesterTimezone);
-        contents.add(createContent(note, bookingLink, invitees, booking, invitees.get(0).getFirstName()
-                + " " + invitees.get(0).getLastName(), false, inviteeDayOfWeek, ownerBookMeName));
-        Booking finalBooking = booking;
-        contents.addAll(invitees.stream().skip(1).map(i ->
-                createContent(note, bookingLink, invitees, finalBooking, null, false, inviteeDayOfWeek, ownerBookMeName)).collect(Collectors.toList()));
-        sendBookingEmail(contents, invitees, booking, bookingLink, ownerBookMeName, ownerStartTime, ownerEndTime);
+        createContentAndSend(false, zonedTime, booking, bookingLink);
 
         return booking;
     }
@@ -174,8 +164,38 @@ public class BookingDaoJpa {
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public void cancel(String bookingId) {
+    public void cancel(String bookingId, String bookingLinkId) {
+        // send cancel email
+        BookingLink bookingLink = this.bookingLinkRepository.findById(bookingLinkId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking link " + bookingLinkId + " not found"));
+        Booking booking = this.bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking " + bookingId + " not found"));
+
+        ZonedDateTime zonedTime = ZonedDateTimeHelper.getStartTime(booking.getSlotDate(), null, bookingLink.getTimezone())
+                .plusMinutes(booking.getSlotIndex() * bookingLink.getSlotSpan());
+
+
+        createContentAndSend(true, zonedTime, booking, bookingLink);
+
         this.bookingRepository.deleteById(bookingId);
+    }
+
+    private void createContentAndSend(boolean isCancel, ZonedDateTime ownerZonedTime, Booking booking, BookingLink bookingLink) {
+        String ownerStartTime = ZonedDateTimeHelper.getTime(ownerZonedTime);
+        String ownerEndTime = ZonedDateTimeHelper.getTime(ownerZonedTime.plusMinutes(bookingLink.getSlotSpan()));
+        String ownerBookMeName = this.userDaoJpa.getBookMeUsername(bookingLink.getOwner());
+
+        String note = booking.getNote();
+        List<Invitee> invitees = Arrays.asList(GSON.fromJson(booking.getInvitees(), Invitee[].class));
+        List<String> contents = new ArrayList<>();
+        contents.add(createContent(note, bookingLink, invitees, booking, ownerBookMeName, true,
+                getDayOfWeek(booking.getSlotDate(), ownerStartTime, bookingLink.getTimezone()), ownerBookMeName, isCancel));
+        String inviteeDayOfWeek = getDayOfWeek(booking.getDisplayDate(), booking.getStartTime(), booking.getRequesterTimeZone());
+        contents.add(createContent(note, bookingLink, invitees, booking, invitees.get(0).getFirstName()
+                + " " + invitees.get(0).getLastName(), false, inviteeDayOfWeek, ownerBookMeName, isCancel));
+        contents.addAll(invitees.stream().skip(1).map(i -> createContent(note, bookingLink, invitees, booking,
+                null, false, inviteeDayOfWeek, ownerBookMeName, true)).collect(Collectors.toList()));
+        sendBookingEmail(contents, invitees, booking, bookingLink, ownerBookMeName, ownerStartTime, ownerEndTime, isCancel);
     }
 
     private String prependLinkInContent(Booking booking, String user) {
@@ -184,25 +204,26 @@ public class BookingDaoJpa {
                 + "\"},\"insert\":\"Cancel / reschedule event\"},{\"insert\": \"\\n\"}";
     }
 
-    private void sendBookingEmail(List<String> contents, List<Invitee> invitees, Booking booking,
-                                  BookingLink bookingLink, String ownerBookMeName, String ownerStartTime, String ownerEndTime) {
+    private void sendBookingEmail(List<String> contents, List<Invitee> invitees, Booking booking, BookingLink bookingLink,
+                                  String ownerBookMeName, String ownerStartTime, String ownerEndTime, boolean isCancel) {
         List<String> html = contents.stream().map(this::convert).collect(Collectors.toList());
         String primaryName = invitees.get(0).getFirstName() + " " + invitees.get(0).getLastName();
-        String emailSubjectOwner = getSlotSpan(bookingLink.getSlotSpan()) + " Booking - " + ownerBookMeName + " and "
+        String emailSubjectOwner = (isCancel ? "Cancelled: " : "") + getSlotSpan(bookingLink.getSlotSpan()) + " Booking - " + ownerBookMeName + " and "
                 + primaryName + " on " + getDayOfWeek(booking.getSlotDate(), ownerStartTime, bookingLink.getTimezone())
                 + " " + booking.getSlotDate() + " from " + ownerStartTime + " to " + ownerEndTime;
-        String emailSubjectInvitee = getSlotSpan(bookingLink.getSlotSpan()) + " Booking - " + ownerBookMeName + " and "
+        String emailSubjectInvitee = (isCancel ? "Cancelled: " : "") + getSlotSpan(bookingLink.getSlotSpan()) + " Booking - " + ownerBookMeName + " and "
                 + primaryName + " on " + getDayOfWeek(booking.getDisplayDate(), booking.getStartTime(),
                 booking.getRequesterTimeZone()) + " " + booking.getDisplayDate() + " from " + booking.getStartTime()
                 + " to " + booking.getEndTime();
 
-        messagingService.sendBookingEmailsToUser(ownerBookMeName, this.userDaoJpa.getByName(bookingLink.getOwner()).getEmail(),
+        // this.userDaoJpa.getByName(bookingLink.getOwner()).getEmail()
+        messagingService.sendBookingEmailsToUser(ownerBookMeName, "bookworm223485@gmail.com",
                 invitees, emailSubjectOwner, emailSubjectInvitee, html);
 
     }
 
     private String createContent(String note, BookingLink bookingLink, List<Invitee> invitees, Booking booking,
-                                 String receiver, boolean isOwner, String dayOfWeek, String ownerBookMeName) {
+                                 String receiver, boolean isOwner, String dayOfWeek, String ownerBookMeName, boolean isCancel) {
 
         String startTime = booking.getStartTime();
         String endTime = booking.getEndTime();
@@ -224,8 +245,9 @@ public class BookingDaoJpa {
         sb.append("{\"delta\": {\"ops\": [");
 
         // event info
-        String info = "{\"insert\": \"A new event has been scheduled.\\n\\n\"},{\"attributes\": {\"bold\": true},\"insert\": " +
-                "\"Event Type:\"},{\"insert\": \"\\n\"},{\"insert\": \"" + getSlotSpan(bookingLink.getSlotSpan())
+        String info = "{\"insert\": \"" + (isCancel ? "An event has been cancelled" : "A new event has been scheduled")
+                + ".\\n\\n\"},{\"attributes\": {\"bold\": true},\"insert\": "
+                + "\"Event Type:\"},{\"insert\": \"\\n\"},{\"insert\": \"" + getSlotSpan(bookingLink.getSlotSpan())
                 + "\\n\"},{\"insert\": \"\\n\"},{\"attributes\": {\"bold\": true},\"insert\": " +
                 "\"Event Date/Time:\"},{\"insert\": \"\\n\"},{\"insert\": \"" + startTime + " - "
                 + endTime + " on " + dayOfWeek + " " + bookingDate + " (" + timeZone
@@ -237,7 +259,7 @@ public class BookingDaoJpa {
         // add invitees info
         sb.append(prependInfoToNote(note, bookingLink, invitees, ownerBookMeName));
 
-        if (!StringUtils.isBlank(receiver)) {
+        if (!StringUtils.isBlank(receiver) && !isCancel) {
             receiver = encodeValue(receiver);
             sb.append(prependLinkInContent(booking, receiver));
         }
