@@ -96,6 +96,11 @@ export type DeleteBookingAction = {
     bookingLinkId: string,
 }
 
+export type CloneBookingAction = {
+    bookingLinkId: string,
+    slotSpan: string,
+}
+
 let initialState = {
     link: undefined as BookingLink | undefined,
     booking: undefined as Booking | undefined,
@@ -124,6 +129,7 @@ const slice = createSlice({
             state.links = links;
         },
         deleteBooking: (state, action: PayloadAction<DeleteBookingAction>) => state,
+        cloneBooking: (state, action: PayloadAction<CloneBookingAction>) => state,
         AddBookingLink: (state, action: PayloadAction<AddBookingLink>) => state,
         PatchBookingLink: (state, action: PayloadAction<PatchBookingLink>) => state,
         GetBookMeUsername: (state, action: PayloadAction<FetchBookMeUsername>) => state,

@@ -20,6 +20,7 @@ import {
     getBookMeUsername,
     updateBookMeUsername,
     deleteBookingLink,
+    cloneBookingLink,
 } from "../../features/bookingLink/actions";
 import { BookingLink } from "../../features/bookingLink/interface";
 import BookMeDrawer, { getSlotSpan } from "../../components/book-me/book-me-drawer";
@@ -38,6 +39,7 @@ type ManageBookingProps = {
     getBookingLinks: () => void;
     getBookingLink: (bookingLinkId: string, timezone?: string) => void;
     deleteBookingLink: (id: string) => void;
+    cloneBookingLink: (id: string, slotSpan: string) => void;
 }
 
 const ManageBooking: React.FC<ManageBookingProps> = (
@@ -52,6 +54,7 @@ const ManageBooking: React.FC<ManageBookingProps> = (
         getBookingLinks,
         getBookingLink,
         deleteBookingLink,
+        cloneBookingLink,
     }
 ) => {
     const [name, setName] = useState(bookMeUsername ? bookMeUsername : myself);
@@ -150,7 +153,7 @@ const ManageBooking: React.FC<ManageBookingProps> = (
                 }
 
                 return <div className='link-card'
-                            key={`link-card${index}`}
+                    key={`link-card${index}`}
                     style={{ backgroundColor: getBackgroundColor(slotSpan) }}
                     onClick={() => {
                         getBookingLink(link.id);
@@ -164,7 +167,11 @@ const ManageBooking: React.FC<ManageBookingProps> = (
                     </div>
                     <div className='link-card-operations' key={`link-card-operations${index}`}>
                         <Tooltip title="Clone">
-                            <CopyOutlined />
+                            <CopyOutlined onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                cloneBookingLink(link.id, String(link.slotSpan));
+                            }} />
                         </Tooltip>
                         <Tooltip title="Edit">
                             <EditOutlined />
@@ -196,5 +203,6 @@ export default connect(mapStateToProps, {
     updateBookMeUsername,
     getBookingLinks,
     getBookingLink,
-    deleteBookingLink
+    deleteBookingLink,
+    cloneBookingLink,
 })(ManageBooking);

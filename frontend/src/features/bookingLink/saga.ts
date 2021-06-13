@@ -1,4 +1,5 @@
-import {all, call, put, select, takeLatest} from "redux-saga/effects";
+import { linkReceived } from './actions';
+import { all, call, put, select, takeLatest } from "redux-saga/effects";
 import {
     actions as bookingLinksActions,
     AddBookingLink,
@@ -10,11 +11,14 @@ import {
     FetchBookingLink,
     UpdateBookingLinkSlot,
     CreateBooking,
-    FetchBooking, CancelBooking, DeleteBookingAction,
+    FetchBooking,
+    CancelBooking,
+    DeleteBookingAction,
+    CloneBookingAction,
 } from "./reducer";
-import {PayloadAction} from "redux-starter-kit";
-import {message} from "antd";
-import {reloadReceived} from "../myself/actions";
+import { PayloadAction } from "redux-starter-kit";
+import { message } from "antd";
+import { reloadReceived } from "../myself/actions";
 import {
     createBookingLink,
     getBookMeUsername,
@@ -24,15 +28,16 @@ import {
     updateBookingLinkRecurrences,
     updateBookingLinkSlot,
     getBookingLink, book, getBooking, cancelBooking, deleteBooking,
+    cloneBooking,
 } from "../../apis/bookinglinkApis";
-import {Booking, BookingLink} from "./interface";
-import {IState} from "../../store";
+import { Booking, BookingLink } from "./interface";
+import { IState } from "../../store";
 
 function* fetchBookMeUsername(action: PayloadAction<FetchBookMeUsername>) {
     try {
         const data = yield call(getBookMeUsername);
-        const name : string = yield data.text();
-        yield put(bookingLinksActions.bookMeUsernameReceived({name: name}));
+        const name: string = yield data.text();
+        yield put(bookingLinksActions.bookMeUsernameReceived({ name: name }));
     } catch (error) {
         if (error.message === 'reload') {
             yield put(reloadReceived(true));
@@ -44,9 +49,9 @@ function* fetchBookMeUsername(action: PayloadAction<FetchBookMeUsername>) {
 
 function* putBookMeUsername(action: PayloadAction<BookMeUsernameAction>) {
     try {
-        const {name} = action.payload;
+        const { name } = action.payload;
         yield call(updateBookMeUsername, name);
-        yield put(bookingLinksActions.bookMeUsernameReceived({name: name}));
+        yield put(bookingLinksActions.bookMeUsernameReceived({ name: name }));
     } catch (error) {
         if (error.message === 'reload') {
             yield put(reloadReceived(true));
@@ -58,9 +63,9 @@ function* putBookMeUsername(action: PayloadAction<BookMeUsernameAction>) {
 
 function* fetchBookingLink(action: PayloadAction<FetchBookingLink>) {
     try {
-        const {bookingLinkId, timezone} = action.payload;
-        const link : BookingLink = yield call(getBookingLink, bookingLinkId, timezone);
-        yield put(bookingLinksActions.linkReceived({link: link}));
+        const { bookingLinkId, timezone } = action.payload;
+        const link: BookingLink = yield call(getBookingLink, bookingLinkId, timezone);
+        yield put(bookingLinksActions.linkReceived({ link: link }));
     } catch (error) {
         if (error.message === 'reload') {
             yield put(reloadReceived(true));
@@ -72,8 +77,8 @@ function* fetchBookingLink(action: PayloadAction<FetchBookingLink>) {
 
 function* fetchBookingLinks(action: PayloadAction<FetchBookingLinks>) {
     try {
-        const links : BookingLink[] = yield call(getBookingLinks);
-        yield put(bookingLinksActions.bookingLinksReceived({links: links}));
+        const links: BookingLink[] = yield call(getBookingLinks);
+        yield put(bookingLinksActions.bookingLinksReceived({ links: links }));
     } catch (error) {
         if (error.message === 'reload') {
             yield put(reloadReceived(true));
@@ -112,7 +117,7 @@ function* addBookingLink(action: PayloadAction<AddBookingLink>) {
             startDate,
             timezone
         );
-        yield put(bookingLinksActions.linkReceived({link: data}));
+        yield put(bookingLinksActions.linkReceived({ link: data }));
         onSuccess();
     } catch (error) {
         if (error.message === 'reload') {
@@ -140,7 +145,7 @@ function* patchBookingLink(action: PayloadAction<PatchBookingLink>) {
         } = action.payload
 
         const state: IState = yield select();
-        const link : BookingLink = {...state.bookingReducer.link!};
+        const link: BookingLink = { ...state.bookingReducer.link! };
         link.timezone = timezone;
         if (afterEventBuffer) {
             link.afterEventBuffer = afterEventBuffer;
@@ -169,7 +174,7 @@ function* patchBookingLink(action: PayloadAction<PatchBookingLink>) {
         if (projectId) {
             // skip project for now
         }
-        yield put(bookingLinksActions.linkReceived({link: link}));
+        yield put(bookingLinksActions.linkReceived({ link: link }));
         const data: BookingLink = yield call(
             updateBookingLink,
             bookingLinkId,
@@ -184,7 +189,7 @@ function* patchBookingLink(action: PayloadAction<PatchBookingLink>) {
             startDate,
             note
         );
-        yield put(bookingLinksActions.linkReceived({link: data}));
+        yield put(bookingLinksActions.linkReceived({ link: data }));
     } catch (error) {
         if (error.message === 'reload') {
             yield put(reloadReceived(true));
@@ -202,13 +207,13 @@ function* changeBookingLinkRecurrences(action: PayloadAction<UpdateBookingLinkRe
             timezone
         } = action.payload;
 
-        const data : BookingLink = yield call(
+        const data: BookingLink = yield call(
             updateBookingLinkRecurrences,
             bookingLinkId,
             recurrences,
             timezone
         );
-        yield put(bookingLinksActions.linkReceived({link: data}));
+        yield put(bookingLinksActions.linkReceived({ link: data }));
     } catch (error) {
         if (error.message === 'reload') {
             yield put(reloadReceived(true));
@@ -226,13 +231,13 @@ function* changeBookingLinkSlot(action: PayloadAction<UpdateBookingLinkSlot>) {
             timezone
         } = action.payload;
 
-        const data : BookingLink = yield call(
+        const data: BookingLink = yield call(
             updateBookingLinkSlot,
             bookingLinkId,
             slot,
             timezone
         );
-        yield put(bookingLinksActions.linkReceived({link: data}));
+        yield put(bookingLinksActions.linkReceived({ link: data }));
     } catch (error) {
         if (error.message === 'reload') {
             yield put(reloadReceived(true));
@@ -258,7 +263,7 @@ function* createBooking(action: PayloadAction<CreateBooking>) {
             onSuccess
         } = action.payload;
 
-        const data : Booking = yield call(
+        const data: Booking = yield call(
             book,
             bookingLinkId,
             invitees,
@@ -283,21 +288,21 @@ function* createBooking(action: PayloadAction<CreateBooking>) {
 
 function* fetchBooking(action: PayloadAction<FetchBooking>) {
     try {
-        const {bookingId} = action.payload;
-        const booking : Booking = yield call(getBooking, bookingId);
-        yield put(bookingLinksActions.bookingReceived({booking: booking}));
+        const { bookingId } = action.payload;
+        const booking: Booking = yield call(getBooking, bookingId);
+        yield put(bookingLinksActions.bookingReceived({ booking: booking }));
     } catch (error) {
         if (error.message === 'reload') {
             yield put(reloadReceived(true));
         } else {
-            yield put(bookingLinksActions.bookingReceived({booking: undefined}));
+            yield put(bookingLinksActions.bookingReceived({ booking: undefined }));
         }
     }
 }
 
 function* cancelCurrentBooking(action: PayloadAction<CancelBooking>) {
     try {
-        const {bookingId, name, onSuccess} = action.payload;
+        const { bookingId, name, onSuccess } = action.payload;
         yield call(cancelBooking, bookingId, name);
         onSuccess();
     } catch (error) {
@@ -311,14 +316,28 @@ function* cancelCurrentBooking(action: PayloadAction<CancelBooking>) {
 
 function* removeBookingLink(action: PayloadAction<DeleteBookingAction>) {
     try {
-        const {bookingLinkId} = action.payload;
+        const { bookingLinkId } = action.payload;
         const links = yield call(deleteBooking, bookingLinkId);
-        yield put(bookingLinksActions.bookingLinksReceived({links: links}));
+        yield put(bookingLinksActions.bookingLinksReceived({ links: links }));
     } catch (error) {
         if (error.message === 'reload') {
             yield put(reloadReceived(true));
         } else {
             yield call(message.error, `removeBookingLink fail: ${error}`);
+        }
+    }
+}
+
+function* cloneBookingLink(action: PayloadAction<CloneBookingAction>) {
+    try {
+        const { bookingLinkId, slotSpan } = action.payload;
+        const links = yield call(cloneBooking, bookingLinkId, slotSpan);
+        yield put(bookingLinksActions.bookingLinksReceived({ links: links }));
+    } catch (error) {
+        if (error.message === 'reload') {
+            yield put(reloadReceived(true));
+        } else {
+            yield call(message.error, `cloneBookingLink fail: ${error}`);
         }
     }
 }
@@ -337,5 +356,6 @@ export default function* groupSagas() {
         yield takeLatest(bookingLinksActions.GetBooking.type, fetchBooking),
         yield takeLatest(bookingLinksActions.CancelBooking.type, cancelCurrentBooking),
         yield takeLatest(bookingLinksActions.deleteBooking.type, removeBookingLink),
+        yield takeLatest(bookingLinksActions.cloneBooking.type, cloneBookingLink),
     ]);
 }

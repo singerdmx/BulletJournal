@@ -42,7 +42,12 @@ export const addBookingLink = (
 
 export const deleteBookingLink = (id: string) => actions.deleteBooking({
     bookingLinkId: id
-})
+});
+
+export const cloneBookingLink = (id: string, slotSpan: string) => actions.cloneBooking({
+    bookingLinkId: id,
+    slotSpan: slotSpan,
+});
 
 export const linkReceived = (link: BookingLink) =>
     actions.linkReceived({ link: link });
