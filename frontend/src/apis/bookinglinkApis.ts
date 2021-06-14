@@ -1,4 +1,3 @@
-import { message } from 'antd';
 import { doDelete, doFetch, doPatch, doPost, doPut } from "./api-helper";
 import { Invitee, RecurringSpan, Slot } from "../features/bookingLink/interface";
 
@@ -75,11 +74,7 @@ export const deleteBooking = (bookingLinkId: string) => {
 };
 
 export const cloneBooking = (bookingLinkId: string, slotSpan: string) => {
-    const postBody = JSON.stringify({
-        bookingLinkId: bookingLinkId,
-        slotSpan: slotSpan,
-    });
-    return doPost(`/api/bookingLinks/${bookingLinkId}/clone`, postBody)
+    return doPost(`/api/bookingLinks/${bookingLinkId}/clone`, slotSpan)
         .then(res => res.json())
         .catch((err) => {
             throw Error(err.message);
