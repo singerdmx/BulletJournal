@@ -348,9 +348,9 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                         })}
                     </Select>
                 </div>
-                <div className='dns-panel' style={{textAlign:"center"}}>
+                <div className='dns-panel'>
                     <div className='dns-panel-title'>
-                        Do Not Schedule&nbsp;&nbsp;
+                        <b>DO NOT SCHEDULE</b>&nbsp;&nbsp;
                         <Tooltip
                             title="Unavailable time on calendar">
                                     <span className="question-icon">
