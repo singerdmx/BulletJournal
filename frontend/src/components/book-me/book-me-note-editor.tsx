@@ -15,14 +15,12 @@ const Delta = Quill.import('delta');
 type BookMeNoteEditorProps = {
     delta: DeltaStatic;
     height: number;
-    saveContent?: (delta: DeltaStatic) => void;
     onContentChange?: (delta: DeltaStatic) => void;
 }
 
 const BookMeNoteEditor: React.FC<BookMeNoteEditorProps> = (
     {
         delta,
-        saveContent,
         height,
         onContentChange
     }
@@ -156,14 +154,6 @@ const BookMeNoteEditor: React.FC<BookMeNoteEditorProps> = (
 
     modules.imageDropAndPaste = {handler: imageDropAndPasteHandler};
 
-    const handleOnClick = () => {
-        setContentChanged(false);
-        const newContent : DeltaStatic = new Delta(editorContent['delta']);
-        if (saveContent) {
-            saveContent(newContent);
-        }
-    }
-
     const handleChange = (
         content: string,
         delta: any,
@@ -188,17 +178,6 @@ const BookMeNoteEditor: React.FC<BookMeNoteEditorProps> = (
                                     <QuestionCircleOutlined/>
                                 </span>
             </Tooltip>
-            {saveContent && <Tooltip placement="top" title='Save'>
-                <CheckCircleOutlined
-                    onClick={() => handleOnClick()}
-                    style={{
-                        marginLeft: '20px',
-                        cursor: 'pointer',
-                        color: '#00e600',
-                        fontSize: 20,
-                        visibility: contentChanged ? 'visible' : 'hidden'
-                    }} />
-            </Tooltip>}
         </div>
         <ReactQuill
             bounds={'.note-editor'}

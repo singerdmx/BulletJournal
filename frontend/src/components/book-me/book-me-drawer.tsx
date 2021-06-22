@@ -75,6 +75,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
     const {setBookMeDrawerVisible, bookMeDrawerVisible, link, projects, patchBookingLink} = props;
     const [location, setLocation] = useState();
     const [projectId, setProjectId] = useState();
+    const [noteValue, setNoteValue] = useState<DeltaStatic>(new Delta());
     const result = ['5', '10', '15', '30', '45', '60'];
     const bufferOptions = result.map((time: string) => {
         return {value: time};
@@ -85,6 +86,19 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
             setProjectId(link.project.id);
         }
     }, [link])
+
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            if (link) {
+                patchBookingLink(link.id, link.timezone, undefined,
+                    undefined, undefined, undefined,
+                    undefined, undefined, undefined,
+                    undefined, JSON.stringify({delta: noteValue}));
+            }
+        }, 500)
+
+        return () => clearTimeout(delayDebounceFn)
+    }, [noteValue])
 
     const handleClose = () => {
         setBookMeDrawerVisible(false);
@@ -115,15 +129,6 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                 value = 0;
             }
             patchBookingLink(link.id, link.timezone, undefined, value, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
-        }
-    }
-
-    const handleNoteChange = (value: DeltaStatic) => {
-        if (link) {
-            patchBookingLink(link.id, link.timezone, undefined,
-                undefined, undefined, undefined,
-                undefined, undefined, undefined,
-                undefined, JSON.stringify({delta: value}));
         }
     }
 
@@ -370,7 +375,7 @@ const BookMeDrawer: React.FC<BookMeDrawerProps> = (props) => {
                 </div>
                 <BookMeNoteEditor
                     delta={link.note ? JSON.parse(link.note)['delta'] : new Delta()}
-                    saveContent={(delta: DeltaStatic) => handleNoteChange(delta)}
+                    onContentChange={(delta: DeltaStatic) => setNoteValue(delta)}
                     height={160}/>
                 <div className="buttons-div">
                     <div className="buttons">

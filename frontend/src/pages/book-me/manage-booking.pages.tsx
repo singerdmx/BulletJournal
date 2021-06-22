@@ -128,7 +128,7 @@ const ManageBooking: React.FC<ManageBookingProps> = (
                     }} />
             </Tooltip>
         </div>
-        <div>
+        <div key='book-me-drawer'>
             <BookMeDrawer bookMeDrawerVisible={cardIsClicked}
                 setBookMeDrawerVisible={setCardIsClicked}
                 projects={projects} />
