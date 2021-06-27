@@ -174,9 +174,6 @@ public class ProjectDaoJpa {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Project create(CreateProjectParams createProjectParams, String owner, List<Event> events) {
         String name = createProjectParams.getName();
-        if (!this.projectRepository.findByNameAndOwner(name, owner).isEmpty()) {
-            throw new ResourceAlreadyExistException("BuJo with name \"" + name + "\" already exists");
-        }
         Long groupId = createProjectParams.getGroupId();
         Project project = new Project();
         if (StringUtils.isNotBlank(createProjectParams.getDescription())) {
