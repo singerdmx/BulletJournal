@@ -71,9 +71,10 @@ const BookingLinkClone: React.FC<BookingLinkCloneProps> = (props) => {
           >
             {minOptions}
           </Select>
+          {' '}min{' '}
         </div>
       }
-      icon={<InfoCircleOutlined />}
+      icon={<InfoCircleOutlined style={{color: '#6ECEDA'}}/>}
       onConfirm={confirm}
       okText="Clone"
       cancelText="Cancel"
