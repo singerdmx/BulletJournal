@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { IState } from "../../store";
 import { connect } from "react-redux";
-import { Popconfirm, Select } from 'antd';
+import {Popconfirm, Select, Tooltip} from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
 
 const { Option } = Select; 
@@ -77,10 +77,12 @@ const BookingLinkClone: React.FC<BookingLinkCloneProps> = (props) => {
       okText="Clone"
       cancelText="Cancel"
     >
-      <CopyOutlined onClick={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-      }}/>
+      <Tooltip title="Clone">
+        <CopyOutlined onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}/>
+      </Tooltip>
     </Popconfirm>
   )
 };

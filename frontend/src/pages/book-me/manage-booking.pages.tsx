@@ -166,12 +166,10 @@ const ManageBooking: React.FC<ManageBookingProps> = (
                         {link.startDate} <SwapRightOutlined /> {link.endDate}
                     </div>
                     <div className='link-card-operations' key={`link-card-operations${index}`}>
-                        <Tooltip title="Clone">
-                            <BookingLinkClone
-                                linkId={link.id}
-                                cloneBookingLink={cloneBookingLink}
-                                slotSpan={link.slotSpan}/>
-                        </Tooltip>
+                        <BookingLinkClone
+                            linkId={link.id}
+                            cloneBookingLink={cloneBookingLink}
+                            slotSpan={link.slotSpan}/>
                         <Tooltip title="Edit">
                             <EditOutlined />
                         </Tooltip>
