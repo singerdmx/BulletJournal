@@ -32,7 +32,8 @@ const BookingLinkClone: React.FC<BookingLinkCloneProps> = (props) => {
 
   const newSlotSpan = Number(hr) * 60 + Number(min);
 
-  const confirm = () => {
+  const confirm = (e: any) => {
+    e.stopPropagation();
     return cloneBookingLink(linkId, String(newSlotSpan));
   };
   
@@ -75,7 +76,7 @@ const BookingLinkClone: React.FC<BookingLinkCloneProps> = (props) => {
         </div>
       }
       icon={<InfoCircleOutlined style={{color: '#6ECEDA'}}/>}
-      onConfirm={confirm}
+      onConfirm={(e) => confirm(e)}
       okText="Clone"
       cancelText="Cancel"
       onCancel={(e) => e?.stopPropagation()}
