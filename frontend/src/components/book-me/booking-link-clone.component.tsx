@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { IState } from "../../store";
 import { connect } from "react-redux";
 import {Popconfirm, Select, Tooltip} from 'antd';
-import { CopyOutlined } from '@ant-design/icons';
+import {CopyOutlined, InfoCircleOutlined} from '@ant-design/icons';
 
 const { Option } = Select; 
 
@@ -41,7 +41,7 @@ const BookingLinkClone: React.FC<BookingLinkCloneProps> = (props) => {
       style={{width: 400}}
       title={
         <div>
-          <p>Do you want to change booking duration?</p>
+          <p>Duration</p>
           <Select 
             defaultValue={String(defaultHour)}
             onChange={(value: string) => {
@@ -73,9 +73,11 @@ const BookingLinkClone: React.FC<BookingLinkCloneProps> = (props) => {
           </Select>
         </div>
       }
+      icon={<InfoCircleOutlined />}
       onConfirm={confirm}
       okText="Clone"
       cancelText="Cancel"
+      onCancel={(e) => e?.stopPropagation()}
     >
       <Tooltip title="Clone">
         <CopyOutlined onClick={(e) => {
