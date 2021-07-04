@@ -146,6 +146,10 @@ function* patchBookingLink(action: PayloadAction<PatchBookingLink>) {
 
         const state: IState = yield select();
         const link: BookingLink = { ...state.bookingReducer.link! };
+        if (bookingLinkId !== link.id) {
+            console.log('Debounce happened after new booking link');
+            return;
+        }
         link.timezone = timezone;
         if (afterEventBuffer) {
             link.afterEventBuffer = afterEventBuffer;
