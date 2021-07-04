@@ -167,11 +167,7 @@ const ManageBooking: React.FC<ManageBookingProps> = (
                     </div>
                     <div className='link-card-operations' key={`link-card-operations${index}`}>
                         <Tooltip title="Clone">
-                            <BookingLinkClone 
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    e.preventDefault();
-                                }}
+                            <BookingLinkClone
                                 linkId={link.id}
                                 cloneBookingLink={cloneBookingLink}
                                 slotSpan={link.slotSpan}/>

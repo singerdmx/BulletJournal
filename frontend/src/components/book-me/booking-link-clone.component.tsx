@@ -7,7 +7,6 @@ import { CopyOutlined } from '@ant-design/icons';
 const { Option } = Select; 
 
 type BookingLinkCloneProps = {
-  onClick: (e: MouseEvent) => void,
   slotSpan: number,
   linkId: string,
   cloneBookingLink: (id: string, slotSpan: string) => void,
@@ -78,7 +77,10 @@ const BookingLinkClone: React.FC<BookingLinkCloneProps> = (props) => {
       okText="Clone"
       cancelText="Cancel"
     >
-      <CopyOutlined />
+      <CopyOutlined onClick={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+      }}/>
     </Popconfirm>
   )
 };
