@@ -200,6 +200,7 @@ public class BookingLinkDaoJpa {
         res.setProject(bookingLink.getProject());
         res.setOwner(owner);
         res.setRecurrences(bookingLink.getRecurrences());
+        res.setTimezone(bookingLink.getTimezone());
         this.bookingLinkRepository.save(res);
         return res;
     }

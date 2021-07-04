@@ -50,7 +50,7 @@ const BookingLinkClone: React.FC<BookingLinkCloneProps> = (props) => {
               switch (value) {
                 case "0":
                   setMinOptions(getMinOptions([15, 30, 45]));
-                  setMin("45");
+                  setMin("15");
                   break;
                 case "1":
                   setMinOptions(getMinOptions([0, 30]));
