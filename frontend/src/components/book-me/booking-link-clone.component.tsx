@@ -44,7 +44,7 @@ const BookingLinkClone: React.FC<BookingLinkCloneProps> = (props) => {
         <div>
           <p>Duration</p>
           <Select 
-            defaultValue={String(defaultHour)}
+            value={hr}
             onChange={(value: string) => {
               setHr(value);
               switch (value) {
@@ -66,7 +66,7 @@ const BookingLinkClone: React.FC<BookingLinkCloneProps> = (props) => {
             {hourOptions}
           </Select>
           {' '}hr{' '} 
-          <Select defaultValue={String(defaultMin)} value={min}
+          <Select value={min}
             onChange={(value: string) => setMin(value)}
             onClick={(e) => e.stopPropagation()}
           >
@@ -85,6 +85,8 @@ const BookingLinkClone: React.FC<BookingLinkCloneProps> = (props) => {
         <CopyOutlined onClick={(e) => {
           e.stopPropagation();
           e.preventDefault();
+          setHr(String(defaultHour));
+          setMin(String(defaultMin));
         }}/>
       </Tooltip>
     </Popconfirm>
