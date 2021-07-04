@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { IState } from "../../store";
 import { connect } from "react-redux";
 import {Popconfirm, Select, Tooltip} from 'antd';
-import {CopyOutlined, InfoCircleOutlined} from '@ant-design/icons';
+import {CopyOutlined} from '@ant-design/icons';
 
 const { Option } = Select; 
 
@@ -49,7 +49,7 @@ const BookingLinkClone: React.FC<BookingLinkCloneProps> = (props) => {
               setHr(value);
               switch (value) {
                 case "0":
-                  setMinOptions(getMinOptions([45]));
+                  setMinOptions(getMinOptions([15, 30, 45]));
                   setMin("45");
                   break;
                 case "1":
