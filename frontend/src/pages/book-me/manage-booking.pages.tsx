@@ -7,7 +7,6 @@ import {
     QuestionCircleOutlined,
     SwapRightOutlined,
     DeleteOutlined,
-    CopyOutlined,
     EditOutlined
 } from "@ant-design/icons";
 
@@ -24,6 +23,7 @@ import {
 } from "../../features/bookingLink/actions";
 import { BookingLink } from "../../features/bookingLink/interface";
 import BookMeDrawer, { getSlotSpan } from "../../components/book-me/book-me-drawer";
+import BookingLinkClone from "../../components/book-me/booking-link-clone.component";
 import { Project, ProjectsWithOwner } from "../../features/project/interface";
 import { flattenOwnedProject, flattenSharedProject } from "../projects/projects.pages";
 import { ProjectType } from "../../features/project/constants";
@@ -167,11 +167,14 @@ const ManageBooking: React.FC<ManageBookingProps> = (
                     </div>
                     <div className='link-card-operations' key={`link-card-operations${index}`}>
                         <Tooltip title="Clone">
-                            <CopyOutlined onClick={(e) => {
-                                e.stopPropagation();
-                                e.preventDefault();
-                                cloneBookingLink(link.id, String(link.slotSpan));
-                            }} />
+                            <BookingLinkClone 
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                }}
+                                linkId={link.id}
+                                cloneBookingLink={cloneBookingLink}
+                                slotSpan={link.slotSpan}/>
                         </Tooltip>
                         <Tooltip title="Edit">
                             <EditOutlined />
