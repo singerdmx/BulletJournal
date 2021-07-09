@@ -412,6 +412,7 @@ const EditTask: React.FC<
                 <Tooltip title="Select Due Time" placement="right">
                   <Form.Item name="dueTime" style={{width: '210px'}}>
                     <TimePicker
+                        use12Hours={true}
                         allowClear={true}
                         format="HH:mm"
                         placeholder="Due Time"
@@ -559,6 +560,7 @@ const EditTask: React.FC<
                 <Tooltip title="Reminder Time" placement="bottom">
                   <Form.Item name="reminderTime" style={{ width: '100px' }}>
                     <TimePicker
+                      use12Hours={true}
                       defaultValue={
                         task.reminderSetting.time
                           ? moment(task.reminderSetting.time, 'HH:mm')

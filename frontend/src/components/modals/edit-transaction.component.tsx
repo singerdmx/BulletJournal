@@ -345,6 +345,7 @@ const EditTransaction: React.FC<
                 <Tooltip title="Select Time" placement="right">
                   <Form.Item name="time" style={{width: '210px'}}>
                     <TimePicker
+                        use12Hours={true}
                         allowClear={true}
                         format="HH:mm"
                         placeholder="Time"

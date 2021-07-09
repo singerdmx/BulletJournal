@@ -35,6 +35,7 @@ class Start extends React.Component<StartProps> {
           allowClear={false}
         />
         <TimePicker
+          use12Hours={true}
           allowClear={false}
           placeholder="Time"
           value={this.props.startTime ? moment(time) : null}
