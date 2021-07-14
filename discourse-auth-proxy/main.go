@@ -20,8 +20,6 @@ import (
 
 	"github.com/golang/groupcache/lru"
 	"github.com/pborman/uuid"
-
-	"github.com/discourse/discourse-auth-proxy/internal/httpproxy"
 )
 
 var (
@@ -57,7 +55,7 @@ func main() {
 
 	rand.Seed(time.Now().UnixNano())
 
-	dnssrv := httpproxy.NewDNSSRVBackend(config.OriginURL)
+	dnssrv := NewDNSSRVBackend(config.OriginURL)
 	go dnssrv.Lookup(context.Background(), 50*time.Second, 10*time.Second, config.SRVAbandonAfter)
 	proxy := &httputil.ReverseProxy{Director: dnssrv.Director}
 
