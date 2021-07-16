@@ -5,6 +5,7 @@ import com.bulletjournal.controller.models.RecurringSpan;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.models.Booking;
 import com.bulletjournal.repository.models.BookingLink;
+import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.Task;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -94,11 +95,13 @@ public class BookingUtil {
             ZonedDateTime endT = startTime.plusMinutes((i + 1) * slotSpan);
             String date = ZonedDateTimeHelper.getDate(startT);
             int index = i % totalIndexes;
+            List<String> slotEvents = new ArrayList<>();
 
             BookingSlot bookingSlot = new BookingSlot();
             bookingSlot.setIndex(index);
             bookingSlot.setDate(date);
             bookingSlot.setOn(true);
+            bookingSlot.setEvents(slotEvents);
 
             // display to client
             ZonedDateTime displayStartTime = ZonedDateTimeHelper.getDateTimeInDifferentZone(ZonedDateTimeHelper.getDate(startT),
@@ -109,10 +112,12 @@ public class BookingUtil {
             bookingSlot.setEndTime(ZonedDateTimeHelper.getTime(displayEndTime));
             bookingSlot.setDisplayDate(ZonedDateTimeHelper.getDate(displayStartTime));
 
-
-            if (tasksBetween.stream().anyMatch(t -> isBetweenSlot(taskTimes.get(t).getLeft(),
-                    taskTimes.get(t).getRight(), startT, endT))) {
+            List<Task> tasks = tasksBetween.stream().filter(t -> isBetweenSlot(taskTimes.get(t).getLeft(),
+                    taskTimes.get(t).getRight(), startT, endT)).collect(Collectors.toList());
+            if (tasks.size() > 0) {
                 bookingSlot.setOn(false);
+                slotEvents.addAll(tasks.stream().map(ProjectItemModel::getName).collect(Collectors.toList()));
+                bookingSlot.setEvents(slotEvents);
             }
 
             if (recurringTimes.stream().anyMatch(r -> isBetweenSlot(r.getLeft(), r.getRight(), startT, endT))) {

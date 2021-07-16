@@ -2,6 +2,7 @@ package com.bulletjournal.controller.models;
 
 import com.google.gson.annotations.Expose;
 
+import java.util.List;
 import java.util.Objects;
 
 public class BookingSlot {
@@ -15,6 +16,15 @@ public class BookingSlot {
     private String endTime;
     private String displayDate;
     private Booking booking;
+    private List<String> events;
+
+    public List<String> getEvents() {
+        return events;
+    }
+
+    public void setEvents(List<String> events) {
+        this.events = events;
+    }
 
     public Booking getBooking() {
         return booking;
