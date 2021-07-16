@@ -13,6 +13,7 @@ export interface Slot {
     endTime: string;
     index: number;
     on: boolean;
+    events: string[];
 }
 
 export interface BookingLink {

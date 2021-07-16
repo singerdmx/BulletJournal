@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Badge, Button, Calendar, Drawer, Input, message, Result, Tooltip} from "antd";
+import {Badge, Button, Calendar, Drawer, Input, message, Popover, Result, Tooltip} from "antd";
 
 import './book-me-calendar.styles.less';
 import moment from "moment";
@@ -189,6 +189,28 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
         return false;
     }
 
+    function getSlotEventsContent(events: string[]) {
+        return <div>
+            {events.map(event => {
+                return <p>{event}</p>
+            })}
+        </div>
+    }
+
+    function getSlotDiv(slot: Slot) {
+        if (!isPublic && slot.events.length > 0) {
+            return <Popover placement='left' content={getSlotEventsContent(slot.events)} title="Events">
+                <div className='slot' style={{backgroundColor: `${slot.on ? '#52c41a' : '#f78cba'}`}}>
+                    {slot.startTime}<SwapRightOutlined/>{slot.endTime}
+                </div>
+            </Popover>
+        }
+
+        return <div className='slot' style={{backgroundColor: `${slot.on ? '#52c41a' : '#f78cba'}`}}>
+            {slot.startTime}<SwapRightOutlined/>{slot.endTime}
+        </div>
+    }
+
     function getCalendarDiv() {
         return <>
             <div className='calendar-div'>
@@ -201,9 +223,7 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
                 <div className='slots'>
                     {slots.map((slot, i) => {
                         return <div key={i} className='slot-card' onClick={() => handleOnSlotClick(slot)}>
-                            <div className='slot' style={{backgroundColor: `${slot.on ? '#52c41a' : '#f78cba'}`}}>
-                                {slot.startTime}<SwapRightOutlined/>{slot.endTime}
-                            </div>
+                            {getSlotDiv(slot)}
                             {getSlotButtons(slot)}
                         </div>
                     })}
