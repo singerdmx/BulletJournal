@@ -6,6 +6,11 @@ export interface RecurringSpan {
     recurrenceRule: string;
 }
 
+export interface SlotEvent {
+    eventName: string;
+    taskId: number;
+}
+
 export interface Slot {
     date: string;
     displayDate: string;
@@ -13,7 +18,7 @@ export interface Slot {
     endTime: string;
     index: number;
     on: boolean;
-    events: string[];
+    events: SlotEvent[];
 }
 
 export interface BookingLink {

@@ -3,7 +3,7 @@ import {Badge, Button, Calendar, Drawer, Input, message, Popover, Result, Toolti
 
 import './book-me-calendar.styles.less';
 import moment from "moment";
-import {BookingLink, Invitee, Slot} from "../../features/bookingLink/interface";
+import {BookingLink, Invitee, Slot, SlotEvent} from "../../features/bookingLink/interface";
 import {
     CheckCircleOutlined,
     CloseCircleOutlined,
@@ -189,10 +189,12 @@ const BookMeCalendar: React.FC<BookMeCalendarProps> = (
         return false;
     }
 
-    function getSlotEventsContent(events: string[]) {
+    function getSlotEventsContent(events: SlotEvent[]) {
         return <div>
             {events.map(event => {
-                return <p>{event}</p>
+                return <p><a href={`/#/task/${event.taskId}`} target="_blank" rel="noopener noreferrer">
+                    {event.eventName}
+                </a></p>
             })}
         </div>
     }
