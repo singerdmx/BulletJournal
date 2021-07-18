@@ -6,7 +6,6 @@ import com.bulletjournal.controller.models.SlotEvent;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.models.Booking;
 import com.bulletjournal.repository.models.BookingLink;
-import com.bulletjournal.repository.models.ProjectItemModel;
 import com.bulletjournal.repository.models.Task;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
