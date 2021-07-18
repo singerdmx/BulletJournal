@@ -16,13 +16,13 @@ public class BookingSlot {
     private String endTime;
     private String displayDate;
     private Booking booking;
-    private List<String> events;
+    private List<SlotEvent> events;
 
-    public List<String> getEvents() {
+    public List<SlotEvent> getEvents() {
         return events;
     }
 
-    public void setEvents(List<String> events) {
+    public void setEvents(List<SlotEvent> events) {
         this.events = events;
     }
 

@@ -2,6 +2,7 @@ package com.bulletjournal.util;
 
 import com.bulletjournal.controller.models.BookingSlot;
 import com.bulletjournal.controller.models.RecurringSpan;
+import com.bulletjournal.controller.models.SlotEvent;
 import com.bulletjournal.controller.utils.ZonedDateTimeHelper;
 import com.bulletjournal.repository.models.Booking;
 import com.bulletjournal.repository.models.BookingLink;
@@ -95,7 +96,7 @@ public class BookingUtil {
             ZonedDateTime endT = startTime.plusMinutes((i + 1) * slotSpan);
             String date = ZonedDateTimeHelper.getDate(startT);
             int index = i % totalIndexes;
-            List<String> slotEvents = new ArrayList<>();
+            List<SlotEvent> slotEvents = new ArrayList<>();
 
             BookingSlot bookingSlot = new BookingSlot();
             bookingSlot.setIndex(index);
@@ -116,7 +117,9 @@ public class BookingUtil {
                     taskTimes.get(t).getRight(), startT, endT)).collect(Collectors.toList());
             if (tasks.size() > 0) {
                 bookingSlot.setOn(false);
-                slotEvents.addAll(tasks.stream().map(ProjectItemModel::getName).collect(Collectors.toList()));
+                for (Task t : tasks) {
+                    slotEvents.add(new SlotEvent(t.getName(), t.getId()));
+                }
                 bookingSlot.setEvents(slotEvents);
             }
 
