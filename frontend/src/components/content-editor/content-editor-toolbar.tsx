@@ -105,7 +105,7 @@ export const modules = {
         {indent: '+1'},
       ],
 
-      ['link', 'image', 'emoji'],
+      ['link', 'image', 'emoji', 'video'],
 
       ['clean'],
       [
@@ -152,8 +152,8 @@ export const formats = [
   'height',
   'alt',
   'font',
-  'size'
-
+  'size',
+  'video'
 ];
 
 // // Quill Toolbar component
