@@ -8,6 +8,7 @@ First for logging purpose create folder /var/log/bulletjournal and grant permiss
 sudo mkdir -p /var/log/bulletjournal
 sudo chmod 777 /var/log/bulletjournal
 ```
+You need to make sure you have two running containers, one for redis and one for postgres. So make sure you are under directory `backend` and then run `../start.sh`.
 
 Make sure port 8080 is available and then start backend by running the following command:
 ```
