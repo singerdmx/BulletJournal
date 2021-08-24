@@ -154,6 +154,9 @@ public class Reminder {
         LOGGER.info("process record=" + record.toString());
         Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.getInterval(VERIFY_BUFF_SECONDS, reminderConfig.getTimeZone());
         taskRepository.findById(record.getId()).ifPresent(task -> {
+            LOGGER.info("process recode=" + record.toString()
+                    + " start time = " + interval.getFirst()
+                    + " end time= " + interval.getSecond());
             if (filterInvalidTask(record, interval.getFirst(), interval.getSecond(), task)) {
                 LOGGER.info("Push notification record {}", record);
                 fillDueDateTimeForRecurringTask(task, record);
