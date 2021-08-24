@@ -143,7 +143,7 @@ public class DaoHelper {
                         + task.getId() + " rule: " + recurrenceRule
                         + " current time: " + currDateTime.toString()
                         + " start time: " + startDateTime.toString()
-                        + " end time: " + startDateTime.toString()
+                        + " end time: " + endDateTime.toString()
                 );
                 if (currDateTime.after(endDateTime)) {
                     break;
