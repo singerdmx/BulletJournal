@@ -152,7 +152,10 @@ public class Reminder {
 
     private void process(final ReminderRecord record) {
         LOGGER.info("process record=" + record.toString());
-        Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper.getInterval(VERIFY_BUFF_SECONDS, reminderConfig.getTimeZone());
+        // Add SCHEDULE_BUFF_SECONDS.
+        // Since we use Jitter delay, it will cause reminder 2 hrs before task be accidentally filtered out
+        Pair<ZonedDateTime, ZonedDateTime> interval = ZonedDateTimeHelper
+                .getInterval(VERIFY_BUFF_SECONDS + SCHEDULE_BUFF_SECONDS, reminderConfig.getTimeZone());
         taskRepository.findById(record.getId()).ifPresent(task -> {
             LOGGER.info("process recode=" + record.toString()
                     + " start time = " + interval.getFirst()
