@@ -81,7 +81,7 @@ const BookingLinkClone: React.FC<BookingLinkCloneProps> = (props) => {
       cancelText="Cancel"
       onCancel={(e) => e?.stopPropagation()}
     >
-      <Tooltip title="Clone">
+      <Tooltip title="Clone" placement='right'>
         <CopyOutlined onClick={(e) => {
           e.stopPropagation();
           e.preventDefault();

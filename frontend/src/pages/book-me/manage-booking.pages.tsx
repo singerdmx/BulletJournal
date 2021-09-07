@@ -170,10 +170,10 @@ const ManageBooking: React.FC<ManageBookingProps> = (
                             linkId={link.id}
                             cloneBookingLink={cloneBookingLink}
                             slotSpan={link.slotSpan}/>
-                        <Tooltip title="Edit">
+                        <Tooltip title="Edit" placement='right'>
                             <EditOutlined />
                         </Tooltip>
-                        <Tooltip title="Delete">
+                        <Tooltip title="Delete" placement='right'>
                             <DeleteOutlined onClick={(e) => {
                                 e.stopPropagation();
                                 e.preventDefault();
