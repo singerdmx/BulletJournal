@@ -193,10 +193,13 @@ public class Reminder {
     @PreDestroy
     public void preDestroy() {
         if (executorService != null) {
+            executorService.shutdown();
             try {
-                executorService.awaitTermination(AWAIT_TERMINATION_SECONDS, TimeUnit.SECONDS);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
+                if (!executorService.awaitTermination(AWAIT_TERMINATION_SECONDS, TimeUnit.SECONDS)) {
+                    executorService.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                executorService.shutdownNow();
             }
         }
     }
