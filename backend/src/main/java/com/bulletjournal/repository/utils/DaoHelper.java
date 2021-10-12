@@ -139,12 +139,12 @@ public class DaoHelper {
 
             while (it.hasNext()) {
                 DateTime currDateTime = it.nextDateTime();
-                LOGGER.info("Recurring Task id: "
-                        + task.getId() + " rule: " + recurrenceRule
-                        + " current time: " + currDateTime.toString()
-                        + " start time: " + startDateTime.toString()
-                        + " end time: " + endDateTime.toString()
-                );
+//                LOGGER.info("Recurring Task id: "
+//                        + task.getId() + " rule: " + recurrenceRule
+//                        + " current time: " + currDateTime.toString()
+//                        + " start time: " + startDateTime.toString()
+//                        + " end time: " + endDateTime.toString()
+//                );
                 if (currDateTime.after(endDateTime)) {
                     break;
                 }
