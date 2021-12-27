@@ -1,6 +1,7 @@
 package com.bulletjournal.controller.models;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.controller.Editable;
 import com.bulletjournal.controller.utils.EtagGenerator;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
@@ -11,7 +12,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.List;
 
-public class Content {
+public class Content implements Editable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Content.class);
     private static final Gson GSON = new Gson();
 
@@ -33,6 +34,8 @@ public class Content {
 
     @NotNull
     private Long updatedAt;
+
+    private boolean editable;
 
     private Revision[] revisions;
 
@@ -148,6 +151,14 @@ public class Content {
 
     public void setEtag(String etag) {
         this.etag = etag;
+    }
+
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
     }
 
     @Override

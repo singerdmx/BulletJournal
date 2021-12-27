@@ -1,6 +1,7 @@
 package com.bulletjournal.controller.models;
 
 import com.bulletjournal.clients.UserClient;
+import com.bulletjournal.controller.Editable;
 import com.google.gson.annotations.Expose;
 
 import javax.validation.Valid;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Project {
+public class Project implements Editable {
     @Expose
     private Long id;
 
@@ -32,6 +33,8 @@ public class Project {
     private Group group;
 
     private String description;
+
+    private boolean editable;
 
     @Expose
     @Valid
@@ -150,6 +153,14 @@ public class Project {
         this.shared = shared;
     }
 
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
+    }
+
     public void clone(Project other) {
         this.setGroup(other.getGroup());
         this.setName(other.getName());
@@ -158,6 +169,7 @@ public class Project {
         this.setProjectType(other.getProjectType());
         this.setDescription(other.getDescription());
         this.setShared(other.isShared());
+        this.setEditable(other.isEditable());
     }
 
     @Override

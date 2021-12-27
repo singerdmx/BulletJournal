@@ -2,6 +2,7 @@ package com.bulletjournal.controller.models;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentType;
+import com.bulletjournal.controller.Editable;
 import com.bulletjournal.repository.models.Project;
 import com.google.gson.annotations.Expose;
 
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public abstract class ProjectItem {
+public abstract class ProjectItem implements Editable {
 
     @Expose
     protected Long id;
@@ -37,6 +38,8 @@ public abstract class ProjectItem {
     protected Long createdAt;
 
     protected boolean shared = false;
+
+    private boolean editable;
 
     public ProjectItem() {
     }
@@ -165,6 +168,14 @@ public abstract class ProjectItem {
 
     public void setShared(boolean shared) {
         this.shared = shared;
+    }
+
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
     }
 
     @Override
