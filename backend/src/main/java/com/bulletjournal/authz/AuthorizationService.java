@@ -88,6 +88,32 @@ public class AuthorizationService {
         }
     }
 
+    /**
+     * @param owner Content Owner
+     */
+    public boolean isContentEditable(
+            String owner, String requester,
+            String projectOwner, String projectItemOwner, ProjectItemModel projectItem) {
+        if (this.sharedProjectItemDaoJpa.getSharedProjectItems(requester).stream()
+                .anyMatch(item -> Objects.equals(item.getId(), projectItem.getId()) &&
+                        Objects.equals(item.getContentType(), projectItem.getContentType()))) {
+            // contents of project item being shared specifically can be edited
+            return true;
+        }
+
+        return Objects.equals(owner, requester) || Objects.equals(projectOwner, requester)
+                || Objects.equals(projectItemOwner, requester);
+    }
+
+    /**
+     * @param owner Content Owner
+     */
+    public boolean isContentDeletable(String owner, String requester,
+                                      String projectOwner, String projectItemOwner) {
+        return Objects.equals(owner, requester) || Objects.equals(projectOwner, requester)
+                || Objects.equals(projectItemOwner, requester);
+    }
+
     private void checkAuthorizedToOperateOnBankAccount(
             String owner, String requester, Operation operation, Long contentId) {
         switch (operation) {
@@ -167,15 +193,14 @@ public class AuthorizationService {
 
         switch (operation) {
             case UPDATE:
-                // contents of project item being shared specifically can be edited
-                if (this.sharedProjectItemDaoJpa.getSharedProjectItems(requester).stream()
-                        .anyMatch(item -> Objects.equals(item.getId(), projectItem.getId()) &&
-                                Objects.equals(item.getContentType(), projectItem.getContentType()))) {
-                    return;
+                if (!isContentEditable(owner, requester, projectOwner, projectItemOwner, projectItem)) {
+                    throw new UnAuthorizedException("Project Item " + contentId + " is owner by " +
+                            owner + " and Project is owned by " + projectOwner +
+                            " and Project Item is owned by " + projectItemOwner +
+                            " while request is from " + requester);
                 }
             case DELETE:
-                if (!Objects.equals(owner, requester) && !Objects.equals(projectOwner, requester)
-                        && !Objects.equals(projectItemOwner, requester)) {
+                if (!isContentDeletable(owner, requester, projectOwner, projectItemOwner)) {
                     throw new UnAuthorizedException("Project Item " + contentId + " is owner by " +
                             owner + " and Project is owned by " + projectOwner +
                             " and Project Item is owned by " + projectItemOwner +
