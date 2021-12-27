@@ -374,7 +374,7 @@ public class SystemController {
         }
 
         PublicProjectItem publicProjectItem;
-        if (item == null) { // brand new page
+        if (item == null) { // brand-new page
             publicProjectItem = createEmptyPublicProjectItem();
             return ResponseEntity.ok().body(publicProjectItem);
         }
@@ -411,6 +411,7 @@ public class SystemController {
         content.setCreatedAt(System.currentTimeMillis());
         content.setUpdatedAt(System.currentTimeMillis());
         content.setRevisions(new Revision[0]);
+        content.setEditable(true);
         publicProjectItem.setContents(ImmutableList.of(content));
         return publicProjectItem;
     }

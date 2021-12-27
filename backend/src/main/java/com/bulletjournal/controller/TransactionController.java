@@ -1,5 +1,6 @@
 package com.bulletjournal.controller;
 
+import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.contents.ContentType;
@@ -76,8 +77,6 @@ public class TransactionController {
     protected static final String TRANSACTION_EXPORT_IMAGE_ROUTE = "/api/transactions/{transactionId}/exportImage";
     protected static final String TRANSACTION_HISTORY_ROUTE = "/api/transactions/{transactionId}/history";
 
-
-
     @Autowired
     private LedgerSummaryCalculator ledgerSummaryCalculator;
 
@@ -107,6 +106,9 @@ public class TransactionController {
 
     @Autowired
     private TransactionAuditableDaoJpa transactionAuditableDaoJpa;
+
+    @Autowired
+    private AuthorizationService authorizationService;
 
     @GetMapping(RECURRING_TRANSACTIONS_ROUTE)
     public List<Transaction> getRecurringTransactions(@NotNull @PathVariable Long projectId) {
@@ -377,7 +379,7 @@ public class TransactionController {
         Pair<ContentModel, ProjectItemModel> res = this.transactionDaoJpa.addContent(transactionId, username,
                 new TransactionContent(createContentParams.getText()));
 
-        Content createdContent = res.getLeft().toPresentationModel();
+        Content createdContent = res.getLeft().toPresentationModel(this.authorizationService);
         String transactionName = res.getRight().getName();
         Long projectId = res.getRight().getProject().getId();
         String projectName = res.getRight().getProject().getName();
@@ -396,7 +398,7 @@ public class TransactionController {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return Content.addOwnerAvatar(
                 this.transactionDaoJpa.getContents(transactionId, username).stream()
-                        .map(t -> t.toPresentationModel()).collect(Collectors.toList()),
+                        .map(t -> t.toPresentationModel(this.authorizationService)).collect(Collectors.toList()),
                 this.userClient);
     }
 

@@ -328,7 +328,7 @@ public class WorkflowController {
         }
         return new Content(this.userDaoJpa.isAdmin(requester) ? sampleTaskId : 0L,
                 user, content, content,
-                System.currentTimeMillis(), System.currentTimeMillis(), "");
+                System.currentTimeMillis(), System.currentTimeMillis(), "", true, true);
     }
 
     @PatchMapping(SAMPLE_TASK_CONTENT_ROUTE)

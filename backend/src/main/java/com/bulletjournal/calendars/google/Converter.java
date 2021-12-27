@@ -67,6 +67,8 @@ public class Converter {
         content.setText(getText(event, task));
         content.setBaseText(getBaseText(event, task));
         content.setOwner(new User(username));
+        content.setEditable(true);
+        content.setDeletable(true);
 
         return new GoogleCalendarEvent(task, content, event.getId(),
                 processHtmlTags(event.getDescription()));

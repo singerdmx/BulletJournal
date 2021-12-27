@@ -48,7 +48,7 @@ public class Content implements Editable, Deletable {
     public Content(@NotNull Long id, @NotNull User owner,
                    @NotBlank String text, String baseText,
                    @NotNull Long createdAt, @NotNull Long updatedAt,
-                   String revisions) {
+                   String revisions, boolean editable, boolean deletable) {
         this.id = id;
         this.owner = owner;
         this.text = text;
@@ -58,6 +58,8 @@ public class Content implements Editable, Deletable {
         this.baseText = baseText;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.editable = editable;
+        this.deletable = deletable;
         try {
             this.revisions = GSON.fromJson(revisions, Revision[].class);
         } catch (Exception ex) {

@@ -1,5 +1,6 @@
 package com.bulletjournal.controller;
 
+import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.contents.ContentType;
@@ -97,11 +98,14 @@ public class NoteController {
     @Autowired
     private NoteAuditableDaoJpa noteAuditableDaoJpa;
 
+    @Autowired
+    private AuthorizationService authorizationService;
+
     @GetMapping(NOTES_ROUTE)
     public ResponseEntity<List<Note>> getNotes(@NotNull @PathVariable Long projectId,
-            @RequestParam(required = false) String owner, @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate, @RequestParam(required = false) Boolean order,
-            @RequestParam(required = false) String timezone) {
+                                               @RequestParam(required = false) String owner, @RequestParam(required = false) String startDate,
+                                               @RequestParam(required = false) String endDate, @RequestParam(required = false) Boolean order,
+                                               @RequestParam(required = false) String timezone) {
         if (StringUtils.isNotBlank(owner)) {
             return getNotesByOwner(projectId, owner);
         }
@@ -304,7 +308,7 @@ public class NoteController {
         Pair<ContentModel, ProjectItemModel> res = this.noteDaoJpa.addContent(noteId, username,
                 new NoteContent(createContentParams.getText()));
 
-        Content createdContent = res.getLeft().toPresentationModel();
+        Content createdContent = res.getLeft().toPresentationModel(this.authorizationService);
         String noteName = res.getRight().getName();
         Long projectId = res.getRight().getProject().getId();
         String projectName = res.getRight().getProject().getName();
@@ -320,7 +324,8 @@ public class NoteController {
     public List<Content> getContents(@NotNull @PathVariable Long noteId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         List<Content> contents = Content.addOwnerAvatar(this.noteDaoJpa.getContents(noteId, username).stream()
-                .map(t -> t.toPresentationModel()).collect(Collectors.toList()), this.userClient);
+                .map(t -> t.toPresentationModel(this.authorizationService))
+                .collect(Collectors.toList()), this.userClient);
         return contents;
     }
 

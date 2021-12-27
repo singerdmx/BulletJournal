@@ -1,5 +1,6 @@
 package com.bulletjournal.controller;
 
+import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentAction;
 import com.bulletjournal.contents.ContentType;
@@ -104,6 +105,8 @@ public class TaskController {
     @Autowired
     private TaskAuditableDaoJpa taskAuditableDaoJpa;
 
+    @Autowired
+    private AuthorizationService authorizationService;
 
     @GetMapping(TASKS_ROUTE)
     public ResponseEntity<List<Task>> getTasks(@NotNull @PathVariable Long projectId,
@@ -527,7 +530,7 @@ public class TaskController {
         Pair<ContentModel, ProjectItemModel> res = this.taskDaoJpa.addContent(taskId, username,
                 new TaskContent(createContentParams.getText()));
 
-        Content createdContent = res.getLeft().toPresentationModel();
+        Content createdContent = res.getLeft().toPresentationModel(this.authorizationService);
         String taskName = res.getRight().getName();
         Long projectId = res.getRight().getProject().getId();
         String projectName = res.getRight().getProject().getName();
@@ -543,14 +546,16 @@ public class TaskController {
     public List<Content> getContents(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return Content.addOwnerAvatar(this.taskDaoJpa.getContents(taskId, username).stream()
-                .map(t -> t.toPresentationModel()).collect(Collectors.toList()), this.userClient);
+                .map(t -> t.toPresentationModel(this.authorizationService))
+                .collect(Collectors.toList()), this.userClient);
     }
 
     @GetMapping(COMPLETED_TASK_CONTENTS_ROUTE)
     public List<Content> getCompletedTaskContents(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return Content.addOwnerAvatar(this.taskDaoJpa.getCompletedTaskContents(taskId, username).stream()
-                .map(t -> t.toPresentationModel()).collect(Collectors.toList()), this.userClient);
+                .map(t -> t.toPresentationModel(this.authorizationService))
+                .collect(Collectors.toList()), this.userClient);
     }
 
     @DeleteMapping(CONTENT_ROUTE)

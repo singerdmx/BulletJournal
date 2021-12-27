@@ -1,8 +1,11 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.authz.AuthorizationService;
+import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.Content;
 import com.bulletjournal.controller.models.User;
 import com.google.gson.annotations.Expose;
+import org.slf4j.MDC;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
@@ -66,11 +69,29 @@ public abstract class ContentModel<T extends ProjectItemModel> extends AuditMode
         this.revisions = revisions;
     }
 
-    public Content toPresentationModel() {
+    public Content toPresentationModel(AuthorizationService authorizationService) {
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+        ProjectItemModel projectItem = this.getProjectItem();
+        String projectItemOwner = projectItem.getOwner();
+        String projectOwner = projectItem.getProject().getOwner();
+
         return new Content(
                 this.getId(), new User(this.getOwner()), this.getText(),
                 this.getBaseText(), this.getCreatedAt() == null ? null : this.getCreatedAt().getTime(),
                 this.getUpdatedAt() == null ? null : this.getUpdatedAt().getTime(),
-                this.getRevisions());
+                this.getRevisions(),
+                authorizationService.isContentEditable(
+                        this.getOwner(),
+                        requester,
+                        projectOwner,
+                        projectItemOwner,
+                        projectItem
+                ),
+                authorizationService.isContentDeletable(
+                        this.getOwner(),
+                        requester,
+                        projectOwner,
+                        projectItemOwner
+                ));
     }
 }
