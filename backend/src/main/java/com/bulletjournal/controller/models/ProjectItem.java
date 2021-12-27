@@ -2,7 +2,8 @@ package com.bulletjournal.controller.models;
 
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentType;
-import com.bulletjournal.controller.Editable;
+import com.bulletjournal.controller.models.authz.Deletable;
+import com.bulletjournal.controller.models.authz.Editable;
 import com.bulletjournal.repository.models.Project;
 import com.google.gson.annotations.Expose;
 
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public abstract class ProjectItem implements Editable {
+public abstract class ProjectItem implements Editable, Deletable {
 
     @Expose
     protected Long id;
@@ -40,6 +41,8 @@ public abstract class ProjectItem implements Editable {
     protected boolean shared = false;
 
     private boolean editable;
+
+    private boolean deletable;
 
     public ProjectItem() {
     }
@@ -179,6 +182,15 @@ public abstract class ProjectItem implements Editable {
     }
 
     @Override
+    public boolean isDeletable() {
+        return deletable;
+    }
+
+    public void setDeletable(boolean deletable) {
+        this.deletable = deletable;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ProjectItem)) return false;
@@ -205,6 +217,8 @@ public abstract class ProjectItem implements Editable {
         this.setUpdatedAt(projectItem.getUpdatedAt());
         this.setCreatedAt(projectItem.getCreatedAt());
         this.setLocation(projectItem.getLocation());
+        this.setEditable(projectItem.isEditable());
+        this.setDeletable(projectItem.isDeletable());
         if (projectItem instanceof Note) {
             ((Note) this).setColor(((Note) projectItem).getColor());
         }
