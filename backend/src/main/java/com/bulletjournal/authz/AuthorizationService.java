@@ -101,8 +101,7 @@ public class AuthorizationService {
             return true;
         }
 
-        return Objects.equals(owner, requester) || Objects.equals(projectOwner, requester)
-                || Objects.equals(projectItemOwner, requester);
+        return isContentDeletable(owner, requester, projectOwner, projectItemOwner);
     }
 
     /**

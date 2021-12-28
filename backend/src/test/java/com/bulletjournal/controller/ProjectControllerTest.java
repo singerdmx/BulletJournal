@@ -1225,7 +1225,7 @@ public class ProjectControllerTest {
     }
 
     private ProjectDetails testProjectSetting(Project project) {
-        ProjectSetting projectSetting = new ProjectSetting("{\"r\":255,\"g\":224,\"b\":178,\"a\":1}", true);
+        ProjectSetting projectSetting = new ProjectSetting("{\"r\":255,\"g\":224,\"b\":178,\"a\":1}", true, true);
         ResponseEntity<ProjectDetails> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECT_SETTINGS_ROUTE,
                 HttpMethod.PUT,
@@ -1238,7 +1238,7 @@ public class ProjectControllerTest {
         assertEquals("{\"r\":255,\"g\":224,\"b\":178,\"a\":1}", p.getProjectSetting().getColor());
         assertTrue(p.getProjectSetting().isAutoDelete());
 
-        projectSetting = new ProjectSetting("{\"r\":209,\"g\":196,\"b\":233,\"a\":1}", false);
+        projectSetting = new ProjectSetting("{\"r\":209,\"g\":196,\"b\":233,\"a\":1}", false, true);
         response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECT_SETTINGS_ROUTE,
                 HttpMethod.PUT,
@@ -1255,7 +1255,7 @@ public class ProjectControllerTest {
     }
 
     private void testGetProjectSettingsMultiple(List<Project> projects) {
-        ProjectSetting projectSetting = new ProjectSetting("{\"r\":255,\"g\":224,\"b\":178,\"a\":1}", true);
+        ProjectSetting projectSetting = new ProjectSetting("{\"r\":255,\"g\":224,\"b\":178,\"a\":1}", true, true);
         ResponseEntity<ProjectDetails> response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECT_SETTINGS_ROUTE,
                 HttpMethod.PUT,
@@ -1267,7 +1267,7 @@ public class ProjectControllerTest {
         assertEquals("{\"r\":255,\"g\":224,\"b\":178,\"a\":1}", p.getProjectSetting().getColor());
         assertTrue(p.getProjectSetting().isAutoDelete());
 
-        projectSetting = new ProjectSetting("{\"r\":209,\"g\":196,\"b\":233,\"a\":1}", false);
+        projectSetting = new ProjectSetting("{\"r\":209,\"g\":196,\"b\":233,\"a\":1}", false, true);
         response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECT_SETTINGS_ROUTE,
                 HttpMethod.PUT,
@@ -1279,7 +1279,7 @@ public class ProjectControllerTest {
         assertEquals("{\"r\":209,\"g\":196,\"b\":233,\"a\":1}", p.getProjectSetting().getColor());
         assertFalse(p.getProjectSetting().isAutoDelete());
 
-        projectSetting = new ProjectSetting("{\"r\":220,\"g\":231,\"b\":117,\"a\":1}", true);
+        projectSetting = new ProjectSetting("{\"r\":220,\"g\":231,\"b\":117,\"a\":1}", true, true);
         response = this.restTemplate.exchange(
                 ROOT_URL + randomServerPort + ProjectController.PROJECT_SETTINGS_ROUTE,
                 HttpMethod.PUT,

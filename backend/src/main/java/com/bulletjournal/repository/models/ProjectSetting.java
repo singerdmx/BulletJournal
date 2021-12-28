@@ -20,14 +20,18 @@ public class ProjectSetting {
     @Column(name = "auto_delete")
     private boolean autoDelete;
 
+    @Column(name = "allow_edit_contents")
+    private boolean allowEditContents;
+
     public ProjectSetting() {
     }
 
-    public ProjectSetting(Project project, String color, boolean autoDelete) {
+    public ProjectSetting(Project project, String color, boolean autoDelete, boolean allowEditContents) {
         this.id = project.getId();
         this.project = project;
         this.color = color;
         this.autoDelete = autoDelete;
+        this.allowEditContents = allowEditContents;
     }
 
     public Long getId() {
@@ -62,7 +66,15 @@ public class ProjectSetting {
         this.autoDelete = autoDelete;
     }
 
+    public boolean isAllowEditContents() {
+        return allowEditContents;
+    }
+
+    public void setAllowEditContents(boolean allowEditContents) {
+        this.allowEditContents = allowEditContents;
+    }
+
     public com.bulletjournal.controller.models.ProjectSetting toPresentationModel() {
-        return new com.bulletjournal.controller.models.ProjectSetting(this.color, this.autoDelete);
+        return new com.bulletjournal.controller.models.ProjectSetting(this.color, this.autoDelete, this.allowEditContents);
     }
 }

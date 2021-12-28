@@ -237,11 +237,11 @@ public class ProjectDaoJpa {
         projects.get(2).addSubProject(billProject.toPresentationModel());
         this.updateUserOwnedProjects(username, projects);
 
-        this.projectSettingRepository.save(new ProjectSetting(todoProject, "{\"r\":239,\"g\":239,\"b\":241,\"a\":1}", false));
-        this.projectSettingRepository.save(new ProjectSetting(beginnerProject, "{\"r\":236,\"g\":212,\"b\":212,\"a\":1}", false));
-        this.projectSettingRepository.save(new ProjectSetting(noteProject, "{\"r\":253,\"g\":242,\"b\":240,\"a\":1}", false));
-        this.projectSettingRepository.save(new ProjectSetting(ledgerProject, "{\"r\":254,\"g\":245,\"b\":212,\"a\":1}", false));
-        this.projectSettingRepository.save(new ProjectSetting(billProject, "{\"r\":218,\"g\":218,\"b\":252,\"a\":1}", false));
+        this.projectSettingRepository.save(new ProjectSetting(todoProject, "{\"r\":239,\"g\":239,\"b\":241,\"a\":1}", false, false));
+        this.projectSettingRepository.save(new ProjectSetting(beginnerProject, "{\"r\":236,\"g\":212,\"b\":212,\"a\":1}", false, false));
+        this.projectSettingRepository.save(new ProjectSetting(noteProject, "{\"r\":253,\"g\":242,\"b\":240,\"a\":1}", false, false));
+        this.projectSettingRepository.save(new ProjectSetting(ledgerProject, "{\"r\":254,\"g\":245,\"b\":212,\"a\":1}", false, false));
+        this.projectSettingRepository.save(new ProjectSetting(billProject, "{\"r\":218,\"g\":218,\"b\":252,\"a\":1}", false, false));
         return Pair.of(beginnerProject, noteProject);
     }
 

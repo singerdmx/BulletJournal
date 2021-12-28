@@ -23,13 +23,14 @@ public class ProjectSettingDaoJpa {
         ProjectSetting projectSetting = this.projectSettingRepository.findById(projectId)
                 .orElse(null);
         if (projectSetting == null) {
-            return new com.bulletjournal.controller.models.ProjectSetting(null, false);
+            return new com.bulletjournal.controller.models.ProjectSetting(null, false, true);
         }
         return projectSetting.toPresentationModel();
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    public ProjectSetting setProjectSetting(String requester, Project project, String color, boolean autoDelete) {
+    public ProjectSetting setProjectSetting(
+            String requester, Project project, String color, boolean autoDelete, boolean allowEditContents) {
         this.authorizationService.checkAuthorizedToOperateOnContent(
                 project.getOwner(), requester, ContentType.PROJECT, Operation.UPDATE, project.getId());
         ProjectSetting setting = this.projectSettingRepository.findById(project.getId())
@@ -38,6 +39,7 @@ public class ProjectSettingDaoJpa {
         setting.setProject(project);
         setting.setAutoDelete(autoDelete);
         setting.setColor(color);
+        setting.setAllowEditContents(allowEditContents);
         this.projectSettingRepository.save(setting);
         return setting;
     }
