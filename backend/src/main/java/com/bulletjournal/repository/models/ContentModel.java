@@ -91,7 +91,8 @@ public abstract class ContentModel<T extends ProjectItemModel> extends AuditMode
                         this.getOwner(),
                         requester,
                         projectOwner,
-                        projectItemOwner
+                        projectItemOwner,
+                        projectItem
                 ));
     }
 }

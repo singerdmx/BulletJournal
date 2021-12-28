@@ -1,7 +1,9 @@
 package com.bulletjournal.authz;
 
 import com.bulletjournal.contents.ContentType;
+import com.bulletjournal.controller.models.ProjectSetting;
 import com.bulletjournal.exceptions.UnAuthorizedException;
+import com.bulletjournal.repository.ProjectSettingDaoJpa;
 import com.bulletjournal.repository.SharedProjectItemDaoJpa;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.Project;
@@ -30,6 +32,10 @@ public class AuthorizationService {
     @Lazy
     private SharedProjectItemDaoJpa sharedProjectItemDaoJpa;
 
+    @Autowired
+    @Lazy
+    private ProjectSettingDaoJpa projectSettingDaoJpa;
+
     public <T extends ProjectItemModel> void validateRequesterInProjectGroup(String requester, T projectItem) {
         if (this.sharedProjectItemDaoJpa.getSharedProjectItems(requester).stream()
                 .anyMatch(item -> Objects.equals(item.getId(), projectItem.getId()) &&
@@ -48,11 +54,15 @@ public class AuthorizationService {
     }
 
     public void validateRequesterInGroup(String requester, Group group, boolean acceptedUserOnly) {
-        if ((acceptedUserOnly ? group.getAcceptedUsers() : group.getUsers())
-                .stream().noneMatch(u -> Objects.equals(requester, u.getUser().getName()))) {
+        if (notInGroup(requester, group, acceptedUserOnly)) {
             throw new UnAuthorizedException("User " + requester + " not in Group "
                     + group.getName());
         }
+    }
+
+    private boolean notInGroup(String requester, Group group, boolean acceptedUserOnly) {
+        return (acceptedUserOnly ? group.getAcceptedUsers() : group.getUsers())
+                .stream().noneMatch(u -> Objects.equals(requester, u.getUser().getName()));
     }
 
     public void checkAuthorizedToOperateOnContent(
@@ -101,16 +111,22 @@ public class AuthorizationService {
             return true;
         }
 
-        return isContentDeletable(owner, requester, projectOwner, projectItemOwner);
+        return isContentDeletable(owner, requester, projectOwner, projectItemOwner, projectItem);
     }
 
     /**
      * @param owner Content Owner
      */
     public boolean isContentDeletable(String owner, String requester,
-                                      String projectOwner, String projectItemOwner) {
-        return Objects.equals(owner, requester) || Objects.equals(projectOwner, requester)
-                || Objects.equals(projectItemOwner, requester);
+                                      String projectOwner, String projectItemOwner, ProjectItemModel projectItem) {
+        ProjectSetting projectSetting = this.projectSettingDaoJpa.getProjectSetting(projectItem.getProject().getId());
+        if (!projectSetting.isAllowEditContents()) {
+            return Objects.equals(owner, requester) || Objects.equals(projectOwner, requester)
+                    || Objects.equals(projectItemOwner, requester);
+        }
+
+        // projectSetting.isAllowEditContents() is true and user needs to be in project's group
+        return !notInGroup(requester, projectItem.getProject().getGroup(), true);
     }
 
     private void checkAuthorizedToOperateOnBankAccount(
@@ -199,7 +215,7 @@ public class AuthorizationService {
                             " while request is from " + requester);
                 }
             case DELETE:
-                if (!isContentDeletable(owner, requester, projectOwner, projectItemOwner)) {
+                if (!isContentDeletable(owner, requester, projectOwner, projectItemOwner, projectItem)) {
                     throw new UnAuthorizedException("Project Item " + contentId + " is owner by " +
                             owner + " and Project is owned by " + projectOwner +
                             " and Project Item is owned by " + projectItemOwner +
