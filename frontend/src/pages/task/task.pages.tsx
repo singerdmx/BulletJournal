@@ -46,7 +46,6 @@ import {Content} from "../../features/myBuJo/interface";
 import {DeleteOutlined, EditOutlined} from "@ant-design/icons/lib";
 import {getProject} from "../../features/project/actions";
 import {Project} from "../../features/project/interface";
-import {contentEditable} from "../note/note.pages";
 import {resizeFloatButton} from "../../utils/Util";
 import ProjectItemHistoryDrawer from "../../components/project-item/project-item-history-drawer";
 
@@ -168,14 +167,14 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
         >
           <SyncOutlined/>
         </FloatButton>
-        {contentEditable(myself, content, task, project) && <FloatButton
+        {content && content.deletable && <FloatButton
             tooltip="Delete Content"
             onClick={handleDelete}
             styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
         >
           <DeleteOutlined/>
         </FloatButton>}
-        {contentEditable(myself, content, task, project) && <FloatButton
+        {content && content.editable && <FloatButton
             tooltip="Edit Content"
             onClick={handleEdit}
             styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
@@ -295,7 +294,7 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
         <ProjectItemHistoryDrawer
             projectItemId={task.id}
             projectType={ProjectType.TODO}
-            editable={contentEditable(myself, content, task, project)}
+            editable={content && content.editable}
         />
         <LabelManagement
           labelEditableHandler={labelEditableHandler}

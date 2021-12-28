@@ -62,22 +62,6 @@ interface NotePageHandler {
 
 }
 
-export const contentEditable = (
-    myself: string, content: Content | undefined, item: ProjectItem, project: Project | undefined) => {
-    if (!content) {
-        return false;
-    }
-
-    if (!content.id) {
-        return false;
-    }
-
-    if (project && project.owner.name === myself) {
-        return true;
-    }
-    return content.owner.name === myself || item.owner.name === myself;
-}
-
 const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
     // hook history in router
     const history = useHistory();
@@ -159,14 +143,14 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
             >
                 <SyncOutlined/>
             </FloatButton>
-            {contentEditable(myself, content, note, project) && <FloatButton
+            {content && content.deletable && <FloatButton
                 tooltip="Delete Content"
                 onClick={handleDelete}
                 styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
             >
                 <DeleteOutlined/>
             </FloatButton>}
-            {contentEditable(myself, content, note, project) && <FloatButton
+            {content && content.editable && <FloatButton
                 tooltip="Edit Content"
                 onClick={handleEdit}
                 styles={{backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
@@ -208,7 +192,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
                 <ProjectItemHistoryDrawer
                     projectItemId={note.id}
                     projectType={ProjectType.NOTE}
-                    editable={ contentEditable(myself, content, note, project)}
+                    editable={content && content.editable}
                 />
                 <LabelManagement
                     labelEditableHandler={labelEditableHandler}

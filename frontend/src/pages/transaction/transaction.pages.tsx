@@ -72,7 +72,6 @@ import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
 import CopyToClipboard from "react-copy-to-clipboard";
 import {getProject} from "../../features/project/actions";
 import {Project} from "../../features/project/interface";
-import {contentEditable} from "../note/note.pages";
 import TransactionColorSettingDialog from '../../components/modals/transaction-color.component';
 import {convertToTextWithRRule} from "../../features/recurrence/actions";
 import BankList from "../../components/modals/bank-list.component";
@@ -252,21 +251,21 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
       >
         <SyncOutlined/>
       </FloatButton>
-      {contentEditable(myself, content, transaction, project) && <FloatButton
+      {content && content.deletable && <FloatButton
         tooltip="Delete Content"
         onClick={handleDelete}
         styles={{ backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
       >
         <DeleteOutlined />
       </FloatButton>}
-      {content && content.revisions.length > 1 && contentEditable(myself, content, transaction, project) && <FloatButton
+      {content && content.revisions.length > 1 && content.editable && <FloatButton
         tooltip={`View Revision History (${content.revisions.length - 1})`}
         onClick={handleOpenRevisions}
         styles={{ backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}
       >
         <HighlightOutlined />
       </FloatButton>}
-      {contentEditable(myself, content, transaction, project) && <FloatButton
+      {content && content.editable && <FloatButton
         tooltip="Edit Content"
         onClick={handleEdit}
         styles={{ backgroundColor: darkColors.grey, color: lightColors.white, fontSize: '25px'}}

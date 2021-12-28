@@ -4,6 +4,7 @@ import { Group, User } from '../group/interface';
 export interface ProjectSetting {
   color: string | undefined;
   autoDelete: boolean;
+  allowEditContents: boolean;
 }
 
 export interface Project {
@@ -15,6 +16,8 @@ export interface Project {
   projectType: ProjectType;
   subProjects: Project[];
   shared: boolean;
+  editable: boolean;
+  deletable: boolean;
   projectSetting: ProjectSetting;
 }
 

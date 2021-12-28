@@ -20,9 +20,11 @@ export interface ProjectItem {
   projectId: number;
   labels: Label[];
   contentType: ContentType;
-  updatedAt: number,
-  createdAt: number,
-  shared: boolean
+  updatedAt: number;
+  createdAt: number;
+  shared: boolean;
+  editable: boolean;
+  deletable: boolean;
 }
 
 export interface Content {
@@ -32,6 +34,8 @@ export interface Content {
   etag: string;
   createdAt: number;
   updatedAt: number;
+  editable: boolean;
+  deletable: boolean;
   revisions: Revision[];
 }
 

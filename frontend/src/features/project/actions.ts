@@ -44,12 +44,14 @@ export const updateProjectRelations = (projects: Project[]) =>
 export const updateProjectSetting = (
   projectId: number,
   autoDelete: boolean,
-  color: string | undefined
+  color: string | undefined,
+  allowEditContents: boolean
 ) =>
   actions.updateProjectSetting({ 
     projectId: projectId,
     autoDelete: autoDelete,
     color: color,
+    allowEditContents: allowEditContents
   });
 export const getProjectHistory = (
   projectId: number,

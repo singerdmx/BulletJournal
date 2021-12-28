@@ -10,6 +10,7 @@ import {
   CheckCircleOutlined,
   CloseCircleOutlined,
   CrownOutlined,
+  EditOutlined,
   FileExcelOutlined,
   SettingOutlined
 } from '@ant-design/icons';
@@ -29,6 +30,7 @@ type ProjectSettingProps = {
       projectId: number,
       autoDelete: boolean,
       color: string | undefined,
+      allowEditContents: boolean
   ) => void;
   updateSettingShown: (
       visible: boolean
@@ -89,7 +91,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
   const onCheckColorIcon = (e: any) => {
     setDisplayColorPicker(!displayColorPicker);
     if (!e.target.checked && project) {
-      updateProjectSetting(project.id, projectSetting.autoDelete, undefined);
+      updateProjectSetting(project.id, projectSetting.autoDelete, undefined, projectSetting.allowEditContents);
       setBgColor({
         r: '0',
         g: '0',
@@ -101,14 +103,20 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
 
   const handleColorChange = (c: any, event: any) => {
     if (project) {
-      updateProjectSetting(project.id, projectSetting.autoDelete, JSON.stringify(c.rgb));
+      updateProjectSetting(project.id, projectSetting.autoDelete, JSON.stringify(c.rgb), projectSetting.allowEditContents);
     }
     setBgColor(c.rgb);
   };
 
   const handleAutoDeleteChange = (e: any) => {
     if (project) {
-      updateProjectSetting(project.id, e.target.checked, projectSetting.color);
+      updateProjectSetting(project.id, e.target.checked, projectSetting.color, projectSetting.allowEditContents);
+    }
+  };
+
+  const handleEditContentChange = (e: any) => {
+    if (project) {
+      updateProjectSetting(project.id, projectSetting.autoDelete, projectSetting.color, e.target.checked);
     }
   };
 
@@ -209,6 +217,16 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
             />
           </Tooltip>
         </div>}
+        <div style={{marginBottom: '5px'}}>
+          <Checkbox
+              style={{marginTop: '-0.5em'}}
+              onChange={handleEditContentChange}
+              checked={projectSetting.allowEditContents}
+          >
+            Allow everyone in this BuJo to edit contents
+          </Checkbox>
+          <EditOutlined />
+        </div>
         {project?.projectType === ProjectType.TODO && <div style={{marginBottom: '5px'}}>
           <Checkbox
               style={{marginTop: '-0.5em'}}

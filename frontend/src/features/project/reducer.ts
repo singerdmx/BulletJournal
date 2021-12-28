@@ -52,6 +52,7 @@ export type UpdateProjectSettingAction = {
   projectId: number;
   autoDelete: boolean;
   color: string | undefined;
+  allowEditContents: boolean;
 };
 
 export type DeleteProjectAction = {
