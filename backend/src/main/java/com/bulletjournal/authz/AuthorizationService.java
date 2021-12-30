@@ -119,16 +119,16 @@ public class AuthorizationService {
      */
     public boolean isContentDeletable(String owner, String requester,
                                       String projectOwner, String projectItemOwner, ProjectItemModel projectItem) {
-        if (!Objects.equals(owner, requester)
-            && !Objects.equals(projectOwner, requester)
-            && !Objects.equals(projectItemOwner, requester)) {
+        if (Objects.equals(owner, requester)
+            || Objects.equals(projectOwner, requester)
+            || Objects.equals(projectItemOwner, requester)) {
 
-            ProjectSetting projectSetting = this.projectSettingDaoJpa.getProjectSetting(projectItem.getProject().getId());
-            // projectSetting.isAllowEditContents() is true and user needs to be in project's group
-            return projectSetting.isAllowEditContents() && !notInGroup(requester, projectItem.getProject().getGroup(), true);
+            return true;
         }
 
-        return true;
+        ProjectSetting projectSetting = this.projectSettingDaoJpa.getProjectSetting(projectItem.getProject().getId());
+        // projectSetting.isAllowEditContents() is true and user needs to be in project's group
+        return projectSetting.isAllowEditContents() && !notInGroup(requester, projectItem.getProject().getGroup(), true);
     }
 
     /**
@@ -145,16 +145,16 @@ public class AuthorizationService {
     public boolean isProjectItemDeletable(String owner, String requester, String projectOwner,
                                           Long contentId, Project project) {
 
-        if (!Objects.equals(owner, requester) && !Objects.equals(projectOwner, requester)) {
-            LOGGER.info("Project Item " + contentId + " is owner by " +
-                owner + " and Project is owned by " + projectOwner + " while request is from " + requester);
-
-            ProjectSetting projectSetting = this.projectSettingDaoJpa.getProjectSetting(project.getId());
-            // projectSetting.isAllowEditProjItems() is true and user needs to be in project's group
-            return projectSetting.isAllowEditProjItems() && !notInGroup(requester, project.getGroup(), true);
+        if (Objects.equals(owner, requester) || Objects.equals(projectOwner, requester)) {
+            return true;
         }
 
-        return true;
+        LOGGER.info("Project Item " + contentId + " is owner by " +
+            owner + " and Project is owned by " + projectOwner + " while request is from " + requester);
+
+        ProjectSetting projectSetting = this.projectSettingDaoJpa.getProjectSetting(project.getId());
+        // projectSetting.isAllowEditProjItems() is true and user needs to be in project's group
+        return projectSetting.isAllowEditProjItems() && !notInGroup(requester, project.getGroup(), true);
     }
 
     private void checkAuthorizedToOperateOnBankAccount(
