@@ -8,13 +8,17 @@ public class ProjectSetting {
     // Allow everyone in this BuJo to edit contents
     private boolean allowEditContents;
 
+    // Allow everyone in this BuJo to edit project items;
+    private boolean allowEditProjItems;
+
     public ProjectSetting() {
     }
 
-    public ProjectSetting(String color, boolean autoDelete, boolean allowEditContents) {
+    public ProjectSetting(String color, boolean autoDelete, boolean allowEditContents, boolean allowEditProjItems) {
         this.color = color;
         this.autoDelete = autoDelete;
         this.allowEditContents = allowEditContents;
+        this.allowEditProjItems = allowEditProjItems;
     }
 
     public boolean isAllowEditContents() {
@@ -23,6 +27,14 @@ public class ProjectSetting {
 
     public void setAllowEditContents(boolean allowEditContents) {
         this.allowEditContents = allowEditContents;
+    }
+
+    public boolean isAllowEditProjItems() {
+        return allowEditProjItems;
+    }
+
+    public void setAllowEditProjItems(boolean allowEditProjItems) {
+        this.allowEditProjItems = allowEditProjItems;
     }
 
     public String getColor() {

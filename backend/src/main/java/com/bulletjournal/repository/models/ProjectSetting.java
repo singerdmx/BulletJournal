@@ -23,6 +23,9 @@ public class ProjectSetting {
     @Column(name = "allow_edit_contents")
     private boolean allowEditContents;
 
+    @Column(name = "allow_edit_proj_items")
+    private boolean allowEditProjItems;
+
     public ProjectSetting() {
     }
 
@@ -74,7 +77,16 @@ public class ProjectSetting {
         this.allowEditContents = allowEditContents;
     }
 
+    public boolean isAllowEditProjItems() {
+        return allowEditProjItems;
+    }
+
+    public void setAllowEditProjItems(boolean allowEditProjItems) {
+        this.allowEditProjItems = allowEditProjItems;
+    }
+
     public com.bulletjournal.controller.models.ProjectSetting toPresentationModel() {
-        return new com.bulletjournal.controller.models.ProjectSetting(this.color, this.autoDelete, this.allowEditContents);
+    return new com.bulletjournal.controller.models.ProjectSetting(
+        this.color, this.autoDelete, this.allowEditContents, this.allowEditProjItems);
     }
 }
