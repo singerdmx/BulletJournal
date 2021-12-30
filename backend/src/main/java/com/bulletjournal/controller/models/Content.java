@@ -36,9 +36,9 @@ public class Content implements Editable, Deletable {
     @NotNull
     private Long updatedAt;
 
-    private boolean editable;
+    private boolean editable = true;
 
-    private boolean deletable;
+    private boolean deletable = true;
 
     private Revision[] revisions;
 

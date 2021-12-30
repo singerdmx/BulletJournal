@@ -40,9 +40,9 @@ public abstract class ProjectItem implements Editable, Deletable {
 
     protected boolean shared = false;
 
-    private boolean editable;
+    private boolean editable = true;
 
-    private boolean deletable;
+    private boolean deletable = true;
 
     public ProjectItem() {
     }
