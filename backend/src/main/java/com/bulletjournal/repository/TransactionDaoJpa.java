@@ -271,7 +271,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         Transaction transaction = this.getProjectItem(transactionId, requester);
 
         this.authorizationService.checkAuthorizedToOperateOnContent(transaction.getOwner(), requester,
-                ContentType.TRANSACTION, Operation.UPDATE, transactionId, transaction.getProject().getOwner());
+                ContentType.TRANSACTION, Operation.UPDATE, transactionId, transaction.getProject());
 
         com.bulletjournal.controller.models.Transaction transAsPresentationModel = transaction.toPresentationModel();
         transAsPresentationModel.setLabels(labelDaoJpa.getLabels(transaction.getLabels()));
@@ -392,7 +392,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         Long projectId = project.getId();
 
         this.authorizationService.checkAuthorizedToOperateOnContent(transaction.getOwner(), requester,
-                ContentType.TRANSACTION, Operation.DELETE, projectId, project.getOwner());
+                ContentType.TRANSACTION, Operation.DELETE, projectId, project);
 
         if (transaction.hasBankAccount()) {
             this.bankAccountBalanceRepository.deleteById(transaction.getBankAccount().getId());
@@ -443,7 +443,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
             throw new BadRequestException("Cannot move to Project Type " + project.getType());
         }
         this.authorizationService.checkAuthorizedToOperateOnContent(projectItem.getOwner(), requester,
-                ContentType.TRANSACTION, Operation.UPDATE, targetProject, project.getOwner());
+                ContentType.TRANSACTION, Operation.UPDATE, targetProject, project);
         projectItem.setProject(project);
         this.getJpaRepository().save(projectItem);
         return Pair.of(projectItem, project);
@@ -519,7 +519,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     public void setColor(String requester, Long transactionId, String color) {
         Transaction transaction = this.getProjectItem(transactionId, requester);
         this.authorizationService.checkAuthorizedToOperateOnContent(transaction.getOwner(), requester,
-                ContentType.TRANSACTION, Operation.UPDATE, transactionId, transaction.getProject().getOwner());
+                ContentType.TRANSACTION, Operation.UPDATE, transactionId, transaction.getProject());
         transaction.setColor(color);
         this.transactionRepository.save(transaction);
     }

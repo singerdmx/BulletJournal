@@ -129,6 +129,27 @@ public class AuthorizationService {
         return !notInGroup(requester, projectItem.getProject().getGroup(), true);
     }
 
+    /**
+     * @param owner Project Item Owner
+     */
+    public boolean isProjectItemEditable(String owner, String requester, String projectOwner,
+                                         Long contentId, Project project) {
+       return isProjectItemDeletable(owner, requester, projectOwner, contentId, project);
+    }
+
+    /**
+     * @param owner Project Item Owner
+     */
+    public boolean isProjectItemDeletable(String owner, String requester, String projectOwner,
+                                          Long contentId, Project project) {
+        if (!Objects.equals(owner, requester) && !Objects.equals(projectOwner, requester)) {
+            LOGGER.info("Project Item " + contentId + " is owner by " +
+                    owner + " and Project is owned by " + projectOwner + " while request is from " + requester);
+            // TODO: check project setting to see if we should fail here
+        }
+        return !notInGroup(requester, project.getGroup(), true);
+    }
+
     private void checkAuthorizedToOperateOnBankAccount(
             String owner, String requester, Operation operation, Long contentId) {
         switch (operation) {
@@ -188,13 +209,21 @@ public class AuthorizationService {
 
     private void checkAuthorizedToOperateOnProjectItem(
             String owner, String requester, Operation operation, Long contentId, Object... other) {
-        String projectOwner = (String) other[0];
+        Project project = (Project) other[0];
+        String projectOwner = project.getOwner();
+        String errorMsg = "Project Item " + contentId + " is owner by " +
+                owner + " and Project is owned by " + projectOwner +
+                " and Project Item is owned by " + owner +
+                " while request is from " + requester;
         switch (operation) {
             case DELETE:
+                if (!isProjectItemDeletable(owner, requester, projectOwner, contentId, project)) {
+                    throw new UnAuthorizedException(errorMsg);
+                }
+                break;
             case UPDATE:
-                if (!Objects.equals(owner, requester) && !Objects.equals(projectOwner, requester)) {
-                    LOGGER.info("Project Item " + contentId + " is owner by " +
-                            owner + " and Project is owned by " + projectOwner + " while request is from " + requester);
+                if (!isProjectItemEditable(owner, requester, projectOwner, contentId, project)) {
+                    throw new UnAuthorizedException(errorMsg);
                 }
                 break;
         }
@@ -205,21 +234,19 @@ public class AuthorizationService {
         String projectItemOwner = (String) other[0];
         String projectOwner = (String) other[1];
         ProjectItemModel projectItem = (ProjectItemModel) other[2];
-
+        String errorMsg = "Project Item " + contentId + " is owner by " +
+                owner + " and Project is owned by " + projectOwner +
+                " and Project Item is owned by " + projectItemOwner +
+                " while request is from " + requester;
         switch (operation) {
             case UPDATE:
                 if (!isContentEditable(owner, requester, projectOwner, projectItemOwner, projectItem)) {
-                    throw new UnAuthorizedException("Project Item " + contentId + " is owner by " +
-                            owner + " and Project is owned by " + projectOwner +
-                            " and Project Item is owned by " + projectItemOwner +
-                            " while request is from " + requester);
+                    throw new UnAuthorizedException(errorMsg);
                 }
+                break;
             case DELETE:
                 if (!isContentDeletable(owner, requester, projectOwner, projectItemOwner, projectItem)) {
-                    throw new UnAuthorizedException("Project Item " + contentId + " is owner by " +
-                            owner + " and Project is owned by " + projectOwner +
-                            " and Project Item is owned by " + projectItemOwner +
-                            " while request is from " + requester);
+                    throw new UnAuthorizedException(errorMsg);
                 }
                 break;
         }

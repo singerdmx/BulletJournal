@@ -683,7 +683,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         String taskBeforeUpdate = GSON.toJson(taskAsPresentationModel);
 
         this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(), requester, ContentType.TASK,
-                Operation.UPDATE, taskId, task.getProject().getOwner());
+                Operation.UPDATE, taskId, task.getProject());
 
         DaoHelper.updateIfPresent(updateTaskParams.hasName(), updateTaskParams.getName(), task::setName);
 
@@ -853,7 +853,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         Task task = this.getProjectItem(taskId, requester);
 
         this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(), requester, ContentType.TASK,
-                Operation.UPDATE, task.getProject().getId(), task.getProject().getOwner());
+                Operation.UPDATE, task.getProject().getId(), task.getProject());
 
         // clone its contents
         String contents = GSON_ALLOW_EXPOSE_ONLY
@@ -949,7 +949,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 .orElseThrow(() -> new ResourceNotFoundException("Task " + taskId + " not found"));
         Project project = task.getProject();
         this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(), requester, ContentType.TASK,
-                Operation.DELETE, project.getId(), task.getProject().getOwner());
+                Operation.DELETE, project.getId(), task.getProject());
         this.completedTaskRepository.delete(task);
         return generateEvents(task, requester, project);
     }
@@ -1034,7 +1034,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         Project project = task.getProject();
         this.authorizationService.validateRequesterInProjectGroup(requester, project);
         this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(), requester, ContentType.TASK,
-                Operation.UPDATE, project.getId(), task.getProject().getOwner());
+                Operation.UPDATE, project.getId(), task.getProject());
         List<TaskContent> contents = getCompletedTaskContents(taskId, requester);
         this.completedTaskRepository.delete(task);
         Long newId = create(project.getId(), task.getOwner(), getCreateTaskParams(task)).getId();
@@ -1077,7 +1077,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         }
 
         this.authorizationService.checkAuthorizedToOperateOnContent(task.getOwner(), requester, ContentType.TASK,
-                Operation.UPDATE, project.getId(), project.getOwner());
+                Operation.UPDATE, project.getId(), project);
 
         task.setProject(project);
         this.taskRepository.save(task);
