@@ -23,7 +23,7 @@ public class ProjectSettingDaoJpa {
         ProjectSetting projectSetting = this.projectSettingRepository.findById(projectId)
                 .orElse(null);
         if (projectSetting == null) {
-            return new com.bulletjournal.controller.models.ProjectSetting(null, false, true);
+            return new com.bulletjournal.controller.models.ProjectSetting(null, false, true, true);
         }
         return projectSetting.toPresentationModel();
     }
