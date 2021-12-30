@@ -86,30 +86,30 @@ const ManageTransaction: React.FC<TransactionManageProps> = (props) => {
   if (inModal === true) {
     return (
         <div style={{display: 'flex', flexDirection: 'column'}}>
-            {getPopConfirmForDelete(transaction)}
+            {transaction.deletable && getPopConfirmForDelete(transaction)}
         </div>
     );
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <EditTransaction
-          transaction={transaction}
-          mode='div'
-          onUpdateSuccess={onUpdateSuccess}
-      />
-      <MoveProjectItem
-        type={ProjectType.LEDGER}
-        projectItemId={transaction.id}
-        mode='div'
-      />
-      <ShareProjectItem
-        type={ProjectType.LEDGER}
-        projectItemId={transaction.id}
-        mode="div"
-      />
-      {getPopConfirmForDelete(transaction)}
-    </div>
+      <div style={{display: 'flex', flexDirection: 'column'}}>
+          {transaction.editable && <EditTransaction
+              transaction={transaction}
+              mode='div'
+              onUpdateSuccess={onUpdateSuccess}
+          />}
+          {transaction.editable && <MoveProjectItem
+              type={ProjectType.LEDGER}
+              projectItemId={transaction.id}
+              mode='div'
+          />}
+          <ShareProjectItem
+              type={ProjectType.LEDGER}
+              projectItemId={transaction.id}
+              mode="div"
+          />
+          {transaction.deletable && getPopConfirmForDelete(transaction)}
+      </div>
   );
 };
 

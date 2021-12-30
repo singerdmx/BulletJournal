@@ -253,14 +253,15 @@ function* putProjectSetting(
   action: PayloadAction<UpdateProjectSettingAction>
 ) {
   try {
-    const { projectId, autoDelete, color, allowEditContents } = action.payload;
+    const { projectId, autoDelete, color, allowEditContents, allowEditProjItems } = action.payload;
     
     const data : Project = yield call(
       updateProjectSetting,
       projectId,
       autoDelete,
       color,
-      allowEditContents
+      allowEditContents,
+      allowEditProjItems
     );
 
     yield put(projectActions.projectReceived({project: data}));

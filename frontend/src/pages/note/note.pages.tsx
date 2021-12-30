@@ -135,7 +135,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
             >
                 <UpSquareOutlined/>
             </FloatButton>
-            <NoteColorSettingDialog />
+            {note.editable && <NoteColorSettingDialog />}
             <FloatButton
                 tooltip="Refresh Contents"
                 onClick={handleRefresh}
@@ -194,22 +194,22 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
                     projectType={ProjectType.NOTE}
                     editable={content && content.editable}
                 />
-                <LabelManagement
+                {note.editable && <LabelManagement
                     labelEditableHandler={labelEditableHandler}
                     labelEditable={labelEditable}
-                />
-                <MoveProjectItem
+                />}
+                {note.editable && <MoveProjectItem
                     type={ProjectType.NOTE}
                     projectItemId={note.id}
                     mode="icon"
-                />
+                />}
                 <ShareProjectItem
                     type={ProjectType.NOTE}
                     projectItemId={note.id}
                     mode="icon"
                 />
-                <EditNote note={note} mode="icon"/>
-                <Tooltip title="Delete">
+                {note.editable && <EditNote note={note} mode="icon"/>}
+                {note.deletable && <Tooltip title="Delete">
                     <Popconfirm
                         title="Are you sure?"
                         okText="Yes"
@@ -225,7 +225,7 @@ const NotePage: React.FC<NotePageHandler & NoteProps> = (props) => {
                             <DeleteTwoTone twoToneColor="#f5222d"/>
                         </div>
                     </Popconfirm>
-                </Tooltip>
+                </Tooltip>}
             </div>
         );
     };

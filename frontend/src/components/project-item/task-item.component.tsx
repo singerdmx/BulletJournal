@@ -88,14 +88,14 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
   if (isComplete) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <div
+        {task.editable && <div
           onClick={() => uncompleteTask(task.id)}
           className="popover-control-item"
         >
           <span>Uncomplete</span>
           <CloseCircleOutlined twoToneColor="#52c41a" />
-        </div>
-        <Popconfirm
+        </div>}
+        {task.deletable && <Popconfirm
           title="Are you sure?"
           okText="Yes"
           cancelText="No"
@@ -107,7 +107,7 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
             <span>Delete</span>
             <DeleteTwoTone twoToneColor="#f5222d" />
           </div>
-        </Popconfirm>
+        </Popconfirm>}
       </div>
     );
   }
@@ -149,8 +149,8 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
   if (inModal === true) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        {getCompleteButton()}
-        <Popconfirm
+        {task.editable && getCompleteButton()}
+        {task.editable && <Popconfirm
           title="Are you sure?"
           okText="Yes"
           cancelText="No"
@@ -162,26 +162,26 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
             <span>Delete</span>
             <DeleteTwoTone twoToneColor="#f5222d" />
           </div>
-        </Popconfirm>
+        </Popconfirm>}
       </div>
     );
   }
 
   return (
     <div style={{display: 'flex', flexDirection: 'column'}}>
-      <EditTask task={task} mode="div" type={type}/>
-      <MoveProjectItem
+      {task.editable && <EditTask task={task} mode="div" type={type}/>}
+      {task.editable && <MoveProjectItem
           type={ProjectType.TODO}
           projectItemId={task.id}
           mode="div"
-      />
+      />}
       <ShareProjectItem
           type={ProjectType.TODO}
           projectItemId={task.id}
           mode="div"
       />
-      {getCompleteButton()}
-      <Popconfirm
+      {task.editable && getCompleteButton()}
+      {task.deletable && <Popconfirm
           title="Are you sure?"
           okText="Yes"
           cancelText="No"
@@ -193,7 +193,7 @@ const ManageTask: React.FC<ManageTaskProps> = (props) => {
           <span>Delete</span>
           <DeleteTwoTone twoToneColor="#f5222d"/>
         </div>
-      </Popconfirm>
+      </Popconfirm>}
     </div>
   );
 };

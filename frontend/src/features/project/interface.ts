@@ -5,6 +5,7 @@ export interface ProjectSetting {
   color: string | undefined;
   autoDelete: boolean;
   allowEditContents: boolean;
+  allowEditProjItems: boolean;
 }
 
 export interface Project {

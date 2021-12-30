@@ -99,11 +99,12 @@ export const GetProjectHistory = (
 };
 
 export const updateProjectSetting = (projectId: number, autoDelete: boolean,
-                                     color: string | undefined, allowEditContents: boolean) => {
+                                     color: string | undefined, allowEditContents: boolean, allowEditProjItems: boolean) => {
   const putBody = JSON.stringify({
     autoDelete: autoDelete,
     color: color,
     allowEditContents: allowEditContents,
+    allowEditProjItems: allowEditProjItems
   });
   return doPut(`/api/projects/${projectId}/settings`, putBody)
     .then((res) => res.json())

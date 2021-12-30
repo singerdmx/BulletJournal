@@ -4,10 +4,17 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {useHistory} from 'react-router-dom';
 // antd imports
-import {CopyOutlined, DeleteTwoTone, FileTextOutlined, FormOutlined, MoreOutlined, BgColorsOutlined} from '@ant-design/icons';
+import {
+    BgColorsOutlined,
+    CopyOutlined,
+    DeleteTwoTone,
+    FileTextOutlined,
+    FormOutlined,
+    MoreOutlined
+} from '@ant-design/icons';
 import {Avatar, message, Popconfirm, Popover, Tag, Tooltip} from 'antd';
 // features import
-import {deleteNote} from '../../features/notes/actions';
+import {deleteNote, updateColorSettingShown} from '../../features/notes/actions';
 import {Note} from '../../features/notes/interface';
 import {Label} from '../../features/label/interface';
 import {setSelectedLabel} from '../../features/label/actions';
@@ -27,7 +34,6 @@ import {theme as ContextMenuTheme} from "react-contexify/lib/utils/styles";
 import CopyToClipboard from "react-copy-to-clipboard";
 import 'react-contexify/dist/ReactContexify.min.css';
 import {IState} from "../../store";
-import {updateColorSettingShown} from '../../features/notes/actions';
 import {stringToRGB} from "../../utils/Util";
 
 type ProjectProps = {
@@ -58,7 +64,7 @@ const ManageNote: React.FC<NoteManageProps> = (props) => {
   if (inModal === true) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <Popconfirm
+        {note.editable && <Popconfirm
           title="Are you sure?"
           okText="Yes"
           cancelText="No"
@@ -70,38 +76,38 @@ const ManageNote: React.FC<NoteManageProps> = (props) => {
             <span>Delete</span>
             <DeleteTwoTone twoToneColor="#f5222d" />
           </div>
-        </Popconfirm>
+        </Popconfirm>}
       </div>
     );
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <EditNote note={note} mode="div" />
-      <MoveProjectItem
-        type={ProjectType.NOTE}
-        projectItemId={note.id}
-        mode="div"
-      />
-      <ShareProjectItem
-        type={ProjectType.NOTE}
-        projectItemId={note.id}
-        mode="div"
-      />
-      <Popconfirm
-        title="Are you sure?"
-        okText="Yes"
-        cancelText="No"
-        onConfirm={() => deleteNote(note.id, type)}
-        className="group-setting"
-        placement="bottom"
-      >
-        <div className="popover-control-item">
-          <span>Delete</span>
-          <DeleteTwoTone twoToneColor="#f5222d" />
-        </div>
-      </Popconfirm>
-    </div>
+      <div style={{display: 'flex', flexDirection: 'column'}}>
+          {note.editable && <EditNote note={note} mode="div"/>}
+          {note.editable && <MoveProjectItem
+              type={ProjectType.NOTE}
+              projectItemId={note.id}
+              mode="div"
+          />}
+          <ShareProjectItem
+              type={ProjectType.NOTE}
+              projectItemId={note.id}
+              mode="div"
+          />
+          {note.deletable && <Popconfirm
+              title="Are you sure?"
+              okText="Yes"
+              cancelText="No"
+              onConfirm={() => deleteNote(note.id, type)}
+              className="group-setting"
+              placement="bottom"
+          >
+              <div className="popover-control-item">
+                  <span>Delete</span>
+                  <DeleteTwoTone twoToneColor="#f5222d"/>
+              </div>
+          </Popconfirm>}
+      </div>
   );
 };
 
@@ -254,10 +260,10 @@ const NoteItem: React.FC<ProjectProps & NoteProps & NoteManageProps> = (
                         <span>Copy Link Address</span>
                     </Item>
                 </CopyToClipboard>
-                <Item onClick={() => handleClickChangeBgColor(note.id)}>
+                {note.editable && <Item onClick={() => handleClickChangeBgColor(note.id)}>
                     <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><BgColorsOutlined/></IconFont>
                     <span>Set Background Color</span>
-                </Item>
+                </Item>}
             </Menu>
         </>
     }

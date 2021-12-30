@@ -45,13 +45,15 @@ export const updateProjectSetting = (
   projectId: number,
   autoDelete: boolean,
   color: string | undefined,
-  allowEditContents: boolean
+  allowEditContents: boolean,
+  allowEditProjItems: boolean
 ) =>
   actions.updateProjectSetting({ 
     projectId: projectId,
     autoDelete: autoDelete,
     color: color,
-    allowEditContents: allowEditContents
+    allowEditContents: allowEditContents,
+    allowEditProjItems: allowEditProjItems
   });
 export const getProjectHistory = (
   projectId: number,

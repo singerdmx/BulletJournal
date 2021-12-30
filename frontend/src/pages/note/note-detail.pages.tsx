@@ -157,19 +157,19 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
                   <span>Copy Link Address</span>
                 </Item>
               </CopyToClipboard>
-              <Item onClick={() => updateColorSettingShown(true)}>
+              {note.editable && <Item onClick={() => updateColorSettingShown(true)}>
                   <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><BgColorsOutlined/></IconFont>
                   <span>Set Background Color</span>
-              </Item>
+              </Item>}
             </Menu>
           </>
-          <DraggableLabelsList
+          {note.editable && <DraggableLabelsList
             mode={ProjectType.NOTE}
             labels={note.labels}
             editable={labelEditable}
             itemId={note.id}
             itemShared={note.shared}
-          />
+          />}
         </div>
 
         {noteOperation()}

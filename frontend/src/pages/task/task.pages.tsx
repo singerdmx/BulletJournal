@@ -296,22 +296,22 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
             projectType={ProjectType.TODO}
             editable={content && content.editable}
         />
-        <LabelManagement
+        {task.editable && <LabelManagement
           labelEditableHandler={labelEditableHandler}
           labelEditable={labelEditable}
-        />
-        <MoveProjectItem
+        />}
+        {task.editable && <MoveProjectItem
           type={ProjectType.TODO}
           projectItemId={task.id}
           mode="icon"
-        />
+        />}
         <ShareProjectItem
           type={ProjectType.TODO}
           projectItemId={task.id}
           mode="icon"
         />
-        <EditTask task={task} mode="icon" type={ProjectItemUIType.PAGE}/>
-        <Tooltip title="Delete">
+        {task.editable && <EditTask task={task} mode="icon" type={ProjectItemUIType.PAGE}/>}
+        {task.deletable && <Tooltip title="Delete">
           <Popconfirm
             title="Are you sure?"
             okText="Yes"
@@ -327,8 +327,8 @@ const TaskPage: React.FC<TaskPageHandler & TaskProps> = (props) => {
               <DeleteTwoTone twoToneColor="#f5222d" />
             </div>
           </Popconfirm>
-        </Tooltip>
-        {getCompleteButton()}
+        </Tooltip>}
+        {task.editable && getCompleteButton()}
       </div>
     );
   };

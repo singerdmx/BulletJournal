@@ -243,7 +243,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
       >
         <UpSquareOutlined/>
       </FloatButton>
-      <TransactionColorSettingDialog />
+      {transaction.editable && <TransactionColorSettingDialog />}
       <FloatButton
           tooltip="Refresh Contents"
           onClick={handleRefresh}
@@ -388,19 +388,19 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
                   <span>Copy Link Address</span>
                 </Item>
               </CopyToClipboard>
-              <Item onClick={() => updateTransactionColorSettingShown(true)}>
+              {transaction.editable && <Item onClick={() => updateTransactionColorSettingShown(true)}>
                   <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><BgColorsOutlined/></IconFont>
                   <span>Set Background Color</span>
-              </Item>
+              </Item>}
             </Menu>
           </>
-          <DraggableLabelsList
+          {transaction.editable && <DraggableLabelsList
             mode={ProjectType.LEDGER}
             labels={transaction.labels}
             editable={labelEditable}
             itemId={transaction.id}
             itemShared={transaction.shared}
-          />
+          />}
         </div>
         <div className="transaction-operation">
           <Tooltip title={`Created by ${transaction.owner.alias}`}>
@@ -412,22 +412,22 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
               projectItemId={transaction.id}
               projectType={ProjectType.LEDGER}
           />
-          <LabelManagement
+          {transaction.editable && <LabelManagement
             labelEditableHandler={labelEditableHandler}
             labelEditable={labelEditable}
-          />
-          <MoveProjectItem
+          />}
+          {transaction.editable && <MoveProjectItem
             type={ProjectType.LEDGER}
             projectItemId={transaction.id}
             mode="icon"
-          />
+          />}
           <ShareProjectItem
               type={ProjectType.LEDGER}
               projectItemId={transaction.id}
               mode="icon"
           />
-          <EditTransaction transaction={transaction} mode="icon" />
-          <Tooltip title="Delete">
+          {transaction.editable && <EditTransaction transaction={transaction} mode="icon" />}
+          {transaction.deletable && <Tooltip title="Delete">
             <Popconfirm
               title="Are you sure?"
               okText="Yes"
@@ -443,8 +443,8 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
                 <DeleteTwoTone twoToneColor="#f5222d" />
               </div>
             </Popconfirm>
-          </Tooltip>
-          {myself === transaction.payer.name && <BankList/>}
+          </Tooltip>}
+          {myself === transaction.payer.name && transaction.editable && <BankList/>}
         </div>
       </div>
       {bankAccount && <BankAccountElem bankAccount={bankAccount} mode='banner'/>}

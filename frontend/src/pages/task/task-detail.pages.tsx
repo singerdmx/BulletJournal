@@ -135,7 +135,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
   };
 
   const getTaskStatusDropdown = (task: Task) => {
-    if (createContentElem === null) {
+    if (createContentElem === null || !task.editable) {
       return null;
     }
     if (inputStatus) {
@@ -264,7 +264,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
             </>
             {taskOperation()}
         </div>
-        <div className="title-labels">
+        {task.editable && <div className="title-labels">
             <DraggableLabelsList
                 mode={ProjectType.TODO}
                 labels={task.labels}
@@ -272,7 +272,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
                 itemId={task.id}
                 itemShared={task.shared}
             />
-        </div>
+        </div>}
         <Divider style={{marginTop: '5px', marginBottom: '0px'}}/>
         {getTaskStatisticsDiv(task)}
         <Divider style={{marginTop: '0px'}}/>

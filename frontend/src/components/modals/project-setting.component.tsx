@@ -15,12 +15,13 @@ import {
   SettingOutlined
 } from '@ant-design/icons';
 import {setProjectOwner, updateProjectSetting, updateSettingShown} from '../../features/project/actions';
-import {ProjectType} from "../../features/project/constants";
+import {ProjectType, toContentType} from "../../features/project/constants";
 import {Button as FloatButton, darkColors, lightColors} from "react-floating-action-button";
 import {getGroupByProject} from '../../pages/projects/projects.pages';
 import {GroupsWithOwner} from '../../features/group/interface';
 import {useHistory} from 'react-router-dom';
 import {swatchesPickerColors} from "../../utils/Util";
+import {iconMapper} from "../side-menu/side-menu.component";
 
 type ProjectSettingProps = {
   project: Project | undefined;
@@ -30,7 +31,8 @@ type ProjectSettingProps = {
       projectId: number,
       autoDelete: boolean,
       color: string | undefined,
-      allowEditContents: boolean
+      allowEditContents: boolean,
+      allowEditProjItems: boolean
   ) => void;
   updateSettingShown: (
       visible: boolean
@@ -91,7 +93,8 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
   const onCheckColorIcon = (e: any) => {
     setDisplayColorPicker(!displayColorPicker);
     if (!e.target.checked && project) {
-      updateProjectSetting(project.id, projectSetting.autoDelete, undefined, projectSetting.allowEditContents);
+      updateProjectSetting(project.id, projectSetting.autoDelete, undefined,
+          projectSetting.allowEditContents, projectSetting.allowEditProjItems);
       setBgColor({
         r: '0',
         g: '0',
@@ -103,20 +106,30 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
 
   const handleColorChange = (c: any, event: any) => {
     if (project) {
-      updateProjectSetting(project.id, projectSetting.autoDelete, JSON.stringify(c.rgb), projectSetting.allowEditContents);
+      updateProjectSetting(project.id, projectSetting.autoDelete, JSON.stringify(c.rgb),
+          projectSetting.allowEditContents, projectSetting.allowEditProjItems);
     }
     setBgColor(c.rgb);
   };
 
   const handleAutoDeleteChange = (e: any) => {
     if (project) {
-      updateProjectSetting(project.id, e.target.checked, projectSetting.color, projectSetting.allowEditContents);
+      updateProjectSetting(project.id, e.target.checked, projectSetting.color,
+          projectSetting.allowEditContents, projectSetting.allowEditProjItems);
     }
   };
 
   const handleEditContentChange = (e: any) => {
     if (project) {
-      updateProjectSetting(project.id, projectSetting.autoDelete, projectSetting.color, e.target.checked);
+      updateProjectSetting(project.id, projectSetting.autoDelete, projectSetting.color,
+          e.target.checked, projectSetting.allowEditProjItems);
+    }
+  };
+
+  const handleEditProjectItemChange = (e: any) => {
+    if (project) {
+      updateProjectSetting(project.id, projectSetting.autoDelete, projectSetting.color,
+          projectSetting.allowEditContents, e.target.checked);
     }
   };
 
@@ -150,6 +163,23 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
     } else {
       setCurrentOwner(project.owner.name);
     }
+  }
+
+  function allowEditProjectItemSetting() {
+    if (!project) {
+      return <div/>;
+    }
+
+    return <div style={{marginBottom: '5px'}}>
+      <Checkbox
+          style={{marginTop: '-0.5em'}}
+          onChange={handleEditProjectItemChange}
+          checked={projectSetting.allowEditProjItems}
+      >
+        Allow everyone in this BuJo to edit {toContentType(project.projectType).toLowerCase()}s
+      </Checkbox>
+      {iconMapper[project.projectType]}
+    </div>;
   }
 
   const getModal = () => (
@@ -217,6 +247,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
             />
           </Tooltip>
         </div>}
+        {allowEditProjectItemSetting()}
         <div style={{marginBottom: '5px'}}>
           <Checkbox
               style={{marginTop: '-0.5em'}}
@@ -225,7 +256,7 @@ const ProjectSettingDialog: React.FC<ProjectSettingProps & GroupProps> = (props)
           >
             Allow everyone in this BuJo to edit contents
           </Checkbox>
-          <EditOutlined />
+          <EditOutlined/>
         </div>
         {project?.projectType === ProjectType.TODO && <div style={{marginBottom: '5px'}}>
           <Checkbox
