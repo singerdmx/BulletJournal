@@ -62,10 +62,10 @@ const getTree = (
                             <span>Copy Link Address</span>
                         </Item>
                     </CopyToClipboard>
-                    <Item onClick={(e) => handleClickChangeSetting(item.id)}>
+                    {!item.shared && <Item onClick={(e) => handleClickChangeSetting(item.id)}>
                         <IconFont style={{fontSize: '14px', paddingRight: '6px'}}><SettingOutlined/></IconFont>
                         <span>Change Settings</span>
-                    </Item>
+                    </Item>}
                 </Menu>
             </>
         );
