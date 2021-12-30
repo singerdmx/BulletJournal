@@ -30,7 +30,8 @@ public class ProjectSettingDaoJpa {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public ProjectSetting setProjectSetting(
-            String requester, Project project, String color, boolean autoDelete, boolean allowEditContents) {
+            String requester, Project project, String color, boolean autoDelete,
+            boolean allowEditContents, boolean allowEditProjItems) {
         this.authorizationService.checkAuthorizedToOperateOnContent(
                 project.getOwner(), requester, ContentType.PROJECT, Operation.UPDATE, project.getId());
         ProjectSetting setting = this.projectSettingRepository.findById(project.getId())
@@ -40,6 +41,7 @@ public class ProjectSettingDaoJpa {
         setting.setAutoDelete(autoDelete);
         setting.setColor(color);
         setting.setAllowEditContents(allowEditContents);
+        setting.setAllowEditProjItems(allowEditProjItems);
         this.projectSettingRepository.save(setting);
         return setting;
     }

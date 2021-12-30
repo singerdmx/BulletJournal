@@ -106,9 +106,10 @@ public class ProjectController {
         String projectColor = setting.getColor();
         boolean autoDelete = setting.isAutoDelete();
         boolean allowEditContents = setting.isAllowEditContents();
+        boolean allowEditProjItems = setting.isAllowEditProjItems();
         String username = MDC.get(UserClient.USER_NAME_KEY);
         this.projectSettingDaoJpa.setProjectSetting(username,
-                this.projectDaoJpa.getProject(projectId, username), projectColor, autoDelete, allowEditContents);
+                this.projectDaoJpa.getProject(projectId, username), projectColor, autoDelete, allowEditContents, allowEditProjItems);
         return getProject(projectId);
     }
 
