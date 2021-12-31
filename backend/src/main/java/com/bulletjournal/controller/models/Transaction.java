@@ -63,8 +63,10 @@ public class Transaction extends ProjectItem {
                        String location,
                        String color,
                        String recurrenceRule,
-                       BankAccount bankAccount) {
-        super(id, name, owner, project, labels, location);
+                       BankAccount bankAccount,
+                       boolean editable,
+                       boolean deletable) {
+        super(id, name, owner, project, labels, location, editable, deletable);
         this.payer = payer;
         this.amount = amount;
         this.date = date;

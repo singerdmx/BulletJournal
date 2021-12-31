@@ -51,15 +51,17 @@ public class Task extends ProjectItem {
     public Task(Long id, @NotNull User owner, List<User> assignees, String dueDate, String dueTime,
                 @NotBlank String timezone, @NotNull String name, Integer duration, @NotNull Project project,
                 List<Label> labels, ReminderSetting reminderSetting, String recurrenceRule, Long createdAt, Long updatedAt,
-                TaskStatus status, Long reminderDateTime) {
-        this(id, owner, assignees, dueDate, dueTime, timezone, name, duration, project, labels, reminderSetting, recurrenceRule, createdAt, updatedAt, status, reminderDateTime, null);
+                TaskStatus status, Long reminderDateTime, boolean editable, boolean deletable) {
+        this(id, owner, assignees, dueDate, dueTime, timezone, name, duration, project, labels, reminderSetting,
+             recurrenceRule, createdAt, updatedAt, status, reminderDateTime, null,
+             editable, deletable);
     }
 
     public Task(Long id, @NotNull User owner, List<User> assignees, String dueDate, String dueTime,
                 @NotBlank String timezone, @NotNull String name, Integer duration, @NotNull Project project,
                 List<Label> labels, ReminderSetting reminderSetting, String recurrenceRule, Long createdAt, Long updatedAt,
-                TaskStatus status, Long reminderDateTime, String location) {
-        super(id, name, owner, project, labels, location);
+                TaskStatus status, Long reminderDateTime, String location, boolean editable, boolean deletable) {
+        super(id, name, owner, project, labels, location, editable, deletable);
         this.assignees = assignees;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
