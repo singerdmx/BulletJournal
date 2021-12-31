@@ -15,7 +15,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ProjectItemsGrouper {
-    private static AuthorizationService authorizationService;
 
     public static final Comparator<Transaction> TRANSACTION_COMPARATOR = (t1, t2) -> {
         if (!t1.hasDate() && !t2.hasDate()) {
@@ -134,7 +133,8 @@ public class ProjectItemsGrouper {
      * @projectItems Map<ZonedDateTime, List<ProjectItems>> - List of ProjectItems
      */
     public static Map<ZonedDateTime, ProjectItems> mergeTransactionsMap(Map<ZonedDateTime, ProjectItems> mergedMap,
-                                                                        @Nullable Map<ZonedDateTime, List<Transaction>> transactionsMap) {
+                                                                        @Nullable Map<ZonedDateTime, List<Transaction>> transactionsMap,
+                                                                        AuthorizationService authorizationService) {
         if (transactionsMap == null) {
             return mergedMap;
         }
@@ -160,7 +160,8 @@ public class ProjectItemsGrouper {
      * @projectItems Map<ZonedDateTime, List<ProjectItems>> - List of ProjectItems
      */
     public static Map<ZonedDateTime, ProjectItems> mergeTasksMap(Map<ZonedDateTime, ProjectItems> mergedMap,
-                                                                 @Nullable Map<ZonedDateTime, List<Task>> tasksMap) {
+                                                                 @Nullable Map<ZonedDateTime, List<Task>> tasksMap,
+                                                                 AuthorizationService authorizationService) {
         if (tasksMap == null) {
             return mergedMap;
         }
@@ -186,7 +187,8 @@ public class ProjectItemsGrouper {
      * @projectItems Map<ZonedDateTime, List<ProjectItems>> - List of ProjectItems
      */
     public static Map<ZonedDateTime, ProjectItems> mergeNotesMap(Map<ZonedDateTime, ProjectItems> mergedMap,
-                                                                 @Nullable Map<ZonedDateTime, List<Note>> notesMap) {
+                                                                 @Nullable Map<ZonedDateTime, List<Note>> notesMap,
+                                                                 AuthorizationService authorizationService) {
         if (notesMap == null) {
             return mergedMap;
         }

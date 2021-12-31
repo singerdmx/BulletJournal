@@ -111,8 +111,8 @@ public class ProjectItemController {
         }
 
         Map<ZonedDateTime, ProjectItems> projectItemsMap = new HashMap<>();
-        projectItemsMap = ProjectItemsGrouper.mergeTasksMap(projectItemsMap, taskMap);
-        projectItemsMap = ProjectItemsGrouper.mergeTransactionsMap(projectItemsMap, transactionMap);
+        projectItemsMap = ProjectItemsGrouper.mergeTasksMap(projectItemsMap, taskMap, authorizationService);
+        projectItemsMap = ProjectItemsGrouper.mergeTransactionsMap(projectItemsMap, transactionMap, authorizationService);
 
         return projectItemsMap;
     }

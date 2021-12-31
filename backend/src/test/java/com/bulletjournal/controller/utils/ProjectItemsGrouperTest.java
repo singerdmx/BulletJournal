@@ -137,8 +137,8 @@ public class ProjectItemsGrouperTest {
         taskMap.computeIfAbsent(time4, t -> new ArrayList<>()).add(task2);
 
         Map<ZonedDateTime, ProjectItems> map = new HashMap<>();
-        map = ProjectItemsGrouper.mergeTasksMap(map, taskMap);
-        map = ProjectItemsGrouper.mergeTransactionsMap(map, transactionMap);
+        map = ProjectItemsGrouper.mergeTasksMap(map, taskMap, authorizationService);
+        map = ProjectItemsGrouper.mergeTransactionsMap(map, transactionMap, authorizationService);
         assertEquals(3, map.size());
 
         ProjectItems p1 = map.get(time1);

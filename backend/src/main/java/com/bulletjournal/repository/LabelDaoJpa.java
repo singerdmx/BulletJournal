@@ -195,12 +195,12 @@ public class LabelDaoJpa {
 
         // Group project items by date
         Map<ZonedDateTime, List<Task>> tasksMap = ProjectItemsGrouper.groupTasksByDate(tasks, true, timezone);
-        projectItemsMap = ProjectItemsGrouper.mergeTasksMap(projectItemsMap, tasksMap);
+        projectItemsMap = ProjectItemsGrouper.mergeTasksMap(projectItemsMap, tasksMap, authorizationService);
         Map<ZonedDateTime, List<Transaction>> transactionsMap = ProjectItemsGrouper
                 .groupTransactionsByDate(transactions, timezone);
-        projectItemsMap = ProjectItemsGrouper.mergeTransactionsMap(projectItemsMap, transactionsMap);
+        projectItemsMap = ProjectItemsGrouper.mergeTransactionsMap(projectItemsMap, transactionsMap, authorizationService);
         Map<ZonedDateTime, List<Note>> notesMap = ProjectItemsGrouper.groupNotesByDate(notes, timezone);
-        projectItemsMap = ProjectItemsGrouper.mergeNotesMap(projectItemsMap, notesMap);
+        projectItemsMap = ProjectItemsGrouper.mergeNotesMap(projectItemsMap, notesMap, authorizationService);
         List<ProjectItems> projectItems = ProjectItemsGrouper.getSortedProjectItems(projectItemsMap);
         return getLabelsForProjectItems(projectItems);
     }
