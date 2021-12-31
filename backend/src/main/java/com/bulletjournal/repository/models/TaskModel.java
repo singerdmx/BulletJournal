@@ -312,37 +312,37 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
         }
 
         String requester = MDC.get(UserClient.USER_NAME_KEY);
-    com.bulletjournal.controller.models.Task task =
-        new com.bulletjournal.controller.models.Task(
-            this.getId(),
-            new User(this.getOwner()),
-            this.getAssignees().stream().map(a -> new User(a)).collect(Collectors.toList()),
-            this.getDueDate(),
-            this.getDueTime(),
-            this.getTimezone(),
-            this.getName(),
-            this.getDuration(),
-            this.getProject(),
-            labels,
-            reminderSetting,
-            this.getRecurrenceRule(),
-            this.getCreatedAt().getTime(),
-            this.getUpdatedAt().getTime(),
-            null,
-            reminderDateTime,
-            this.getLocation(),
-            authorizationService.isProjectItemEditable(
-                this.getOwner(),
-                requester,
-                this.getProject().getOwner(),
+        com.bulletjournal.controller.models.Task task =
+            new com.bulletjournal.controller.models.Task(
                 this.getId(),
-                this.getProject()),
-            authorizationService.isProjectItemDeletable(
-                this.getOwner(),
-                requester,
-                this.getProject().getOwner(),
-                this.getId(),
-                this.getProject()));
+                new User(this.getOwner()),
+                this.getAssignees().stream().map(a -> new User(a)).collect(Collectors.toList()),
+                this.getDueDate(),
+                this.getDueTime(),
+                this.getTimezone(),
+                this.getName(),
+                this.getDuration(),
+                this.getProject(),
+                labels,
+                reminderSetting,
+                this.getRecurrenceRule(),
+                this.getCreatedAt().getTime(),
+                this.getUpdatedAt().getTime(),
+                null,
+                reminderDateTime,
+                this.getLocation(),
+                authorizationService.isProjectItemEditable(
+                    this.getOwner(),
+                    requester,
+                    this.getProject().getOwner(),
+                    this.getId(),
+                    this.getProject()),
+                authorizationService.isProjectItemDeletable(
+                    this.getOwner(),
+                    requester,
+                    this.getProject().getOwner(),
+                    this.getId(),
+                    this.getProject()));
 
         task.setShared(this.isShared());
         return task;

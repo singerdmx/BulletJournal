@@ -1,8 +1,11 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.authz.AuthorizationService;
+import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.User;
+import org.slf4j.MDC;
 
 import javax.persistence.*;
 import java.util.List;
@@ -56,15 +59,17 @@ public class Note extends ProjectItemModel<com.bulletjournal.controller.models.N
     }
 
     @Override
-    public com.bulletjournal.controller.models.Note toPresentationModel() {
+    public com.bulletjournal.controller.models.Note toPresentationModel(AuthorizationService authorizationService) {
         return toPresentationModel((this.isShared() ? this.getSharedItemLabels() : this.getLabels())
                 .stream()
                 .map(Label::new)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList()), authorizationService);
     }
 
     @Override
-    public com.bulletjournal.controller.models.Note toPresentationModel(List<Label> labels) {
+    public com.bulletjournal.controller.models.Note toPresentationModel(List<Label> labels,
+                                                                        AuthorizationService authorizationService) {
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
         com.bulletjournal.controller.models.Note note = new com.bulletjournal.controller.models.Note(
                 this.getId(),
                 new User(this.getOwner()),
@@ -74,7 +79,20 @@ public class Note extends ProjectItemModel<com.bulletjournal.controller.models.N
                 this.getCreatedAt().getTime(),
                 this.getUpdatedAt().getTime(),
                 this.getLocation(),
-                this.getColor());
+                this.getColor(),
+            authorizationService.isProjectItemEditable(
+                this.getOwner(),
+                requester,
+                this.getProject().getOwner(),
+                this.getId(),
+                this.getProject()),
+            authorizationService.isProjectItemDeletable(
+                this.getOwner(),
+                requester,
+                this.getProject().getOwner(),
+                this.getId(),
+                this.getProject())
+        );
         note.setShared(this.isShared());
         return note;
     }
