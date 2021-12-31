@@ -232,38 +232,38 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
     public com.bulletjournal.controller.models.Transaction toPresentationModel(List<Label> labels,
                                                                                AuthorizationService authorizationService) {
         String requester = MDC.get(UserClient.USER_NAME_KEY);
-    return new com.bulletjournal.controller.models.Transaction(
-        this.getId(),
-        new User(this.getOwner()),
-        this.getName(),
-        this.getProject(),
-        new User(this.getPayer()),
-        this.getAmount(),
-        this.getDate(),
-        this.getTime(),
-        this.getTimezone(),
-        this.getTransactionType().getValue(),
-        this.getCreatedAt().getTime(),
-        this.getUpdatedAt().getTime(),
-        labels,
-        this.getLocation(),
-        this.getColor(),
-        this.getRecurrenceRule(),
-        this.hasBankAccount() && Objects.equals(this.getBankAccount().getOwner(), MDC.get(UserClient.USER_NAME_KEY))
-            ? this.getBankAccount().toPresentationModel()
-            : null,
-        authorizationService.isProjectItemEditable(
-            this.getOwner(),
-            requester,
-            this.getProject().getOwner(),
+        return new com.bulletjournal.controller.models.Transaction(
             this.getId(),
-            this.getProject()),
-        authorizationService.isProjectItemDeletable(
-            this.getOwner(),
-            requester,
-            this.getProject().getOwner(),
-            this.getId(),
-            this.getProject()));
+            new User(this.getOwner()),
+            this.getName(),
+            this.getProject(),
+            new User(this.getPayer()),
+            this.getAmount(),
+            this.getDate(),
+            this.getTime(),
+            this.getTimezone(),
+            this.getTransactionType().getValue(),
+            this.getCreatedAt().getTime(),
+            this.getUpdatedAt().getTime(),
+            labels,
+            this.getLocation(),
+            this.getColor(),
+            this.getRecurrenceRule(),
+            this.hasBankAccount() && Objects.equals(this.getBankAccount().getOwner(), MDC.get(UserClient.USER_NAME_KEY))
+                ? this.getBankAccount().toPresentationModel()
+                : null,
+            authorizationService.isProjectItemEditable(
+                this.getOwner(),
+                requester,
+                this.getProject().getOwner(),
+                this.getId(),
+                this.getProject()),
+            authorizationService.isProjectItemDeletable(
+                this.getOwner(),
+                requester,
+                this.getProject().getOwner(),
+                this.getId(),
+                this.getProject()));
     }
 
     @Override
