@@ -1,5 +1,6 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.TaskStatus;
@@ -98,8 +99,8 @@ public class Task extends TaskModel {
     }
 
     @Override
-    public com.bulletjournal.controller.models.Task toPresentationModel() {
-        com.bulletjournal.controller.models.Task task = super.toPresentationModel();
+    public com.bulletjournal.controller.models.Task toPresentationModel(AuthorizationService authorizationService) {
+        com.bulletjournal.controller.models.Task task = super.toPresentationModel(authorizationService);
         if (this.status != null) {
             task.setStatus(TaskStatus.getType(this.status));
         }
@@ -107,9 +108,9 @@ public class Task extends TaskModel {
     }
 
     @Override
-    public com.bulletjournal.controller.models.Task toPresentationModel(List<Label> labels) {
+    public com.bulletjournal.controller.models.Task toPresentationModel(List<Label> labels, AuthorizationService authorizationService) {
 
-        com.bulletjournal.controller.models.Task task = super.toPresentationModel(labels);
+        com.bulletjournal.controller.models.Task task = super.toPresentationModel(labels, authorizationService);
         if (this.status != null) {
             task.setStatus(TaskStatus.getType(this.status));
         }
