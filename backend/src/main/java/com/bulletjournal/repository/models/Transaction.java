@@ -1,5 +1,6 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.Label;
@@ -221,34 +222,48 @@ public class Transaction extends ProjectItemModel<com.bulletjournal.controller.m
     }
 
     @Override
-    public com.bulletjournal.controller.models.Transaction toPresentationModel() {
+    public com.bulletjournal.controller.models.Transaction toPresentationModel(AuthorizationService authorizationService) {
         return this.toPresentationModel(this.getLabels().stream()
                 .map(Label::new)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList()), authorizationService);
     }
 
     @Override
-    public com.bulletjournal.controller.models.Transaction toPresentationModel(List<Label> labels) {
-        return new com.bulletjournal.controller.models.Transaction(
-                this.getId(),
-                new User(this.getOwner()),
-                this.getName(),
-                this.getProject(),
-                new User(this.getPayer()),
-                this.getAmount(),
-                this.getDate(),
-                this.getTime(),
-                this.getTimezone(),
-                this.getTransactionType().getValue(),
-                this.getCreatedAt().getTime(),
-                this.getUpdatedAt().getTime(),
-                labels,
-                this.getLocation(),
-                this.getColor(),
-                this.getRecurrenceRule(),
-                this.hasBankAccount() && Objects.equals(
-                        this.getBankAccount().getOwner(), MDC.get(UserClient.USER_NAME_KEY)) ?
-                        this.getBankAccount().toPresentationModel() : null);
+    public com.bulletjournal.controller.models.Transaction toPresentationModel(List<Label> labels,
+                                                                               AuthorizationService authorizationService) {
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+    return new com.bulletjournal.controller.models.Transaction(
+        this.getId(),
+        new User(this.getOwner()),
+        this.getName(),
+        this.getProject(),
+        new User(this.getPayer()),
+        this.getAmount(),
+        this.getDate(),
+        this.getTime(),
+        this.getTimezone(),
+        this.getTransactionType().getValue(),
+        this.getCreatedAt().getTime(),
+        this.getUpdatedAt().getTime(),
+        labels,
+        this.getLocation(),
+        this.getColor(),
+        this.getRecurrenceRule(),
+        this.hasBankAccount() && Objects.equals(this.getBankAccount().getOwner(), MDC.get(UserClient.USER_NAME_KEY))
+            ? this.getBankAccount().toPresentationModel()
+            : null,
+        authorizationService.isProjectItemEditable(
+            this.getOwner(),
+            requester,
+            this.getProject().getOwner(),
+            this.getId(),
+            this.getProject()),
+        authorizationService.isProjectItemDeletable(
+            this.getOwner(),
+            requester,
+            this.getProject().getOwner(),
+            this.getId(),
+            this.getProject()));
     }
 
     @Override
