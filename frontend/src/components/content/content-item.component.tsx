@@ -63,19 +63,6 @@ type ContentProps = {
   ) => void;
 };
 
-export const isContentEditable = (
-  project: Project,
-  projectItem: ProjectItem,
-  content: Content,
-  myself: string
-) => {
-  return (
-    project.owner.name === myself ||
-    projectItem.owner.name === myself ||
-    content.owner.name === myself
-  );
-};
-
 export const createHTML = (delta: DeltaStatic) => {
   const element = document.createElement('article1');
   const tmpEditor = new ReactQuill.Quill(element, { readOnly: true });

@@ -15,7 +15,7 @@ import {EyeInvisibleOutlined, EyeOutlined, RollbackOutlined} from '@ant-design/i
 import {IState} from '../../store';
 import {Project} from '../../features/project/interface';
 import {ContentType} from '../../features/myBuJo/constants';
-import {createHTML, isContentEditable} from '../content/content-item.component';
+import {createHTML} from '../content/content-item.component';
 import Quill from "quill";
 import {getProject} from "../../features/project/actions";
 import {getHtmlDiff} from "../../utils/htmldiff/htmldiff";
@@ -162,7 +162,7 @@ const RevisionContent: React.FC<RevisionProps & RevisionContentHandler> = ({
   };
 
   const getRollbackButton = () => {
-    if (project && isContentEditable(project, projectItem, content, myself)) {
+    if (project && content.editable) {
       return (
         <Tooltip title="Revert to this version">
           <Button
