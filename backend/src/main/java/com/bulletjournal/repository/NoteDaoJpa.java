@@ -112,7 +112,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
 
         ret.addAll(this.labelDaoJpa.getLabelsForProjectItemList(
                 notes.stream().sorted(Comparator.comparingLong(Note::getId))
-                        .map(Note::toPresentationModel).collect(Collectors.toList())));
+                        .map(note -> note.toPresentationModel(authorizationService)).collect(Collectors.toList())));
         return ret;
     }
 
@@ -150,7 +150,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
 
         notes.sort(ProjectItemsGrouper.NOTE_COMPARATOR_REVERSE_ORDER);
         return this.labelDaoJpa.getLabelsForProjectItemList(notes.stream()
-                .map(Note::toPresentationModel).collect(Collectors.toList()));
+                .map(note -> note.toPresentationModel(authorizationService)).collect(Collectors.toList()));
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -174,7 +174,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     public Note partialUpdate(String requester, Long noteId, UpdateNoteParams updateNoteParams) {
         Note note = this.getProjectItem(noteId, requester);
 
-        com.bulletjournal.controller.models.Note noteAsPresentationModel = note.toPresentationModel();
+        com.bulletjournal.controller.models.Note noteAsPresentationModel = note.toPresentationModel(authorizationService);
         noteAsPresentationModel.setLabels(labelDaoJpa.getLabels(note.getLabels()));
 
         String noteBeforeUpdate = GSON.toJson(noteAsPresentationModel);
@@ -194,7 +194,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
 
         Note res = this.noteRepository.save(note);
 
-        noteAsPresentationModel = note.toPresentationModel();
+        noteAsPresentationModel = note.toPresentationModel(authorizationService);
         noteAsPresentationModel.setLabels(labelDaoJpa.getLabels(note.getLabels()));
 
         String noteAfterUpdate = GSON.toJson(noteAsPresentationModel);
@@ -217,7 +217,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
     public com.bulletjournal.controller.models.Note getNote(String requester, Long id) {
         Note note = this.getProjectItem(id, requester);
         List<com.bulletjournal.controller.models.Label> labels = this.getLabelsToProjectItem(note);
-        return note.toPresentationModel(labels);
+        return note.toPresentationModel(labels, authorizationService);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -232,7 +232,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         notes.sort(ProjectItemsGrouper.NOTE_COMPARATOR_REVERSE_ORDER);
         return notes.stream().map(t -> {
             List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
-            return t.toPresentationModel(labels);
+            return t.toPresentationModel(labels, authorizationService);
         }).collect(Collectors.toList());
     }
 
@@ -375,15 +375,15 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         List<com.bulletjournal.controller.models.Note> notes = new ArrayList<>();
         Note note = this.create(noteProject.getId(), username, new CreateNoteParams("Diary"));
         this.setColor(username, note.getId(), "{\"r\":250,\"g\":240,\"b\":228,\"a\":1}");
-        notes.add(note.toPresentationModel());
+        notes.add(note.toPresentationModel(authorizationService));
         for (int i = 0; i < MONTHS.length; i++) {
             String month = MONTHS[i];
             note = this.create(noteProject.getId(), username, new CreateNoteParams(month));
             this.setColor(username, note.getId(), MONTH_COLORS[i]);
-            notes.get(0).addSubNote(note.toPresentationModel());
+            notes.get(0).addSubNote(note.toPresentationModel(authorizationService));
             for (int j = 1; j <= 3; j++) {
                 note = this.create(noteProject.getId(), username, new CreateNoteParams(Integer.toString(i + 1) + "-" + j));
-                notes.get(0).getSubNotes().get(i).addSubNote(note.toPresentationModel());
+                notes.get(0).getSubNotes().get(i).addSubNote(note.toPresentationModel(authorizationService));
             }
         }
 

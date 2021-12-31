@@ -314,7 +314,7 @@ public class WorkflowController {
                 sampleTaskId, user, Collections.emptyList(), null, null, null,
                 sampleTask.getName(), null, null, Collections.emptyList(),
                 new ReminderSetting(null, null, 6),
-                null, System.currentTimeMillis(), System.currentTimeMillis(), null, null);
+                null, System.currentTimeMillis(), System.currentTimeMillis(), null, null, true, true);
 
         String requester = MDC.get(UserClient.USER_NAME_KEY);
         Content content = getSampleTaskContent(sampleTaskId, sampleTask.getContent(), requester);

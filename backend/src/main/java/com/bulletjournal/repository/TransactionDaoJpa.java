@@ -138,7 +138,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
 
     private com.bulletjournal.controller.models.Transaction addLabels(Transaction transaction) {
         List<Label> labels = this.getLabelsToProjectItem(transaction);
-        return transaction.toPresentationModel(labels);
+        return transaction.toPresentationModel(labels, authorizationService);
     }
 
     /**
@@ -229,7 +229,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         transactions.sort(ProjectItemsGrouper.TRANSACTION_COMPARATOR);
         return transactions.stream().map(t -> {
             List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
-            return t.toPresentationModel(labels);
+            return t.toPresentationModel(labels, authorizationService);
         }).collect(Collectors.toList());
     }
 
@@ -261,7 +261,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         List<Transaction> transactions = this.transactionRepository.findRecurringTransactionsByProject(project);
         return transactions.stream().map(t -> {
             List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
-            return t.toPresentationModel(labels);
+            return t.toPresentationModel(labels, authorizationService);
         }).collect(Collectors.toList());
     }
 
@@ -273,7 +273,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         this.authorizationService.checkAuthorizedToOperateOnContent(transaction.getOwner(), requester,
                 ContentType.TRANSACTION, Operation.UPDATE, transactionId, transaction.getProject());
 
-        com.bulletjournal.controller.models.Transaction transAsPresentationModel = transaction.toPresentationModel();
+        com.bulletjournal.controller.models.Transaction transAsPresentationModel = transaction.toPresentationModel(authorizationService);
         transAsPresentationModel.setLabels(labelDaoJpa.getLabels(transaction.getLabels()));
         ProjectItem.addAvatar(transAsPresentationModel, userClient);
         String transBeforeUpdate = GSON.toJson(transAsPresentationModel);
@@ -343,7 +343,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
                     transactionId, null);
         }
 
-        transAsPresentationModel = transaction.toPresentationModel();
+        transAsPresentationModel = transaction.toPresentationModel(authorizationService);
         transAsPresentationModel.setLabels(labelDaoJpa.getLabels(transaction.getLabels()));
         ProjectItem.addAvatar(transAsPresentationModel, userClient);
         String transAfterUpdate = GSON.toJson(transAsPresentationModel);
@@ -568,7 +568,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         transactions.addAll(recurringTransactions);
         return transactions.stream().sorted(Comparator.comparing(Transaction::getStartTime)).map(t -> {
             List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
-            return t.toPresentationModel(labels);
+            return t.toPresentationModel(labels, authorizationService);
         }).collect(Collectors.toList());
     }
 

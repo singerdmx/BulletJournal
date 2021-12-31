@@ -1,5 +1,6 @@
 package com.bulletjournal.hierarchy;
 
+import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.controller.models.Task;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -9,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 public class TaskRelationsProcessor {
+
+    private static AuthorizationService authorizationService;
 
     private static final String SUB_TASKS_KEY = "subTasks";
     private static final Gson GSON = new GsonBuilder()
@@ -32,7 +35,7 @@ public class TaskRelationsProcessor {
     }
 
     private static Task merge(Map<Long, com.bulletjournal.repository.models.Task> taskMap, Task cur) {
-        cur.clone(taskMap.get(cur.getId()).toPresentationModel());
+        cur.clone(taskMap.get(cur.getId()).toPresentationModel(authorizationService));
         for (Task subTask : cur.getSubTasks()) {
             merge(taskMap, subTask);
         }

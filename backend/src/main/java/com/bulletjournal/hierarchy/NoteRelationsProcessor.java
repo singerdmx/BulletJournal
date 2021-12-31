@@ -1,5 +1,6 @@
 package com.bulletjournal.hierarchy;
 
+import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.controller.models.Note;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 public class NoteRelationsProcessor {
-
+    private static AuthorizationService authorizationService;
     private static final String SUB_NOTES_KEY = "subNotes";
     private static final Gson GSON = new GsonBuilder()
             .excludeFieldsWithoutExposeAnnotation().create();
@@ -32,7 +33,7 @@ public class NoteRelationsProcessor {
     }
 
     private static Note merge(Map<Long, com.bulletjournal.repository.models.Note> noteMap, Note cur) {
-        cur.clone(noteMap.get(cur.getId()).toPresentationModel());
+        cur.clone(noteMap.get(cur.getId()).toPresentationModel(authorizationService));
         for (Note subNote : cur.getSubNotes()) {
             merge(noteMap, subNote);
         }

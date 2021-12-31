@@ -1,5 +1,6 @@
 package com.bulletjournal.controller;
 
+import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.ProjectItem;
 import com.bulletjournal.controller.models.ProjectItems;
@@ -45,10 +46,12 @@ public class ProjectItemController {
 
     private final Map<ProjectType, ProjectItemDaoJpa> daos;
 
+    private final AuthorizationService authorizationService;
+
     @Autowired
     public ProjectItemController(TaskDaoJpa taskDaoJpa, TransactionDaoJpa transactionDaoJpa, LabelDaoJpa labelDaoJpa,
                                  UserDaoJpa userDaoJpa, UserClient userClient, ProjectItemDaos projectItemDaos,
-                                 ProjectDaoJpa projectDaoJpa) {
+                                 ProjectDaoJpa projectDaoJpa, AuthorizationService authorizationService) {
         this.taskDaoJpa = taskDaoJpa;
         this.transactionDaoJpa = transactionDaoJpa;
         this.daos = projectItemDaos.getDaos();
@@ -56,6 +59,7 @@ public class ProjectItemController {
         this.userDaoJpa = userDaoJpa;
         this.userClient = userClient;
         this.projectDaoJpa = projectDaoJpa;
+        this.authorizationService = authorizationService;
     }
 
     @GetMapping(PROJECT_ITEMS_ROUTE)
@@ -139,7 +143,7 @@ public class ProjectItemController {
 
         final List<T> items = this.daos.get(projectType).getRecentProjectItemsBetween(startTime, endTime, new ArrayList<>(projectIds));
 
-        projectItems.addAll(items.stream().map(t -> ProjectItem.addAvatar(t.toPresentationModel(), this.userClient))
+        projectItems.addAll(items.stream().map(t -> ProjectItem.addAvatar(t.toPresentationModel(authorizationService), this.userClient))
                 .collect(Collectors.toList()));
     }
 }

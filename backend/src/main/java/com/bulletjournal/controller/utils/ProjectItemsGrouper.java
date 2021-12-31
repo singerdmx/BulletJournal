@@ -1,5 +1,6 @@
 package com.bulletjournal.controller.utils;
 
+import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.repository.models.AuditModel;
 import com.bulletjournal.repository.models.Note;
@@ -14,6 +15,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ProjectItemsGrouper {
+    private static AuthorizationService authorizationService;
 
     public static final Comparator<Transaction> TRANSACTION_COMPARATOR = (t1, t2) -> {
         if (!t1.hasDate() && !t2.hasDate()) {
@@ -145,7 +147,7 @@ public class ProjectItemsGrouper {
             transactions.sort(TRANSACTION_COMPARATOR);
             projectItem.setTransactions(transactions
                     .stream()
-                    .map(t -> t.toPresentationModel())
+                    .map(t -> t.toPresentationModel(authorizationService))
                     .collect(Collectors.toList()));
             mergedMap.put(zonedDateTime, projectItem);
         });
@@ -171,7 +173,7 @@ public class ProjectItemsGrouper {
             List<Task> tasks = tasksMap.get(zonedDateTime);
             tasks.sort(TASK_BY_STATUS_COMPARATOR);
             projectItem.setTasks(tasks.stream().map(t ->
-                    t.toPresentationModel())
+                    t.toPresentationModel(authorizationService))
                     .collect(Collectors.toList()));
             mergedMap.put(zonedDateTime, projectItem);
         });
@@ -198,7 +200,7 @@ public class ProjectItemsGrouper {
             // Sort note by update time
             notes.sort(NOTE_COMPARATOR_REVERSE_ORDER);
             projectItem.setNotes(notes.stream().map(n ->
-                    n.toPresentationModel())
+                    n.toPresentationModel(authorizationService))
                     .collect(Collectors.toList()));
             mergedMap.put(zonedDateTime, projectItem);
         });
