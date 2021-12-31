@@ -103,7 +103,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
             final Map<Long, Note> noteMap = notes.stream().filter(n -> processedIds.contains(n.getId()))
                     .collect(Collectors.toMap(n -> n.getId(), n -> n));
 
-            ret.addAll(NoteRelationsProcessor.processRelations(noteMap, keptHierarchy).stream()
+            ret.addAll(NoteRelationsProcessor.processRelations(noteMap, keptHierarchy, authorizationService).stream()
                     .map(note -> addLabels(note, noteMap)).collect(Collectors.toList()));
 
             // add orphaned ones(not processed means orphaned)

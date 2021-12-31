@@ -206,7 +206,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             final Map<Long, Task> taskMap = tasks.stream().filter(t -> processedIds.contains(t.getId()))
                     .collect(Collectors.toMap(n -> n.getId(), n -> n));
 
-            ret.addAll(TaskRelationsProcessor.processRelations(taskMap, keptHierarchy).stream()
+            ret.addAll(TaskRelationsProcessor.processRelations(taskMap, keptHierarchy, authorizationService).stream()
                     .map(task -> addLabels(task, taskMap)).collect(Collectors.toList()));
 
             tasks = tasks.stream().filter(t -> !processedIds.contains(t.getId())).collect(Collectors.toList());
