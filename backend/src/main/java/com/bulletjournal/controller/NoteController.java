@@ -147,7 +147,7 @@ public class NoteController {
         this.notificationService.trackActivity(new Auditable(projectId,
                 "created Note ##" + createdNote.getName() + "## in BuJo ##" + projectName + "##", username,
                 createdNote.getId(), Timestamp.from(Instant.now()), ContentAction.ADD_NOTE));
-        return createdNote.toPresentationModel();
+        return createdNote.toPresentationModel(authorizationService);
     }
 
     @GetMapping(NOTE_ROUTE)

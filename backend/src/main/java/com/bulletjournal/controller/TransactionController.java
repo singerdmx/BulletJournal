@@ -201,7 +201,7 @@ public class TransactionController {
                 username, createdTransaction.getId(), Timestamp.from(Instant.now()),
                 ContentAction.ADD_TRANSACTION));
 
-        return createdTransaction.toPresentationModel();
+        return createdTransaction.toPresentationModel(authorizationService);
     }
 
     @GetMapping(TRANSACTION_ROUTE)
