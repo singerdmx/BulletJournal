@@ -15,9 +15,9 @@ public class SampleTask extends Task {
     public SampleTask(Long id, @NotNull User owner, List<User> assignees, String dueDate, String dueTime,
                       @NotBlank String timezone, @NotNull String name, Integer duration, @NotNull Project project,
                       List<Label> labels, ReminderSetting reminderSetting, String recurrenceRule,
-                      Long createdAt, Long updatedAt, TaskStatus status, Long reminderDateTime) {
+                      Long createdAt, Long updatedAt, TaskStatus status, Long reminderDateTime, boolean editable, boolean deletable) {
         super(id, owner, assignees, dueDate, dueTime, timezone, name, duration, project,
-                labels, reminderSetting, recurrenceRule, createdAt, updatedAt, status, reminderDateTime);
+                labels, reminderSetting, recurrenceRule, createdAt, updatedAt, status, reminderDateTime, editable, deletable);
     }
 
     @Override

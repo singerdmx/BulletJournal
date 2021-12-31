@@ -206,7 +206,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
             final Map<Long, Task> taskMap = tasks.stream().filter(t -> processedIds.contains(t.getId()))
                     .collect(Collectors.toMap(n -> n.getId(), n -> n));
 
-            ret.addAll(TaskRelationsProcessor.processRelations(taskMap, keptHierarchy).stream()
+            ret.addAll(TaskRelationsProcessor.processRelations(taskMap, keptHierarchy, authorizationService).stream()
                     .map(task -> addLabels(task, taskMap)).collect(Collectors.toList()));
 
             tasks = tasks.stream().filter(t -> !processedIds.contains(t.getId())).collect(Collectors.toList());
@@ -214,7 +214,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         ret.addAll(this.labelDaoJpa.getLabelsForProjectItemList(
                 tasks.stream().sorted(Comparator.comparingLong(Task::getId))
-                        .map(Task::toPresentationModel).collect(Collectors.toList())));
+                        .map(task -> task.toPresentationModel(authorizationService)).collect(Collectors.toList())));
         return ret;
     }
 
@@ -241,7 +241,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         tasks.sort(ProjectItemsGrouper.TASK_BY_STATUS_COMPARATOR);
         return tasks.stream().map(t -> {
             List<com.bulletjournal.controller.models.Label> labels = getLabelsToProjectItem(t);
-            return t.toPresentationModel(labels);
+            return t.toPresentationModel(labels, authorizationService);
         }).collect(Collectors.toList());
     }
 
@@ -270,7 +270,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         tasks.sort(ProjectItemsGrouper.TASK_COMPARATOR);
         return this.labelDaoJpa.getLabelsForProjectItemList(tasks.stream()
-                .map(Task::toPresentationModel).collect(Collectors.toList()));
+                .map(task -> task.toPresentationModel(authorizationService)).collect(Collectors.toList()));
     }
 
     /**
@@ -312,7 +312,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
     public com.bulletjournal.controller.models.Task getTask(String requester, Long id) {
         Task task = this.getProjectItem(id, requester);
         List<com.bulletjournal.controller.models.Label> labels = this.getLabelsToProjectItem(task);
-        return task.toPresentationModel(labels);
+        return task.toPresentationModel(labels, authorizationService);
     }
 
     /**
@@ -378,7 +378,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
                 .filter(t -> t.hasReminderDateTime() &&
                         t.getReminderDateTime().before(ZonedDateTimeHelper.getTimestamp(now)) &&
                         t.getStartTime().after(ZonedDateTimeHelper.getTimestamp(now)))
-                .map(t -> t.toPresentationModel()).collect(Collectors.toList());
+                .map(t -> t.toPresentationModel(authorizationService)).collect(Collectors.toList());
     }
 
     /**
@@ -676,7 +676,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         updateTaskParams.selfClean();
         Task task = this.getProjectItem(taskId, requester);
 
-        com.bulletjournal.controller.models.Task taskAsPresentationModel = task.toPresentationModel();
+        com.bulletjournal.controller.models.Task taskAsPresentationModel = task.toPresentationModel(authorizationService);
         taskAsPresentationModel.setLabels(labelDaoJpa.getLabels(task.getLabels()));
         ProjectItem.addAvatar(taskAsPresentationModel, userClient);
 
@@ -721,7 +721,7 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
 
         Task res = this.taskRepository.save(selfAdjustTask(task, requester));
 
-        taskAsPresentationModel = task.toPresentationModel();
+        taskAsPresentationModel = task.toPresentationModel(authorizationService);
         taskAsPresentationModel.setLabels(labelDaoJpa.getLabels(task.getLabels()));
         ProjectItem.addAvatar(taskAsPresentationModel, userClient);
         String taskAfterUpdate = GSON.toJson(taskAsPresentationModel);
@@ -1260,36 +1260,36 @@ public class TaskDaoJpa extends ProjectItemDaoJpa<TaskContent> {
         User user = this.userDaoJpa.getByName(username);
         Task task1 = this.create(beginnerProject.getId(), username,
                 new CreateTaskParams("01- Create a new BuJo \"Mom\"", ImmutableList.of(username), user.getTimezone()));
-        tasks.add(task1.toPresentationModel());
+        tasks.add(task1.toPresentationModel(authorizationService));
         this.addContent(task1.getId(), username, new TaskContent(
                 "{\"delta\":{\"ops\":[{\"insert\":\"Create a new BuJo task called \\\"\"},{\"attributes\":{\"bold\":true},\"insert\":\"Mom\"},{\"insert\":\"\\\"\\n\\nChoose the default group.\\n\\n\"},{\"insert\":{\"image\":\"https://user-images.githubusercontent.com/122956/109781146-82980100-7bbc-11eb-8dc3-ae80c8d56c5c.png\"}},{\"insert\":\"\\n\\n\\n\\nHint:\\nDo you see the \\\"+\\\"  on the right corner of the page?\\nYou can always add new content with this icon or edit the existing content with the icon above.\\n\"},{\"attributes\":{\"width\":\"252\"},\"insert\":{\"image\":\"https://user-images.githubusercontent.com/122956/109782041-50d36a00-7bbd-11eb-899d-9df3460c2e2f.png\"}},{\"insert\":\"\\n\"}]}}"));
         Task task2 = this.create(beginnerProject.getId(), username,
                 new CreateTaskParams("02- Create a new task under Mom", ImmutableList.of(username), user.getTimezone()));
-        tasks.add(task2.toPresentationModel());
+        tasks.add(task2.toPresentationModel(authorizationService));
         this.addContent(task2.getId(), username, new TaskContent(
                 "{\"delta\":{\"ops\":[{\"insert\":\"Create a new task and enter task name as \\\"\"},{\"attributes\":{\"bold\":true},\"insert\":\"Mother's day\"},{\"insert\":\"\\\"\\nSet the date as \"},{\"attributes\":{\"bold\":true},\"insert\":\"recurring\"},{\"insert\":\" on the \"},{\"attributes\":{\"bold\":true},\"insert\":\"Second Sunday of May \"},{\"insert\":\"and repeat it as \"},{\"attributes\":{\"bold\":true},\"insert\":\"YEARLY\"},{\"insert\":\"\\n\\n\\n\\n \"},{\"attributes\":{\"width\":\"335\",\"style\":\"\"},\"insert\":{\"image\":\"https://user-images.githubusercontent.com/122956/109782996-57161600-7bbe-11eb-9909-72bdb300e640.png\"}},{\"insert\":\"\\n\"}]}}"));
         Task childTask1 = this.create(beginnerProject.getId(), username,
                 new CreateTaskParams("01-01 Child Task 1", ImmutableList.of(username), user.getTimezone()));
-        tasks.get(1).addSubTask(childTask1.toPresentationModel());
+        tasks.get(1).addSubTask(childTask1.toPresentationModel(authorizationService));
         Task childTask2 = this.create(beginnerProject.getId(), username,
                 new CreateTaskParams("01-02 Child Task 2", ImmutableList.of(username), user.getTimezone()));
-        tasks.get(1).addSubTask(childTask2.toPresentationModel());
+        tasks.get(1).addSubTask(childTask2.toPresentationModel(authorizationService));
         Task task3 = this.create(beginnerProject.getId(), username,
                 new CreateTaskParams("03- Create a new BuJo \"Family\"", ImmutableList.of(username), user.getTimezone()));
-        tasks.add(task3.toPresentationModel());
+        tasks.add(task3.toPresentationModel(authorizationService));
         Task task4 = this.create(beginnerProject.getId(), username,
                 new CreateTaskParams("04- Drag \"Mom\" and drop under \"Family\"", ImmutableList.of(username), user.getTimezone()));
-        tasks.add(task4.toPresentationModel());
+        tasks.add(task4.toPresentationModel(authorizationService));
         this.addContent(task4.getId(), username, new TaskContent(
                 "{\"delta\":{\"ops\":[{\"insert\":\"Here is what the structure looks like:\\n\\n\\n\"},{\"attributes\":{\"width\":\"194\",\"style\":\"\"},\"insert\":{\"image\":\"https://user-images.githubusercontent.com/122956/109783787-39957c00-7bbf-11eb-810b-cb15787ace6b.png\"}},{\"insert\":\"\\n\"}]}}"));
         Task task5 = this.create(beginnerProject.getId(), username,
                 new CreateTaskParams("05- Explore other features", ImmutableList.of(username), user.getTimezone()));
-        tasks.add(task5.toPresentationModel());
+        tasks.add(task5.toPresentationModel(authorizationService));
         this.addContent(task5.getId(), username, new TaskContent(
                 "{\"delta\":{\"ops\":[{\"insert\":\"\uD83C\uDF89 Congratulations! \uD83C\uDF89\\n\\nNow you’ve completed all the beginner's tasks and get to know the basic function of our TODO BuJo.\\n\\nFeel free to explore more features and start your own journey in Bullet Journal!\\n\\n\"}]}}"));
         Task task6 = this.create(beginnerProject.getId(), username,
                 new CreateTaskParams("01-01 Drag and drop me under the Task 01", ImmutableList.of(username), user.getTimezone()));
-        tasks.add(task6.toPresentationModel());
+        tasks.add(task6.toPresentationModel(authorizationService));
         this.addContent(task6.getId(), username, new TaskContent(
                 "{\"delta\":{\"ops\":[{\"insert\":\"If you see this structure, then you did right!\\n\"},{\"insert\":{\"image\":\"https://user-images.githubusercontent.com/122956/109784867-5c746000-7bc0-11eb-92fb-191afaa1629b.png\"}},{\"insert\":\"\\n\"}]}}"));
         this.updateUserTasks(beginnerProject.getId(), tasks, username);

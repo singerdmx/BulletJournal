@@ -104,6 +104,9 @@ public class SystemController {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired
+    private AuthorizationService authorizationService;
+
     @GetMapping(UPDATES_ROUTE)
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public SystemUpdates getUpdates(@RequestParam(name = "targets", required = false) String targets,
@@ -191,7 +194,7 @@ public class SystemController {
             List<ReminderRecord> reminderRecordsClone = reminderRecords.stream()
                     .map(reminderRecord -> reminderRecord.clone()).collect(Collectors.toList());
             List<Task> tasks = this.reminder.getRemindingTasks(reminderRecordsClone, startTime)
-                    .stream().map(t -> t.toPresentationModel()).collect(Collectors.toList());
+                    .stream().map(t -> t.toPresentationModel(authorizationService)).collect(Collectors.toList());
             remindingTasks = this.labelDaoJpa.getLabelsForProjectItemList(tasks);
             remindingTaskEtag = EtagGenerator.generateEtag(EtagGenerator.HashAlgorithm.MD5,
                     EtagGenerator.HashType.TO_HASHCODE,

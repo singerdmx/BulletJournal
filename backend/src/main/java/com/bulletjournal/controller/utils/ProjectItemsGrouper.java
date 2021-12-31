@@ -1,5 +1,6 @@
 package com.bulletjournal.controller.utils;
 
+import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.repository.models.AuditModel;
 import com.bulletjournal.repository.models.Note;
@@ -132,7 +133,8 @@ public class ProjectItemsGrouper {
      * @projectItems Map<ZonedDateTime, List<ProjectItems>> - List of ProjectItems
      */
     public static Map<ZonedDateTime, ProjectItems> mergeTransactionsMap(Map<ZonedDateTime, ProjectItems> mergedMap,
-                                                                        @Nullable Map<ZonedDateTime, List<Transaction>> transactionsMap) {
+                                                                        @Nullable Map<ZonedDateTime, List<Transaction>> transactionsMap,
+                                                                        AuthorizationService authorizationService) {
         if (transactionsMap == null) {
             return mergedMap;
         }
@@ -145,7 +147,7 @@ public class ProjectItemsGrouper {
             transactions.sort(TRANSACTION_COMPARATOR);
             projectItem.setTransactions(transactions
                     .stream()
-                    .map(t -> t.toPresentationModel())
+                    .map(t -> t.toPresentationModel(authorizationService))
                     .collect(Collectors.toList()));
             mergedMap.put(zonedDateTime, projectItem);
         });
@@ -158,7 +160,8 @@ public class ProjectItemsGrouper {
      * @projectItems Map<ZonedDateTime, List<ProjectItems>> - List of ProjectItems
      */
     public static Map<ZonedDateTime, ProjectItems> mergeTasksMap(Map<ZonedDateTime, ProjectItems> mergedMap,
-                                                                 @Nullable Map<ZonedDateTime, List<Task>> tasksMap) {
+                                                                 @Nullable Map<ZonedDateTime, List<Task>> tasksMap,
+                                                                 AuthorizationService authorizationService) {
         if (tasksMap == null) {
             return mergedMap;
         }
@@ -171,7 +174,7 @@ public class ProjectItemsGrouper {
             List<Task> tasks = tasksMap.get(zonedDateTime);
             tasks.sort(TASK_BY_STATUS_COMPARATOR);
             projectItem.setTasks(tasks.stream().map(t ->
-                    t.toPresentationModel())
+                    t.toPresentationModel(authorizationService))
                     .collect(Collectors.toList()));
             mergedMap.put(zonedDateTime, projectItem);
         });
@@ -184,7 +187,8 @@ public class ProjectItemsGrouper {
      * @projectItems Map<ZonedDateTime, List<ProjectItems>> - List of ProjectItems
      */
     public static Map<ZonedDateTime, ProjectItems> mergeNotesMap(Map<ZonedDateTime, ProjectItems> mergedMap,
-                                                                 @Nullable Map<ZonedDateTime, List<Note>> notesMap) {
+                                                                 @Nullable Map<ZonedDateTime, List<Note>> notesMap,
+                                                                 AuthorizationService authorizationService) {
         if (notesMap == null) {
             return mergedMap;
         }
@@ -198,7 +202,7 @@ public class ProjectItemsGrouper {
             // Sort note by update time
             notes.sort(NOTE_COMPARATOR_REVERSE_ORDER);
             projectItem.setNotes(notes.stream().map(n ->
-                    n.toPresentationModel())
+                    n.toPresentationModel(authorizationService))
                     .collect(Collectors.toList()));
             mergedMap.put(zonedDateTime, projectItem);
         });

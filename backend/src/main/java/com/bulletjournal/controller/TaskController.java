@@ -153,7 +153,7 @@ public class TaskController {
     @GetMapping(COMPLETED_TASK_ROUTE)
     public Task getCompletedTask(@NotNull @PathVariable Long taskId) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
-        return ProjectItem.addAvatar(this.taskDaoJpa.getCompletedTask(taskId, username).toPresentationModel(),
+        return ProjectItem.addAvatar(this.taskDaoJpa.getCompletedTask(taskId, username).toPresentationModel(authorizationService),
                 this.userClient);
     }
 
@@ -166,7 +166,7 @@ public class TaskController {
         this.notificationService.trackActivity(new Auditable(projectId,
                 "created Task ##" + createdTask.getName() + "## in BuJo ##" + projectName + "##", username,
                 createdTask.getId(), Timestamp.from(Instant.now()), ContentAction.ADD_TASK));
-        return createdTask.toPresentationModel();
+        return createdTask.toPresentationModel(authorizationService);
     }
 
     @PatchMapping(TASK_ROUTE)
@@ -305,14 +305,15 @@ public class TaskController {
 
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return this.taskDaoJpa.getCompletedTasks(projectId, username, pageNo, pageSize).stream()
-                .map(t -> ProjectItem.addAvatar(t.toPresentationModel(), this.userClient)).collect(Collectors.toList());
+            .map(t -> ProjectItem.addAvatar(t.toPresentationModel(authorizationService), this.userClient))
+            .collect(Collectors.toList());
     }
 
     private List<Task> getCompletedTasksBetween(Long projectId, String assignee, String startDate, String endDate,
             String timezone) {
         String username = MDC.get(UserClient.USER_NAME_KEY);
         return this.taskDaoJpa.getCompletedTasksBetween(projectId, assignee, username, startDate, endDate, timezone)
-                .stream().map(t -> ProjectItem.addAvatar(t.toPresentationModel(), this.userClient))
+                .stream().map(t -> ProjectItem.addAvatar(t.toPresentationModel(authorizationService), this.userClient))
                 .collect(Collectors.toList());
     }
 

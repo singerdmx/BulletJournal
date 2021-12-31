@@ -1,5 +1,6 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.ProjectItem;
 import com.bulletjournal.repository.utils.LongArrayType;
@@ -131,10 +132,10 @@ public abstract class ProjectItemModel<T extends ProjectItem> extends AuditModel
         this.location = location;
     }
 
-    public abstract T toPresentationModel();
+    public abstract T toPresentationModel(AuthorizationService authorizationService);
 
     public abstract T toPresentationModel(
-            List<com.bulletjournal.controller.models.Label> labels);
+            List<com.bulletjournal.controller.models.Label> labels, AuthorizationService authorizationService);
 
     public abstract ContentType getContentType();
 

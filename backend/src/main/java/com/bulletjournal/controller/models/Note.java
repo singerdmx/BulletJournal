@@ -30,8 +30,10 @@ public class Note extends ProjectItem {
                 Long createdAt,
                 Long updatedAt,
                 String location,
-                String color) {
-        super(id, name, owner, project, labels, location);
+                String color,
+                boolean editable,
+                boolean deletable) {
+        super(id, name, owner, project, labels, location, editable, deletable);
         this.color = color;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;

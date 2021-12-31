@@ -1,5 +1,7 @@
 package com.bulletjournal.repository.models;
 
+import com.bulletjournal.authz.AuthorizationService;
+import com.bulletjournal.clients.UserClient;
 import com.bulletjournal.controller.models.Before;
 import com.bulletjournal.controller.models.Label;
 import com.bulletjournal.controller.models.ReminderSetting;
@@ -11,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
@@ -283,14 +286,15 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
     }
 
     @Override
-    public com.bulletjournal.controller.models.Task toPresentationModel() {
+    public com.bulletjournal.controller.models.Task toPresentationModel(AuthorizationService authorizationService) {
         return toPresentationModel(
                 (this.isShared() ? this.getSharedItemLabels() : this.getLabels())
-                        .stream().map(Label::new).collect(Collectors.toList()));
+                        .stream().map(Label::new).collect(Collectors.toList()), authorizationService);
     }
 
     @Override
-    public com.bulletjournal.controller.models.Task toPresentationModel(List<Label> labels) {
+    public com.bulletjournal.controller.models.Task toPresentationModel(List<Label> labels,
+                                                                        AuthorizationService authorizationService) {
 
         ReminderSetting reminderSetting = new ReminderSetting();
         if (this.hasReminderDate()) {
@@ -307,25 +311,44 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
             reminderDateTime = this.getReminderDateTime().getTime();
         }
 
-        com.bulletjournal.controller.models.Task task = new com.bulletjournal.controller.models.Task(
-            this.getId(),
-            new User(this.getOwner()),
-            this.getAssignees().stream().map(a -> new User(a)).collect(Collectors.toList()),
-            this.getDueDate(),
-            this.getDueTime(),
-            this.getTimezone(),
-            this.getName(),
-            this.getDuration(),
-            this.getProject(),
-            labels,
-            reminderSetting,
-            this.getRecurrenceRule(),
-            this.getCreatedAt().getTime(),
-            this.getUpdatedAt().getTime(),
-            null,
-            reminderDateTime,
-            this.getLocation()
-        );
+        String requester = MDC.get(UserClient.USER_NAME_KEY);
+        boolean isCompletedTask = this instanceof CompletedTask;
+        boolean editable =
+            isCompletedTask || authorizationService.isProjectItemEditable(
+                this.getOwner(),
+                requester,
+                this.getProject().getOwner(),
+                this.getId(),
+                this.getProject());
+        boolean deletable =
+            isCompletedTask || authorizationService.isProjectItemDeletable(
+                    this.getOwner(),
+                    requester,
+                    this.getProject().getOwner(),
+                    this.getId(),
+                    this.getProject());
+
+        com.bulletjournal.controller.models.Task task =
+            new com.bulletjournal.controller.models.Task(
+                this.getId(),
+                new User(this.getOwner()),
+                this.getAssignees().stream().map(a -> new User(a)).collect(Collectors.toList()),
+                this.getDueDate(),
+                this.getDueTime(),
+                this.getTimezone(),
+                this.getName(),
+                this.getDuration(),
+                this.getProject(),
+                labels,
+                reminderSetting,
+                this.getRecurrenceRule(),
+                this.getCreatedAt().getTime(),
+                this.getUpdatedAt().getTime(),
+                null,
+                reminderDateTime,
+                this.getLocation(),
+                editable,
+                deletable);
 
         task.setShared(this.isShared());
         return task;

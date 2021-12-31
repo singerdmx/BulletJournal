@@ -48,7 +48,8 @@ public abstract class ProjectItem implements Editable, Deletable {
     }
 
     public ProjectItem(Long id, @NotBlank @Size(min = 1, max = 100) String name, @NotNull User owner,
-                       @NotNull Project project, List<Label> labels, String location) {
+                       @NotNull Project project, List<Label> labels, String location,
+                       boolean editable, boolean deletable) {
         this.id = id;
         this.name = name;
         this.owner = owner;
@@ -57,6 +58,8 @@ public abstract class ProjectItem implements Editable, Deletable {
             this.projectId = project.getId();
         }
         this.labels = labels;
+        this.editable = editable;
+        this.deletable = deletable;
     }
 
     public static <T extends ProjectItem> List<T> addAvatar(

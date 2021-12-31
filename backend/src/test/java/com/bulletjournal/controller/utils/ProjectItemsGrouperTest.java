@@ -1,11 +1,13 @@
 package com.bulletjournal.controller.utils;
 
+import com.bulletjournal.authz.AuthorizationService;
 import com.bulletjournal.controller.models.ProjectItems;
 import com.bulletjournal.controller.models.ReminderSetting;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.Task;
 import com.bulletjournal.repository.models.Transaction;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.ZonedDateTime;
@@ -23,6 +25,8 @@ import static org.junit.Assert.assertTrue;
  */
 @ActiveProfiles("test")
 public class ProjectItemsGrouperTest {
+    @Autowired
+    private AuthorizationService authorizationService;
 
     @Test
     public void testGroupTransactionsByDate() {
@@ -133,8 +137,8 @@ public class ProjectItemsGrouperTest {
         taskMap.computeIfAbsent(time4, t -> new ArrayList<>()).add(task2);
 
         Map<ZonedDateTime, ProjectItems> map = new HashMap<>();
-        map = ProjectItemsGrouper.mergeTasksMap(map, taskMap);
-        map = ProjectItemsGrouper.mergeTransactionsMap(map, transactionMap);
+        map = ProjectItemsGrouper.mergeTasksMap(map, taskMap, authorizationService);
+        map = ProjectItemsGrouper.mergeTransactionsMap(map, transactionMap, authorizationService);
         assertEquals(3, map.size());
 
         ProjectItems p1 = map.get(time1);
@@ -144,16 +148,16 @@ public class ProjectItemsGrouperTest {
 
         assertEquals(p2, p4);
         assertEquals(1, p1.getTransactions().size());
-        assertEquals(transaction1.toPresentationModel(), p1.getTransactions().get(0));
+        assertEquals(transaction1.toPresentationModel(authorizationService), p1.getTransactions().get(0));
 
         assertEquals(1, p2.getTransactions().size());
-        assertEquals(transaction2.toPresentationModel(), p2.getTransactions().get(0));
+        assertEquals(transaction2.toPresentationModel(authorizationService), p2.getTransactions().get(0));
 
         assertEquals(1, p3.getTasks().size());
-        assertEquals(task1.toPresentationModel(), p3.getTasks().get(0));
+        assertEquals(task1.toPresentationModel(authorizationService), p3.getTasks().get(0));
 
         assertEquals(1, p2.getTasks().size());
-        assertEquals(task2.toPresentationModel(), p2.getTasks().get(0));
+        assertEquals(task2.toPresentationModel(authorizationService), p2.getTasks().get(0));
     }
 
     /*
@@ -187,27 +191,27 @@ public class ProjectItemsGrouperTest {
         List<Transaction> tr1 = new ArrayList<>();
         tr1.add(transaction1);
         ProjectItems p1 = new ProjectItems();
-        p1.setTransactions(tr1.stream().map(t -> t.toPresentationModel()).collect(Collectors.toList()));
+        p1.setTransactions(tr1.stream().map(t -> t.toPresentationModel(authorizationService)).collect(Collectors.toList()));
         p1.setDate(transaction1.getDate());
         p1.setDayOfWeek(time1.getDayOfWeek());
 
         List<Transaction> tr2 = new ArrayList<>();
         tr2.add(transaction2);
         ProjectItems p2 = new ProjectItems();
-        p2.setTransactions(tr2.stream().map(t -> t.toPresentationModel()).collect(Collectors.toList()));
+        p2.setTransactions(tr2.stream().map(t -> t.toPresentationModel(authorizationService)).collect(Collectors.toList()));
         p2.setDate(transaction2.getDate());
         p2.setDayOfWeek(time2.getDayOfWeek());
 
         List<Task> ta1 = new ArrayList<>();
         ta1.add(task1);
         ProjectItems p3 = new ProjectItems();
-        p3.setTasks(ta1.stream().map(t -> t.toPresentationModel()).collect(Collectors.toList()));
+        p3.setTasks(ta1.stream().map(t -> t.toPresentationModel(authorizationService)).collect(Collectors.toList()));
         p3.setDate(task1.getDueDate());
         p3.setDayOfWeek(time3.getDayOfWeek());
 
         List<Task> ta2 = new ArrayList<>();
         ta2.add(task2);
-        p2.setTasks(ta2.stream().map(t -> t.toPresentationModel()).collect(Collectors.toList()));
+        p2.setTasks(ta2.stream().map(t -> t.toPresentationModel(authorizationService)).collect(Collectors.toList()));
         p2.setDate(task2.getDueDate());
         p2.setDayOfWeek(time4.getDayOfWeek());
 
