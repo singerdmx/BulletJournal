@@ -312,6 +312,22 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
         }
 
         String requester = MDC.get(UserClient.USER_NAME_KEY);
+        boolean isCompletedTask = this instanceof CompletedTask;
+        boolean editable =
+            isCompletedTask || authorizationService.isProjectItemEditable(
+                this.getOwner(),
+                requester,
+                this.getProject().getOwner(),
+                this.getId(),
+                this.getProject());
+        boolean deletable =
+            isCompletedTask || authorizationService.isProjectItemDeletable(
+                    this.getOwner(),
+                    requester,
+                    this.getProject().getOwner(),
+                    this.getId(),
+                    this.getProject());
+
         com.bulletjournal.controller.models.Task task =
             new com.bulletjournal.controller.models.Task(
                 this.getId(),
@@ -331,18 +347,8 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
                 null,
                 reminderDateTime,
                 this.getLocation(),
-                authorizationService.isProjectItemEditable(
-                    this.getOwner(),
-                    requester,
-                    this.getProject().getOwner(),
-                    this.getId(),
-                    this.getProject()),
-                authorizationService.isProjectItemDeletable(
-                    this.getOwner(),
-                    requester,
-                    this.getProject().getOwner(),
-                    this.getId(),
-                    this.getProject()));
+                editable,
+                deletable);
 
         task.setShared(this.isShared());
         return task;
