@@ -17,8 +17,6 @@ export interface Project {
   projectType: ProjectType;
   subProjects: Project[];
   shared: boolean;
-  editable: boolean;
-  deletable: boolean;
   projectSetting: ProjectSetting;
 }
 
