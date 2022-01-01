@@ -40,12 +40,6 @@ public class SharedProjectItemDaoJpa {
     @Autowired
     private GroupDaoJpa groupDaoJpa;
 
-    @Autowired
-    private TaskContentRepository taskContentRepository;
-
-    @Autowired
-    private NoteContentRepository noteContentRepository;
-
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public List<ProjectItemModel> getSharedProjectItems(
             String requester, final ContentType contentType) {

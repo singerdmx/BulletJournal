@@ -4,7 +4,6 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.ProjectSetting;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.ProjectSettingDaoJpa;
-import com.bulletjournal.repository.SharedProjectItemDaoJpa;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.ProjectItemModel;
@@ -30,16 +29,10 @@ public class AuthorizationService {
 
     @Autowired
     @Lazy
-    private SharedProjectItemDaoJpa sharedProjectItemDaoJpa;
-
-    @Autowired
-    @Lazy
     private ProjectSettingDaoJpa projectSettingDaoJpa;
 
     public <T extends ProjectItemModel> void validateRequesterInProjectGroup(String requester, T projectItem) {
-        if (this.sharedProjectItemDaoJpa.getSharedProjectItems(requester).stream()
-                .anyMatch(item -> Objects.equals(item.getId(), projectItem.getId()) &&
-                        Objects.equals(item.getContentType(), projectItem.getContentType()))) {
+        if (projectItem.isShared()) {
             return;
         }
         validateRequesterInProjectGroup(requester, projectItem.getProject());
@@ -104,11 +97,9 @@ public class AuthorizationService {
     public boolean isContentEditable(
             String owner, String requester,
             String projectOwner, String projectItemOwner, ProjectItemModel projectItem) {
-        if (this.sharedProjectItemDaoJpa.getSharedProjectItems(requester).stream()
-                .anyMatch(item -> Objects.equals(item.getId(), projectItem.getId()) &&
-                        Objects.equals(item.getContentType(), projectItem.getContentType()))) {
-            // contents of project item being shared specifically can be edited
-            return true;
+        if (projectItem.isShared()) {
+            // contents of project item being shared specifically cannot be edited
+            return false;
         }
 
         return isContentDeletable(owner, requester, projectOwner, projectItemOwner, projectItem);
