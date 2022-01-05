@@ -263,9 +263,9 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
             <span>
               <Select
                 style={{ width: '160px', marginRight: '25px' }}
-                value={selectAction.replace('_', ' ')}
-                onChange={(action) => {
-                  let actionKey = action.replace(' ', '_');
+                value={selectAction.replace(/_/g, ' ')}
+                onChange={(action: string) => {
+                  let actionKey = action.replace(/ /g, '_');
                   setSelectAction(actionKey as ContentAction);
                 }}
               >
@@ -274,7 +274,7 @@ const ShowProjectHistory: React.FC<ShowProjectHistoryProps> = ({
                     <Option value={action} key={action}>
                       <Tooltip key={action} title={action} placement='left'>
                         <span>
-                          {getIcon(action)}&nbsp;{action.replace('_', ' ')}
+                          {getIcon(action)}&nbsp;{action.replace(/_/g, ' ')}
                         </span>
                       </Tooltip>
                     </Option>

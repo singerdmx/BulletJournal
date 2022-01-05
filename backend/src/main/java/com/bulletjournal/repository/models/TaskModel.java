@@ -332,7 +332,7 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
             new com.bulletjournal.controller.models.Task(
                 this.getId(),
                 new User(this.getOwner()),
-                this.getAssignees().stream().map(a -> new User(a)).collect(Collectors.toList()),
+                this.getAssignees().stream().map(User::new).collect(Collectors.toList()),
                 this.getDueDate(),
                 this.getDueTime(),
                 this.getTimezone(),
