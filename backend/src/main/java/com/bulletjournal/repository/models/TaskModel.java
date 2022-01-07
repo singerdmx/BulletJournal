@@ -312,43 +312,40 @@ public abstract class TaskModel extends ProjectItemModel<com.bulletjournal.contr
         }
 
         String requester = MDC.get(UserClient.USER_NAME_KEY);
-        boolean isCompletedTask = this instanceof CompletedTask;
-        boolean editable =
-            isCompletedTask || authorizationService.isProjectItemEditable(
+        boolean editable = authorizationService.isProjectItemEditable(
                 this.getOwner(),
                 requester,
                 this.getProject().getOwner(),
                 this.getId(),
-                this.getProject());
-        boolean deletable =
-            isCompletedTask || authorizationService.isProjectItemDeletable(
-                    this.getOwner(),
-                    requester,
-                    this.getProject().getOwner(),
-                    this.getId(),
-                    this.getProject());
+                this);
+        boolean deletable = authorizationService.isProjectItemDeletable(
+                this.getOwner(),
+                requester,
+                this.getProject().getOwner(),
+                this.getId(),
+                this);
 
         com.bulletjournal.controller.models.Task task =
-            new com.bulletjournal.controller.models.Task(
-                this.getId(),
-                new User(this.getOwner()),
-                this.getAssignees().stream().map(User::new).collect(Collectors.toList()),
-                this.getDueDate(),
-                this.getDueTime(),
-                this.getTimezone(),
-                this.getName(),
-                this.getDuration(),
-                this.getProject(),
-                labels,
-                reminderSetting,
-                this.getRecurrenceRule(),
-                this.getCreatedAt().getTime(),
-                this.getUpdatedAt().getTime(),
-                null,
-                reminderDateTime,
-                this.getLocation(),
-                editable,
-                deletable);
+                new com.bulletjournal.controller.models.Task(
+                        this.getId(),
+                        new User(this.getOwner()),
+                        this.getAssignees().stream().map(User::new).collect(Collectors.toList()),
+                        this.getDueDate(),
+                        this.getDueTime(),
+                        this.getTimezone(),
+                        this.getName(),
+                        this.getDuration(),
+                        this.getProject(),
+                        labels,
+                        reminderSetting,
+                        this.getRecurrenceRule(),
+                        this.getCreatedAt().getTime(),
+                        this.getUpdatedAt().getTime(),
+                        null,
+                        reminderDateTime,
+                        this.getLocation(),
+                        editable,
+                        deletable);
 
         task.setShared(this.isShared());
         return task;

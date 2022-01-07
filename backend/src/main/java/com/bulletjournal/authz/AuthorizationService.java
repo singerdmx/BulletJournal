@@ -4,6 +4,7 @@ import com.bulletjournal.contents.ContentType;
 import com.bulletjournal.controller.models.ProjectSetting;
 import com.bulletjournal.exceptions.UnAuthorizedException;
 import com.bulletjournal.repository.ProjectSettingDaoJpa;
+import com.bulletjournal.repository.models.CompletedTask;
 import com.bulletjournal.repository.models.Group;
 import com.bulletjournal.repository.models.Project;
 import com.bulletjournal.repository.models.ProjectItemModel;
@@ -126,23 +127,45 @@ public class AuthorizationService {
      * @param owner Project Item Owner
      */
     public boolean isProjectItemEditable(String owner, String requester, String projectOwner,
-                                         Long contentId, Project project) {
-       return isProjectItemDeletable(owner, requester, projectOwner, contentId, project);
+                                         Long contentId, ProjectItemModel projectItem) {
+        if (projectItem.isShared()) {
+            return false;
+        }
+        return isProjectItemEditableAndDeletable(owner, requester, projectOwner, contentId, projectItem);
     }
 
     /**
      * @param owner Project Item Owner
      */
     public boolean isProjectItemDeletable(String owner, String requester, String projectOwner,
-                                          Long contentId, Project project) {
+                                          Long contentId, ProjectItemModel projectItem) {
+        if (projectItem.isShared()) {
+            return true;
+        }
+
+        return isProjectItemEditableAndDeletable(owner, requester, projectOwner, contentId, projectItem);
+    }
+
+    private boolean isProjectItemEditableAndDeletable(
+            String owner, String requester, String projectOwner, Long contentId,
+            ProjectItemModel projectItem) {
+        if (projectItem.getId() < 0) {
+            // Transaction that is created from BankAccountTransaction has negative id `-Math.abs(RAND.nextLong())`
+            return false;
+        }
+
+        if (projectItem instanceof CompletedTask) {
+            return true;
+        }
 
         if (Objects.equals(owner, requester) || Objects.equals(projectOwner, requester)) {
             return true;
         }
 
         LOGGER.info("Project Item " + contentId + " is owner by " +
-            owner + " and Project is owned by " + projectOwner + " while request is from " + requester);
+                owner + " and Project is owned by " + projectOwner + " while request is from " + requester);
 
+        Project project = projectItem.getProject();
         ProjectSetting projectSetting = this.projectSettingDaoJpa.getProjectSetting(project.getId());
         // projectSetting.isAllowEditProjItems() is true and user needs to be in project's group
         return projectSetting.isAllowEditProjItems() && !notInGroup(requester, project.getGroup(), true);
@@ -207,7 +230,8 @@ public class AuthorizationService {
 
     private void checkAuthorizedToOperateOnProjectItem(
             String owner, String requester, Operation operation, Long contentId, Object... other) {
-        Project project = (Project) other[0];
+        ProjectItemModel projectItem = (ProjectItemModel) other[0];
+        Project project = projectItem.getProject();
         String projectOwner = project.getOwner();
         String errorMsg = "Project Item " + contentId + " is owner by " +
                 owner + " and Project is owned by " + projectOwner +
@@ -215,12 +239,12 @@ public class AuthorizationService {
                 " while request is from " + requester;
         switch (operation) {
             case DELETE:
-                if (!isProjectItemDeletable(owner, requester, projectOwner, contentId, project)) {
+                if (!isProjectItemDeletable(owner, requester, projectOwner, contentId, projectItem)) {
                     throw new UnAuthorizedException(errorMsg);
                 }
                 break;
             case UPDATE:
-                if (!isProjectItemEditable(owner, requester, projectOwner, contentId, project)) {
+                if (!isProjectItemEditable(owner, requester, projectOwner, contentId, projectItem)) {
                     throw new UnAuthorizedException(errorMsg);
                 }
                 break;

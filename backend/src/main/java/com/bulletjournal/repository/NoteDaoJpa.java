@@ -180,7 +180,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         String noteBeforeUpdate = GSON.toJson(noteAsPresentationModel);
 
         this.authorizationService.checkAuthorizedToOperateOnContent(note.getOwner(), requester, ContentType.NOTE,
-                Operation.UPDATE, noteId, note.getProject());
+                Operation.UPDATE, noteId, note);
 
         DaoHelper.updateIfPresent(updateNoteParams.hasName(), updateNoteParams.getName(),
                 (value) -> note.setName(value));
@@ -279,7 +279,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         }
 
         this.authorizationService.checkAuthorizedToOperateOnContent(note.getOwner(), requester, ContentType.NOTE,
-                Operation.UPDATE, project.getId(), project);
+                Operation.UPDATE, note.getId(), note);
 
         note.setProject(project);
         noteRepository.save(note);
@@ -358,7 +358,7 @@ public class NoteDaoJpa extends ProjectItemDaoJpa<NoteContent> {
         Note note = this.getProjectItem(noteId, requester);
 
         this.authorizationService.checkAuthorizedToOperateOnContent(note.getOwner(), requester, ContentType.NOTE,
-                Operation.UPDATE, noteId, note.getProject());
+                Operation.UPDATE, noteId, note);
         note.setColor(color);
         this.noteRepository.save(note);
     }

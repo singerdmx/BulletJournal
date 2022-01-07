@@ -80,18 +80,18 @@ public class Note extends ProjectItemModel<com.bulletjournal.controller.models.N
                 this.getUpdatedAt().getTime(),
                 this.getLocation(),
                 this.getColor(),
-            authorizationService.isProjectItemEditable(
-                this.getOwner(),
-                requester,
-                this.getProject().getOwner(),
-                this.getId(),
-                this.getProject()),
-            authorizationService.isProjectItemDeletable(
-                this.getOwner(),
-                requester,
-                this.getProject().getOwner(),
-                this.getId(),
-                this.getProject())
+                authorizationService.isProjectItemEditable(
+                        this.getOwner(),
+                        requester,
+                        this.getProject().getOwner(),
+                        this.getId(),
+                        this),
+                authorizationService.isProjectItemDeletable(
+                        this.getOwner(),
+                        requester,
+                        this.getProject().getOwner(),
+                        this.getId(),
+                        this)
         );
         note.setShared(this.isShared());
         return note;

@@ -392,7 +392,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
         Long projectId = project.getId();
 
         this.authorizationService.checkAuthorizedToOperateOnContent(transaction.getOwner(), requester,
-                ContentType.TRANSACTION, Operation.DELETE, projectId, project);
+                ContentType.TRANSACTION, Operation.DELETE, transactionId, transaction);
 
         if (transaction.hasBankAccount()) {
             this.bankAccountBalanceRepository.deleteById(transaction.getBankAccount().getId());
@@ -443,7 +443,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
             throw new BadRequestException("Cannot move to Project Type " + project.getType());
         }
         this.authorizationService.checkAuthorizedToOperateOnContent(projectItem.getOwner(), requester,
-                ContentType.TRANSACTION, Operation.UPDATE, targetProject, project);
+                ContentType.TRANSACTION, Operation.UPDATE, projectItem.getId(), projectItem);
         projectItem.setProject(project);
         this.getJpaRepository().save(projectItem);
         return Pair.of(projectItem, project);
@@ -519,7 +519,7 @@ public class TransactionDaoJpa extends ProjectItemDaoJpa<TransactionContent> {
     public void setColor(String requester, Long transactionId, String color) {
         Transaction transaction = this.getProjectItem(transactionId, requester);
         this.authorizationService.checkAuthorizedToOperateOnContent(transaction.getOwner(), requester,
-                ContentType.TRANSACTION, Operation.UPDATE, transactionId, transaction.getProject());
+                ContentType.TRANSACTION, Operation.UPDATE, transactionId, transaction);
         transaction.setColor(color);
         this.transactionRepository.save(transaction);
     }
