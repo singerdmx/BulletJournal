@@ -179,7 +179,7 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
       <Divider style={{marginTop: '0px'}}/>
       <div className="note-content">
         <div className="content-list">
-          {contents.length > 1
+          {note.editable && contents.length > 1
           && !isPublic
           && <Tooltip title="Reorder Contents">
             <Button
@@ -192,7 +192,7 @@ const NoteDetailPage: React.FC<NoteProps & NoteDetailProps> = (props) => {
           </Tooltip>}
           <NoteContentList projectItem={note} contents={contents} />
         </div>
-        {getReorderContextsModal()}
+        {note.editable && getReorderContextsModal()}
         {createContentElem}
       </div>
       {noteEditorElem}

@@ -278,7 +278,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
         <Divider style={{marginTop: '0px'}}/>
         <div className="task-content">
             <div className="content-list">
-                {contents.length > 1
+                {task.editable && contents.length > 1
                 && !isPublic
                 && <Tooltip title="Reorder Contents">
                     <Button
@@ -295,7 +295,7 @@ const TaskDetailPage: React.FC<TaskProps & TaskDetailProps> = (props) => {
                     contentEditable={contentEditable}
                 />
             </div>
-            {getReorderContextsModal()}
+            {task.editable && getReorderContextsModal()}
             {createContentElem}
         </div>
         {taskEditorElem}

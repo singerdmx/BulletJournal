@@ -443,6 +443,10 @@ public abstract class ProjectItemDaoJpa<K extends ContentModel> {
     public <T extends ProjectItemModel> void setContentsOrder(
             String requester, Long projectItemId, List<Long> contentsOrder) {
         T projectItem = getProjectItem(projectItemId, requester);
+        this.authorizationService.checkAuthorizedToOperateOnContent(
+                projectItem.getOwner(), requester, projectItem.getContentType(),
+                Operation.UPDATE, projectItemId, projectItem
+        );
         projectItem.setContentsOrder(GSON.toJson(contentsOrder));
         this.getJpaRepository().save(projectItem);
     }

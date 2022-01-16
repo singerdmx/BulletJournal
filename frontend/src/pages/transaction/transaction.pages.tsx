@@ -470,7 +470,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
       <Divider style={{marginTop: '5px'}}/>
       <div className="tran-content">
         <div className="content-list">
-          {contents.length > 1
+          {transaction.editable && contents.length > 1
           && <Tooltip title="Reorder Contents">
             <Button
                 type="primary"
@@ -485,7 +485,7 @@ const TransactionPage: React.FC<TransactionPageHandler & TransactionProps> = (
             contents={contents}
           />
         </div>
-        {getReorderContextsModal()}
+        {transaction.editable && getReorderContextsModal()}
         {createContentElem}
       </div>
       <div className="transaction-drawer">
