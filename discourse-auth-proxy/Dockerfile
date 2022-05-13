@@ -9,6 +9,6 @@ RUN go get && go build
 FROM alpine:latest
 COPY bulletjournal.us.cert /bin/
 COPY bulletjournal.us.key /bin/
-COPY --from=builder /go/bin/discourse-auth-proxy /bin/
+COPY --from=builder /go/src/github.com/discourse/discourse-auth-proxy/discourse-auth-proxy /bin/
 COPY start.sh /bin/start.sh
 CMD ["/bin/start.sh"]
